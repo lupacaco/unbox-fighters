@@ -1,39 +1,43 @@
 # Godot MCP (assistente ligado ao editor)
 
-MCP = uma “ponte” que deixa a IA mexer no Godot aberto (cenas, nós, play, erros), parecido com o Unity MCP.
+MCP = ponte entre o Cursor e o Godot aberto (cenas, nós, play, erros, export).
 
-## Vale a pena?
+## Opção escolhida (grátis)
 
-**Sim**, para este projeto. Hoje eu já edito arquivos direto; com MCP eu também consigo:
-- ver a árvore da cena ao vivo
-- apertar Play / ver erros do editor
-- testar cliques e inspecionar o jogo rodando
-- exportar com mais confiança
+**[KeeVeeG/godot-mcp](https://github.com/KeeVeeG/godot-mcp)** — MIT, grátis, testado com **Godot 4.7**, 300+ tools.
 
-## O link que você achou
+Por que esta:
+- Gratuita
+- Feita para Godot 4.7 (a nossa versão)
+- Ligação ao editor ao vivo (não só arquivos)
+- Setup simples no Cursor com `npx`
 
-[Godot MCP Pro (Asset Library)](https://godotengine.org/asset-library/asset/4961) — pago (~US$ 15, compra única).  
-Site: [godot-mcp.abyo.net](https://godot-mcp.abyo.net/) · itch: [y1uda.itch.io/godot-mcp-pro](https://y1uda.itch.io/godot-mcp-pro)
+Alternativas que consideramos: Godot MCP Pro (pago) e [Godot AI](https://github.com/hi-godot/godot-ai) (também grátis).
 
-- Plugin no Godot: parte pública no GitHub  
-- Servidor MCP completo: no pacote pago  
+## O que já está no projeto
 
-## Alternativas (gratuitas / open source)
+1. Plugin em `addons/godot_mcp/` (ativo em `project.godot`)
+2. Config Cursor: `.cursor/mcp.json`
 
-| Opção | Notas |
-|-------|--------|
-| [Godot AI (Asset Lib #5050)](https://godotengine.org/asset-library/asset/5050) / [hi-godot/godot-ai](https://github.com/hi-godot/godot-ai) | Popular, setup com Cursor, Godot 4.5+ |
-| [KeeVeeG/godot-mcp](https://github.com/KeeVeeG/godot-mcp) | Muitas tools, Godot 4.x / testado com 4.7 |
+## Como ativar (uma vez)
 
-Não existe MCP **oficial** da Godot — tudo é comunidade.
+1. **Abra o projeto no Godot 4.7**
+2. Confirme: **Projeto → Configurações do Projeto → Plugins → Godot MCP = Ativo**
+3. **Reinicie o Cursor** (para ler o `.cursor/mcp.json`)
+4. No Godot, olhe o painel **MCP** embaixo — deve mostrar conexão
+5. No Cursor: Settings → MCP → servidor `godot` deve aparecer conectado
 
-## Recomendação prática
+Com o Godot **aberto** e o plugin ativo, eu consigo usar as tools do MCP.
 
-1. Se quiser o mais simples pago e focado: **Godot MCP Pro**  
-2. Se preferir grátis: testar **Godot AI** ou **KeeVeeG/godot-mcp**  
+## Se não conectar
 
-Quando você escolher um, eu ajudo a instalar e conectar no Cursor.
+- Godot precisa estar aberto com este projeto
+- Plugin ativo
+- Cursor reiniciado depois do `mcp.json`
+- Portas localhost 6505–6514 livres
+- Node.js instalado (já está nesta máquina)
 
-## Relação com Unity MCP
+## Docs oficiais do addon
 
-No Cursor ainda aparece o Unity MCP; este projeto é **Godot**. O ideal é ter um **Godot MCP** ativo enquanto trabalhamos aqui.
+- Repo: https://github.com/KeeVeeG/godot-mcp  
+- Catálogo de tools: https://nikita-abaturov.ru/godot-mcp/tools.html
