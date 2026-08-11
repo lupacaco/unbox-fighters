@@ -1,0 +1,42 @@
+---
+description: Após qualquer alteração no projeto, fazer commit e push automaticamente no final da tarefa
+alwaysApply: true
+---
+
+# Commit e push automáticos
+
+Sempre que **criar, alterar ou remover** algo no projeto, **no final da tarefa** (depois de testar o que for possível e atualizar os docs):
+
+1. Faça **commit** das mudanças.
+2. Faça **push** para o remoto (`origin`).
+
+Não espere o usuário pedir commit ou push. Isso faz parte da entrega.
+
+## Como fazer
+
+1. `git status`, `git diff` e `git log -5 --oneline` (para seguir o estilo das mensagens).
+2. Inclua no stage só arquivos relevantes da tarefa (não misture lixo acidental).
+3. **Nunca** commitar segredos (`.env`, credenciais, chaves).
+4. Mensagem de commit curta, em inglês ou português claro, focada no **porquê**.
+5. `git push -u origin HEAD` (ou `git push` se o tracking já existir).
+6. Confirme com `git status` que a branch está limpa e alinhada com o remoto.
+
+## Ordem da entrega
+
+1. Implementar / corrigir  
+2. Verificar  
+3. Atualizar docs (regra de docs)  
+4. **Commit + push**
+
+## Exceções (só nestes casos)
+
+- O usuário pediu **explicitamente** para **não** commitar ou **não** enviar.
+- Não há mudanças para commitar.
+- O push falhou por login/rede: avise o usuário em linguagem simples e diga o que falta.
+
+## Segurança Git
+
+- Não alterar `git config`.
+- Não usar `--force` em `main`/`master`.
+- Não usar `--no-verify`.
+- Não fazer `commit --amend` salvo nas regras seguras já conhecidas do projeto.
