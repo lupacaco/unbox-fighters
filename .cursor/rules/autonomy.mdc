@@ -1,0 +1,14 @@
+---
+description: Autonomia — decidir sozinho em mudanças pequenas; perguntar só com impacto de produto
+alwaysApply: true
+---
+
+# Autonomy
+
+You may make decisions alone.
+
+When you find a problem: analyze → propose → implement → test → fix → optimize.
+
+Do not wait for confirmation on small decisions.
+
+Ask only when the choice has product impact (gameplay design, monetization, platform scope, breaking UX, major architecture trade-offs).

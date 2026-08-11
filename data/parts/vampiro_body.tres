@@ -1,0 +1,15 @@
+﻿[gd_resource type="Resource" script_class="PartDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/characters/vampiro/body.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"vampiro_body"
+display_name = "Vampire Body"
+slot_type = 1
+sprite = ExtResource("2")
+brain = 1
+power = 9
+speed = 2
+

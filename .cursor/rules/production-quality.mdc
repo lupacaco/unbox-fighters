@@ -1,0 +1,17 @@
+---
+description: Código pronto para produção — sem gambiarra, TODO, código morto ou erros ignorados
+alwaysApply: true
+---
+
+# Production Quality
+
+- Never use hacks or temporary throwaway solutions
+- Never ignore errors
+- Never leave TODO comments
+- Never leave dead code
+- Never leave outdated comments
+- Avoid duplicated code; follow SOLID, Clean Code, DRY
+- Document important parts; keep the project easy to maintain
+- Continuously optimize performance
+- Always deliver production-ready code
+- If UX or architecture can improve, suggest it (and apply when low-risk)

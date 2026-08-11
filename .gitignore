@@ -1,0 +1,43 @@
+# Godot 4+
+.godot/
+.import/
+export.cfg
+export_presets.cfg
+
+# Imported / generated
+*.translation
+
+# Mono / C# (if ever used)
+.mono/
+data_*/
+mono_crash.*.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+*~
+*.swp
+
+# IDE
+.vs/
+.vscode/
+*.code-workspace
+
+# Builds / exports
+builds/
+dist/
+*.apk
+*.aab
+*.ipa
+*.exe
+*.dll
+*.pck
+*.zip
+
+# Local secrets (never commit)
+.env
+.env.*
+*.pem
+credentials.json

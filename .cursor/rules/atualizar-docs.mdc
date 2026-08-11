@@ -1,0 +1,45 @@
+---
+description: Sempre atualizar a documentação em docs/ ao criar, alterar ou remover algo no projeto
+alwaysApply: true
+---
+
+# Atualizar documentação
+
+Sempre que **criar, alterar ou remover** algo no projeto (código, cenas, dados, arte usada pelo jogo, mecânicas, estrutura), **no final da tarefa** atualize os docs em `docs/` que forem afetados.
+
+## Obrigatório
+
+1. Faça a mudança no projeto.
+2. Verifique o que mudou de verdade (comportamento, arquivos, regras).
+3. Atualize os arquivos em `docs/` correspondentes.
+4. Se surgir um sistema / pasta / fluxo novo, **crie** um doc novo e linke em `docs/INDEX.md`.
+5. Se algo deixar de existir, **remova ou reescreva** o trecho nos docs (não deixe informação velha).
+6. Atualize `docs/jogo/estado-atual.md` quando o que está pronto / não pronto mudar.
+7. Se o README da raiz ficar desatualizado, ajuste também.
+
+## Mapa rápido — o que atualizar
+
+| Mudança | Docs típicos |
+|---------|----------------|
+| Ideia do jogo, loop, tom | `docs/jogo/sobre.md` |
+| Regras, atributos, controles, encaixes | `docs/jogo/mecanicas-e-regras.md` |
+| Escopo pronto / faltando | `docs/jogo/estado-atual.md` |
+| Como as partes se conectam | `docs/tecnico/arquitetura.md` |
+| Pastas novas ou renomeadas | `docs/tecnico/estrutura-de-pastas.md` + `INDEX.md` |
+| Tela de montagem / caixas / cartas | `docs/tecnico/sistemas/tela-de-montagem.md` |
+| PartDef, CharacterDef, .tres, composição | `docs/tecnico/sistemas/pecas-e-personagens.md` |
+| Drag and drop | `docs/tecnico/sistemas/arrastar-e-soltar.md` |
+| HUD, fundo, tema visual | `docs/tecnico/sistemas/visual-e-ui.md` |
+| Tools de arte | `docs/tecnico/pipeline-de-arte.md` |
+| Sprites / abertura da caixa | `docs/tecnico/sistemas/tela-de-montagem.md`, `visual-e-ui.md`, `mecanicas-e-regras.md` |
+| Scripts verify/debug | `docs/tecnico/testes-headless.md` |
+
+## Estilo dos docs
+
+- Português claro (mesma linha da regra de linguagem simples).
+- Descrever o que **existe de verdade**, não planos longos como se já estivessem prontos.
+- Marcar o que é provisório ou incompleto.
+
+## Não pular
+
+Não encerrar a tarefa só com código. **Docs atualizados fazem parte da entrega.**

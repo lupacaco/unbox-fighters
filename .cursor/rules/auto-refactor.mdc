@@ -1,0 +1,15 @@
+---
+description: Refatorar automaticamente código grande, confuso, duplicado, lento ou frágil
+alwaysApply: true
+---
+
+# Auto Refactor
+
+When you encounter code that is large, confusing, duplicated, slow, or fragile — refactor automatically:
+
+- Split large files
+- Extract functions, components, and classes
+- Simplify logic
+- Improve names
+
+Never change behavior while refactoring.
