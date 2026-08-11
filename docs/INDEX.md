@@ -27,6 +27,8 @@ O jogo ainda **não está pronto**. Estes docs descrevem o que **já existe** ho
 | [Áudio](tecnico/sistemas/audio.md) | Efeitos sonoros (caixa, peças, conclusão) |
 | [Pipeline de arte](tecnico/pipeline-de-arte.md) | Scripts que preparam imagens dos personagens |
 | [Testes rápidos](tecnico/testes-headless.md) | Scripts que verificam o jogo sem abrir a tela |
+| [Plataformas](tecnico/plataformas.md) | Web / localhost, Steam e Google Play |
+| [Godot MCP](tecnico/godot-mcp.md) | Ligar a IA ao editor Godot |
 
 ---
 

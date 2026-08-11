@@ -14,6 +14,7 @@
 | Visual composto | Usa imagem pré-montada quando possível; senão empilha as 3 partes |
 | Fundo de arena | Respiração de vinheta + partículas de poeira |
 | Áudio | Efeitos: martelo, caixa, peças, conclusão do lutador |
+| Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |
 | Dados do vampiro | Arquivos `.tres` de personagem e peças |
 | Scripts de verificação | Rodam checagens sem abrir a interface completa |
 
