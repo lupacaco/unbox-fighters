@@ -7,12 +7,13 @@
 | Área | Situação |
 |------|----------|
 | Tela de montagem | Funciona como cena principal |
-| Abrir caixas | 2 cliques com 3 sprites + cursor martelo no hover/batida |
-| Arrastar e soltar | Mouse, com destaque no encaixe válido |
+| Abrir caixas | 2 cliques com 3 sprites + cursor martelo + SFX |
+| Arrastar e soltar | Mouse, com destaque no encaixe válido + SFX |
 | 3 cartas de personagem | Montagem cabeça / tronco / pernas |
 | Atributos BRN / PWR / SPD | Somam ao encaixar |
 | Visual composto | Usa imagem pré-montada quando possível; senão empilha as 3 partes |
 | Fundo de arena | Respiração de vinheta + partículas de poeira |
+| Áudio | Efeitos: martelo, caixa, peças, conclusão do lutador |
 | Dados do vampiro | Arquivos `.tres` de personagem e peças |
 | Scripts de verificação | Rodam checagens sem abrir a interface completa |
 
@@ -29,7 +30,7 @@
 
 - Combate / luta
 - Multiplayer
-- Áudio
+- Áudio de música de fundo / menu de volume
 - Menus / navegação entre telas
 - Salvamento / progressão
 - Economia (moeda, loja)

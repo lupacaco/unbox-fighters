@@ -32,6 +32,7 @@ Sempre que **criar, alterar ou remover** algo no projeto (código, cenas, dados,
 | HUD, fundo, tema visual | `docs/tecnico/sistemas/visual-e-ui.md` |
 | Tools de arte | `docs/tecnico/pipeline-de-arte.md` |
 | Sprites / abertura da caixa | `docs/tecnico/sistemas/tela-de-montagem.md`, `visual-e-ui.md`, `mecanicas-e-regras.md` |
+| Áudio / SFX | `docs/tecnico/sistemas/audio.md` |
 | Scripts verify/debug | `docs/tecnico/testes-headless.md` |
 
 ## Estilo dos docs

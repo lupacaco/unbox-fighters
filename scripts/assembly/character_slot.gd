@@ -78,6 +78,7 @@ func _zone_contains(slot: PartSlotType.Value, global_point: Vector2) -> bool:
 func try_attach(part_view: PartView) -> bool:
 	if not can_accept(part_view.part_def):
 		return false
+	var was_complete := _has_head and _has_body and _has_legs
 	var slot := part_view.part_def.slot_type
 	_set_flag(slot, true)
 	_bound_parts[slot] = part_view
@@ -86,6 +87,10 @@ func try_attach(part_view: PartView) -> bool:
 	_refresh_display(true)
 	_update_stats()
 	_pulse_attach()
+	GameAudio.part_place()
+	var now_complete := _has_head and _has_body and _has_legs
+	if now_complete and not was_complete:
+		GameAudio.fighter_complete()
 	part_attached.emit(self, part_view.part_def)
 	return true
 

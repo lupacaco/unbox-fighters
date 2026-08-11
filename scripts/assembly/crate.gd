@@ -60,13 +60,16 @@ func _input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 
 func _on_clicked() -> void:
 	HammerCursor.strike()
+	GameAudio.hammer_hit()
 	if _hits == 0:
 		_hits = 1
 		_apply_stage_art(TEX_CRACKED)
+		GameAudio.crate_crack()
 		_play_hit_feedback()
 		return
 	if _hits == 1:
 		_hits = 2
+		GameAudio.crate_break()
 		_finish_open()
 
 func _clear_hover_cursor() -> void:

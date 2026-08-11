@@ -8,8 +8,6 @@
 
 config_version=5
 
-"ï»¿config_version"=5
-
 [application]
 
 config/name="Unbox Fighters"
@@ -17,6 +15,10 @@ config/description="Character assembly and unboxing fighters"
 run/main_scene="res://scenes/assembly/Assembly.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+Sfx="*res://scripts/audio/sfx.gd"
 
 [display]
 

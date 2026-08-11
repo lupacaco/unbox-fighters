@@ -11,6 +11,7 @@ unbox-fighters/
 ├── assets/                # Arte (imagens)
 │   ├── boxes/             # Sprites da caixa (intacta / trincada / quebrada)
 │   ├── objects/           # Objetos de UI (martelo do cursor)
+│   ├── audio/sfx/         # Efeitos sonoros (.wav)
 │   ├── characters/vampiro/
 │   └── ui/
 ├── data/                  # Dados do jogo (.tres)

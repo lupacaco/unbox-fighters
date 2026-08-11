@@ -52,6 +52,7 @@ Quando cabeça + tronco + pernas estão encaixados, o nome real do personagem ap
 ## Controles atuais
 
 - Mouse: passar por cima da caixa troca o cursor para o martelo; clicar bate (`hammer-02` por 0,2 s). Arrastar e soltar peças.
+- Sons acompanham batida, quebra, pegar peça, encaixar, errar e completar o lutador.
 - Não há controle de gamepad / teclado de gameplay além disso (por enquanto).
 
 ## O que ainda não é regra de jogo

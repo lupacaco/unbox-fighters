@@ -19,6 +19,7 @@ func begin_drag(part: PartView) -> void:
 	_dragging = part
 	set_process(true)
 	part.begin_drag()
+	GameAudio.part_pickup()
 	drag_started.emit(part)
 
 func _process(_delta: float) -> void:
@@ -61,6 +62,7 @@ func _finish_drag() -> void:
 			part.cancel_drag_return()
 		else:
 			part.return_to_tray()
+		GameAudio.part_reject()
 	drag_ended.emit(part, accepted)
 
 func notify_drag_process_needed() -> void:

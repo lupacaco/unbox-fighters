@@ -29,6 +29,7 @@ Arte e recursos (assets/, data/)
 | `CharacterSlot` | Carta com zonas de cabeça/tronco/pernas, visual e atributos |
 | `CompositeResolver` | Decide se mostra imagem já montada ou as 3 partes empilhadas |
 | `StatReadout` / `BackgroundFX` | HUD de atributos e fundo |
+| `Sfx` (autoload) | Toca efeitos sonoros curtos |
 
 ## Organização dos scripts
 

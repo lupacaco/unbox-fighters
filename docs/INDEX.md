@@ -24,6 +24,7 @@ O jogo ainda **não está pronto**. Estes docs descrevem o que **já existe** ho
 | [Peças e personagens](tecnico/sistemas/pecas-e-personagens.md) | Dados dos personagens e composição visual |
 | [Arrastar e soltar](tecnico/sistemas/arrastar-e-soltar.md) | Como o jogador move peças para as cartas |
 | [Visual e UI](tecnico/sistemas/visual-e-ui.md) | Interface, fundo, cores e sprites das caixas |
+| [Áudio](tecnico/sistemas/audio.md) | Efeitos sonoros (caixa, peças, conclusão) |
 | [Pipeline de arte](tecnico/pipeline-de-arte.md) | Scripts que preparam imagens dos personagens |
 | [Testes rápidos](tecnico/testes-headless.md) | Scripts que verificam o jogo sem abrir a tela |
 
