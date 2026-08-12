@@ -8,6 +8,15 @@ const BODY_ORIGIN := Vector2(0, -8)
 const PART_SIZE_PX := 150.0
 
 static func resolve(character: CharacterDef, has_head: bool, has_body: bool, has_legs: bool) -> Dictionary:
+	if character == null:
+		return resolve_parts(null, null, null)
+	return resolve_parts(
+		character.head if has_head else null,
+		character.body if has_body else null,
+		character.legs if has_legs else null
+	)
+
+static func resolve_parts(head: PartDef, body: PartDef, legs: PartDef) -> Dictionary:
 	var empty := {
 		"mode": "empty",
 		"head": null,
@@ -18,12 +27,10 @@ static func resolve(character: CharacterDef, has_head: bool, has_body: bool, has
 		"legs_pos": Vector2.ZERO,
 		"part_size_px": PART_SIZE_PX,
 	}
-	if character == null:
-		return empty
 
-	var head_tex: Texture2D = character.head.sprite if has_head and character.head != null else null
-	var body_tex: Texture2D = character.body.sprite if has_body and character.body != null else null
-	var legs_tex: Texture2D = character.legs.sprite if has_legs and character.legs != null else null
+	var head_tex: Texture2D = head.sprite if head != null else null
+	var body_tex: Texture2D = body.sprite if body != null else null
+	var legs_tex: Texture2D = legs.sprite if legs != null else null
 
 	if head_tex == null and body_tex == null and legs_tex == null:
 		return empty
@@ -32,19 +39,17 @@ static func resolve(character: CharacterDef, has_head: bool, has_body: bool, has
 	var head_pos := Vector2(0, -138)
 	var legs_pos := Vector2(0, 118)
 
-	if body_tex != null and character.body != null:
+	if body_tex != null and body != null:
 		var body_scale := _scale_for(body_tex, PART_SIZE_PX)
-		if head_tex != null and character.head != null:
+		if head_tex != null and head != null:
 			var head_scale := _scale_for(head_tex, PART_SIZE_PX)
-			# body.magnet_up snaps to head.magnet_down
-			var body_up := character.body.magnet_up * body_scale
-			var head_down := character.head.magnet_down * head_scale
+			var body_up := body.magnet_up * body_scale
+			var head_down := head.magnet_down * head_scale
 			head_pos = body_pos + body_up - head_down
-		if legs_tex != null and character.legs != null:
+		if legs_tex != null and legs != null:
 			var legs_scale := _scale_for(legs_tex, PART_SIZE_PX)
-			# body.magnet_down snaps to legs.magnet_up
-			var body_down := character.body.magnet_down * body_scale
-			var legs_up := character.legs.magnet_up * legs_scale
+			var body_down := body.magnet_down * body_scale
+			var legs_up := legs.magnet_up * legs_scale
 			legs_pos = body_pos + body_down - legs_up
 	elif head_tex != null and legs_tex == null:
 		head_pos = Vector2(0, -80)

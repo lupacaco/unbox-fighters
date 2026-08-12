@@ -22,8 +22,7 @@ Como o jogador move peças até as cartas.
 ## Regras de aceite (`CharacterSlot.can_accept`)
 
 - A peça não pode ser nula
-- O slot daquele tipo ainda está vazio
-- O `id` da peça é o mesmo da peça esperada no `CharacterDef`
+- O slot daquele tipo ainda está vazio (qualquer peça do tipo certo serve em qualquer carta)
 
 ## Sinais úteis
 

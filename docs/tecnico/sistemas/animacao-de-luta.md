@@ -2,18 +2,18 @@
 
 Por enquanto **não há oponente**. O botão **LUTAR** só mostra uma animação de showcase no shelf (a prateleira).
 
-## Quando o botão aparece
+## Quando o botão libera
 
-- Só em personagens que têm poses de **perfil** e **ataque** nas 3 peças (hoje: policial).
-- Só fica clicável quando a carta está **completa** (cabeça + tronco + pernas).
+- Aparece em **todas** as cartas.
+- Só fica clicável quando a carta está **completa** e as 3 peças encaixadas têm poses de perfil e ataque (hoje: set do policial).
 
 ## Sequência ao clicar
 
 1. Peças e caixas do shelf **deslizam para fora** da tela e somem.
-2. O lutador **pula** da carta e **cai com força** no shelf (vista de frente).
-3. Espera **2 s**.
-4. Troca para vista de **perfil** (sprites `-2` / `sprite_profile`).
-5. Espera **2 s**.
+2. O lutador **pula** da carta e **cai com força** no **canto esquerdo** do shelf (vista de frente).
+3. Vira de **perfil** (`sprite_profile` / pose `-2`).
+4. **Anda até o meio** do shelf. A cada passo, as 3 partes intercalam `-2` e `-3` (`sprite_profile` ↔ `sprite_attack`).
+5. Para no meio com todas em `-2`.
 6. Lança como bumerangue (vai e volta), nesta ordem:
    - cabeça (`sprite_attack`)
    - tronco

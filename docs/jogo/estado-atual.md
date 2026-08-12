@@ -23,8 +23,9 @@
 
 | Item | Observação |
 |------|------------|
-| 3 cartas | Esquerda e direita = vampiro; centro = policial |
+| 3 cartas | Cartas em branco: qualquer peça encaixa em qualquer carta |
 | Loot das 6 caixas | Set completo vampiro + set completo policial |
+| Botão LUTAR | Libera quando as 3 peças encaixadas têm poses de perfil/ataque |
 | ThemeTokens | Cores definidas no código, mas pouco (ou não) usadas nas cenas |
 | Arte PNG + WEBP | As duas formatos existem para os mesmos sprites |
 

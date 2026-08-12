@@ -15,7 +15,7 @@ var _slot_scene: PackedScene = preload("res://scenes/assembly/CharacterSlot.tscn
 
 var _vampiro: CharacterDef
 var _policial: CharacterDef
-var _card_characters: Array[CharacterDef] = []
+var _roster: Array[CharacterDef] = []
 var _reward_parts: Array[PartDef] = []
 var _slots: Array[CharacterSlot] = []
 var _fight_director: FightDirector
@@ -34,8 +34,7 @@ func _ready() -> void:
 func _build_character_data() -> void:
 	_vampiro = load("res://data/parts/vampiro_character.tres") as CharacterDef
 	_policial = load("res://data/parts/policial_character.tres") as CharacterDef
-	# Left / center / right cards: vampiro, policial, vampiro
-	_card_characters = [_vampiro, _policial, _vampiro]
+	_roster = [_vampiro, _policial]
 	# 6 crates = full set for vampiro + full set for policial
 	_reward_parts = [
 		_vampiro.head,
@@ -62,7 +61,8 @@ func _spawn_slots() -> void:
 		var slot := _slot_scene.instantiate() as CharacterSlot
 		_slots_root.add_child(slot)
 		slot.position = Vector2(xs[i], 400)
-		slot.setup(_card_characters[i])
+		# Blank cards: any head/body/legs can be mounted on any slot.
+		slot.setup(null, _roster)
 		slot.fight_pressed.connect(_on_slot_fight_pressed)
 		slot.play_intro(0.12 * float(i))
 		_slots.append(slot)

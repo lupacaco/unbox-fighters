@@ -8,13 +8,19 @@ signal finished
 const CLEAR_DURATION := 0.45
 const JUMP_UP_DURATION := 0.28
 const JUMP_DOWN_DURATION := 0.34
-const HOLD_FRONT_SEC := 2.0
-const HOLD_PROFILE_SEC := 2.0
+const HOLD_AFTER_LAND_SEC := 0.35
+const HOLD_PROFILE_SEC := 0.35
+const WALK_STEPS := 5
+const WALK_STEP_DURATION := 0.22
+const HOLD_BEFORE_ATTACK_SEC := 0.45
 const BOOMERANG_OUT := 0.28
 const BOOMERANG_BACK := 0.34
 const BOOMERANG_DIST := 320.0
 const RETURN_JUMP_UP := 0.26
 const RETURN_JUMP_DOWN := 0.32
+const SHELF_Y := -150.0
+const SHELF_LEFT_X := -520.0
+const SHELF_MID_X := 0.0
 
 var _busy: bool = false
 
@@ -27,7 +33,7 @@ func play(
 	fx_layer: Node2D,
 	drag_service: DragDropService
 ) -> void:
-	if _busy or slot == null or not slot.is_complete() or not slot.character.can_fight():
+	if _busy or slot == null or not slot.can_fight():
 		return
 	_busy = true
 	if drag_service != null and drag_service.has_method("set_locked"):
@@ -39,43 +45,51 @@ func play(
 
 	var puppet := FighterPuppet.new()
 	fx_layer.add_child(puppet)
-	puppet.setup(slot.character)
+	puppet.setup_parts(
+		slot.get_attached_part(PartSlotType.Value.HEAD),
+		slot.get_attached_part(PartSlotType.Value.BODY),
+		slot.get_attached_part(PartSlotType.Value.LEGS)
+	)
 	puppet.global_position = slot.get_fighter_global_position()
 	puppet.modulate.a = 1.0
 	puppet.scale = Vector2.ONE
 
-	var land_pos := tray.global_position + Vector2(0.0, -150.0)
+	var left_pos := tray.global_position + Vector2(SHELF_LEFT_X, SHELF_Y)
+	var mid_pos := tray.global_position + Vector2(SHELF_MID_X, SHELF_Y)
 	var peak := Vector2(
-		lerpf(puppet.global_position.x, land_pos.x, 0.5),
-		minf(puppet.global_position.y, land_pos.y) - 220.0
+		lerpf(puppet.global_position.x, left_pos.x, 0.5),
+		minf(puppet.global_position.y, left_pos.y) - 220.0
 	)
 
-	# Leap onto the shelf (front pose).
+	# Leap onto the LEFT side of the shelf (front pose).
 	var leap := create_tween()
-	leap.set_parallel(false)
 	leap.tween_property(puppet, "global_position", peak, JUMP_UP_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	leap.tween_property(puppet, "global_position", land_pos, JUMP_DOWN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	leap.tween_property(puppet, "global_position", left_pos, JUMP_DOWN_DURATION).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	await leap.finished
 	await _land_impact(puppet, tray)
+	await get_tree().create_timer(HOLD_AFTER_LAND_SEC).timeout
 
-	await get_tree().create_timer(HOLD_FRONT_SEC).timeout
-
-	# Turn to profile.
+	# Turn to profile, then walk to the middle alternating pose -2 / -3 each step.
 	puppet.set_pose(FighterPuppet.Pose.PROFILE)
 	await get_tree().create_timer(HOLD_PROFILE_SEC).timeout
+	await _walk_to_center(puppet, left_pos, mid_pos)
+
+	puppet.set_pose(FighterPuppet.Pose.PROFILE)
+	await get_tree().create_timer(HOLD_BEFORE_ATTACK_SEC).timeout
 
 	# Boomerang attacks: head → body → legs.
 	for part_slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
 		await _boomerang_part(puppet, part_slot)
 
 	# Jump back to the card.
+	var return_target := slot.get_fighter_global_position()
 	var return_peak := Vector2(
-		lerpf(puppet.global_position.x, slot.get_fighter_global_position().x, 0.5),
-		minf(puppet.global_position.y, slot.get_fighter_global_position().y) - 220.0
+		lerpf(puppet.global_position.x, return_target.x, 0.5),
+		minf(puppet.global_position.y, return_target.y) - 220.0
 	)
 	var back := create_tween()
 	back.tween_property(puppet, "global_position", return_peak, RETURN_JUMP_UP).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	back.tween_property(puppet, "global_position", slot.get_fighter_global_position(), RETURN_JUMP_DOWN).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	back.tween_property(puppet, "global_position", return_target, RETURN_JUMP_DOWN).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	await back.finished
 
 	puppet.queue_free()
@@ -85,6 +99,19 @@ func play(
 		drag_service.set_locked(false)
 	_busy = false
 	finished.emit()
+
+func _walk_to_center(puppet: FighterPuppet, from_pos: Vector2, to_pos: Vector2) -> void:
+	for i in WALK_STEPS:
+		var t := float(i + 1) / float(WALK_STEPS)
+		var next_pos := from_pos.lerp(to_pos, t)
+		# Alternate -2 / -3 every step (profile ↔ attack on all parts).
+		puppet.set_stride_frame((i % 2) == 0)
+		var bob := next_pos + Vector2(0.0, -10.0 if (i % 2) == 0 else 0.0)
+		var step := create_tween()
+		step.tween_property(puppet, "global_position", bob, WALK_STEP_DURATION * 0.55).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		step.tween_property(puppet, "global_position", next_pos, WALK_STEP_DURATION * 0.45).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		await step.finished
+	puppet.global_position = to_pos
 
 func _clear_shelf(tray: Node2D) -> void:
 	var fleeing: Array[Node2D] = []

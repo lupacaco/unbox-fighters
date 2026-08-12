@@ -26,6 +26,7 @@ const PART_SIZE_PX := 150.0
 @onready var _fight_button: Button = $FightButton
 
 var character: CharacterDef
+var _roster: Array[CharacterDef] = []
 var _has_head: bool = false
 var _has_body: bool = false
 var _has_legs: bool = false
@@ -34,8 +35,9 @@ var _crossfade_busy: bool = false
 var _rest_y: float = 0.0
 var _fight_locked: bool = false
 
-func setup(def: CharacterDef) -> void:
+func setup(def: CharacterDef = null, roster: Array[CharacterDef] = []) -> void:
 	character = def
+	_roster = roster
 	_rest_y = position.y
 	_readout.set_display_name("???")
 	_readout.set_stats(0, 0, 0)
@@ -51,8 +53,23 @@ func setup(def: CharacterDef) -> void:
 func is_complete() -> bool:
 	return _has_head and _has_body and _has_legs
 
+func get_attached_part(slot: PartSlotType.Value) -> PartDef:
+	if not _bound_parts.has(slot):
+		return null
+	var view: PartView = _bound_parts[slot]
+	return view.part_def if view != null else null
+
+func attached_parts_can_fight() -> bool:
+	if not is_complete():
+		return false
+	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
+		var part := get_attached_part(slot)
+		if part == null or not part.has_fight_poses():
+			return false
+	return true
+
 func can_fight() -> bool:
-	return is_complete() and character != null and character.can_fight() and not _fight_locked
+	return attached_parts_can_fight() and not _fight_locked
 
 func set_fight_locked(locked: bool) -> void:
 	_fight_locked = locked
@@ -68,15 +85,15 @@ func get_fighter_global_position() -> Vector2:
 	return _display_root.global_position
 
 func can_accept(part: PartDef) -> bool:
-	if _fight_locked or part == null or character == null:
+	if _fight_locked or part == null:
 		return false
 	match part.slot_type:
 		PartSlotType.Value.HEAD:
-			return not _has_head and character.head != null and part.id == character.head.id
+			return not _has_head
 		PartSlotType.Value.BODY:
-			return not _has_body and character.body != null and part.id == character.body.id
+			return not _has_body
 		PartSlotType.Value.LEGS:
-			return not _has_legs and character.legs != null and part.id == character.legs.id
+			return not _has_legs
 		_:
 			return false
 
@@ -237,8 +254,12 @@ func _set_flag(slot: PartSlotType.Value, value: bool) -> void:
 			_has_legs = value
 
 func _refresh_display(animate: bool) -> void:
-	var plan := CompositeResolver.resolve(character, _has_head, _has_body, _has_legs)
-	var complete := _has_head and _has_body and _has_legs
+	var plan := CompositeResolver.resolve_parts(
+		get_attached_part(PartSlotType.Value.HEAD),
+		get_attached_part(PartSlotType.Value.BODY),
+		get_attached_part(PartSlotType.Value.LEGS)
+	)
+	var complete := is_complete()
 	_glow.visible = complete
 	_readout.set_complete(complete)
 	_empty_hint.visible = plan["mode"] == "empty" or (
@@ -294,7 +315,20 @@ func _update_stats() -> void:
 		power += view.part_def.power
 		speed += view.part_def.speed
 	_readout.set_stats(brain, power, speed)
-	_readout.set_display_name("???" if not (_has_head and _has_body and _has_legs) else character.display_name)
+	_readout.set_display_name(_resolve_display_name())
+
+func _resolve_display_name() -> String:
+	if not is_complete():
+		return "???"
+	var head := get_attached_part(PartSlotType.Value.HEAD)
+	var body := get_attached_part(PartSlotType.Value.BODY)
+	var legs := get_attached_part(PartSlotType.Value.LEGS)
+	for def in _roster:
+		if def == null or def.head == null or def.body == null or def.legs == null:
+			continue
+		if head.id == def.head.id and body.id == def.body.id and legs.id == def.legs.id:
+			return def.display_name
+	return "MIX"
 
 func _pulse_attach() -> void:
 	var tween := create_tween()
@@ -327,8 +361,8 @@ func _setup_fight_button() -> void:
 func _refresh_fight_button() -> void:
 	if _fight_button == null:
 		return
-	var supports_fight := character != null and character.can_fight()
-	_fight_button.visible = supports_fight
+	# Always show: becomes ready when the 3 attached parts have fight poses.
+	_fight_button.visible = true
 	var ready := can_fight()
 	_fight_button.disabled = not ready
 	_fight_button.modulate = Color(1, 1, 1, 1) if ready else Color(1, 1, 1, 0.45)

@@ -13,10 +13,10 @@ A cena principal do jogo hoje.
 ## O que o controlador faz ao iniciar
 
 1. Registra o `DragDropService` no grupo `drag_drop_service`
-2. Carrega vampiro e policial (`vampiro_character.tres`, `policial_character.tres`)
+2. Carrega o elenco (vampiro, policial) só para nomear sets completos
 3. Monta a lista de recompensas das 6 caixas (set completo de cada um)
 4. Posiciona a prateleira visual
-5. Spawna 3 cartas (vampiro | policial | vampiro) e 6 caixas
+5. Spawna 3 cartas em branco (qualquer peça em qualquer carta) e 6 caixas
 6. Liga o serviço de arraste às cartas e à bandeja
 7. Toca a intro (fade do título)
 

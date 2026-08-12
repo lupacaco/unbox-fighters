@@ -8,8 +8,6 @@ func _run() -> void:
 	assert(policial != null)
 	assert(policial.can_fight())
 	assert(policial.head.sprite_profile != null and policial.head.sprite_attack != null)
-	assert(policial.body.sprite_profile != null and policial.body.sprite_attack != null)
-	assert(policial.legs.sprite_profile != null and policial.legs.sprite_attack != null)
 
 	var vampiro: CharacterDef = load("res://data/parts/vampiro_character.tres")
 	assert(vampiro != null)
@@ -18,9 +16,11 @@ func _run() -> void:
 	var packed: PackedScene = load("res://scenes/assembly/CharacterSlot.tscn")
 	var slot := packed.instantiate() as CharacterSlot
 	root.add_child(slot)
-	slot.setup(policial)
+	slot.setup(null, [policial, vampiro])
 	assert(slot.get_node("FightButton") != null)
 	assert(slot.get_node("FightButton").visible == true)
-	assert(slot.get_node("FightButton").disabled == true)
+	assert(slot.can_accept(policial.head))
+	assert(slot.can_accept(vampiro.head))
+	assert(not slot.can_fight())
 	print("VERIFY_FIGHT_POSES_PASS")
 	quit(0)

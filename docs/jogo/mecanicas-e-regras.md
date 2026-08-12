@@ -41,21 +41,21 @@ Na carta, os atributos são a **soma** das peças já encaixadas.
 ## Regras de encaixe
 
 - Só cabe **uma peça por tipo** em cada carta (uma cabeça, um tronco, umas pernas).
-- A peça só entra se for a peça **certa daquele personagem** (mesmo `id` da definição do personagem).
+- Qualquer cabeça/tronco/pernas pode ir em **qualquer carta** (dá para misturar personagens).
 - Não dá para colocar cabeça no lugar das pernas, etc.
 - Se o drop falhar, a peça volta (não fica “presa” no lugar errado).
 
 ## Nome misterioso
 
 Enquanto a carta não estiver completa, o nome mostrado é `???`.  
-Quando cabeça + tronco + pernas estão encaixados, o nome real do personagem aparece.
+Quando as 3 peças formam um set conhecido (ex.: só policial), aparece o nome desse personagem.  
+Se misturar sets, o nome fica `MIX`.
 
 ## Botão LUTAR
 
-- Fica **acima da carta**.
-- Só aparece se o personagem tiver artes de perfil e ataque (hoje: policial).
-- Só libera com as **3 peças** encaixadas.
-- Ao clicar: limpa o shelf, o lutador pula até a prateleira, vira de perfil e lança cabeça → tronco → pernas (vai e volta), depois volta à carta.
+- Fica **acima da carta** (em todas as cartas).
+- Só libera com as **3 peças** encaixadas **e** com artes de perfil/ataque nessas peças.
+- Ao clicar: limpa o shelf → pula no canto esquerdo → anda até o meio intercalando poses → ataca → volta à carta.
 - Detalhes técnicos: [Animação de luta](../tecnico/sistemas/animacao-de-luta.md).
 
 ## Controles atuais
