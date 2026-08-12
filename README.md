@@ -8,7 +8,8 @@ Feito em **Godot 4.7**. Ainda em construção: hoje existe a tela de montagem; o
 1. Abra a pasta do projeto no Godot 4.7
 2. Rode a cena principal: `scenes/assembly/Assembly.tscn`
 
-Para ver as **pernas 3D do policial dando passos**, rode `scenes/preview/LegsWalkPreview.tscn` (F6). Isso não substitui a tela principal.
+Para ver as **pernas 3D do policial dando passos**, rode `scenes/preview/LegsWalkPreview.tscn` (F6).  
+Para ver a **múmia 3D no shelf**, rode `scenes/preview/MumiaShelfPreview.tscn` (F6) e clique em **INICIAR**. Isso não substitui a tela principal.
 
 ## Documentação
 

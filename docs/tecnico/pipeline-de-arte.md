@@ -11,6 +11,8 @@ Scripts fora do Godot que preparam imagens dos personagens.
 | `normalize_parts_300.py` | Limpa fundo preto, centraliza a peça num canvas **300×300** |
 | `remove_backgrounds.py` | Remove fundo xadrez / preto de artes de personagem |
 | `rig_legs_walk.py` | Coloca ossos nas pernas 3D do policial e grava a animação de passos |
+| `rig_mumia_parts.py` | Coloca ossos na múmia 3D (cabeça / tronco / pernas) e grava passos, soco, chute |
+| `glb_rig_lib.py` | Funções compartilhadas para gravar GLB com esqueleto |
 
 ## Convenção de arquivos
 
@@ -34,3 +36,13 @@ Em `assets/characters/policial/3d/`:
 
 Para gerar de novo: `python tools/rig_legs_walk.py`  
 Para ver: `scenes/preview/LegsWalkPreview.tscn` (F6)
+
+## Modelos 3D (múmia)
+
+Em `assets/characters/mumia/3d/`:
+
+- `mumia-head.glb`, `mumia-body.glb`, `mumia-legs.glb` — originais, parados
+- `mumia-head-rig.glb`, `mumia-body-rig.glb`, `mumia-legs-rig.glb` — com ossos e animações
+
+Para gerar de novo: `python tools/rig_mumia_parts.py`  
+Para ver: `scenes/preview/MumiaShelfPreview.tscn` (F6), botão **INICIAR**

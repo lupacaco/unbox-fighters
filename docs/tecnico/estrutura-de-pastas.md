@@ -15,6 +15,8 @@ unbox-fighters/
 │   ├── characters/vampiro/
 │   ├── characters/policial/
 │   │   └── 3d/            # GLB das pernas (parado + com passos)
+│   ├── characters/mumia/
+│   │   └── 3d/            # GLB da múmia (cabeça / tronco / pernas)
 │   ├── characters/bruxa/
 │   └── ui/
 ├── data/                  # Dados do jogo (.tres)
@@ -43,6 +45,7 @@ unbox-fighters/
 | Mudar HUD / fundo | `scripts/ui/` |
 | Preparar imagens 300×300 | `tools/` |
 | Ver as pernas 3D andando | `scenes/preview/LegsWalkPreview.tscn` |
+| Ver a múmia 3D no shelf | `scenes/preview/MumiaShelfPreview.tscn` |
 | Documentação | `docs/` |
 
 ## Pastas que o Godot gera

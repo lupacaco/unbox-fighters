@@ -28,6 +28,7 @@ O jogo ainda **não está pronto**. Estes docs descrevem o que **já existe** ho
 | [Áudio](tecnico/sistemas/audio.md) | Efeitos sonoros (caixa, peças, conclusão) |
 | [Pipeline de arte](tecnico/pipeline-de-arte.md) | Scripts que preparam imagens dos personagens |
 | [Pernas 3D com passos](tecnico/sistemas/pernas-3d-passos.md) | Preview das pernas do policial andando em 3D |
+| [Múmia 3D no shelf](tecnico/sistemas/mumia-3d-shelf.md) | Preview da múmia montada andando e atacando no shelf |
 | [Testes rápidos](tecnico/testes-headless.md) | Scripts que verificam o jogo sem abrir a tela |
 | [Plataformas](tecnico/plataformas.md) | Web / localhost, Steam e Google Play |
 | [Godot MCP](tecnico/godot-mcp.md) | Ligar a IA ao editor Godot |
