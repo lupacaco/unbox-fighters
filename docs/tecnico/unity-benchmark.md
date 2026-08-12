@@ -11,5 +11,3 @@ Existe uma pasta irmã **fora** deste repositório Godot:
 - Detalhes de abertura e bootstrap: leia o `README.md` dentro de `unbox-fighters-unity`.
 
 Última atualização: montagem + showcase LUTAR portados em C# com os mesmos sets vampiro / policial / bruxa.
-
-Também existe um **teste 3D** do policial (GLB) nos dois motores — ver `docs/tecnico/sistemas/teste-3d-policial.md` no Godot.

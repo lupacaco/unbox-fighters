@@ -37,7 +37,6 @@ Arte e recursos (assets/, data/)
 | Pasta | Responsabilidade |
 |-------|------------------|
 | `scripts/assembly/` | Jogabilidade da montagem |
-| `scripts/assembly3d/` | Teste 3D do policial (mesma montagem; o modelo é fotografado para a tela 2D) |
 | `scripts/data/` | Definições de dados e lógica pura de composição |
 | `scripts/ui/` | Interface e efeitos visuais |
 | `scripts/core/` | Utilitários (pool) e scripts de verificação |

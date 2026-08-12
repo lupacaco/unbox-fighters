@@ -28,7 +28,6 @@
 | Botão LUTAR | Libera quando as 3 peças encaixadas têm poses de perfil/ataque |
 | ThemeTokens | Cores definidas no código, mas pouco (ou não) usadas nas cenas |
 | Arte no padrão `-1/-2/-3` | Frente / perfil / ataque por peça |
-| Teste 3D do policial | Cena `scenes/assembly3d/Assembly3D.tscn` — montagem completa, só policial em 3D (peças fotografadas para a tela 2D, com a pintura do modelo visível) |
 
 ## Ainda não existe
 

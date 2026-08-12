@@ -31,7 +31,6 @@ O jogo ainda **não está pronto**. Estes docs descrevem o que **já existe** ho
 | [Plataformas](tecnico/plataformas.md) | Web / localhost, Steam e Google Play |
 | [Godot MCP](tecnico/godot-mcp.md) | Ligar a IA ao editor Godot |
 | [Unity (benchmark)](tecnico/unity-benchmark.md) | Cópia Unity da tela de montagem para comparar desempenho |
-| [Teste 3D (policial)](tecnico/sistemas/teste-3d-policial.md) | Montagem completa só com o policial em 3D (Godot e Unity) |
 
 ---
 
