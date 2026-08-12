@@ -40,6 +40,13 @@ func play(
 	_busy = true
 	if drag_service != null and drag_service.has_method("set_locked"):
 		drag_service.set_locked(true)
+
+	# Snapshot part data BEFORE clearing the shelf. Attached PartViews live under
+	# the tray too; we must not depend on them after loose tray items are cleared.
+	var head := slot.get_attached_part(PartSlotType.Value.HEAD)
+	var body := slot.get_attached_part(PartSlotType.Value.BODY)
+	var legs := slot.get_attached_part(PartSlotType.Value.LEGS)
+
 	slot.set_fight_locked(true)
 	slot.set_fighter_visible(false)
 
@@ -47,11 +54,7 @@ func play(
 
 	var puppet := FighterPuppet.new()
 	fx_layer.add_child(puppet)
-	puppet.setup_parts(
-		slot.get_attached_part(PartSlotType.Value.HEAD),
-		slot.get_attached_part(PartSlotType.Value.BODY),
-		slot.get_attached_part(PartSlotType.Value.LEGS)
-	)
+	puppet.setup_parts(head, body, legs)
 	puppet.global_position = slot.get_fighter_global_position()
 	puppet.modulate.a = 1.0
 	puppet.scale = Vector2.ONE
@@ -118,8 +121,14 @@ func _walk_to_center(puppet: FighterPuppet, from_pos: Vector2, to_pos: Vector2) 
 func _clear_shelf(tray: Node2D) -> void:
 	var fleeing: Array[Node2D] = []
 	for child in tray.get_children():
-		if child is Crate or child is PartView:
+		if child is Crate:
 			fleeing.append(child as Node2D)
+		elif child is PartView:
+			var part_view := child as PartView
+			# Keep parts that are mounted on cards (hidden under the tray).
+			if part_view.is_attached():
+				continue
+			fleeing.append(part_view)
 	if fleeing.is_empty():
 		return
 

@@ -9,7 +9,7 @@ Por enquanto **não há oponente**. O botão **LUTAR** só mostra uma animação
 
 ## Sequência ao clicar
 
-1. Peças e caixas do shelf **deslizam para fora** da tela e somem.
+1. Peças soltas e caixas do shelf **deslizam para fora** da tela e somem (peças já encaixadas nas cartas **não** são apagadas).
 2. O lutador **pula** da carta e **cai com força** no **canto esquerdo** do shelf (vista de frente).
 3. Vira de **perfil** (`sprite_profile` / pose `-2`).
 4. **Anda até o meio** do shelf. A cada passo, as 3 partes intercalam `-2` e `-3` (`sprite_profile` ↔ `sprite_attack`).

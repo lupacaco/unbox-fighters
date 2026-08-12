@@ -56,8 +56,19 @@ func is_complete() -> bool:
 func get_attached_part(slot: PartSlotType.Value) -> PartDef:
 	if not _bound_parts.has(slot):
 		return null
-	var view: PartView = _bound_parts[slot]
-	return view.part_def if view != null else null
+	var view = _bound_parts[slot]
+	if view == null or not is_instance_valid(view):
+		_bound_parts.erase(slot)
+		return null
+	return (view as PartView).part_def
+
+func set_fight_locked(locked: bool) -> void:
+	_fight_locked = locked
+	_refresh_fight_button()
+	for key in _bound_parts.keys():
+		var view = _bound_parts[key]
+		if view != null and is_instance_valid(view):
+			(view as PartView).lock_interaction(locked)
 
 func attached_parts_can_fight() -> bool:
 	if not is_complete():
@@ -70,13 +81,6 @@ func attached_parts_can_fight() -> bool:
 
 func can_fight() -> bool:
 	return attached_parts_can_fight() and not _fight_locked
-
-func set_fight_locked(locked: bool) -> void:
-	_fight_locked = locked
-	_refresh_fight_button()
-	for view in _bound_parts.values():
-		if view != null:
-			view.lock_interaction(locked)
 
 func set_fighter_visible(visible_flag: bool) -> void:
 	_display_root.visible = visible_flag
@@ -363,10 +367,10 @@ func _refresh_fight_button() -> void:
 		return
 	# Always show: becomes ready when the 3 attached parts have fight poses.
 	_fight_button.visible = true
-	var ready := can_fight()
-	_fight_button.disabled = not ready
-	_fight_button.modulate = Color(1, 1, 1, 1) if ready else Color(1, 1, 1, 0.45)
-	_fight_button.mouse_filter = Control.MOUSE_FILTER_STOP if ready else Control.MOUSE_FILTER_IGNORE
+	var fight_ready := can_fight()
+	_fight_button.disabled = not fight_ready
+	_fight_button.modulate = Color(1, 1, 1, 1) if fight_ready else Color(1, 1, 1, 0.45)
+	_fight_button.mouse_filter = Control.MOUSE_FILTER_STOP if fight_ready else Control.MOUSE_FILTER_IGNORE
 
 func _on_fight_pressed() -> void:
 	if not can_fight():
