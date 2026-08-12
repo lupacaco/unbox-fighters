@@ -33,7 +33,9 @@ func play(
 	fx_layer: Node2D,
 	drag_service: DragDropService
 ) -> void:
-	if _busy or slot == null or not slot.can_fight():
+	# Use attached_parts_can_fight() — not can_fight() — because the assembly
+	# may already lock other cards before calling play().
+	if _busy or slot == null or not slot.attached_parts_can_fight():
 		return
 	_busy = true
 	if drag_service != null and drag_service.has_method("set_locked"):

@@ -94,11 +94,13 @@ func _play_intro() -> void:
 func _on_slot_fight_pressed(slot: CharacterSlot) -> void:
 	if _fight_director.is_busy():
 		return
-	for other in _slots:
-		other.set_fight_locked(true)
-	await _fight_director.play(slot, _tray, _fx_layer, _drag_service)
+	if not slot.attached_parts_can_fight():
+		return
+	# Lock the other cards only. The fighting card is locked inside FightDirector
+	# after the fight is accepted (locking it first would cancel the fight).
 	for other in _slots:
 		if other != slot:
-			other.set_fight_locked(false)
-		else:
-			other.set_fight_locked(false)
+			other.set_fight_locked(true)
+	await _fight_director.play(slot, _tray, _fx_layer, _drag_service)
+	for other in _slots:
+		other.set_fight_locked(false)
