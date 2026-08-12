@@ -61,29 +61,28 @@ Regras por tipo:
 2. Cabeça: `magnet_down` cola no `magnet_up` do tronco  
 3. Pernas: `magnet_up` cola no `magnet_down` do tronco  
 
+## Arte relacionada
+
+Padrão de arquivos por personagem em `assets/characters/<nome>/`:
+
+- `<nome>_head-1.png` / `_body-1` / `_legs-1` — frente
+- `<nome>_head-2.png` / `_body-2` / `_legs-2` — perfil
+- `<nome>_head-3.png` / `_body-3` / `_legs-3` — ataque
+
+Todos em **300×300**.
+
 ## Arquivos de dados atuais
 
 Pasta: `data/parts/`
 
 | Arquivo | Conteúdo |
 |---------|----------|
-| `vampiro_character.tres` | Personagem vampiro + links das peças |
-| `vampiro_head.tres` | Cabeça + `magnet_down` |
-| `vampiro_body.tres` | Tronco + `magnet_up` / `magnet_down` |
-| `vampiro_legs.tres` | Pernas + `magnet_up` |
-| `policial_character.tres` | Personagem policial + links das peças |
-| `policial_head.tres` | Cabeça + `magnet_down` |
-| `policial_body.tres` | Tronco + `magnet_up` / `magnet_down` |
-| `policial_legs.tres` | Pernas + `magnet_up` |
+| `vampiro_character.tres` + `vampiro_*.tres` | Vampiro |
+| `policial_character.tres` + `policial_*.tres` | Policial |
+| `bruxa_character.tres` + `bruxa_*.tres` | Bruxa |
 
 ## Composição visual (`CompositeResolver`)
 
 Arquivo: `scripts/data/composite_resolver.gd`
 
 Sempre no modo **layered** (só partes). Calcula a posição de cada sprite pelos ímãs.
-
-## Arte relacionada
-
-- Sprites em `assets/characters/vampiro/` — use `head`, `body`, `legs` (300×300).
-- Sprites em `assets/characters/policial/` — frente + `*_profile` + `*_attack` (300×300). Originais em `_src_*.webp`.
-Imagens `full` / `body_head` / `body_legs` podem existir na pasta, mas **não são mais usadas** pelo jogo.

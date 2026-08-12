@@ -16,7 +16,7 @@
 | Fundo de arena | Respiração de vinheta + partículas de poeira |
 | Áudio | Efeitos: martelo, caixa, peças, conclusão do lutador |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |
-| Dados do vampiro e do policial | Arquivos `.tres` de personagem e peças |
+| Dados do vampiro, policial e bruxa | Arquivos `.tres` de personagem e peças |
 | Scripts de verificação | Rodam checagens sem abrir a interface completa |
 
 ## Parcial / provisório
@@ -24,10 +24,10 @@
 | Item | Observação |
 |------|------------|
 | 3 cartas | Cartas em branco: qualquer peça encaixa em qualquer carta |
-| Loot das 6 caixas | Set completo vampiro + set completo policial |
+| Loot das 9 caixas | Set completo vampiro + policial + bruxa |
 | Botão LUTAR | Libera quando as 3 peças encaixadas têm poses de perfil/ataque |
 | ThemeTokens | Cores definidas no código, mas pouco (ou não) usadas nas cenas |
-| Arte PNG + WEBP | As duas formatos existem para os mesmos sprites |
+| Arte no padrão `-1/-2/-3` | Frente / perfil / ataque por peça |
 
 ## Ainda não existe
 
@@ -37,7 +37,7 @@
 - Menus / navegação entre telas
 - Salvamento / progressão
 - Economia (moeda, loja)
-- Elenco grande de personagens (só vampiro + policial por enquanto)
+- Elenco grande de personagens (hoje: vampiro, policial, bruxa)
 - Controles de gamepad
 
 ## Motor e entrada

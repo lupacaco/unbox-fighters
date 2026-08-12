@@ -29,10 +29,10 @@ Por enquanto **não há oponente**. O botão **LUTAR** só mostra uma animação
 | Botão na carta | `CharacterSlot` → nó `FightButton` |
 | Dados das poses | `PartDef.sprite_profile` / `PartDef.sprite_attack` |
 
-## Arte (policial)
+## Arte (padrão `-1/-2/-3`)
 
-Em `assets/characters/policial/`:
+Em `assets/characters/<nome>/`:
 
-- Frente: `head.png`, `body.png`, `legs.png`
-- Perfil: `head_profile.png`, `body_profile.png`, `legs_profile.png`
-- Ataque: `head_attack.png`, `body_attack.png`, `legs_attack.png`
+- Frente: `<nome>_head-1.png`, `_body-1`, `_legs-1`
+- Perfil: `…-2.png`
+- Ataque: `…-3.png`

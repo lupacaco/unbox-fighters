@@ -13,13 +13,13 @@ Scripts fora do Godot que preparam imagens dos personagens.
 
 ## Convenção de arquivos
 
-Em `assets/characters/vampiro/` e `assets/characters/policial/`:
+Em `assets/characters/<nome>/`:
 
-- Arquivos finais usados pelo jogo: `head.png`, `body.png`, `legs.png`
-- Compostos antigos do vampiro (`full`, `body_head`, `body_legs`) podem sobrar na pasta, mas o jogo não usa mais
-- `_src_*` — arte de origem / intermediária do pipeline
-- Também podem existir cópias `.webp` das mesmas artes
+- `<nome>_head-1.png`, `<nome>_body-1.png`, `<nome>_legs-1.png` — frente
+- `<nome>_head-2.png` … — perfil
+- `<nome>_head-3.png` … — ataque
+- Canvas **300×300**
 
 ## Por que 300×300
 
-As cartas posicionam as partes em tamanhos fixos. Normalizar evita peças tortas ou em escalas diferentes. Os scripts em `scripts/core/verify_part_sizes.gd` checam esse padrão (vampiro e policial).
+As cartas posicionam as partes em tamanhos fixos. Normalizar evita peças tortas ou em escalas diferentes. Os scripts em `scripts/core/verify_part_sizes.gd` checam esse padrão.

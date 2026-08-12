@@ -14,6 +14,7 @@ unbox-fighters/
 │   ├── audio/sfx/         # Efeitos sonoros (.wav)
 │   ├── characters/vampiro/
 │   ├── characters/policial/
+│   ├── characters/bruxa/
 │   └── ui/
 ├── data/                  # Dados do jogo (.tres)
 │   └── parts/

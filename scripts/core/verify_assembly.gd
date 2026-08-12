@@ -19,9 +19,9 @@ func _run() -> void:
 		push_error("VERIFY_FAIL expected 3 slots")
 		quit(1)
 		return
-	# Shelf + 6 crates (vampiro set + policial set)
-	if tray_children < 7:
-		push_error("VERIFY_FAIL expected platform + 6 crates")
+	# Shelf + 9 crates (vampiro + policial + bruxa)
+	if tray_children < 10:
+		push_error("VERIFY_FAIL expected platform + 9 crates")
 		quit(1)
 		return
 	print("VERIFY_PASS")

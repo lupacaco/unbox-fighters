@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://davyjfkmcbuu8"
-path="res://.godot/imported/_src_head.webp-d8a9e2c37e4267cc975bdafb253ef648.ctex"
+uid="uid://ui4ltbkx0tis"
+path="res://.godot/imported/policial_legs-3.png-2f3530cc50d551807aafe7a23732a8d0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/characters/policial/_src_head.webp"
-dest_files=["res://.godot/imported/_src_head.webp-d8a9e2c37e4267cc975bdafb253ef648.ctex"]
+source_file="res://assets/characters/policial/policial_legs-3.png"
+dest_files=["res://.godot/imported/policial_legs-3.png-2f3530cc50d551807aafe7a23732a8d0.ctex"]
 
 [params]
 

@@ -4,7 +4,7 @@ O que o jogador pode fazer hoje, e as regras que o jogo aplica.
 
 ## Fluxo na tela de montagem
 
-1. Aparecem **3 cartas** de personagem e **6 caixas** na prateleira.
+1. Aparecem **3 cartas** de personagem e **9 caixas** na prateleira.
 2. O jogador abre cada caixa com **2 cliques**:
    - 1º clique → caixa **trincada**
    - 2º clique → caixa **quebrada**, fica 0,5 s e some; aí aparece a **peça**
@@ -27,14 +27,13 @@ Cada peça ocupa **um** tipo de encaixe:
 
 Cada peça tem três números:
 
-| Código | Nome simples | Exemplo (vampiro) | Exemplo (policial) |
-|--------|--------------|-------------------|--------------------|
-| BRN | Brain (cérebro / inteligência) | Cabeça 8, Tronco 1, Pernas 0 | Cabeça 6, Tronco 2, Pernas 0 |
-| PWR | Power (força) | Cabeça 2, Tronco 9, Pernas 3 | Cabeça 3, Tronco 7, Pernas 4 |
-| SPD | Speed (velocidade) | Cabeça 3, Tronco 2, Pernas 8 | Cabeça 4, Tronco 3, Pernas 7 |
+| Código | Nome simples | Vampiro | Policial | Bruxa |
+|--------|--------------|---------|----------|-------|
+| BRN | Brain (cérebro / inteligência) | 8+1+0 | 6+2+0 | 9+3+1 |
+| PWR | Power (força) | 2+9+3 | 3+7+4 | 1+4+2 |
+| SPD | Speed (velocidade) | 3+2+8 | 4+3+7 | 4+5+9 |
 
-**Total do set completo do vampiro:** BRN 9 / PWR 14 / SPD 13  
-**Total do set completo do policial:** BRN 8 / PWR 14 / SPD 14
+**Totais (set completo):** vampiro 9/14/13 · policial 8/14/14 · bruxa 13/7/18
 
 Na carta, os atributos são a **soma** das peças já encaixadas.
 
@@ -54,7 +53,7 @@ Se misturar sets, o nome fica `MIX`.
 ## Botão LUTAR
 
 - Fica **acima da carta** (em todas as cartas).
-- Só libera com as **3 peças** encaixadas **e** com artes de perfil/ataque nessas peças.
+- Só libera com as **3 peças** encaixadas **e** com artes de perfil/ataque nessas peças (vampiro, policial e bruxa têm).
 - Ao clicar: limpa o shelf → pula no canto esquerdo → anda até o meio intercalando poses → ataca → volta à carta.
 - Detalhes técnicos: [Animação de luta](../tecnico/sistemas/animacao-de-luta.md).
 

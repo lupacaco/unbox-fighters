@@ -7,12 +7,14 @@ func _run() -> void:
 	for path in [
 		"res://data/parts/vampiro_character.tres",
 		"res://data/parts/policial_character.tres",
+		"res://data/parts/bruxa_character.tres",
 	]:
 		var c: CharacterDef = load(path)
 		assert(c != null, "Missing character: %s" % path)
 		assert(c.head.sprite.get_size() == Vector2(300, 300))
 		assert(c.body.sprite.get_size() == Vector2(300, 300))
 		assert(c.legs.sprite.get_size() == Vector2(300, 300))
+		assert(c.can_fight(), "Missing fight poses: %s" % path)
 		var layered := CompositeResolver.resolve(c, true, false, false)
 		assert(layered["mode"] == "layered")
 		assert(layered["head"] != null)

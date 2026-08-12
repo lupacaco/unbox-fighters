@@ -13,10 +13,10 @@ A cena principal do jogo hoje.
 ## O que o controlador faz ao iniciar
 
 1. Registra o `DragDropService` no grupo `drag_drop_service`
-2. Carrega o elenco (vampiro, policial) só para nomear sets completos
-3. Monta a lista de recompensas das 6 caixas (set completo de cada um)
+2. Carrega o elenco (vampiro, policial, bruxa) só para nomear sets completos
+3. Monta a lista de recompensas das 9 caixas (set completo de cada um)
 4. Posiciona a prateleira visual
-5. Spawna 3 cartas em branco (qualquer peça em qualquer carta) e 6 caixas
+5. Spawna 3 cartas em branco (qualquer peça em qualquer carta) e 9 caixas
 6. Liga o serviço de arraste às cartas e à bandeja
 7. Toca a intro (fade do título)
 
@@ -33,12 +33,9 @@ A cena principal do jogo hoje.
 
 Ordem fixa (dados de teste):
 
-1. Cabeça do vampiro  
-2. Tronco do vampiro  
-3. Pernas do vampiro  
-4. Cabeça do policial  
-5. Tronco do policial  
-6. Pernas do policial
+1–3. Set completo do vampiro  
+4–6. Set completo do policial  
+7–9. Set completo da bruxa
 
 ## Botão LUTAR
 

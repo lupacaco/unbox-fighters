@@ -15,6 +15,7 @@ var _slot_scene: PackedScene = preload("res://scenes/assembly/CharacterSlot.tscn
 
 var _vampiro: CharacterDef
 var _policial: CharacterDef
+var _bruxa: CharacterDef
 var _roster: Array[CharacterDef] = []
 var _reward_parts: Array[PartDef] = []
 var _slots: Array[CharacterSlot] = []
@@ -34,15 +35,13 @@ func _ready() -> void:
 func _build_character_data() -> void:
 	_vampiro = load("res://data/parts/vampiro_character.tres") as CharacterDef
 	_policial = load("res://data/parts/policial_character.tres") as CharacterDef
-	_roster = [_vampiro, _policial]
-	# 6 crates = full set for vampiro + full set for policial
+	_bruxa = load("res://data/parts/bruxa_character.tres") as CharacterDef
+	_roster = [_vampiro, _policial, _bruxa]
+	# One full set per character in the crates.
 	_reward_parts = [
-		_vampiro.head,
-		_vampiro.body,
-		_vampiro.legs,
-		_policial.head,
-		_policial.body,
-		_policial.legs,
+		_vampiro.head, _vampiro.body, _vampiro.legs,
+		_policial.head, _policial.body, _policial.legs,
+		_bruxa.head, _bruxa.body, _bruxa.legs,
 	]
 
 func _setup_tray_visual() -> void:
@@ -52,7 +51,7 @@ func _setup_tray_visual() -> void:
 	_shelf.centered = true
 	_shelf.position = Vector2(0, 58)
 	var tex_size := shelf_tex.get_size()
-	_shelf.scale = Vector2(1480.0 / tex_size.x, 170.0 / tex_size.y)
+	_shelf.scale = Vector2(1700.0 / tex_size.x, 170.0 / tex_size.y)
 	_shelf.modulate = Color(0.9, 0.92, 0.95, 1)
 
 func _spawn_slots() -> void:
@@ -69,7 +68,7 @@ func _spawn_slots() -> void:
 
 func _spawn_crates() -> void:
 	var count := _reward_parts.size()
-	var spacing := 200.0 if count > 5 else 230.0
+	var spacing := 165.0 if count >= 9 else (200.0 if count > 5 else 230.0)
 	var start_x := -spacing * float(count - 1) * 0.5
 	for i in count:
 		var crate := _crate_scene.instantiate() as Crate
