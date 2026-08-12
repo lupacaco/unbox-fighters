@@ -15,6 +15,7 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 | `verify_part_sizes.gd` | Sprites 300×300, poses e modo layered (vampiro + policial + bruxa) |
 | `verify_fight_poses.gd` | Todos os personagens têm poses; botão LUTAR na carta |
 | `verify_fight_lock.gd` | Luta usa peças anexadas mesmo se a carta já estiver travada |
+| `verify_model_3d.gd` | GLBs do policial carregam com pintura visível (sem material “metal preto”) |
 | `debug_parts.gd` | Carrega peça e checa visibilidade do sprite |
 | `debug_reveal.gd` | Força revelar peça da caixa e checa transparência |
 
