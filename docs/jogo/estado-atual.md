@@ -28,6 +28,7 @@
 | Botão LUTAR | Libera quando as 3 peças encaixadas têm poses de perfil/ataque |
 | ThemeTokens | Cores definidas no código, mas pouco (ou não) usadas nas cenas |
 | Arte no padrão `-1/-2/-3` | Frente / perfil / ataque por peça |
+| Pernas 3D do policial | Preview com passos em `scenes/preview/LegsWalkPreview.tscn` (não é a tela principal) |
 
 ## Ainda não existe
 

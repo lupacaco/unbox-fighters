@@ -10,6 +10,7 @@ Scripts fora do Godot que preparam imagens dos personagens.
 |--------|--------|
 | `normalize_parts_300.py` | Limpa fundo preto, centraliza a peça num canvas **300×300** |
 | `remove_backgrounds.py` | Remove fundo xadrez / preto de artes de personagem |
+| `rig_legs_walk.py` | Coloca ossos nas pernas 3D do policial e grava a animação de passos |
 
 ## Convenção de arquivos
 
@@ -23,3 +24,13 @@ Em `assets/characters/<nome>/`:
 ## Por que 300×300
 
 As cartas posicionam as partes em tamanhos fixos. Normalizar evita peças tortas ou em escalas diferentes. Os scripts em `scripts/core/verify_part_sizes.gd` checam esse padrão.
+
+## Modelos 3D (pernas do policial)
+
+Em `assets/characters/policial/3d/`:
+
+- `policial-legs-3d.glb` — modelo original, parado
+- `policial-legs-3d-walk.glb` — o mesmo modelo com ossos e animação de passos
+
+Para gerar de novo: `python tools/rig_legs_walk.py`  
+Para ver: `scenes/preview/LegsWalkPreview.tscn` (F6)

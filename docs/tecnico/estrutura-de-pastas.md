@@ -14,16 +14,19 @@ unbox-fighters/
 │   ├── audio/sfx/         # Efeitos sonoros (.wav)
 │   ├── characters/vampiro/
 │   ├── characters/policial/
+│   │   └── 3d/            # GLB das pernas (parado + com passos)
 │   ├── characters/bruxa/
 │   └── ui/
 ├── data/                  # Dados do jogo (.tres)
 │   └── parts/
 ├── scenes/                # Cenas Godot (.tscn)
-│   └── assembly/          # Tela 2D principal
+│   ├── assembly/          # Tela 2D principal
+│   └── preview/           # Cenas de teste (ex.: pernas 3D andando)
 ├── scripts/               # Código GDScript (.gd)
 │   ├── assembly/
 │   ├── core/
 │   ├── data/
+│   ├── preview/
 │   └── ui/
 ├── tools/                 # Scripts Python de preparação de arte
 └── .cursor/               # Regras e skills do Cursor (assistente)
@@ -39,6 +42,7 @@ unbox-fighters/
 | Mudar regras de composição visual | `scripts/data/composite_resolver.gd` |
 | Mudar HUD / fundo | `scripts/ui/` |
 | Preparar imagens 300×300 | `tools/` |
+| Ver as pernas 3D andando | `scenes/preview/LegsWalkPreview.tscn` |
 | Documentação | `docs/` |
 
 ## Pastas que o Godot gera
