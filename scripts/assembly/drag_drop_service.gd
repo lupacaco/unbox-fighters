@@ -8,13 +8,24 @@ var _dragging: PartView = null
 var _slots: Array[CharacterSlot] = []
 var _tray: Node2D = null
 var _hover_slot: CharacterSlot = null
+var _locked: bool = false
 
 func setup(slots: Array[CharacterSlot], tray: Node2D) -> void:
 	_slots = slots
 	_tray = tray
 
+func set_locked(locked: bool) -> void:
+	_locked = locked
+	if locked and _dragging != null:
+		_dragging.cancel_drag_return()
+		_dragging = null
+		set_process(false)
+
+func is_locked() -> bool:
+	return _locked
+
 func begin_drag(part: PartView) -> void:
-	if _dragging != null or part == null or not part.can_interact():
+	if _locked or _dragging != null or part == null or not part.can_interact():
 		return
 	_dragging = part
 	set_process(true)

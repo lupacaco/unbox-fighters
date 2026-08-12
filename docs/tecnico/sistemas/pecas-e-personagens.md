@@ -14,7 +14,9 @@ Recurso de **uma peça** (script com `@tool` para o editor poder ler/validar ím
 
 - `id`, `display_name`
 - `slot_type` (cabeça / tronco / pernas)
-- `sprite`
+- `sprite` — frente (pose 1)
+- `sprite_profile` — perfil (pose 2), opcional; necessário para LUTAR
+- `sprite_attack` — ataque (pose 3), opcional; necessário para LUTAR
 - `brain`, `power`, `speed`
 - **Ímãs** (pontos de união):
   - `magnet_up` — cola na peça de cima
@@ -83,5 +85,5 @@ Sempre no modo **layered** (só partes). Calcula a posição de cada sprite pelo
 ## Arte relacionada
 
 - Sprites em `assets/characters/vampiro/` — use `head`, `body`, `legs` (300×300).
-- Sprites em `assets/characters/policial/` — use `head`, `body`, `legs` (300×300). Originais em `_src_*.webp`.
+- Sprites em `assets/characters/policial/` — frente + `*_profile` + `*_attack` (300×300). Originais em `_src_*.webp`.
 Imagens `full` / `body_head` / `body_legs` podem existir na pasta, mas **não são mais usadas** pelo jogo.

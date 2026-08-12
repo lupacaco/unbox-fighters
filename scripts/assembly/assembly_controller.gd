@@ -4,6 +4,7 @@ extends Node2D
 @onready var _slots_root: Node2D = $Slots
 @onready var _tray: Node2D = $Tray
 @onready var _shelf: Sprite2D = $Tray/Shelf
+@onready var _fx_layer: Node2D = $FxLayer
 @onready var _drag_service: DragDropService = $DragDropService
 @onready var _title: Label = $HUD/Title
 @onready var _subtitle: Label = $HUD/Subtitle
@@ -17,9 +18,12 @@ var _policial: CharacterDef
 var _card_characters: Array[CharacterDef] = []
 var _reward_parts: Array[PartDef] = []
 var _slots: Array[CharacterSlot] = []
+var _fight_director: FightDirector
 
 func _ready() -> void:
 	_drag_service.add_to_group("drag_drop_service")
+	_fight_director = FightDirector.new()
+	add_child(_fight_director)
 	_build_character_data()
 	_setup_tray_visual()
 	_spawn_slots()
@@ -59,6 +63,7 @@ func _spawn_slots() -> void:
 		_slots_root.add_child(slot)
 		slot.position = Vector2(xs[i], 400)
 		slot.setup(_card_characters[i])
+		slot.fight_pressed.connect(_on_slot_fight_pressed)
 		slot.play_intro(0.12 * float(i))
 		_slots.append(slot)
 
@@ -85,3 +90,15 @@ func _play_intro() -> void:
 	var tween := create_tween()
 	tween.tween_property(_title, "modulate:a", 1.0, 0.5).set_trans(Tween.TRANS_SINE)
 	tween.parallel().tween_property(_subtitle, "modulate:a", 1.0, 0.65).set_trans(Tween.TRANS_SINE)
+
+func _on_slot_fight_pressed(slot: CharacterSlot) -> void:
+	if _fight_director.is_busy():
+		return
+	for other in _slots:
+		other.set_fight_locked(true)
+	await _fight_director.play(slot, _tray, _fx_layer, _drag_service)
+	for other in _slots:
+		if other != slot:
+			other.set_fight_locked(false)
+		else:
+			other.set_fight_locked(false)

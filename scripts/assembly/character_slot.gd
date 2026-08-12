@@ -3,6 +3,8 @@ extends Node2D
 
 signal part_attached(slot: CharacterSlot, part: PartDef)
 signal part_detached(slot: CharacterSlot, part: PartDef)
+signal fight_pressed(slot: CharacterSlot)
+signal assembly_changed(slot: CharacterSlot)
 
 const BODY_ORIGIN := Vector2(0, -8)
 const PART_SIZE_PX := 150.0
@@ -21,6 +23,7 @@ const PART_SIZE_PX := 150.0
 @onready var _highlight: Line2D = $DropHighlight
 @onready var _glow: Polygon2D = $CompleteGlow
 @onready var _readout: StatReadout = $StatReadout
+@onready var _fight_button: Button = $FightButton
 
 var character: CharacterDef
 var _has_head: bool = false
@@ -29,6 +32,7 @@ var _has_legs: bool = false
 var _bound_parts: Dictionary = {}
 var _crossfade_busy: bool = false
 var _rest_y: float = 0.0
+var _fight_locked: bool = false
 
 func setup(def: CharacterDef) -> void:
 	character = def
@@ -40,10 +44,31 @@ func setup(def: CharacterDef) -> void:
 	_highlight.visible = false
 	_build_visuals()
 	_setup_zones()
+	_setup_fight_button()
 	_refresh_display(false)
+	_refresh_fight_button()
+
+func is_complete() -> bool:
+	return _has_head and _has_body and _has_legs
+
+func can_fight() -> bool:
+	return is_complete() and character != null and character.can_fight() and not _fight_locked
+
+func set_fight_locked(locked: bool) -> void:
+	_fight_locked = locked
+	_refresh_fight_button()
+	for view in _bound_parts.values():
+		if view != null:
+			view.lock_interaction(locked)
+
+func set_fighter_visible(visible_flag: bool) -> void:
+	_display_root.visible = visible_flag
+
+func get_fighter_global_position() -> Vector2:
+	return _display_root.global_position
 
 func can_accept(part: PartDef) -> bool:
-	if part == null or character == null:
+	if _fight_locked or part == null or character == null:
 		return false
 	match part.slot_type:
 		PartSlotType.Value.HEAD:
@@ -66,6 +91,8 @@ func _zone_contains(slot: PartSlotType.Value, global_point: Vector2) -> bool:
 	return rect.has_point(to_local(global_point))
 
 func try_attach(part_view: PartView) -> bool:
+	if _fight_locked:
+		return false
 	if not can_accept(part_view.part_def):
 		return false
 	var was_complete := _has_head and _has_body and _has_legs
@@ -82,9 +109,13 @@ func try_attach(part_view: PartView) -> bool:
 	if now_complete and not was_complete:
 		GameAudio.fighter_complete()
 	part_attached.emit(self, part_view.part_def)
+	assembly_changed.emit(self)
+	_refresh_fight_button()
 	return true
 
 func detach_part(slot: PartSlotType.Value, refresh: bool = true) -> PartView:
+	if _fight_locked:
+		return null
 	if not _bound_parts.has(slot):
 		return null
 	var part_view: PartView = _bound_parts[slot]
@@ -95,6 +126,8 @@ func detach_part(slot: PartSlotType.Value, refresh: bool = true) -> PartView:
 		_refresh_display(true)
 		_update_stats()
 	part_detached.emit(self, part_view.part_def)
+	assembly_changed.emit(self)
+	_refresh_fight_button()
 	return part_view
 
 func set_drop_highlight(enabled: bool, slot: PartSlotType.Value) -> void:
@@ -157,6 +190,8 @@ func _configure_zone(zone: Area2D, rect: Rect2) -> void:
 	zone.input_event.connect(_on_zone_input.bind(zone))
 
 func _on_zone_input(_viewport: Node, event: InputEvent, _shape_idx: int, zone: Area2D) -> void:
+	if _fight_locked:
+		return
 	if not (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed):
 		return
 	var slot := _slot_for_zone(zone)
@@ -265,3 +300,41 @@ func _pulse_attach() -> void:
 	var tween := create_tween()
 	tween.tween_property(_card_frame, "modulate", Color(1.12, 1.1, 1.08, 1), 0.08)
 	tween.tween_property(_card_frame, "modulate", Color.WHITE, 0.28).set_trans(Tween.TRANS_SINE)
+
+func _setup_fight_button() -> void:
+	if _fight_button == null:
+		return
+	_fight_button.pressed.connect(_on_fight_pressed)
+	_fight_button.focus_mode = Control.FOCUS_NONE
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = Color(0.55, 0.1, 0.16, 0.92)
+	normal.set_corner_radius_all(6)
+	normal.content_margin_left = 12
+	normal.content_margin_right = 12
+	normal.content_margin_top = 6
+	normal.content_margin_bottom = 6
+	var hover := normal.duplicate() as StyleBoxFlat
+	hover.bg_color = Color(0.72, 0.14, 0.22, 0.95)
+	var pressed := normal.duplicate() as StyleBoxFlat
+	pressed.bg_color = Color(0.4, 0.08, 0.12, 0.95)
+	var disabled := normal.duplicate() as StyleBoxFlat
+	disabled.bg_color = Color(0.2, 0.22, 0.26, 0.75)
+	_fight_button.add_theme_stylebox_override("normal", normal)
+	_fight_button.add_theme_stylebox_override("hover", hover)
+	_fight_button.add_theme_stylebox_override("pressed", pressed)
+	_fight_button.add_theme_stylebox_override("disabled", disabled)
+
+func _refresh_fight_button() -> void:
+	if _fight_button == null:
+		return
+	var supports_fight := character != null and character.can_fight()
+	_fight_button.visible = supports_fight
+	var ready := can_fight()
+	_fight_button.disabled = not ready
+	_fight_button.modulate = Color(1, 1, 1, 1) if ready else Color(1, 1, 1, 0.45)
+	_fight_button.mouse_filter = Control.MOUSE_FILTER_STOP if ready else Control.MOUSE_FILTER_IGNORE
+
+func _on_fight_pressed() -> void:
+	if not can_fight():
+		return
+	fight_pressed.emit(self)

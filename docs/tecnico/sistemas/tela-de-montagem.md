@@ -40,7 +40,13 @@ Ordem fixa (dados de teste):
 5. Tronco do policial  
 6. Pernas do policial
 
+## Botão LUTAR
+
+Cada carta tem um botão **LUTAR** acima dela (só se o personagem tiver poses de perfil/ataque).  
+Detalhes: [Animação de luta](animacao-de-luta.md).
+
 ## Abrir caixa (`Crate`)
+
 
 Sprites em `assets/boxes/`:
 

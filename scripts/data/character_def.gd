@@ -17,3 +17,11 @@ func get_part(slot: PartSlotType.Value) -> PartDef:
 			return legs
 		_:
 			return null
+
+func can_fight() -> bool:
+	return (
+		head != null and body != null and legs != null
+		and head.has_fight_poses()
+		and body.has_fight_poses()
+		and legs.has_fight_poses()
+	)

@@ -22,8 +22,9 @@ Arte e recursos (assets/, data/)
 
 | Peça | Papel |
 |------|--------|
-| `AssemblyController` | Orquestra a tela: carrega dados, cria 3 cartas e 5 caixas, liga o arrastar e soltar |
+| `AssemblyController` | Orquestra a tela: cartas, caixas, arraste e o botão LUTAR |
 | `DragDropService` | Estado do arraste: quem está sendo arrastado, onde pode soltar |
+| `FightDirector` / `FighterPuppet` | Animação solo de luta no shelf (sem oponente ainda) |
 | `Crate` | Caixa com 2 cliques (3 sprites) que some e revela uma `PartView` |
 | `PartView` | Peça arrastável na prateleira / carta |
 | `CharacterSlot` | Carta com zonas de cabeça/tronco/pernas, visual e atributos |

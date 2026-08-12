@@ -6,6 +6,10 @@ extends Resource
 @export var display_name: String = ""
 @export var slot_type: PartSlotType.Value = PartSlotType.Value.HEAD
 @export var sprite: Texture2D
+## Side view used on the fight stage (pose "-2").
+@export var sprite_profile: Texture2D
+## Attack pose used when the part flies forward (pose "-3").
+@export var sprite_attack: Texture2D
 @export var brain: int = 0
 @export var power: int = 0
 @export var speed: int = 0
@@ -21,6 +25,9 @@ func uses_magnet_up() -> bool:
 
 func uses_magnet_down() -> bool:
 	return slot_type != PartSlotType.Value.LEGS
+
+func has_fight_poses() -> bool:
+	return sprite_profile != null and sprite_attack != null
 
 func _validate_property(property: Dictionary) -> void:
 	match String(property.name):

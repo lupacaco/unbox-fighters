@@ -50,6 +50,14 @@ Na carta, os atributos são a **soma** das peças já encaixadas.
 Enquanto a carta não estiver completa, o nome mostrado é `???`.  
 Quando cabeça + tronco + pernas estão encaixados, o nome real do personagem aparece.
 
+## Botão LUTAR
+
+- Fica **acima da carta**.
+- Só aparece se o personagem tiver artes de perfil e ataque (hoje: policial).
+- Só libera com as **3 peças** encaixadas.
+- Ao clicar: limpa o shelf, o lutador pula até a prateleira, vira de perfil e lança cabeça → tronco → pernas (vai e volta), depois volta à carta.
+- Detalhes técnicos: [Animação de luta](../tecnico/sistemas/animacao-de-luta.md).
+
 ## Controles atuais
 
 - Mouse: passar por cima da caixa troca o cursor para o martelo; clicar bate (`hammer-02` por 0,2 s). Arrastar e soltar peças.
