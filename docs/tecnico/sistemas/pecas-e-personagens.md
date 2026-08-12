@@ -29,37 +29,30 @@ Recurso de **um personagem**:
 
 Não usa mais imagens pré-montadas (full / body_head / body_legs). Só as 3 partes.
 
-## Como marcar os ímãs
+## Como marcar os ímãs (ponto exato)
 
-No Godot, abra o arquivo `.tres` da peça (ex.: `data/parts/vampiro_head.tres`).
+1. No Godot, ative o plugin **Part Magnet Editor** (já vem no projeto).
+2. Abra a peça, ex.: `data/parts/vampiro_body.tres`.
+3. No Inspetor, em cima, aparece a **imagem da peça**.
+4. Clique em **Marcar Ímã de Cima** ou **Marcar Ímã de Baixo**.
+5. Clique no ponto exato da imagem (ex.: o círculo do pescoço / cintura).
+6. Salve o recurso (`Ctrl+S`).
 
-No Inspetor você verá:
+Marcadores:
+- **CIMA** (azul) = `magnet_up`
+- **BAIXO** (vermelho) = `magnet_down`
 
-| Campo | Quem usa | Significado |
-|-------|----------|-------------|
-| `magnet_up` | Corpo e Pernas | Ponto que gruda na peça **acima** |
-| `magnet_down` | Cabeça e Corpo | Ponto que gruda na peça **abaixo** |
-
-### Sistema de coordenadas (simples)
+### Sistema de coordenadas (se precisar editar o número)
 
 - Medido em **pixels da textura**, a partir do **centro** da imagem
-- **Y negativo** = para cima na imagem  
-- **Y positivo** = para baixo na imagem  
-- **X** move esquerda/direita (0 = meio)
-
-Exemplos (arte 300×300):
-
-- Cabeça: `magnet_down = (0, 120)` → perto da base do pescoço  
-- Corpo: `magnet_up = (0, -120)` e `magnet_down = (0, 120)`  
-- Pernas: `magnet_up = (0, -120)` → perto da cintura  
+- **Y negativo** = para cima  
+- **Y positivo** = para baixo  
 
 ### Regra de colagem
 
 1. O tronco fica no centro da carta  
-2. Cabeça: `ímã de baixo da cabeça` cola no `ímã de cima do tronco`  
-3. Pernas: `ímã de cima das pernas` cola no `ímã de baixo do tronco`  
-
-Ajuste os números até as partes “grudarem” visualmente no lugar certo.
+2. Cabeça: `magnet_down` cola no `magnet_up` do tronco  
+3. Pernas: `magnet_up` cola no `magnet_down` do tronco  
 
 ## Arquivos de dados atuais
 

@@ -8,8 +8,6 @@
 
 config_version=5
 
-"ï»¿config_version"=5
-
 [application]
 
 config/name="Unbox Fighters"
@@ -21,7 +19,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Sfx="*res://scripts/audio/sfx.gd"
-MCPRuntime="*uid://crhp2v54ko8nj"
+MCPRuntime="*res://addons/godot_mcp/services/mcp_runtime.gd"
 
 [display]
 
@@ -31,7 +29,7 @@ window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg", "res://addons/part_magnet_editor/plugin.cfg")
 
 [input]
 
@@ -43,5 +41,7 @@ pointer_press={
 
 [rendering]
 
+renderer/rendering_method="forward_plus"
+renderer/rendering_method.web="gl_compatibility"
 textures/canvas_textures/default_texture_filter=0
 environment/defaults/default_clear_color=Color(0.043, 0.047, 0.063, 1)
