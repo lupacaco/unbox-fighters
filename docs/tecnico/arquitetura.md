@@ -40,7 +40,6 @@ Arte e recursos (assets/, data/)
 | `scripts/data/` | Definições de dados e lógica pura de composição |
 | `scripts/ui/` | Interface e efeitos visuais |
 | `scripts/core/` | Utilitários (pool) e scripts de verificação |
-| `scripts/preview/` | Cenas de teste (hoje: pernas 3D andando) |
 
 ## Padrões usados
 

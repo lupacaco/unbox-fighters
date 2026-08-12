@@ -17,7 +17,6 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 | `verify_fight_lock.gd` | Luta usa peças anexadas mesmo se a carta já estiver travada |
 | `debug_parts.gd` | Carrega peça e checa visibilidade do sprite |
 | `debug_reveal.gd` | Força revelar peça da caixa e checa transparência |
-| `verify_legs_walk.gd` | Ossos e animação `walk` das pernas 3D do policial |
 
 ## Quando atualizar
 
