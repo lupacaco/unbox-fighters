@@ -9,10 +9,10 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 
 | Script | O que verifica |
 |--------|----------------|
-| `verify_assembly.gd` | Se nascem 3 cartas e 5 caixas |
+| `verify_assembly.gd` | Se nascem 3 cartas e 6 caixas |
 | `verify_crate_open.gd` | Fluxo de 2 cliques da caixa (`box-01` → `box-02` → `box-03` → peça) |
 | `verify_composite.gd` | Layout por ímãs (ordem cabeça / tronco / pernas) |
-| `verify_part_sizes.gd` | Sprites 300×300 e modo layered |
+| `verify_part_sizes.gd` | Sprites 300×300 e modo layered (vampiro + policial) |
 | `debug_parts.gd` | Carrega peça e checa visibilidade do sprite |
 | `debug_reveal.gd` | Força revelar peça da caixa e checa transparência |
 

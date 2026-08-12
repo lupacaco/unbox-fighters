@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/characters/policial/body.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"policial_body"
+display_name = "Police Body"
+slot_type = 1
+sprite = ExtResource("2")
+brain = 2
+power = 7
+speed = 3
+magnet_up = Vector2(8, -119)
+magnet_down = Vector2(-17, 112)

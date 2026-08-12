@@ -13,6 +13,8 @@ var _crate_scene: PackedScene = preload("res://scenes/assembly/Crate.tscn")
 var _slot_scene: PackedScene = preload("res://scenes/assembly/CharacterSlot.tscn")
 
 var _vampiro: CharacterDef
+var _policial: CharacterDef
+var _card_characters: Array[CharacterDef] = []
 var _reward_parts: Array[PartDef] = []
 var _slots: Array[CharacterSlot] = []
 
@@ -27,12 +29,17 @@ func _ready() -> void:
 
 func _build_character_data() -> void:
 	_vampiro = load("res://data/parts/vampiro_character.tres") as CharacterDef
+	_policial = load("res://data/parts/policial_character.tres") as CharacterDef
+	# Left / center / right cards: vampiro, policial, vampiro
+	_card_characters = [_vampiro, _policial, _vampiro]
+	# 6 crates = full set for vampiro + full set for policial
 	_reward_parts = [
 		_vampiro.head,
 		_vampiro.body,
 		_vampiro.legs,
-		_vampiro.head,
-		_vampiro.body,
+		_policial.head,
+		_policial.body,
+		_policial.legs,
 	]
 
 func _setup_tray_visual() -> void:
@@ -51,14 +58,15 @@ func _spawn_slots() -> void:
 		var slot := _slot_scene.instantiate() as CharacterSlot
 		_slots_root.add_child(slot)
 		slot.position = Vector2(xs[i], 400)
-		slot.setup(_vampiro)
+		slot.setup(_card_characters[i])
 		slot.play_intro(0.12 * float(i))
 		_slots.append(slot)
 
 func _spawn_crates() -> void:
-	var spacing := 230.0
-	var start_x := -spacing * 2.0
-	for i in 5:
+	var count := _reward_parts.size()
+	var spacing := 200.0 if count > 5 else 230.0
+	var start_x := -spacing * float(count - 1) * 0.5
+	for i in count:
 		var crate := _crate_scene.instantiate() as Crate
 		_tray.add_child(crate)
 		var rest := Vector2(start_x + spacing * float(i), -58)

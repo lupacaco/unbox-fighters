@@ -69,6 +69,10 @@ Pasta: `data/parts/`
 | `vampiro_head.tres` | Cabeça + `magnet_down` |
 | `vampiro_body.tres` | Tronco + `magnet_up` / `magnet_down` |
 | `vampiro_legs.tres` | Pernas + `magnet_up` |
+| `policial_character.tres` | Personagem policial + links das peças |
+| `policial_head.tres` | Cabeça + `magnet_down` |
+| `policial_body.tres` | Tronco + `magnet_up` / `magnet_down` |
+| `policial_legs.tres` | Pernas + `magnet_up` |
 
 ## Composição visual (`CompositeResolver`)
 
@@ -78,5 +82,6 @@ Sempre no modo **layered** (só partes). Calcula a posição de cada sprite pelo
 
 ## Arte relacionada
 
-Sprites em `assets/characters/vampiro/` — use `head`, `body`, `legs` (300×300).  
+- Sprites em `assets/characters/vampiro/` — use `head`, `body`, `legs` (300×300).
+- Sprites em `assets/characters/policial/` — use `head`, `body`, `legs` (300×300). Originais em `_src_*.webp`.
 Imagens `full` / `body_head` / `body_legs` podem existir na pasta, mas **não são mais usadas** pelo jogo.

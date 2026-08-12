@@ -13,10 +13,10 @@ A cena principal do jogo hoje.
 ## O que o controlador faz ao iniciar
 
 1. Registra o `DragDropService` no grupo `drag_drop_service`
-2. Carrega o personagem vampiro (`vampiro_character.tres`)
-3. Monta a lista de recompensas das 5 caixas
+2. Carrega vampiro e policial (`vampiro_character.tres`, `policial_character.tres`)
+3. Monta a lista de recompensas das 6 caixas (set completo de cada um)
 4. Posiciona a prateleira visual
-5. Spawna 3 cartas e 5 caixas
+5. Spawna 3 cartas (vampiro | policial | vampiro) e 6 caixas
 6. Liga o serviço de arraste às cartas e à bandeja
 7. Toca a intro (fade do título)
 
@@ -36,8 +36,9 @@ Ordem fixa (dados de teste):
 1. Cabeça do vampiro  
 2. Tronco do vampiro  
 3. Pernas do vampiro  
-4. Cabeça do vampiro (de novo)  
-5. Tronco do vampiro (de novo)
+4. Cabeça do policial  
+5. Tronco do policial  
+6. Pernas do policial
 
 ## Abrir caixa (`Crate`)
 

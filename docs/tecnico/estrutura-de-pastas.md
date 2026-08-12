@@ -13,6 +13,7 @@ unbox-fighters/
 │   ├── objects/           # Objetos de UI (martelo do cursor)
 │   ├── audio/sfx/         # Efeitos sonoros (.wav)
 │   ├── characters/vampiro/
+│   ├── characters/policial/
 │   └── ui/
 ├── data/                  # Dados do jogo (.tres)
 │   └── parts/
@@ -33,7 +34,7 @@ unbox-fighters/
 |------------|----------|
 | Mudar a tela principal | `scenes/assembly/Assembly.tscn` + `scripts/assembly/assembly_controller.gd` |
 | Mudar comportamento de caixa / peça / carta | `scripts/assembly/` |
-| Mudar atributos ou sprites do vampiro | `data/parts/` |
+| Mudar atributos ou sprites do vampiro / policial | `data/parts/` |
 | Mudar regras de composição visual | `scripts/data/composite_resolver.gd` |
 | Mudar HUD / fundo | `scripts/ui/` |
 | Preparar imagens 300×300 | `tools/` |

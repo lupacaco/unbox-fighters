@@ -4,7 +4,7 @@ O que o jogador pode fazer hoje, e as regras que o jogo aplica.
 
 ## Fluxo na tela de montagem
 
-1. Aparecem **3 cartas** de personagem e **5 caixas** na prateleira.
+1. Aparecem **3 cartas** de personagem e **6 caixas** na prateleira.
 2. O jogador abre cada caixa com **2 cliques**:
    - 1º clique → caixa **trincada**
    - 2º clique → caixa **quebrada**, fica 0,5 s e some; aí aparece a **peça**
@@ -27,13 +27,14 @@ Cada peça ocupa **um** tipo de encaixe:
 
 Cada peça tem três números:
 
-| Código | Nome simples | Exemplo (vampiro) |
-|--------|--------------|-------------------|
-| BRN | Brain (cérebro / inteligência) | Cabeça 8, Tronco 1, Pernas 0 |
-| PWR | Power (força) | Cabeça 2, Tronco 9, Pernas 3 |
-| SPD | Speed (velocidade) | Cabeça 3, Tronco 2, Pernas 8 |
+| Código | Nome simples | Exemplo (vampiro) | Exemplo (policial) |
+|--------|--------------|-------------------|--------------------|
+| BRN | Brain (cérebro / inteligência) | Cabeça 8, Tronco 1, Pernas 0 | Cabeça 6, Tronco 2, Pernas 0 |
+| PWR | Power (força) | Cabeça 2, Tronco 9, Pernas 3 | Cabeça 3, Tronco 7, Pernas 4 |
+| SPD | Speed (velocidade) | Cabeça 3, Tronco 2, Pernas 8 | Cabeça 4, Tronco 3, Pernas 7 |
 
-**Total do set completo do vampiro:** BRN 9 / PWR 14 / SPD 13
+**Total do set completo do vampiro:** BRN 9 / PWR 14 / SPD 13  
+**Total do set completo do policial:** BRN 8 / PWR 14 / SPD 14
 
 Na carta, os atributos são a **soma** das peças já encaixadas.
 

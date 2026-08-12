@@ -22,9 +22,9 @@ Visual “premium”: cartas, prateleira, caixas e fundo de arena com poeira. A 
 
 ## Conteúdo atual
 
-- **1 personagem de dados:** Vampiro (`vampiro`)
-- **3 cartas** na tela (as três usam o mesmo personagem, por enquanto)
-- **5 caixas** na prateleira com peças de recompensa
+- **2 personagens de dados:** Vampiro (`vampiro`) e Policial (`policial`)
+- **3 cartas** na tela: vampiro | policial | vampiro
+- **6 caixas** na prateleira (set completo do vampiro + set completo do policial)
 
 ## Resolução da tela
 

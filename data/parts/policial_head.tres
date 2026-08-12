@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/characters/policial/head.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"policial_head"
+display_name = "Police Head"
+slot_type = 0
+sprite = ExtResource("2")
+brain = 6
+power = 3
+speed = 4
+magnet_down = Vector2(-22, 141)
