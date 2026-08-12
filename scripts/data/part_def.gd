@@ -1,3 +1,4 @@
+@tool
 class_name PartDef
 extends Resource
 
@@ -24,8 +25,8 @@ func uses_magnet_down() -> bool:
 func _validate_property(property: Dictionary) -> void:
 	match String(property.name):
 		"magnet_up":
-			if not uses_magnet_up():
+			if slot_type == PartSlotType.Value.HEAD:
 				property.usage = PROPERTY_USAGE_NO_EDITOR
 		"magnet_down":
-			if not uses_magnet_down():
+			if slot_type == PartSlotType.Value.LEGS:
 				property.usage = PROPERTY_USAGE_NO_EDITOR

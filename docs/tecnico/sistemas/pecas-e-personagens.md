@@ -10,7 +10,7 @@ Enum: `HEAD`, `BODY`, `LEGS`.
 
 ### `PartDef` (`scripts/data/part_def.gd`)
 
-Recurso de **uma peça**:
+Recurso de **uma peça** (script com `@tool` para o editor poder ler/validar ímãs no Inspetor):
 
 - `id`, `display_name`
 - `slot_type` (cabeça / tronco / pernas)

@@ -19,11 +19,17 @@ func setup(part: PartDef) -> void:
 	_undo = EditorInterface.get_editor_undo_redo()
 	_build_ui()
 	_apply_slot_visibility()
-	if _part.uses_magnet_down() and not _part.uses_magnet_up():
+	if _can_use_down() and not _can_use_up():
 		_set_target(EditTarget.DOWN)
 	else:
 		_set_target(EditTarget.UP)
 	_refresh_coords()
+
+func _can_use_up() -> bool:
+	return _part != null and _part.slot_type != PartSlotType.Value.HEAD
+
+func _can_use_down() -> bool:
+	return _part != null and _part.slot_type != PartSlotType.Value.LEGS
 
 func _build_ui() -> void:
 	var row := HBoxContainer.new()
@@ -54,15 +60,13 @@ func _build_ui() -> void:
 	add_child(_label_coords)
 
 func _apply_slot_visibility() -> void:
-	if _part == null:
-		return
-	_btn_up.visible = _part.uses_magnet_up()
-	_btn_down.visible = _part.uses_magnet_down()
+	_btn_up.visible = _can_use_up()
+	_btn_down.visible = _can_use_down()
 
 func _set_target(target: EditTarget) -> void:
-	if target == EditTarget.UP and _part != null and not _part.uses_magnet_up():
+	if target == EditTarget.UP and not _can_use_up():
 		target = EditTarget.DOWN
-	if target == EditTarget.DOWN and _part != null and not _part.uses_magnet_down():
+	if target == EditTarget.DOWN and not _can_use_down():
 		target = EditTarget.UP
 	_target = target
 	_refresh_buttons()
@@ -79,9 +83,9 @@ func _refresh_coords() -> void:
 	if _part == null or _label_coords == null:
 		return
 	var parts: PackedStringArray = []
-	if _part.uses_magnet_up():
+	if _can_use_up():
 		parts.append("Cima: %s" % _part.magnet_up)
-	if _part.uses_magnet_down():
+	if _can_use_down():
 		parts.append("Baixo: %s" % _part.magnet_down)
 	_label_coords.text = "   |   ".join(parts)
 
@@ -97,9 +101,9 @@ func _on_canvas_draw() -> void:
 		return
 
 	_canvas.draw_texture_rect(_part.sprite, rect, false)
-	if _part.uses_magnet_up():
+	if _can_use_up():
 		_draw_marker(_part.magnet_up, Color(0.25, 0.85, 1.0, 1.0), "CIMA")
-	if _part.uses_magnet_down():
+	if _can_use_down():
 		_draw_marker(_part.magnet_down, Color(1.0, 0.35, 0.35, 1.0), "BAIXO")
 
 func _draw_marker(magnet: Vector2, color: Color, label: String) -> void:
@@ -128,9 +132,9 @@ func _on_canvas_gui_input(event: InputEvent) -> void:
 func _apply_magnet(magnet: Vector2) -> void:
 	var rounded := Vector2(roundf(magnet.x), roundf(magnet.y))
 	var prop := "magnet_up" if _target == EditTarget.UP else "magnet_down"
-	if prop == "magnet_up" and not _part.uses_magnet_up():
+	if prop == "magnet_up" and not _can_use_up():
 		return
-	if prop == "magnet_down" and not _part.uses_magnet_down():
+	if prop == "magnet_down" and not _can_use_down():
 		return
 	var old_value: Vector2 = _part.get(prop)
 	if old_value == rounded:
