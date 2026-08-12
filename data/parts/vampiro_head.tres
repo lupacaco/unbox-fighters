@@ -1,15 +1,14 @@
-[gd_resource type="Resource" script_class="PartDef" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://cgw3pvuy10bml"]
 
-[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/characters/vampiro/head.png" id="2"]
+[ext_resource type="Script" uid="uid://71ffw17l5buf" path="res://scripts/data/part_def.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bmqj7b4sobtwo" path="res://assets/characters/vampiro/head.png" id="2"]
 
 [resource]
 script = ExtResource("1")
 id = &"vampiro_head"
 display_name = "Vampire Head"
-slot_type = 0
 sprite = ExtResource("2")
 brain = 8
 power = 2
 speed = 3
-magnet_down = Vector2(0, 120)
+magnet_down = Vector2(7, 122)
