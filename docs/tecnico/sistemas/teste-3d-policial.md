@@ -1,82 +1,41 @@
-# Teste 3D — policial em GLB
+# Teste 3D — cópia fiel da montagem (só policial)
 
-Experimento para comparar **sprites 2D** (trocar frente/perfil) com **modelos 3D** (girar o personagem de verdade).
+Experimento: **mesma tela de montagem** (caixas, carta, arrastar/soltar, LUTAR), com **apenas o policial**, e as peças em **3D (GLB)**.
 
-## O que é
+## O que deve acontecer
 
-Uma tela **só de teste**, parecida com a montagem, mas:
+1. Abrir 3 caixas (cabeça / tronco / pernas do policial)
+2. Arrastar para **1 carta**
+3. Ver o policial montado em 3D na carta
+4. Clicar **LUTAR**:
+   - limpa a prateleira
+   - pula para a esquerda do shelf
+   - **gira em 3D** para o perfil (não troca sprite)
+   - anda até o meio
+   - lança cada **parte 3D** (bumerangue)
+   - volta para a carta
 
-- 1 carta só (policial)
-- cabeça + tronco + pernas vêm de arquivos **GLB** (modelo 3D)
-- ao clicar **LUTAR**: pula na prateleira, **vira para a direita em 3D**, anda com pulinhos, ataca com as partes 3D e volta
+A tela principal 2D (`Assembly.tscn`) **não muda**.
 
-Não substitui a tela principal do jogo. É para você ver e decidir.
+## Como abrir no Godot (importante)
 
-## Como abrir no Godot
+1. Abra `scenes/assembly3d/Assembly3D.tscn` (dois cliques)
+2. Rode com **F6** (Executar cena atual)  
+   — **F5** abre a montagem 2D normal
 
-1. Abra o projeto `C:\dev\unbox-fighters` no Godot
-2. No painel de arquivos, vá em `scenes/assembly/`
-3. Dê **dois cliques** em **Assembly3DTest.tscn** (a cena deve aparecer na árvore à esquerda)
-4. Para rodar **esta** cena (e não a 2D principal):
-   - Aperte **F6**, ou
-   - No menu: **Projeto → Executar Cena Atual**, ou
-   - Clique no botão de play com o **filme/claquete** (Play Current Scene)
+## Pastas
 
-Importante: o botão Play grande (**F5**) abre a tela **2D** normal (`Assembly.tscn`).  
-Para o teste 3D, use **F6** (cena atual).
+| Item | Caminho |
+|------|---------|
+| Cena | `scenes/assembly3d/Assembly3D.tscn` |
+| Scripts | `scripts/assembly3d/` |
+| GLBs | `assets/characters/policial/3d/` |
 
-Arquivos 3D: `assets/characters/policial/3d/`
+## Unity
 
-## Como abrir no Unity
+No projeto Unity: menu **Unbox Fighters → Bootstrap 3D Assembly**  
+(cena `Assets/Scenes/Assembly3D.unity`). Use Game **1920×1080** / Scale **1x**.
 
-1. Abra `C:\dev\unbox-fighters-unity` no Unity
-2. No menu: **Unbox Fighters → Bootstrap 3D Test Scene**  
-   (isso importa os GLB e cria/abre a cena)
-3. A cena fica em `Assets/Scenes/Assembly3DTest.unity`
-4. Aperte **Play**
-5. Na aba **Game**, use resolução **1920×1080** e Scale **1x**
+## Peso
 
-Os GLB estão em `Assets/Art/Characters/policial/3d/`.  
-O Unity precisa do pacote **glTFast** (já listado no `Packages/manifest.json`) para ler GLB.
-
-## Fica mais pesado?
-
-**Um pouco sim**, neste teste:
-
-| | 2D (sprites) | 3D (estes GLBs) |
-|--|--------------|-----------------|
-| Arquivos do policial | várias PNGs leves | ~4,5 MB de GLB + texturas |
-| Detalhe na tela | 3 imagens empilhadas | ~41 mil pontos do modelo (bem denso) |
-| Virar de perfil | troca a figura | gira o objeto de verdade |
-| Andar / atacar | troca poses `-2`/`-3` | movimento + inclinação (ainda sem animação de ossos) |
-
-No PC, para **um** lutador, costuma rodar bem.  
-Se no futuro forem **muitos** lutadores 3D densos assim (celular / web), aí pesa mais que 2D.
-
-## Como funciona (ideia simples)
-
-- No 2D atual: cada “pose” é uma **foto** diferente (frente, perfil, ataque).
-- No 3D: é um **boneco** de verdade. A câmera olha de frente; para “perfil”, o boneco **gira**.
-- Estes GLBs **não têm animação** gravada. O pulo/caminhada/ataque deste teste são movimentos feitos no código (não é mocap / skeleton ainda).
-
-## Arquivos principais
-
-**Godot**
-
-- `scenes/assembly/Assembly3DTest.tscn`
-- `scripts/assembly/assembly_3d_test_controller.gd`
-- `scripts/assembly/fighter_3d_puppet.gd`
-
-**Unity**
-
-- `Assets/Scenes/Assembly3DTest.unity` (criada pelo Bootstrap 3D)
-- `Assets/Scripts/Assembly3D/`
-
-## Decisão de produto (ainda aberta)
-
-Este teste serve para sentir:
-
-- se o visual 3D vale a pena no estilo do jogo
-- se o peso e o trabalho (arte + encaixe das partes) compensam
-
-A tela principal continua sendo a montagem **2D** até você decidir o contrário.
+Um policial 3D detalhado é mais pesado que sprites 2D. Neste teste (1 lutador) no PC costuma ir bem.
