@@ -18,14 +18,12 @@ func setup(part: PartDef) -> void:
 	_part = part
 	_undo = EditorInterface.get_editor_undo_redo()
 	_build_ui()
-	_refresh_buttons()
-	_refresh_coords()
-	if _part.slot_type == PartSlotType.Value.HEAD:
+	_apply_slot_visibility()
+	if _part.uses_magnet_down() and not _part.uses_magnet_up():
 		_set_target(EditTarget.DOWN)
-	elif _part.slot_type == PartSlotType.Value.LEGS:
-		_set_target(EditTarget.UP)
 	else:
 		_set_target(EditTarget.UP)
+	_refresh_coords()
 
 func _build_ui() -> void:
 	var row := HBoxContainer.new()
@@ -55,10 +53,21 @@ func _build_ui() -> void:
 	_label_coords.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	add_child(_label_coords)
 
+func _apply_slot_visibility() -> void:
+	if _part == null:
+		return
+	_btn_up.visible = _part.uses_magnet_up()
+	_btn_down.visible = _part.uses_magnet_down()
+
 func _set_target(target: EditTarget) -> void:
+	if target == EditTarget.UP and _part != null and not _part.uses_magnet_up():
+		target = EditTarget.DOWN
+	if target == EditTarget.DOWN and _part != null and not _part.uses_magnet_down():
+		target = EditTarget.UP
 	_target = target
 	_refresh_buttons()
-	_canvas.queue_redraw()
+	if _canvas != null:
+		_canvas.queue_redraw()
 
 func _refresh_buttons() -> void:
 	if _btn_up == null or _btn_down == null:
@@ -69,7 +78,12 @@ func _refresh_buttons() -> void:
 func _refresh_coords() -> void:
 	if _part == null or _label_coords == null:
 		return
-	_label_coords.text = "Cima: %s   |   Baixo: %s" % [_part.magnet_up, _part.magnet_down]
+	var parts: PackedStringArray = []
+	if _part.uses_magnet_up():
+		parts.append("Cima: %s" % _part.magnet_up)
+	if _part.uses_magnet_down():
+		parts.append("Baixo: %s" % _part.magnet_down)
+	_label_coords.text = "   |   ".join(parts)
 
 func _texture_draw_rect() -> Rect2:
 	return Rect2(Vector2.ZERO, Vector2(PREVIEW_SIZE, PREVIEW_SIZE))
@@ -83,8 +97,10 @@ func _on_canvas_draw() -> void:
 		return
 
 	_canvas.draw_texture_rect(_part.sprite, rect, false)
-	_draw_marker(_part.magnet_up, Color(0.25, 0.85, 1.0, 1.0), "CIMA")
-	_draw_marker(_part.magnet_down, Color(1.0, 0.35, 0.35, 1.0), "BAIXO")
+	if _part.uses_magnet_up():
+		_draw_marker(_part.magnet_up, Color(0.25, 0.85, 1.0, 1.0), "CIMA")
+	if _part.uses_magnet_down():
+		_draw_marker(_part.magnet_down, Color(1.0, 0.35, 0.35, 1.0), "BAIXO")
 
 func _draw_marker(magnet: Vector2, color: Color, label: String) -> void:
 	var pos := _magnet_to_canvas(magnet)
@@ -112,6 +128,10 @@ func _on_canvas_gui_input(event: InputEvent) -> void:
 func _apply_magnet(magnet: Vector2) -> void:
 	var rounded := Vector2(roundf(magnet.x), roundf(magnet.y))
 	var prop := "magnet_up" if _target == EditTarget.UP else "magnet_down"
+	if prop == "magnet_up" and not _part.uses_magnet_up():
+		return
+	if prop == "magnet_down" and not _part.uses_magnet_down():
+		return
 	var old_value: Vector2 = _part.get(prop)
 	if old_value == rounded:
 		return
@@ -130,7 +150,6 @@ func _apply_magnet(magnet: Vector2) -> void:
 func _after_magnet_changed() -> void:
 	_refresh_coords()
 	_canvas.queue_redraw()
-	# Keep the resource dirty so Godot asks to save / writes the .tres.
 	if _part != null:
 		_part.emit_changed()
 

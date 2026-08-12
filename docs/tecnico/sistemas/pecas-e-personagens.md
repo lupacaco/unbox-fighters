@@ -39,8 +39,13 @@ Não usa mais imagens pré-montadas (full / body_head / body_legs). Só as 3 par
 6. Salve o recurso (`Ctrl+S`).
 
 Marcadores:
-- **CIMA** (azul) = `magnet_up`
-- **BAIXO** (vermelho) = `magnet_down`
+- **CIMA** (azul) = `magnet_up` — aparece em tronco e pernas
+- **BAIXO** (vermelho) = `magnet_down` — aparece em cabeça e tronco
+
+Regras por tipo:
+- **Cabeça** → só ímã de baixo
+- **Pernas** → só ímã de cima
+- **Tronco** → os dois
 
 ### Sistema de coordenadas (se precisar editar o número)
 

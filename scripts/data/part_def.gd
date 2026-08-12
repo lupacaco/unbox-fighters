@@ -11,6 +11,21 @@ extends Resource
 
 ## Magnet points in texture pixels, from the sprite CENTER.
 ## Y negative = up on the image. Y positive = down on the image.
-## Head uses magnet_down. Legs use magnet_up. Body uses both.
+## Head: only magnet_down. Legs: only magnet_up. Body: both.
 @export var magnet_up: Vector2 = Vector2.ZERO
 @export var magnet_down: Vector2 = Vector2.ZERO
+
+func uses_magnet_up() -> bool:
+	return slot_type != PartSlotType.Value.HEAD
+
+func uses_magnet_down() -> bool:
+	return slot_type != PartSlotType.Value.LEGS
+
+func _validate_property(property: Dictionary) -> void:
+	match String(property.name):
+		"magnet_up":
+			if not uses_magnet_up():
+				property.usage = PROPERTY_USAGE_NO_EDITOR
+		"magnet_down":
+			if not uses_magnet_down():
+				property.usage = PROPERTY_USAGE_NO_EDITOR

@@ -20,7 +20,13 @@ func _parse_begin(object: Object) -> void:
 	box.add_child(title)
 
 	var hint := Label.new()
-	hint.text = "Escolha qual ímã editar, depois clique no círculo da peça (pescoço / cintura)."
+	match part.slot_type:
+		PartSlotType.Value.HEAD:
+			hint.text = "Cabeça: só ímã de baixo. Clique no ponto que cola no tronco."
+		PartSlotType.Value.LEGS:
+			hint.text = "Pernas: só ímã de cima. Clique no ponto que cola no tronco."
+		_:
+			hint.text = "Tronco: ímã de cima (pescoço) e de baixo (cintura). Escolha o botão e clique na imagem."
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.modulate = Color(0.75, 0.78, 0.82, 1)
 	box.add_child(hint)
