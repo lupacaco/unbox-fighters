@@ -44,4 +44,3 @@
 
 - **Godot 4.7**, renderer Forward Plus
 - Cena principal: `scenes/assembly/Assembly.tscn`
-- Projeto Unity independente (só montagem): pasta `C:\dev\unbox-fighters-unity` — ver [Unity](../tecnico/unity.md)

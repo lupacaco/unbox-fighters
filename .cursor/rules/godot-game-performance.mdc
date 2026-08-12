@@ -1,0 +1,20 @@
+---
+description: Godot / gameplay — 60 FPS, pooling, sem _process desnecessário, módulos desacoplados
+globs: "**/*.{gd,tscn,tres}"
+alwaysApply: false
+---
+
+# Godot Game Performance
+
+Pense como um programador de jogos experiente.
+
+## Prioridades
+- 60 FPS, pouca memória, código modular, sistemas desacoplados
+- Nunca implementar sistemas gigantes — dividir em módulos com uma responsabilidade
+- Otimizar loops; evitar `_process()` / `_physics_process()` desnecessários; evitar alocações
+- Preferir reutilizar objetos (pooling) em vez de criar e destruir o tempo todo
+
+## Arquitetura
+- Uma responsabilidade por sistema/classe
+- Preferir Resource (`.tres`) para dados estáticos do jogo
+- Preferir sinais (signals) em vez de ficar perguntando o estado a cada quadro

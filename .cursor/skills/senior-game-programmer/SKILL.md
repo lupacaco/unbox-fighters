@@ -1,6 +1,6 @@
 ---
 name: senior-game-programmer
-description: Senior game programmer standards for gameplay, physics, UI/UX, game feel, optimization, and modular Unity architecture. Use when working on Unity, gameplay systems, assembly screen, crates, drag-drop, combat, UI, performance, or game feel.
+description: Senior game programmer standards for gameplay, physics, UI/UX, game feel, optimization, and modular Godot architecture. Use when working on gameplay systems, assembly screen, crates, drag-drop, combat, UI, performance, or game feel.
 ---
 
 # Senior Game Programmer
@@ -43,11 +43,11 @@ Sempre detectar possíveis exploits.
 
 Sempre otimizar loops.
 
-Evite Update() desnecessários.
+Evite `_process()` / `_physics_process()` desnecessários.
 
 Evite alocações.
 
-Priorize Object Pooling.
+Priorize reutilizar objetos (pooling) em vez de criar e destruir o tempo todo.
 
 Sempre pense como um programador AAA.
 

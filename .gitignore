@@ -40,16 +40,3 @@ dist/
 .env.*
 *.pem
 credentials.json
-
-# Se o Unity Hub abrir esta pasta por engano, ignore o lixo dele
-Library/
-Logs/
-Temp/
-Obj/
-UserSettings/
-ProjectSettings/
-Packages/
-*.csproj
-*.sln
-*.meta
-!docs/**/*.meta
