@@ -31,13 +31,21 @@ var _card_fighter: Fighter3DPuppet
 var _busy: bool = false
 
 func _ready() -> void:
+	print("Assembly3DTest: iniciando tela 3D do policial…")
+	if _camera == null or _world == null or _card_anchor == null or _shelf_anchor == null:
+		push_error("Assembly3DTest: nós da cena faltando. Reabra Assembly3DTest.tscn")
+		return
+	if _fight_button == null:
+		push_error("Assembly3DTest: botão LUTAR não encontrado")
+		return
 	_setup_camera()
 	_setup_background()
 	_setup_shelf()
 	_setup_card_frame()
 	_spawn_card_fighter()
 	_fight_button.pressed.connect(_on_fight_pressed)
-	_hint.text = "Teste 3D — só policial. Clique LUTAR."
+	_hint.text = "Teste 3D — só policial. Clique LUTAR. (Abra esta cena com F6, não F5)"
+	print("Assembly3DTest: pronto. Use Play Current Scene (F6) se a tela 2D abrir no lugar.")
 
 func _px_to_world(pos_2d: Vector2) -> Vector3:
 	# Mesma lógica da tela 2D 1920x1080: centro (960,540) = origem.

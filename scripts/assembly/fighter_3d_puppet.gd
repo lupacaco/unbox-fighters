@@ -36,7 +36,17 @@ func _load_part(path: String, part_name: String) -> Node3D:
 	return wrapper
 
 func _instantiate_gltf(path: String) -> Node3D:
-	# Carrega .glb em tempo de execução (não depende do import do editor).
+	# Preferir o .glb já importado pelo editor (PackedScene).
+	var packed: Variant = load(path)
+	if packed is PackedScene:
+		var inst: Node = (packed as PackedScene).instantiate()
+		if inst is Node3D:
+			return inst as Node3D
+		var wrap := Node3D.new()
+		wrap.add_child(inst)
+		return wrap
+
+	# Fallback: leitura direta do arquivo.
 	var doc := GLTFDocument.new()
 	var state := GLTFState.new()
 	var err := doc.append_from_file(path, state)
@@ -44,18 +54,24 @@ func _instantiate_gltf(path: String) -> Node3D:
 		push_error("GLTF append_from_file failed (%s): %s" % [str(err), path])
 		return null
 	var scene := doc.generate_scene(state)
-	return scene as Node3D
+	if scene is Node3D:
+		return scene as Node3D
+	if scene != null:
+		var wrap2 := Node3D.new()
+		wrap2.add_child(scene)
+		return wrap2
+	return null
 
 func _clear_children() -> void:
 	for child in get_children():
-		child.queue_free()
+		remove_child(child)
+		child.free()
 
 func face_front() -> void:
 	_facing_yaw = 0.0
 	rotation.y = _facing_yaw
 
 func face_right() -> void:
-	# Vira para a direita da tela (+X) para caminhar no shelf.
 	_facing_yaw = -PI * 0.5
 	rotation.y = _facing_yaw
 
@@ -71,7 +87,6 @@ func get_part_node(slot: String) -> Node3D:
 			return null
 
 func set_stride_pose(use_attack_lean: bool) -> void:
-	# Sem animação no GLB: inclina leve para simular passo.
 	var lean := 0.12 if use_attack_lean else -0.08
 	if _body != null:
 		_body.rotation.x = lean

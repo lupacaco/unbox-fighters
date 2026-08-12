@@ -16,8 +16,14 @@ Não substitui a tela principal do jogo. É para você ver e decidir.
 
 1. Abra o projeto `C:\dev\unbox-fighters` no Godot
 2. No painel de arquivos, vá em `scenes/assembly/`
-3. Dê dois cliques em **Assembly3DTest.tscn**
-4. Aperte **Play** (F5 nesta cena, ou botão Play com esta cena aberta)
+3. Dê **dois cliques** em **Assembly3DTest.tscn** (a cena deve aparecer na árvore à esquerda)
+4. Para rodar **esta** cena (e não a 2D principal):
+   - Aperte **F6**, ou
+   - No menu: **Projeto → Executar Cena Atual**, ou
+   - Clique no botão de play com o **filme/claquete** (Play Current Scene)
+
+Importante: o botão Play grande (**F5**) abre a tela **2D** normal (`Assembly.tscn`).  
+Para o teste 3D, use **F6** (cena atual).
 
 Arquivos 3D: `assets/characters/policial/3d/`
 
