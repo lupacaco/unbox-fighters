@@ -6,9 +6,6 @@ extends Resource
 @export var head: PartDef
 @export var body: PartDef
 @export var legs: PartDef
-@export var body_head_sprite: Texture2D
-@export var body_legs_sprite: Texture2D
-@export var full_sprite: Texture2D
 
 func get_part(slot: PartSlotType.Value) -> PartDef:
 	match slot:

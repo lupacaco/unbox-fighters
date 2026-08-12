@@ -4,18 +4,8 @@ extends Node2D
 signal part_attached(slot: CharacterSlot, part: PartDef)
 signal part_detached(slot: CharacterSlot, part: PartDef)
 
-const HEAD_POS := Vector2(0, -138)
-const BODY_POS := Vector2(0, -8)
-const LEGS_POS := Vector2(0, 118)
-const HEAD_SIZE_PX := 150.0
-const BODY_SIZE_PX := 150.0
-const LEGS_SIZE_PX := 150.0
-const FULL_SIZE_PX := 350.0
-const PAIR_SIZE_PX := 300.0
-# Card art area roughly y=-180..160; align pair composites to top/bottom.
-const BODY_HEAD_POS := Vector2(0, -95)
-const BODY_LEGS_POS := Vector2(0, 55)
-const FULL_POS := Vector2(0, -8)
+const BODY_ORIGIN := Vector2(0, -8)
+const PART_SIZE_PX := 150.0
 
 @onready var _card_shadow: Sprite2D = $CardShadow
 @onready var _card_frame: Sprite2D = $CardFrame
@@ -240,21 +230,11 @@ func _apply_plan(plan: Dictionary) -> void:
 	_sprite_body.visible = false
 	_sprite_legs.visible = false
 
-	if plan["mode"] == "composite":
-		var kind: String = str(plan.get("composite_kind", "full"))
-		match kind:
-			"body_head":
-				_place_sprite(_sprite_composite, plan["composite"], BODY_HEAD_POS, PAIR_SIZE_PX)
-			"body_legs":
-				_place_sprite(_sprite_composite, plan["composite"], BODY_LEGS_POS, PAIR_SIZE_PX)
-			_:
-				_place_sprite(_sprite_composite, plan["composite"], FULL_POS, FULL_SIZE_PX)
-		return
-
+	var size_px: float = float(plan.get("part_size_px", PART_SIZE_PX))
 	if plan["mode"] == "layered":
-		_place_sprite(_sprite_legs, plan["legs"], LEGS_POS, LEGS_SIZE_PX)
-		_place_sprite(_sprite_body, plan["body"], BODY_POS, BODY_SIZE_PX)
-		_place_sprite(_sprite_head, plan["head"], HEAD_POS, HEAD_SIZE_PX)
+		_place_sprite(_sprite_legs, plan["legs"], plan["legs_pos"], size_px)
+		_place_sprite(_sprite_body, plan["body"], plan["body_pos"], size_px)
+		_place_sprite(_sprite_head, plan["head"], plan["head_pos"], size_px)
 
 func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2, target_px: float) -> void:
 	if texture == null:

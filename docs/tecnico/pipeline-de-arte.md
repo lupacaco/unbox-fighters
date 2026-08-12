@@ -15,7 +15,8 @@ Scripts fora do Godot que preparam imagens dos personagens.
 
 Em `assets/characters/vampiro/`:
 
-- Arquivos finais usados pelo jogo: `head.png`, `body.png`, `legs.png`, compostos (`full`, `body_head`, `body_legs`), etc.
+- Arquivos finais usados pelo jogo: `head.png`, `body.png`, `legs.png`
+- Compostos antigos (`full`, `body_head`, `body_legs`) podem sobrar na pasta, mas o jogo não usa mais
 - `_src_*` — arte de origem / intermediária do pipeline
 - Também podem existir cópias `.webp` das mesmas artes
 

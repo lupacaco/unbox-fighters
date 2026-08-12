@@ -27,7 +27,7 @@ Arte e recursos (assets/, data/)
 | `Crate` | Caixa com 2 cliques (3 sprites) que some e revela uma `PartView` |
 | `PartView` | Peça arrastável na prateleira / carta |
 | `CharacterSlot` | Carta com zonas de cabeça/tronco/pernas, visual e atributos |
-| `CompositeResolver` | Decide se mostra imagem já montada ou as 3 partes empilhadas |
+| `CompositeResolver` | Posiciona cabeça/tronco/pernas colando pelos ímãs |
 | `StatReadout` / `BackgroundFX` | HUD de atributos e fundo |
 | `Sfx` (autoload) | Toca efeitos sonoros curtos |
 

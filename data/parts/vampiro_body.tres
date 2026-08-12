@@ -12,4 +12,5 @@ sprite = ExtResource("2")
 brain = 1
 power = 9
 speed = 2
-
+magnet_up = Vector2(0, -120)
+magnet_down = Vector2(0, 120)

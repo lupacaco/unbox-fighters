@@ -11,7 +11,7 @@
 | Arrastar e soltar | Mouse, com destaque no encaixe válido + SFX |
 | 3 cartas de personagem | Montagem cabeça / tronco / pernas |
 | Atributos BRN / PWR / SPD | Somam ao encaixar |
-| Visual composto | Usa imagem pré-montada quando possível; senão empilha as 3 partes |
+| Visual composto | Só partes separadas; ímãs (`magnet_up` / `magnet_down`) unem as peças |
 | Fundo de arena | Respiração de vinheta + partículas de poeira |
 | Áudio | Efeitos: martelo, caixa, peças, conclusão do lutador |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |
