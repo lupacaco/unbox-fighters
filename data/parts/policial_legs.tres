@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="PartDef" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://rxjscidx0gaj"]
 
-[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/characters/policial/policial_legs-1.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/characters/policial/policial_legs-2.png" id="3"]
-[ext_resource type="Texture2D" path="res://assets/characters/policial/policial_legs-3.png" id="4"]
+[ext_resource type="Script" uid="uid://71ffw17l5buf" path="res://scripts/data/part_def.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://l03tlm41vt7d" path="res://assets/characters/policial/policial_legs-1.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://gydsqpu5bpvh" path="res://assets/characters/policial/policial_legs-2.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://ui4ltbkx0tis" path="res://assets/characters/policial/policial_legs-3.png" id="4"]
 
 [resource]
 script = ExtResource("1")
@@ -15,4 +15,4 @@ sprite_profile = ExtResource("3")
 sprite_attack = ExtResource("4")
 power = 4
 speed = 7
-magnet_up = Vector2(2, -150)
+magnet_up = Vector2(0, -72)

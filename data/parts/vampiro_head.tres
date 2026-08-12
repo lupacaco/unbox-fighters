@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="PartDef" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://cgw3pvuy10bml"]
 
-[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/characters/vampiro/vampiro_head-1.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/characters/vampiro/vampiro_head-2.png" id="3"]
-[ext_resource type="Texture2D" path="res://assets/characters/vampiro/vampiro_head-3.png" id="4"]
+[ext_resource type="Script" uid="uid://71ffw17l5buf" path="res://scripts/data/part_def.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://dbrr0busvjpix" path="res://assets/characters/vampiro/vampiro_head-1.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://6p15jigkrpwq" path="res://assets/characters/vampiro/vampiro_head-2.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://dyp6m0ic3qjp3" path="res://assets/characters/vampiro/vampiro_head-3.png" id="4"]
 
 [resource]
 script = ExtResource("1")
@@ -15,4 +15,4 @@ sprite_attack = ExtResource("4")
 brain = 8
 power = 2
 speed = 3
-magnet_down = Vector2(0, 120)
+magnet_down = Vector2(6, 104)
