@@ -18,7 +18,6 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 | `debug_parts.gd` | Carrega peça e checa visibilidade do sprite |
 | `debug_reveal.gd` | Força revelar peça da caixa e checa transparência |
 | `verify_legs_walk.gd` | Ossos e animação `walk` das pernas 3D do policial |
-| `verify_mumia_shelf.gd` | Animações da múmia 3D e a cena do shelf |
 
 ## Quando atualizar
 
