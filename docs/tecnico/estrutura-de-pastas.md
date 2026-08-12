@@ -39,6 +39,7 @@ unbox-fighters/
 | Mudar regras de composição visual | `scripts/data/composite_resolver.gd` |
 | Mudar HUD / fundo | `scripts/ui/` |
 | Preparar imagens 300×300 | `tools/` |
+| Teste do policial em 3D | `scenes/assembly/Assembly3DTest.tscn` |
 | Documentação | `docs/` |
 
 ## Pastas que o Godot gera

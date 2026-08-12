@@ -28,6 +28,7 @@
 | Botão LUTAR | Libera quando as 3 peças encaixadas têm poses de perfil/ataque |
 | ThemeTokens | Cores definidas no código, mas pouco (ou não) usadas nas cenas |
 | Arte no padrão `-1/-2/-3` | Frente / perfil / ataque por peça |
+| Teste 3D do policial | Cena `Assembly3DTest` (Godot + Unity) — não é a tela principal |
 
 ## Ainda não existe
 
