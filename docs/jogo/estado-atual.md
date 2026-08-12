@@ -44,4 +44,4 @@
 
 - **Godot 4.7**, renderer Forward Plus
 - Cena principal: `scenes/assembly/Assembly.tscn`
-- Cópia Unity (só montagem, para benchmark): pasta irmã `C:\dev\unbox-fighters-unity` — ver [Unity benchmark](../tecnico/unity-benchmark.md)
+- Projeto Unity independente (só montagem): pasta `C:\dev\unbox-fighters-unity` — ver [Unity](../tecnico/unity.md)

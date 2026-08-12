@@ -8,6 +8,8 @@ Feito em **Godot 4.7**. Ainda em construção: hoje existe a tela de montagem; o
 1. Abra a pasta do projeto no Godot 4.7
 2. Rode a cena principal: `scenes/assembly/Assembly.tscn`
 
+Há também um projeto Unity **independente** (não usa o Godot) em `C:\dev\unbox-fighters-unity`. Veja [docs/tecnico/unity.md](docs/tecnico/unity.md).
+
 ## Documentação
 
 Tudo sobre o jogo, mecânicas e como o projeto funciona por dentro:
