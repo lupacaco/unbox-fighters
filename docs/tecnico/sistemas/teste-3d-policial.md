@@ -1,41 +1,40 @@
-# Teste 3D — cópia fiel da montagem (só policial)
+# Teste 3D — policial (montagem completa)
 
-Experimento: **mesma tela de montagem** (caixas, carta, arrastar/soltar, LUTAR), com **apenas o policial**, e as peças em **3D (GLB)**.
+Cópia da **tela de montagem** (caixas, 3 cartas, arrastar, LUTAR), com **só o policial**, e as peças em **3D**.
 
-## O que deve acontecer
+A tela 2D principal **não muda**. Isto é uma cena à parte.
 
-1. Abrir 3 caixas (cabeça / tronco / pernas do policial)
-2. Arrastar para **1 carta**
-3. Ver o policial montado em 3D na carta
-4. Clicar **LUTAR**:
-   - limpa a prateleira
-   - pula para a esquerda do shelf
-   - **gira em 3D** para o perfil (não troca sprite)
-   - anda até o meio
-   - lança cada **parte 3D** (bumerangue)
-   - volta para a carta
+## O que é igual ao jogo
 
-A tela principal 2D (`Assembly.tscn`) **não muda**.
+- Fundo, prateleira, 3 cartas em branco
+- Abrir caixa com 2 cliques
+- Arrastar cabeça / tronco / pernas para a carta
+- Nome, BRN / PWR / SPD, botão LUTAR
+- LUTAR: pula na prateleira, anda até o meio, lança cada parte e volta
 
-## Como abrir no Godot (importante)
+## O que muda
 
-1. Abra `scenes/assembly3d/Assembly3D.tscn` (dois cliques)
-2. Rode com **F6** (Executar cena atual)  
-   — **F5** abre a montagem 2D normal
+- Só 3 caixas (cabeça, tronco e pernas do policial)
+- Na carta e na luta, a peça é o **modelo 3D**, não a figura 2D
+- Ao virar de perfil, o modelo **gira** (não troca de desenho)
+- No ataque, a **parte 3D** voa para a frente e volta
 
-## Pastas
+## Como abrir no Godot
 
-| Item | Caminho |
-|------|---------|
-| Cena | `scenes/assembly3d/Assembly3D.tscn` |
-| Scripts | `scripts/assembly3d/` |
-| GLBs | `assets/characters/policial/3d/` |
+1. Abra o projeto Godot (`unbox-fighters`)
+2. Vá em `scenes/assembly3d/`
+3. Dois cliques em **Assembly3D.tscn**
+4. Aperte **F6** (cena atual) — **não** F5 (F5 abre o jogo 2D)
 
-## Unity
+## Como abrir no Unity
 
-No projeto Unity: menu **Unbox Fighters → Bootstrap 3D Assembly**  
-(cena `Assets/Scenes/Assembly3D.unity`). Use Game **1920×1080** / Scale **1x**.
+1. Com o Unity aberto em `unbox-fighters-unity`
+2. Menu: **Unbox Fighters → Bootstrap 3D Assembly (policial)**
+3. Play na cena `Assets/Scenes/Assembly3D.unity`
+4. Aba Game em **1920×1080**, Scale **1x**
 
-## Peso
+## Arquivos
 
-Um policial 3D detalhado é mais pesado que sprites 2D. Neste teste (1 lutador) no PC costuma ir bem.
+**Godot:** `scenes/assembly3d/`, `scripts/assembly3d/`  
+**Unity:** `Assets/Scripts/Assembly3D/`, cena `Assembly3D.unity`  
+**Modelos:** `assets/characters/policial/3d/` (Godot) e `Assets/Art/Characters/policial/3d/` (Unity)

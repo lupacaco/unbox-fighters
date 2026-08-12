@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://b8k3dassembly3d01"]
 
 [ext_resource type="Script" path="res://scripts/assembly3d/assembly_3d_controller.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/ui/background_fx.gd" id="2"]
@@ -47,7 +47,7 @@ offset_right = 900.0
 offset_bottom = 92.0
 theme_override_colors/font_color = Color(0.9, 0.92, 0.94, 1)
 theme_override_font_sizes/font_size = 36
-text = "UNBOX FIGHTERS — 3D"
+text = "UNBOX FIGHTERS"
 
 [node name="Subtitle" type="Label" parent="HUD"]
 offset_left = 66.0
@@ -56,4 +56,4 @@ offset_right = 980.0
 offset_bottom = 120.0
 theme_override_colors/font_color = Color(0.54, 0.58, 0.64, 1)
 theme_override_font_sizes/font_size = 16
-text = "Mesma montagem · só policial · 3D"
+text = "Teste 3D — só policial"

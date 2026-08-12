@@ -1,90 +1,47 @@
 class_name CharacterSlot3D
 extends CharacterSlot
 
-## Mesma carta/mecânicas do CharacterSlot, com visual 3D das peças montadas.
+## Same card as 2D. Mounted parts are drawn as 3D models (front on the card).
 
-var _subviewport: SubViewport
-var _host: Model3DHost
-var _preview_sprite: Sprite2D
-
-func setup(def: CharacterDef = null, roster: Array[CharacterDef] = []) -> void:
-	super.setup(def, roster)
-	_ensure_3d_preview()
-	_hide_2d_part_sprites()
-	_refresh_3d_assembly()
+var _hosts: Dictionary = {}
 
 func attached_parts_can_fight() -> bool:
 	if not is_complete():
 		return false
 	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
 		var part := get_attached_part(slot)
-		if part == null or not GlbCatalog.has_glb(part.id):
+		if part == null:
 			return false
+		if GlbCatalog.has_model(part) or part.has_fight_poses():
+			continue
+		return false
 	return true
 
 func _apply_plan(plan: Dictionary) -> void:
-	_hide_2d_part_sprites()
-	var complete := is_complete()
-	_glow.visible = complete
-	_readout.set_complete(complete)
-	_empty_hint.visible = not (
-		plan.get("head") != null or plan.get("body") != null or plan.get("legs") != null
-	)
-	_refresh_3d_assembly()
-
-func _hide_2d_part_sprites() -> void:
 	_sprite_composite.visible = false
 	_sprite_head.visible = false
 	_sprite_body.visible = false
 	_sprite_legs.visible = false
+	var size_px: float = float(plan.get("part_size_px", PART_SIZE_PX))
+	_place_3d(PartSlotType.Value.LEGS, get_attached_part(PartSlotType.Value.LEGS), plan["legs_pos"], size_px, 0)
+	_place_3d(PartSlotType.Value.BODY, get_attached_part(PartSlotType.Value.BODY), plan["body_pos"], size_px, 1)
+	_place_3d(PartSlotType.Value.HEAD, get_attached_part(PartSlotType.Value.HEAD), plan["head_pos"], size_px, 2)
 
-func _ensure_3d_preview() -> void:
-	if _preview_sprite != null:
+func _place_3d(slot: PartSlotType.Value, part: PartDef, pos: Vector2, size_px: float, z: int) -> void:
+	var path := GlbCatalog.path_for(part)
+	if path == "":
+		if _hosts.has(slot):
+			(_hosts[slot] as Model3DHost).visible = false
 		return
-	_subviewport = SubViewport.new()
-	_subviewport.name = "Card3DViewport"
-	_subviewport.size = Vector2i(320, 420)
-	_subviewport.transparent_bg = true
-	_subviewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	add_child(_subviewport)
-
-	var world := Node3D.new()
-	_subviewport.add_child(world)
-
-	var cam := Camera3D.new()
-	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
-	cam.size = 1.85
-	cam.position = Vector3(0.0, 0.55, 3.2)
-	cam.current = true
-	world.add_child(cam)
-
-	var light := DirectionalLight3D.new()
-	light.light_energy = 1.15
-	light.rotation_degrees = Vector3(-40.0, -20.0, 0.0)
-	world.add_child(light)
-
-	_host = Model3DHost.new()
-	_host.name = "Host"
-	world.add_child(_host)
-
-	_preview_sprite = Sprite2D.new()
-	_preview_sprite.name = "Preview3D"
-	_preview_sprite.centered = true
-	_preview_sprite.texture = _subviewport.get_texture()
-	_preview_sprite.position = Vector2(0, -8)
-	_preview_sprite.scale = Vector2.ONE * (150.0 / 160.0)
-	_display_root.add_child(_preview_sprite)
-
-func _refresh_3d_assembly() -> void:
-	_ensure_3d_preview()
-	_host.set_parts(
-		get_attached_part(PartSlotType.Value.HEAD),
-		get_attached_part(PartSlotType.Value.BODY),
-		get_attached_part(PartSlotType.Value.LEGS)
-	)
-	_host.face_front()
-	_preview_sprite.visible = (
-		get_attached_part(PartSlotType.Value.HEAD) != null
-		or get_attached_part(PartSlotType.Value.BODY) != null
-		or get_attached_part(PartSlotType.Value.LEGS) != null
-	)
+	var host: Model3DHost = _hosts.get(slot) as Model3DHost
+	if host == null:
+		host = Model3DHost.new()
+		host.name = "Host_%s" % str(slot)
+		_display_root.add_child(host)
+		_hosts[slot] = host
+		host.setup(path, size_px)
+	host.visible = true
+	host.z_index = z
+	host.position = pos
+	host.set_display_px(size_px)
+	host.set_profile(false)

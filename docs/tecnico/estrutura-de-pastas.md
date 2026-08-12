@@ -14,14 +14,17 @@ unbox-fighters/
 │   ├── audio/sfx/         # Efeitos sonoros (.wav)
 │   ├── characters/vampiro/
 │   ├── characters/policial/
+│   │   └── 3d/            # GLB do policial (teste 3D)
 │   ├── characters/bruxa/
 │   └── ui/
 ├── data/                  # Dados do jogo (.tres)
 │   └── parts/
 ├── scenes/                # Cenas Godot (.tscn)
-│   └── assembly/
+│   ├── assembly/          # Tela 2D principal
+│   └── assembly3d/        # Teste 3D (só policial)
 ├── scripts/               # Código GDScript (.gd)
 │   ├── assembly/
+│   ├── assembly3d/
 │   ├── core/
 │   ├── data/
 │   └── ui/
@@ -39,7 +42,7 @@ unbox-fighters/
 | Mudar regras de composição visual | `scripts/data/composite_resolver.gd` |
 | Mudar HUD / fundo | `scripts/ui/` |
 | Preparar imagens 300×300 | `tools/` |
-| Teste do policial em 3D | `scenes/assembly3d/Assembly3D.tscn` (F6) |
+| Teste 3D do policial | `scenes/assembly3d/Assembly3D.tscn` (F6) |
 | Documentação | `docs/` |
 
 ## Pastas que o Godot gera

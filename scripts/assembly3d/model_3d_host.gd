@@ -1,110 +1,153 @@
 class_name Model3DHost
-extends Node3D
+extends Node2D
 
-## Empilha até 3 partes GLB. Usado na carta, na peça da prateleira e na luta.
+## Renders one GLB into a 2D sprite via a private 3D viewport.
+## Front = looking at the camera. Profile = yaw so the model faces screen-right.
 
-const PART_SCALE := 0.58
-const BODY_Y := 0.52
-const HEAD_Y := 1.05
+const VIEW_PX := 256
+const FRONT_YAW := PI
+const PROFILE_YAW := PI * 0.5
 
-var _head: Node3D
-var _body: Node3D
-var _legs: Node3D
-var _yaw_root: Node3D
+var _viewport: SubViewport
+var _sprite: Sprite2D
+var _pivot: Node3D
+var _display_px: float = 150.0
+var _profile: bool = false
 
-func _ready() -> void:
-	if _yaw_root == null:
-		_ensure_yaw_root()
-
-func _ensure_yaw_root() -> void:
-	_yaw_root = Node3D.new()
-	_yaw_root.name = "YawRoot"
-	add_child(_yaw_root)
-
-func clear_parts() -> void:
-	_ensure_yaw_root()
-	var kids: Array = _yaw_root.get_children()
-	for child in kids:
-		_yaw_root.remove_child(child)
-		child.free()
-	_head = null
-	_body = null
-	_legs = null
-
-func set_parts(head: PartDef, body: PartDef, legs: PartDef) -> void:
-	_ensure_yaw_root()
-	clear_parts()
-	if legs != null:
-		_legs = _add_part(legs, "Legs", Vector3(0.0, 0.0, 0.0))
-	if body != null:
-		_body = _add_part(body, "Body", Vector3(0.0, BODY_Y, 0.0))
-	if head != null:
-		_head = _add_part(head, "Head", Vector3(0.0, HEAD_Y, 0.0))
-	face_front()
-
-func set_single_part(part: PartDef) -> void:
-	_ensure_yaw_root()
-	clear_parts()
-	if part == null:
+func setup(glb_path: String, display_px: float) -> void:
+	_display_px = display_px
+	_ensure_view()
+	_clear_model()
+	var model := _instantiate_glb(glb_path)
+	if model == null:
+		push_error("Model3DHost: could not load %s" % glb_path)
 		return
-	var node := _add_part(part, "Part", Vector3.ZERO)
-	match part.slot_type:
-		PartSlotType.Value.HEAD:
-			_head = node
-		PartSlotType.Value.BODY:
-			_body = node
-		_:
-			_legs = node
-	face_front()
+	model.name = "Model"
+	_pivot.add_child(model)
+	_strip_colliders(model)
+	set_profile(false)
+	_apply_sprite_scale()
+	_sync_update_mode()
 
-func _add_part(part: PartDef, node_name: String, local_pos: Vector3) -> Node3D:
-	var path := GlbCatalog.path_for_part_id(part.id)
-	var model := GlbCatalog.instantiate_model(path)
-	var slot := Node3D.new()
-	slot.name = node_name
-	slot.position = local_pos
-	slot.scale = Vector3.ONE * PART_SCALE
-	_yaw_root.add_child(slot)
-	if model != null:
-		model.name = "Model"
-		slot.add_child(model)
-	return slot
+func set_display_px(display_px: float) -> void:
+	_display_px = display_px
+	_apply_sprite_scale()
 
-func face_front() -> void:
-	_ensure_yaw_root()
-	_yaw_root.rotation.y = 0.0
+func set_profile(enabled: bool) -> void:
+	_profile = enabled
+	if _pivot == null:
+		return
+	_pivot.rotation.y = PROFILE_YAW if enabled else FRONT_YAW
+	_pivot.rotation.x = 0.0
 
-func face_profile_right() -> void:
-	_ensure_yaw_root()
-	_yaw_root.rotation.y = -PI * 0.5
+func set_stride_lean(use_attack: bool) -> void:
+	if _pivot == null:
+		return
+	_pivot.rotation.y = PROFILE_YAW
+	_pivot.rotation.x = 0.18 if use_attack else -0.08
 
-func set_yaw(radians: float) -> void:
-	_ensure_yaw_root()
-	_yaw_root.rotation.y = radians
+func _ensure_view() -> void:
+	if _viewport != null:
+		return
+	_viewport = SubViewport.new()
+	_viewport.name = "View"
+	_viewport.size = Vector2i(VIEW_PX, VIEW_PX)
+	_viewport.transparent_bg = true
+	_viewport.own_world_3d = true
+	_viewport.disable_3d = false
+	_viewport.handle_input_locally = false
+	_viewport.msaa_3d = Viewport.MSAA_2X
+	_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(_viewport)
 
-func get_yaw() -> float:
-	_ensure_yaw_root()
-	return _yaw_root.rotation.y
+	var world := Node3D.new()
+	world.name = "World"
+	_viewport.add_child(world)
 
-func get_part_node(slot: PartSlotType.Value) -> Node3D:
-	match slot:
-		PartSlotType.Value.HEAD:
-			return _head
-		PartSlotType.Value.BODY:
-			return _body
-		_:
-			return _legs
+	var env := Environment.new()
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = Color(0, 0, 0, 0)
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.78, 0.8, 0.84)
+	env.ambient_light_energy = 0.65
+	var world_env := WorldEnvironment.new()
+	world_env.environment = env
+	world.add_child(world_env)
 
-func set_stride_lean(use_attack_lean: bool) -> void:
-	var lean := 0.14 if use_attack_lean else -0.1
-	if _body != null:
-		_body.rotation.x = lean
-	if _legs != null:
-		_legs.rotation.x = -lean * 0.45
-	if _head != null:
-		_head.rotation.x = lean * 0.3
+	var light := DirectionalLight3D.new()
+	light.rotation_degrees = Vector3(-35, 40, 0)
+	light.light_energy = 1.15
+	light.shadow_enabled = false
+	world.add_child(light)
 
-func reset_lean() -> void:
-	for part in [_head, _body, _legs]:
-		if part != null:
-			part.rotation = Vector3.ZERO
+	var fill := OmniLight3D.new()
+	fill.position = Vector3(-1.2, 0.8, 1.6)
+	fill.light_energy = 0.45
+	fill.omni_range = 8.0
+	world.add_child(fill)
+
+	_pivot = Node3D.new()
+	_pivot.name = "Pivot"
+	world.add_child(_pivot)
+
+	var camera := Camera3D.new()
+	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
+	camera.size = 1.2
+	camera.position = Vector3(0, 0, 3)
+	camera.look_at(Vector3.ZERO, Vector3.UP)
+	camera.current = true
+	camera.environment = env
+	world.add_child(camera)
+
+	_sprite = Sprite2D.new()
+	_sprite.name = "Blit"
+	_sprite.centered = true
+	_sprite.texture = _viewport.get_texture()
+	add_child(_sprite)
+
+func _apply_sprite_scale() -> void:
+	if _sprite == null:
+		return
+	var s := _display_px / float(VIEW_PX)
+	_sprite.scale = Vector2.ONE * s
+
+func _clear_model() -> void:
+	if _pivot == null:
+		return
+	for child in _pivot.get_children():
+		_pivot.remove_child(child)
+		child.free()
+
+func _instantiate_glb(path: String) -> Node3D:
+	var packed: Variant = load(path)
+	if packed is PackedScene:
+		var inst: Node = (packed as PackedScene).instantiate()
+		if inst is Node3D:
+			return inst as Node3D
+		var wrap := Node3D.new()
+		wrap.add_child(inst)
+		return wrap
+	var doc := GLTFDocument.new()
+	var state := GLTFState.new()
+	if doc.append_from_file(path, state) != OK:
+		return null
+	var scene := doc.generate_scene(state)
+	return scene as Node3D
+
+func _strip_colliders(root: Node) -> void:
+	for child in root.get_children():
+		_strip_colliders(child)
+	if root is CollisionObject3D:
+		(root as CollisionObject3D).collision_layer = 0
+		(root as CollisionObject3D).collision_mask = 0
+
+func _sync_update_mode() -> void:
+	if _viewport == null:
+		return
+	_viewport.render_target_update_mode = (
+		SubViewport.UPDATE_ALWAYS if is_visible_in_tree() else SubViewport.UPDATE_DISABLED
+	)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_VISIBILITY_CHANGED:
+		_sync_update_mode()

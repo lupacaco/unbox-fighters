@@ -1,6 +1,7 @@
+class_name Assembly3DController
 extends Node2D
 
-## Cópia da montagem principal: mesmas mecânicas, 1 carta, só set do policial em 3D.
+## Full assembly screen, policial only, parts rendered as 3D models.
 
 @onready var _slots_root: Node2D = $Slots
 @onready var _tray: Node2D = $Tray
@@ -29,9 +30,9 @@ func _ready() -> void:
 	_spawn_slots()
 	_spawn_crates()
 	_drag_service.setup(_slots, _tray)
+	_title.text = "UNBOX FIGHTERS"
+	_subtitle.text = "Teste 3D — só policial · mesmas caixas, cartas e LUTAR"
 	_play_intro()
-	_title.text = "UNBOX FIGHTERS — 3D"
-	_subtitle.text = "Mesma montagem · só policial · giro/ataque em 3D · F6 nesta cena"
 
 func _build_character_data() -> void:
 	_policial = load("res://data/parts/policial_character.tres") as CharacterDef
@@ -49,13 +50,15 @@ func _setup_tray_visual() -> void:
 	_shelf.modulate = Color(0.9, 0.92, 0.95, 1)
 
 func _spawn_slots() -> void:
-	var slot := _slot_scene.instantiate() as CharacterSlot3D
-	_slots_root.add_child(slot)
-	slot.position = Vector2(960, 400)
-	slot.setup(null, _roster)
-	slot.fight_pressed.connect(_on_slot_fight_pressed)
-	slot.play_intro(0.0)
-	_slots.append(slot)
+	var xs := [380.0, 960.0, 1540.0]
+	for i in xs.size():
+		var slot := _slot_scene.instantiate() as CharacterSlot
+		_slots_root.add_child(slot)
+		slot.position = Vector2(xs[i], 400)
+		slot.setup(null, _roster)
+		slot.fight_pressed.connect(_on_slot_fight_pressed)
+		slot.play_intro(0.12 * float(i))
+		_slots.append(slot)
 
 func _spawn_crates() -> void:
 	var count := _reward_parts.size()
