@@ -7,6 +7,8 @@ $outDir = Join-Path $root "builds\web"
 $outFile = Join-Path $outDir "index.html"
 
 $godotCandidates = @(
+	"C:\Users\luisp\AppData\Local\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\Godot_v4.7.1-stable_win64_console.exe",
+	"C:\Users\luisp\AppData\Local\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\Godot_v4.7.1-stable_win64.exe",
 	"C:\Users\luisp\OneDrive\Desktop\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe",
 	"C:\Users\luisp\OneDrive\Desktop\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64.exe"
 )
