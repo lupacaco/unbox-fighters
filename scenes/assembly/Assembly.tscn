@@ -1,8 +1,12 @@
-[gd_scene format=3 uid="uid://c5h3xb5tswr3j"]
+[gd_scene load_steps=8 format=3 uid="uid://c5h3xb5tswr3j"]
 
 [ext_resource type="Script" uid="uid://c2i8i6homfw00" path="res://scripts/assembly/assembly_controller.gd" id="1"]
 [ext_resource type="Script" uid="uid://btyepuuc3404r" path="res://scripts/ui/background_fx.gd" id="2"]
 [ext_resource type="Script" uid="uid://dlxuaogko1lqp" path="res://scripts/assembly/drag_drop_service.gd" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/assembly/CharacterSlot.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/assembly/Crate.tscn" id="5"]
+[ext_resource type="Texture2D" uid="uid://dggow7pil84dp" path="res://assets/ui/bg_premium.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://cluxunvn3e03k" path="res://assets/ui/shelf_premium.png" id="7"]
 
 [node name="Assembly" type="Node2D" unique_id=1114481662]
 script = ExtResource("1")
@@ -12,7 +16,11 @@ z_index = -20
 script = ExtResource("2")
 
 [node name="ArenaBackground" type="Sprite2D" parent="BackgroundFX" unique_id=284376527]
+modulate = Color(0.92, 0.93, 0.95, 1)
 z_index = -20
+position = Vector2(960, 540)
+scale = Vector2(1.25, 1.0546875)
+texture = ExtResource("6")
 
 [node name="Vignette" type="Polygon2D" parent="BackgroundFX" unique_id=605349070]
 z_index = -18
@@ -26,11 +34,51 @@ emitting = false
 
 [node name="Slots" type="Node2D" parent="." unique_id=1479939184]
 
+[node name="Slot0" parent="Slots" instance=ExtResource("4")]
+position = Vector2(380, 400)
+
+[node name="Slot1" parent="Slots" instance=ExtResource("4")]
+position = Vector2(960, 400)
+
+[node name="Slot2" parent="Slots" instance=ExtResource("4")]
+position = Vector2(1540, 400)
+
 [node name="Tray" type="Node2D" parent="." unique_id=1093555678]
 position = Vector2(960, 920)
 
 [node name="Shelf" type="Sprite2D" parent="Tray" unique_id=315548021]
+modulate = Color(0.9, 0.92, 0.95, 1)
 z_index = -1
+position = Vector2(0, 58)
+scale = Vector2(1.1525424, 0.7391304)
+texture = ExtResource("7")
+
+[node name="Crate0" parent="Tray" instance=ExtResource("5")]
+position = Vector2(-660, -58)
+
+[node name="Crate1" parent="Tray" instance=ExtResource("5")]
+position = Vector2(-495, -58)
+
+[node name="Crate2" parent="Tray" instance=ExtResource("5")]
+position = Vector2(-330, -58)
+
+[node name="Crate3" parent="Tray" instance=ExtResource("5")]
+position = Vector2(-165, -58)
+
+[node name="Crate4" parent="Tray" instance=ExtResource("5")]
+position = Vector2(0, -58)
+
+[node name="Crate5" parent="Tray" instance=ExtResource("5")]
+position = Vector2(165, -58)
+
+[node name="Crate6" parent="Tray" instance=ExtResource("5")]
+position = Vector2(330, -58)
+
+[node name="Crate7" parent="Tray" instance=ExtResource("5")]
+position = Vector2(495, -58)
+
+[node name="Crate8" parent="Tray" instance=ExtResource("5")]
+position = Vector2(660, -58)
 
 [node name="FxLayer" type="Node2D" parent="." unique_id=1892017742]
 z_index = 50

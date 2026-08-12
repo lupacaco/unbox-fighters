@@ -15,10 +15,12 @@ A cena principal do jogo hoje.
 1. Registra o `DragDropService` no grupo `drag_drop_service`
 2. Carrega o elenco (vampiro, policial, bruxa) só para nomear sets completos
 3. Monta a lista de recompensas das 9 caixas (set completo de cada um)
-4. Posiciona a prateleira visual
-5. Spawna 3 cartas em branco (qualquer peça em qualquer carta) e 9 caixas
+4. Ajusta a prateleira visual
+5. Liga as **3 cartas e 9 caixas que já estão na cena** (não cria cópias novas)
 6. Liga o serviço de arraste às cartas e à bandeja
 7. Toca a intro (fade do título)
+
+No editor 2D você já vê fundo, cartas, prateleira e caixas. O Play só “liga” o jogo (abrir caixa, arrastar, LUTAR).
 
 ## Layout aproximado
 

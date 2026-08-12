@@ -56,9 +56,17 @@ func _setup_tray_visual() -> void:
 
 func _spawn_slots() -> void:
 	var xs := [380.0, 960.0, 1540.0]
+	var existing: Array[CharacterSlot] = []
+	for child in _slots_root.get_children():
+		if child is CharacterSlot:
+			existing.append(child as CharacterSlot)
 	for i in xs.size():
-		var slot := _slot_scene.instantiate() as CharacterSlot
-		_slots_root.add_child(slot)
+		var slot: CharacterSlot
+		if i < existing.size():
+			slot = existing[i]
+		else:
+			slot = _slot_scene.instantiate() as CharacterSlot
+			_slots_root.add_child(slot)
 		slot.position = Vector2(xs[i], 400)
 		# Blank cards: any head/body/legs can be mounted on any slot.
 		slot.setup(null, _roster)
@@ -70,9 +78,17 @@ func _spawn_crates() -> void:
 	var count := _reward_parts.size()
 	var spacing := 165.0 if count >= 9 else (200.0 if count > 5 else 230.0)
 	var start_x := -spacing * float(count - 1) * 0.5
+	var existing: Array[Crate] = []
+	for child in _tray.get_children():
+		if child is Crate:
+			existing.append(child as Crate)
 	for i in count:
-		var crate := _crate_scene.instantiate() as Crate
-		_tray.add_child(crate)
+		var crate: Crate
+		if i < existing.size():
+			crate = existing[i]
+		else:
+			crate = _crate_scene.instantiate() as Crate
+			_tray.add_child(crate)
 		var rest := Vector2(start_x + spacing * float(i), -58)
 		crate.position = Vector2(rest.x, rest.y + 24.0)
 		crate.modulate.a = 0.0
