@@ -30,6 +30,7 @@ O jogo ainda **não está pronto**. Estes docs descrevem o que **já existe** ho
 | [Testes rápidos](tecnico/testes-headless.md) | Scripts que verificam o jogo sem abrir a tela |
 | [Plataformas](tecnico/plataformas.md) | Web / localhost, Steam e Google Play |
 | [Godot MCP](tecnico/godot-mcp.md) | Ligar a IA ao editor Godot |
+| [Unity (benchmark)](tecnico/unity-benchmark.md) | Cópia Unity da tela de montagem para comparar desempenho |
 
 ---
 
