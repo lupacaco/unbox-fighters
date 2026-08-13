@@ -3,11 +3,16 @@ extends Node2D
 
 signal part_attached(slot: CharacterSlot, part: PartDef)
 signal part_detached(slot: CharacterSlot, part: PartDef)
-signal fight_pressed(slot: CharacterSlot)
+signal card_drag_requested(slot: CharacterSlot)
 signal assembly_changed(slot: CharacterSlot)
 
 const BODY_ORIGIN := Vector2(0, -8)
 const PART_SIZE_PX := 150.0
+const TAG_OFFSETS := {
+	PartSlotType.Value.HEAD: Vector2(108, -150),
+	PartSlotType.Value.BODY: Vector2(108, -20),
+	PartSlotType.Value.LEGS: Vector2(108, 110),
+}
 
 @onready var _card_shadow: Sprite2D = $CardShadow
 @onready var _card_frame: Sprite2D = $CardFrame
@@ -26,6 +31,7 @@ const PART_SIZE_PX := 150.0
 @onready var _fight_button: Button = $FightButton
 
 var character: CharacterDef
+var queue_rank: int = 3
 var _roster: Array[CharacterDef] = []
 var _has_head: bool = false
 var _has_body: bool = false
@@ -34,21 +40,71 @@ var _bound_parts: Dictionary = {}
 var _crossfade_busy: bool = false
 var _rest_y: float = 0.0
 var _fight_locked: bool = false
+var _rank_label: Label
+var _tags: Dictionary = {}
+var _grip: Area2D
 
 func setup(def: CharacterDef = null, roster: Array[CharacterDef] = []) -> void:
 	character = def
 	_roster = roster
 	_rest_y = position.y
 	_readout.set_display_name("???")
-	_readout.set_stats(0, 0, 0)
+	_readout.set_total(0)
 	_readout.set_complete(false)
 	_glow.visible = false
 	_highlight.visible = false
 	_build_visuals()
 	_setup_zones()
-	_setup_fight_button()
+	_hide_fight_button()
+	_ensure_rank_label()
+	_ensure_tags()
+	_ensure_grip()
 	_refresh_display(false)
-	_refresh_fight_button()
+	_refresh_tags()
+
+func set_queue_rank(rank: int) -> void:
+	queue_rank = rank
+	_ensure_rank_label()
+	_rank_label.text = "%dº" % rank
+
+func to_loadout() -> FighterLoadout:
+	return FighterLoadout.from_parts(
+		get_attached_part(PartSlotType.Value.HEAD),
+		get_attached_part(PartSlotType.Value.BODY),
+		get_attached_part(PartSlotType.Value.LEGS)
+	)
+
+func steal_all_parts() -> Dictionary:
+	var stolen := {}
+	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
+		var view := detach_part(slot, false)
+		if view != null:
+			stolen[slot] = view
+	_refresh_display(false)
+	_update_stats()
+	return stolen
+
+func receive_parts(parts: Dictionary) -> void:
+	for slot in parts.keys():
+		var view: PartView = parts[slot]
+		if view != null:
+			try_attach(view)
+
+func play_leave_for_fight() -> void:
+	set_fight_locked(true)
+	var tween := create_tween()
+	tween.tween_property(self, "position:y", _rest_y - 120.0, 0.42).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(self, "modulate:a", 0.0, 0.38).set_trans(Tween.TRANS_SINE)
+
+func play_return_from_fight() -> void:
+	position.y = _rest_y - 120.0
+	var tween := create_tween()
+	tween.tween_property(self, "position:y", _rest_y, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(self, "modulate:a", 1.0, 0.38).set_trans(Tween.TRANS_SINE)
+	tween.tween_callback(func() -> void: set_fight_locked(false))
+
+func contains_card_point(global_point: Vector2) -> bool:
+	return Rect2(Vector2(-135, -205), Vector2(270, 400)).has_point(to_local(global_point))
 
 func is_complete() -> bool:
 	return _has_head and _has_body and _has_legs
@@ -64,7 +120,6 @@ func get_attached_part(slot: PartSlotType.Value) -> PartDef:
 
 func set_fight_locked(locked: bool) -> void:
 	_fight_locked = locked
-	_refresh_fight_button()
 	for key in _bound_parts.keys():
 		var view = _bound_parts[key]
 		if view != null and is_instance_valid(view):
@@ -131,7 +186,6 @@ func try_attach(part_view: PartView) -> bool:
 		GameAudio.fighter_complete()
 	part_attached.emit(self, part_view.part_def)
 	assembly_changed.emit(self)
-	_refresh_fight_button()
 	return true
 
 func detach_part(slot: PartSlotType.Value, refresh: bool = true) -> PartView:
@@ -148,7 +202,6 @@ func detach_part(slot: PartSlotType.Value, refresh: bool = true) -> PartView:
 		_update_stats()
 	part_detached.emit(self, part_view.part_def)
 	assembly_changed.emit(self)
-	_refresh_fight_button()
 	return part_view
 
 func set_drop_highlight(enabled: bool, slot: PartSlotType.Value) -> void:
@@ -310,19 +363,15 @@ func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2, target_px
 	sprite.scale = Vector2.ONE * s
 
 func _update_stats() -> void:
-	var brain := 0
-	var power := 0
-	var speed := 0
-	for slot in _bound_parts.keys():
-		var view: PartView = _bound_parts[slot]
-		brain += view.part_def.brain
-		power += view.part_def.power
-		speed += view.part_def.speed
-	_readout.set_stats(brain, power, speed)
+	var loadout := to_loadout()
+	_readout.set_total(loadout.total_power())
 	_readout.set_display_name(_resolve_display_name())
+	_refresh_tags()
 
 func _resolve_display_name() -> String:
 	if not is_complete():
+		if to_loadout().is_empty():
+			return "—"
 		return "???"
 	var head := get_attached_part(PartSlotType.Value.HEAD)
 	var body := get_attached_part(PartSlotType.Value.BODY)
@@ -339,40 +388,59 @@ func _pulse_attach() -> void:
 	tween.tween_property(_card_frame, "modulate", Color(1.12, 1.1, 1.08, 1), 0.08)
 	tween.tween_property(_card_frame, "modulate", Color.WHITE, 0.28).set_trans(Tween.TRANS_SINE)
 
-func _setup_fight_button() -> void:
+func _hide_fight_button() -> void:
 	if _fight_button == null:
 		return
-	_fight_button.pressed.connect(_on_fight_pressed)
-	_fight_button.focus_mode = Control.FOCUS_NONE
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color(0.55, 0.1, 0.16, 0.92)
-	normal.set_corner_radius_all(6)
-	normal.content_margin_left = 12
-	normal.content_margin_right = 12
-	normal.content_margin_top = 6
-	normal.content_margin_bottom = 6
-	var hover := normal.duplicate() as StyleBoxFlat
-	hover.bg_color = Color(0.72, 0.14, 0.22, 0.95)
-	var pressed := normal.duplicate() as StyleBoxFlat
-	pressed.bg_color = Color(0.4, 0.08, 0.12, 0.95)
-	var disabled := normal.duplicate() as StyleBoxFlat
-	disabled.bg_color = Color(0.2, 0.22, 0.26, 0.75)
-	_fight_button.add_theme_stylebox_override("normal", normal)
-	_fight_button.add_theme_stylebox_override("hover", hover)
-	_fight_button.add_theme_stylebox_override("pressed", pressed)
-	_fight_button.add_theme_stylebox_override("disabled", disabled)
+	_fight_button.visible = false
+	_fight_button.disabled = true
+	_fight_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-func _refresh_fight_button() -> void:
-	if _fight_button == null:
+func _ensure_rank_label() -> void:
+	if _rank_label != null:
 		return
-	# Always show: becomes ready when the 3 attached parts have fight poses.
-	_fight_button.visible = true
-	var fight_ready := can_fight()
-	_fight_button.disabled = not fight_ready
-	_fight_button.modulate = Color(1, 1, 1, 1) if fight_ready else Color(1, 1, 1, 0.45)
-	_fight_button.mouse_filter = Control.MOUSE_FILTER_STOP if fight_ready else Control.MOUSE_FILTER_IGNORE
+	_rank_label = Label.new()
+	_rank_label.position = Vector2(-40, -248)
+	_rank_label.size = Vector2(80, 40)
+	_rank_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_rank_label.add_theme_font_size_override("font_size", 28)
+	_rank_label.add_theme_color_override("font_color", Color.WHITE)
+	add_child(_rank_label)
 
-func _on_fight_pressed() -> void:
-	if not can_fight():
+func _ensure_tags() -> void:
+	if not _tags.is_empty():
 		return
-	fight_pressed.emit(self)
+	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
+		var tag := StatTag.new()
+		tag.position = TAG_OFFSETS[slot]
+		add_child(tag)
+		_tags[slot] = tag
+
+func _refresh_tags() -> void:
+	_ensure_tags()
+	var loadout := to_loadout()
+	for slot in _tags.keys():
+		var tag: StatTag = _tags[slot]
+		var value := loadout.combat_value_of(slot)
+		tag.setup(value, ThemeTokens.color_for_slot(slot))
+
+func _ensure_grip() -> void:
+	if _grip != null:
+		return
+	_grip = Area2D.new()
+	_grip.name = "CardGrip"
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(220, 48)
+	shape.shape = rect
+	shape.position = Vector2(0, -226)
+	_grip.add_child(shape)
+	_grip.input_pickable = true
+	_grip.input_event.connect(_on_grip_input)
+	add_child(_grip)
+
+func _on_grip_input(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if _fight_locked:
+		return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		card_drag_requested.emit(self)
+		get_viewport().set_input_as_handled()

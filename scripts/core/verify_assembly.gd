@@ -11,18 +11,20 @@ func _run() -> void:
 		return
 	var scene := packed.instantiate()
 	root.add_child(scene)
-	await create_timer(0.35).timeout
+	await create_timer(0.45).timeout
 	var slots := scene.get_node("Slots").get_child_count()
-	var tray_children := scene.get_node("Tray").get_child_count()
-	print("VERIFY_OK slots=", slots, " tray_nodes=", tray_children)
 	if slots != 3:
 		push_error("VERIFY_FAIL expected 3 slots")
 		quit(1)
 		return
-	# Shelf + 9 crates (vampiro + policial + bruxa)
-	if tray_children < 10:
-		push_error("VERIFY_FAIL expected platform + 9 crates")
+	var crates := 0
+	for child in scene.get_node("Tray").get_children():
+		if child is Crate:
+			crates += 1
+	if crates != MatchRules.SHOP_SLOTS:
+		push_error("VERIFY_FAIL expected 5 shop crates, got %d" % crates)
 		quit(1)
 		return
+	print("VERIFY_OK slots=", slots, " crates=", crates)
 	print("VERIFY_PASS")
 	quit(0)

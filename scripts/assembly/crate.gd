@@ -15,6 +15,9 @@ const BROKEN_HOLD_SEC := 0.5
 @onready var _label: Label = $Hint
 
 var reward_part: PartDef
+var shop_index: int = -1
+var can_afford: Callable
+var on_paid_open: Callable
 ## 0 = intact, 1 = cracked, 2 = broken / finishing open.
 var _hits: int = 0
 var _opened: bool = false
@@ -59,6 +62,9 @@ func _input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 		get_viewport().set_input_as_handled()
 
 func _on_clicked() -> void:
+	if can_afford.is_valid() and not can_afford.call():
+		GameAudio.part_reject()
+		return
 	HammerCursor.strike()
 	GameAudio.hammer_hit()
 	if _hits == 0:
@@ -68,6 +74,9 @@ func _on_clicked() -> void:
 		_play_hit_feedback()
 		return
 	if _hits == 1:
+		if on_paid_open.is_valid() and not on_paid_open.call(self):
+			GameAudio.part_reject()
+			return
 		_hits = 2
 		GameAudio.crate_break()
 		_finish_open()

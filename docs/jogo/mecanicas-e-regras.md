@@ -2,67 +2,86 @@
 
 O que o jogador pode fazer hoje, e as regras que o jogo aplica.
 
-## Fluxo na tela de montagem
+## Loop da partida
 
-1. Aparecem **3 cartas** de personagem e **9 caixas** na prateleira.
-2. O jogador abre cada caixa com **2 cliques**:
-   - 1º clique → caixa **trincada**
-   - 2º clique → caixa **quebrada**, fica 0,5 s e some; aí aparece a **peça**
-3. A peça pode ser **arrastada** (segurar o botão esquerdo do mouse e soltar).
-4. Se soltar numa carta que **aceita** aquela peça, ela encaixa.
-5. Os atributos da carta **somam** os valores das peças encaixadas.
-6. Com cabeça + tronco + pernas, o nome deixa de ser `???` e a carta mostra o personagem completo (com brilho).
+1. **Preparação** (até 60 segundos, ou aperte **PRONTO**).
+2. **Luta** contra 1 oponente (os outros dois bots lutam entre si, sem você ver).
+3. Quem toma dano no HP. Quem chega a 0 sai.
+4. Volta à preparação com as peças das cartas **intactas** (a luta usa uma cópia).
+5. O último com HP ganha.
+
+Há **1 jogador + 3 bots**. HP inicial **40**. Não enfrenta o mesmo oponente duas vezes seguidas, se der. Com 3 vivos, um bot fica de fora naquela rodada.
+
+## Pancadas (o “ouro”)
+
+- Rodada 1: **3**. Sobe **+1 por rodada**, máximo **10**.
+- O que sobrar **não** junta com a próxima rodada.
+- Gastos: quebrar caixa **1**, atualizar loja **1**, subir nível da loja **4 / 5 / 6 / 7** (níveis 1→5).
+- **Travar** é de graça: as 5 caixas atuais ficam no próximo round.
+- **Vender** uma peça (ou o Freak inteiro) devolve **1** pancada.
+
+## Loja
+
+- Sempre **5 caixas**. Peças do **nível da loja** (e abaixo).
+- Nível 1 não vende peça 9.
+- ATUALIZAR = nova leva, custa 1, solta o travar.
+- Abrir caixa: 2 cliques, como antes, mas só se tiver 1 pancada.
+
+## Cartas e fila
+
+- 3 cartas, da esquerda para a direita: **3º**, **2º**, **1º**.
+- O **1º** (direita) luta primeiro.
+- Pode ir incompleto (só pernas, por exemplo). Carta vazia é pulada.
+- Arrastar o Freak pelo rótulo **3º/2º/1º** troca a ordem com outra carta.
 
 ## Peças
 
 Cada peça ocupa **um** tipo de encaixe:
 
-| Tipo | Significado |
-|------|-------------|
-| HEAD | Cabeça |
-| BODY | Tronco / corpo |
-| LEGS | Pernas |
+| Tipo | Significado | Tag |
+|------|-------------|-----|
+| HEAD | Cabeça | Ameaça (azul) |
+| BODY | Tronco | Força (roxo) |
+| LEGS | Pernas | Agilidade (verde) |
 
-## Atributos (stats)
+Cada peça tem **um** número de combate e um **nível** de loja.
 
-Cada peça tem três números:
+| Set | Cabeça | Tronco | Pernas | Total |
+|-----|--------|--------|--------|-------|
+| Policial | 7 | 6 | 5 | 18 |
+| Vampiro | 9 | 9 | 8 | 26 |
+| Bruxa | 9 | 4 | 9 | 22 |
 
-| Código | Nome simples | Vampiro | Policial | Bruxa |
-|--------|--------------|---------|----------|-------|
-| BRN | Brain (cérebro / inteligência) | 8+1+0 | 6+2+0 | 9+3+1 |
-| PWR | Power (força) | 2+9+3 | 3+7+4 | 1+4+2 |
-| SPD | Speed (velocidade) | 3+2+8 | 4+3+7 | 4+5+9 |
+Nível da loja pela força da peça: 4–5 → 1; 6 → 2; 7 → 3; 8 → 4; 9 → 5.
 
-**Totais (set completo):** vampiro 9/14/13 · policial 8/14/14 · bruxa 13/7/18
+## Sinergia (na mesma carta)
 
-Na carta, os atributos são a **soma** das peças já encaixadas.
+Conta quantas peças do **mesmo set** estão na carta. Arredonda para cima.
 
-## Regras de encaixe
+- 3 iguais: 100%
+- 2 iguais: 75%
+- 1 só: 50%
 
-- Só cabe **uma peça por tipo** em cada carta (uma cabeça, um tronco, umas pernas).
-- Qualquer cabeça/tronco/pernas pode ir em **qualquer carta** (dá para misturar personagens).
-- Não dá para colocar cabeça no lugar das pernas, etc.
-- Se o drop falhar, a peça volta (não fica “presa” no lugar errado).
+Exemplo: cabeça 5 sozinha vira **3**. Completar o set ainda vale muito mais.
 
-## Nome misterioso
+## Luta
 
-Enquanto a carta não estiver completa, o nome mostrado é `???`.  
-Quando as 3 peças formam um set conhecido (ex.: só policial), aparece o nome desse personagem.  
-Se misturar sets, o nome fica `MIX`.
+De cima para baixo: cabeça, senão tronco, senão pernas.
 
-## Botão LUTAR
+- Se A > B: B morre, A fica A−B e segue.
+- Se empatar: as duas partes morrem.
+- Quando o Freak inteiro cai, entra o próximo da fila.
 
-- Fica **acima da carta** (em todas as cartas).
-- Só libera com as **3 peças** encaixadas **e** com artes de perfil/ataque nessas peças (vampiro, policial e bruxa têm).
-- Ao clicar: limpa o shelf → pula no canto esquerdo → anda até o meio intercalando poses → ataca → volta à carta.
-- Detalhes técnicos: [Animação de luta](../tecnico/sistemas/animacao-de-luta.md).
+Dano no HP do perdedor = soma do que sobrou em cada Freak vivo do vencedor, **no máximo 12 por Freak**.
 
-## Controles atuais
+Na tela: as peças **crescem e vão ao centro** para colidir. Aparece **9 > 5** e um **X** vermelho em quem perdeu. As cartas **sobem e somem** durante a batalha e voltam depois.
 
-- Mouse: passar por cima da caixa troca o cursor para o martelo; clicar bate (`hammer-02` por 0,2 s). Arrastar e soltar peças.
-- Sons acompanham batida, quebra, pegar peça, encaixar, errar e completar o lutador.
-- Não há controle de gamepad / teclado de gameplay além disso (por enquanto).
+## Controles
 
-## O que ainda não é regra de jogo
+- Mouse: martelo nas caixas; arrastar peças; arrastar carta pelo rótulo 3º/2º/1º; PRONTO; ATUALIZAR; TRAVAR; clicar em NÍVEL para subir a loja.
+- Soltar em **VENDER** vende.
+- Sem gamepad por enquanto.
 
-Combate, vida, dano, turnos, multiplayer, economia, inventário persistente e progressão **ainda não existem**.
+## O que ainda não é regra
+
+Multiplayer, habilidades de set, freeze por caixa, 4º slot, Cachorro e Múmia.

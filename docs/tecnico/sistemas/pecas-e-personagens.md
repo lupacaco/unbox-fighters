@@ -14,10 +14,12 @@ Recurso de **uma peça** (script com `@tool` para o editor poder ler/validar ím
 
 - `id`, `display_name`
 - `slot_type` (cabeça / tronco / pernas)
+- `set_id` (vampiro, policial, bruxa) — usado na sinergia
 - `sprite` — frente (pose 1)
-- `sprite_profile` — perfil (pose 2), opcional; necessário para LUTAR
-- `sprite_attack` — ataque (pose 3), opcional; necessário para LUTAR
-- `brain`, `power`, `speed`
+- `sprite_profile` — perfil (pose 2)
+- `sprite_attack` — ataque (pose 3)
+- `combat_value` — um número só (Ameaça / Força / Agilidade conforme o tipo)
+- `tier` — nível da loja em que a peça pode aparecer
 - **Ímãs** (pontos de união):
   - `magnet_up` — cola na peça de cima
   - `magnet_down` — cola na peça de baixo
@@ -29,7 +31,13 @@ Recurso de **um personagem**:
 - `id`, `display_name`
 - Referências `head`, `body`, `legs` (`PartDef`)
 
-Não usa mais imagens pré-montadas (full / body_head / body_legs). Só as 3 partes.
+## Números atuais
+
+- Policial: 7 / 6 / 5
+- Vampiro: 9 / 9 / 8
+- Bruxa: 9 / 4 / 9
+
+A sinergia (100 / 75 / 50) está em `scripts/match/synergy.gd`.
 
 ## Como marcar os ímãs (ponto exato)
 
@@ -80,9 +88,3 @@ Pasta: `data/parts/`
 | `vampiro_character.tres` + `vampiro_*.tres` | Vampiro |
 | `policial_character.tres` + `policial_*.tres` | Policial |
 | `bruxa_character.tres` + `bruxa_*.tres` | Bruxa |
-
-## Composição visual (`CompositeResolver`)
-
-Arquivo: `scripts/data/composite_resolver.gd`
-
-Sempre no modo **layered** (só partes). Calcula a posição de cada sprite pelos ímãs.

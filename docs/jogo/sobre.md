@@ -6,25 +6,24 @@
 
 ## Ideia em uma frase
 
-Você abre caixas, pega partes do corpo (cabeça, tronco e pernas) e monta lutadores nas cartas.
+Você abre caixas, monta Freaks (cabeça, tronco e pernas) e eles lutam sozinhos em fila contra bots.
 
-## Loop principal (visão do produto)
+## Loop principal
 
-1. **Abrir** caixas (unbox)
-2. **Montar** lutadores com as peças
-3. **Lutar** com os personagens montados *(ainda não implementado)*
-
-Hoje só a parte de **abrir + montar** existe na tela de montagem (assembly). Assembly = a tela onde você monta os lutadores.
+1. **Abrir** caixas na loja (gasta pancadas)
+2. **Montar** até 3 Freaks nas cartas
+3. **Lutar** em auto-battle (parte contra parte, de cima para baixo)
 
 ## Tom visual
 
-Visual “premium”: cartas, prateleira, caixas e fundo de arena com poeira. A intenção é parecer uma arena de luta, mesmo antes do combate existir.
+Arena escura, prateleira como palco, tags coloridas com os números, spotlight no choque do centro.
 
 ## Conteúdo atual
 
-- **3 personagens de dados:** Vampiro, Policial e Bruxa
-- **3 cartas** em branco na tela (qualquer peça pode ir em qualquer carta)
-- **9 caixas** na prateleira (set completo de cada personagem)
+- **3 personagens:** Vampiro, Policial e Bruxa
+- **3 cartas** (fila 3º / 2º / 1º)
+- **5 caixas** por rodada, com nível de loja
+- **3 bots** na mesma partida
 
 ## Resolução da tela
 

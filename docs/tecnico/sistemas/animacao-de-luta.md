@@ -1,38 +1,30 @@
-# Sistema: animação de luta (provisório)
+# Sistema: apresentação da luta
 
-Por enquanto **não há oponente**. O botão **LUTAR** só mostra uma animação de showcase no shelf (a prateleira).
+A luta de verdade é calculada **antes** de aparecer (`CombatSim`). O `FightDirector` só **mostra** o resultado no palco (a prateleira).
 
-## Quando o botão libera
+## Sequência
 
-- Aparece em **todas** as cartas.
-- Só fica clicável quando a carta está **completa** e as 3 peças encaixadas têm poses de perfil e ataque (hoje: set do policial).
-
-## Sequência ao clicar
-
-1. Peças soltas e caixas do shelf **deslizam para fora** da tela e somem (peças já encaixadas nas cartas **não** são apagadas).
-2. O lutador **pula** da carta e **cai com força** no **canto esquerdo** do shelf (vista de frente).
-3. Vira de **perfil** (`sprite_profile` / pose `-2`).
-4. **Anda até o meio** do shelf. A cada passo, as 3 partes intercalam `-2` e `-3` (`sprite_profile` ↔ `sprite_attack`).
-5. Para no meio com todas em `-2`.
-6. Lança como bumerangue (vai e volta), nesta ordem:
-   - cabeça (`sprite_attack`)
-   - tronco
-   - pernas
-7. Pula de volta para a carta.
+1. As peças saltam (cópia visual) para o shelf. As cartas **sobem e somem**.
+2. Caixas da loja saem. Título **LUTEM!**, depois **ROUND N**.
+3. Dois times no palco: jogador à esquerda, oponente à direita. O 1º fica maior, perto do centro.
+4. Cada choque: a peça de cima **cresce e voa ao centro**, aparece **9 > 5**, **X** vermelho em quem morreu.
+5. Freak inteiro cai → o próximo da fila chega perto do centro.
+6. Número de dano no HP. Cartas **descem e voltam**. Tabuleiro de prep intacto.
 
 ## Arquivos
 
 | Peça | Caminho |
 |------|---------|
+| Regras (números) | `scripts/match/combat_sim.gd` |
 | Diretor da sequência | `scripts/assembly/fight_director.gd` |
-| Boneco temporário no stage | `scripts/assembly/fighter_puppet.gd` |
-| Botão na carta | `CharacterSlot` → nó `FightButton` |
-| Dados das poses | `PartDef.sprite_profile` / `PartDef.sprite_attack` |
+| Boneco no palco | `scripts/assembly/fighter_puppet.gd` |
+| Placar 9 > 5 / X | `scripts/ui/fight_overlay.gd` |
+| Tags coloridas | `scripts/ui/stat_tag.gd` |
 
 ## Arte (padrão `-1/-2/-3`)
 
 Em `assets/characters/<nome>/`:
 
 - Frente: `<nome>_head-1.png`, `_body-1`, `_legs-1`
-- Perfil: `…-2.png`
-- Ataque: `…-3.png`
+- Perfil: `…-2.png` (usado no palco)
+- Ataque: `…-3.png` (usado no choque)

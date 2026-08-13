@@ -1,7 +1,7 @@
 # Unbox Fighters
 
-Jogo de **abrir caixas** e **montar lutadores** (cabeça, tronco e pernas).  
-Feito em **Godot 4.7**. Ainda em construção: hoje existe a tela de montagem; o combate ainda não.
+Jogo de **abrir caixas**, **montar Freaks** e **lutar em auto-battle** contra bots.  
+Feito em **Godot 4.7**. Ainda em construção, mas a partida contra 3 bots já existe.
 
 ## Como abrir
 

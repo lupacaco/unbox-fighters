@@ -21,7 +21,8 @@ unbox-fighters/
 ├── scenes/                # Cenas Godot (.tscn)
 │   └── assembly/          # Tela 2D principal
 ├── scripts/               # Código GDScript (.gd)
-│   ├── assembly/
+│   ├── assembly/          # Tela: cartas, caixas, luta visível
+│   ├── match/             # Regras da partida (loja, sinergia, luta)
 │   ├── core/
 │   ├── data/
 │   └── ui/
@@ -37,7 +38,8 @@ unbox-fighters/
 | Mudar comportamento de caixa / peça / carta | `scripts/assembly/` |
 | Mudar atributos ou sprites do vampiro / policial | `data/parts/` |
 | Mudar regras de composição visual | `scripts/data/composite_resolver.gd` |
-| Mudar HUD / fundo | `scripts/ui/` |
+| Mudar regras de luta / loja / bots | `scripts/match/` |
+| Mudar HUD / fundo / tags | `scripts/ui/` |
 | Preparar imagens 300×300 | `tools/` |
 | Documentação | `docs/` |
 

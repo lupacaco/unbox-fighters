@@ -4,14 +4,16 @@ Como o programa está organizado por dentro (visão simples).
 
 ## Em uma frase
 
-Há **uma tela principal** (montagem). Um controlador sobe as cartas e as caixas; um serviço cuida do arrastar e soltar; os dados dos personagens ficam em arquivos de recurso (`.tres`).
+Há **uma tela principal**. As **regras da partida** (loja, sinergia, luta) ficam em código puro; a tela só **mostra** o que aconteceu.
 
 ## Camadas
 
 ```
 Tela (cenas .tscn)
     ↓
-Controladores / serviços (scripts de assembly e UI)
+Controladores / HUD (assembly + ui)
+    ↓
+Regras da partida (scripts/match)
     ↓
 Dados (PartDef, CharacterDef, CompositeResolver)
     ↓
@@ -22,50 +24,49 @@ Arte e recursos (assets/, data/)
 
 | Peça | Papel |
 |------|--------|
-| `AssemblyController` | Orquestra a tela: cartas, caixas, arraste e o botão LUTAR |
-| `DragDropService` | Estado do arraste: quem está sendo arrastado, onde pode soltar |
-| `FightDirector` / `FighterPuppet` | Animação solo de luta no shelf (sem oponente ainda) |
-| `Crate` | Caixa com 2 cliques (3 sprites) que some e revela uma `PartView` |
-| `PartView` | Peça arrastável na prateleira / carta |
-| `CharacterSlot` | Carta com zonas de cabeça/tronco/pernas, visual e atributos |
-| `CompositeResolver` | Posiciona cabeça/tronco/pernas colando pelos ímãs |
-| `StatReadout` / `BackgroundFX` | HUD de atributos e fundo |
-| `Sfx` (autoload) | Toca efeitos sonoros curtos |
+| `AssemblyController` | Maestro: prep ↔ luta, loja, cartas |
+| `MatchState` | Rodada, HP, pancadas, bots, pareamento |
+| `CombatSim` | Calcula a luta e devolve uma lista de eventos |
+| `Synergy` | 100% / 75% / 50% na mesma carta |
+| `ShopPool` / `BotBrain` | Sorteio da loja e compras dos bots |
+| `FightDirector` / `FighterPuppet` | Mostra o choque no palco |
+| `PrepHud` / `ShopBar` / `StatTag` | PREP., pancadas, tags coloridas |
+| `DragDropService` | Arraste de peça, troca de carta, vender |
+| `Crate` / `PartView` / `CharacterSlot` | Caixa, peça, carta |
+| `CompositeResolver` | Cola as peças pelos ímãs |
 
 ## Organização dos scripts
 
 | Pasta | Responsabilidade |
 |-------|------------------|
-| `scripts/assembly/` | Jogabilidade da montagem |
-| `scripts/data/` | Definições de dados e lógica pura de composição |
-| `scripts/ui/` | Interface e efeitos visuais |
-| `scripts/core/` | Utilitários (pool) e scripts de verificação |
+| `scripts/assembly/` | Tela: cartas, caixas, luta visível |
+| `scripts/match/` | Regras (podem ser testadas sem abrir o jogo) |
+| `scripts/data/` | Definições de peças e composição visual |
+| `scripts/ui/` | HUD, tags, cores |
+| `scripts/core/` | Scripts de verificação |
 
 ## Padrões usados
 
-- **Dados em Resource** (`.tres`): como “fichas” editáveis no Godot, sem hardcode de tudo no código.
-- **Cenas instanciadas**: `CharacterSlot`, `Crate`, `PartView` são cenas reutilizáveis.
-- **Sinais** (signals): eventos como “caixa quebrou” ou “peça encaixou”, para as partes se falarem sem ficarem grudadas.
-- **Serviço no grupo** `drag_drop_service`: a peça encontra o serviço de arraste pelo grupo.
-- **Lógica pura** em `CompositeResolver` (`RefCounted`): não depende da tela; só devolve um plano de exibição.
+- **Dados em Resource** (`.tres`): fichas editáveis no Godot.
+- **Cenas instanciadas**: carta, caixa, peça.
+- **Sinais**: “PRONTO”, “atualizar”, “peça vendida”.
+- **Lógica pura** em `CombatSim` e `Synergy`: a animação não inventa o resultado.
 
 ## O que ainda não há na arquitetura
 
-- Autoloads / singletons globais de jogo
-- Gerenciador de cenas (só existe a cena principal)
 - Rede / multiplayer
-- Camada de combate
+- Troca de cenas (menu, etc.)
 
 ## Diagrama simples
 
 ```mermaid
 flowchart TD
-  AC[AssemblyController] --> CS[CharacterSlot x3]
-  AC --> CR[Crate x5]
-  AC --> DDS[DragDropService]
-  CR -->|revela| PV[PartView]
-  PV --> DDS
-  DDS -->|solta em| CS
-  CS --> Comp[CompositeResolver]
-  CS --> SR[StatReadout]
+  AC[AssemblyController] --> MS[MatchState]
+  AC --> CS[CharacterSlot x3]
+  AC --> Shop[Loja 5 caixas]
+  MS --> Bot[BotBrain]
+  MS --> Sim[CombatSim]
+  Sim --> FD[FightDirector]
+  Syn[Synergy] --> Sim
+  Syn --> CS
 ```

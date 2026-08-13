@@ -6,6 +6,7 @@ extends Node2D
 @onready var _shelf: Sprite2D = $Tray/Shelf
 @onready var _fx_layer: Node2D = $FxLayer
 @onready var _drag_service: DragDropService = $DragDropService
+@onready var _hud: CanvasLayer = $HUD
 @onready var _title: Label = $HUD/Title
 @onready var _subtitle: Label = $HUD/Subtitle
 
@@ -13,36 +14,56 @@ var _part_scene: PackedScene = preload("res://scenes/assembly/PartView.tscn")
 var _crate_scene: PackedScene = preload("res://scenes/assembly/Crate.tscn")
 var _slot_scene: PackedScene = preload("res://scenes/assembly/CharacterSlot.tscn")
 
-var _vampiro: CharacterDef
-var _policial: CharacterDef
-var _bruxa: CharacterDef
 var _roster: Array[CharacterDef] = []
-var _reward_parts: Array[PartDef] = []
 var _slots: Array[CharacterSlot] = []
 var _fight_director: FightDirector
+var _match: MatchState
+var _prep_hud: PrepHud
+var _shop_bar: ShopBar
+var _fight_overlay: FightOverlay
+var _sell_zone: Area2D
+var _crates: Array[Crate] = []
+var _waiting_for_fight: bool = false
 
 func _ready() -> void:
 	_drag_service.add_to_group("drag_drop_service")
 	_fight_director = FightDirector.new()
 	add_child(_fight_director)
-	_build_character_data()
+	_roster = ShopPool.roster()
+	_title.visible = false
+	_subtitle.visible = false
 	_setup_tray_visual()
+	_build_hud()
 	_spawn_slots()
-	_spawn_crates()
-	_drag_service.setup(_slots, _tray)
-	_play_intro()
+	_spawn_sell_zone()
+	_drag_service.setup(_slots, _tray, _sell_zone)
+	_drag_service.part_sold.connect(_on_part_sold)
+	_drag_service.card_sold.connect(_on_card_sold)
+	_drag_service.cards_swapped.connect(_on_cards_swapped)
+	_match = MatchState.new()
+	_match.start_match()
+	_refresh_shop_crates()
+	_refresh_hud()
 
-func _build_character_data() -> void:
-	_vampiro = load("res://data/parts/vampiro_character.tres") as CharacterDef
-	_policial = load("res://data/parts/policial_character.tres") as CharacterDef
-	_bruxa = load("res://data/parts/bruxa_character.tres") as CharacterDef
-	_roster = [_vampiro, _policial, _bruxa]
-	# One full set per character in the crates.
-	_reward_parts = [
-		_vampiro.head, _vampiro.body, _vampiro.legs,
-		_policial.head, _policial.body, _policial.legs,
-		_bruxa.head, _bruxa.body, _bruxa.legs,
-	]
+func _process(delta: float) -> void:
+	if _match == null or _match.phase != MatchState.Phase.PREP or _waiting_for_fight:
+		return
+	if _match.tick_prep(delta):
+		_begin_fight()
+	else:
+		_prep_hud.set_time(_match.prep_time_left)
+
+func _build_hud() -> void:
+	_prep_hud = PrepHud.new()
+	_hud.add_child(_prep_hud)
+	_prep_hud.ready_pressed.connect(_on_ready_pressed)
+	_shop_bar = ShopBar.new()
+	_hud.add_child(_shop_bar)
+	_shop_bar.refresh_pressed.connect(_on_refresh_pressed)
+	_shop_bar.freeze_pressed.connect(_on_freeze_pressed)
+	_shop_bar.upgrade_pressed.connect(_on_upgrade_pressed)
+	_fight_overlay = FightOverlay.new()
+	_hud.add_child(_fight_overlay)
 
 func _setup_tray_visual() -> void:
 	_tray.position = Vector2(960, 920)
@@ -56,6 +77,7 @@ func _setup_tray_visual() -> void:
 
 func _spawn_slots() -> void:
 	var xs := [380.0, 960.0, 1540.0]
+	var ranks := [3, 2, 1]
 	var existing: Array[CharacterSlot] = []
 	for child in _slots_root.get_children():
 		if child is CharacterSlot:
@@ -68,54 +90,192 @@ func _spawn_slots() -> void:
 			slot = _slot_scene.instantiate() as CharacterSlot
 			_slots_root.add_child(slot)
 		slot.position = Vector2(xs[i], 400)
-		# Blank cards: any head/body/legs can be mounted on any slot.
 		slot.setup(null, _roster)
-		slot.fight_pressed.connect(_on_slot_fight_pressed)
+		slot.set_queue_rank(ranks[i])
+		slot.card_drag_requested.connect(_on_card_drag_requested)
 		slot.play_intro(0.12 * float(i))
 		_slots.append(slot)
 
-func _spawn_crates() -> void:
-	var count := _reward_parts.size()
-	var spacing := 165.0 if count >= 9 else (200.0 if count > 5 else 230.0)
-	var start_x := -spacing * float(count - 1) * 0.5
-	var existing: Array[Crate] = []
+func _spawn_sell_zone() -> void:
+	_sell_zone = Area2D.new()
+	_sell_zone.name = "SellZone"
+	_tray.add_child(_sell_zone)
+	_sell_zone.position = Vector2(-780, -58)
+	var rect := Rect2(Vector2(-70, -70), Vector2(140, 140))
+	_sell_zone.set_meta("rect", rect)
+	var shape := CollisionShape2D.new()
+	var box := RectangleShape2D.new()
+	box.size = rect.size
+	shape.shape = box
+	_sell_zone.add_child(shape)
+	var label := Label.new()
+	label.text = "VENDER"
+	label.position = Vector2(-54, 64)
+	label.size = Vector2(108, 24)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 16)
+	label.add_theme_color_override("font_color", ThemeTokens.TEXT_DIM)
+	_sell_zone.add_child(label)
+	var plate := Polygon2D.new()
+	plate.polygon = PackedVector2Array([
+		Vector2(-60, -60), Vector2(60, -60), Vector2(60, 60), Vector2(-60, 60)
+	])
+	plate.color = Color(0.12, 0.08, 0.08, 0.55)
+	_sell_zone.add_child(plate)
+	plate.z_index = -1
+
+func _refresh_shop_crates() -> void:
+	for crate in _crates:
+		if is_instance_valid(crate):
+			crate.queue_free()
+	_crates.clear()
 	for child in _tray.get_children():
 		if child is Crate:
-			existing.append(child as Crate)
+			child.queue_free()
+	var human := _match.human()
+	var count := MatchRules.SHOP_SLOTS
+	var spacing := 165.0
+	var start_x := -spacing * float(count - 1) * 0.5
 	for i in count:
-		var crate: Crate
-		if i < existing.size():
-			crate = existing[i]
-		else:
-			crate = _crate_scene.instantiate() as Crate
-			_tray.add_child(crate)
+		var part: PartDef = human.shop_offers[i] if i < human.shop_offers.size() else null
+		if part == null:
+			continue
+		var crate: Crate = _crate_scene.instantiate() as Crate
+		_tray.add_child(crate)
 		var rest := Vector2(start_x + spacing * float(i), -58)
-		crate.position = Vector2(rest.x, rest.y + 24.0)
-		crate.modulate.a = 0.0
-		crate.setup(_reward_parts[i], _part_scene, _drag_service, _tray)
+		crate.position = rest
+		crate.shop_index = i
+		crate.can_afford = func() -> bool: return _match.human().gold >= MatchRules.OPEN_CRATE_COST
+		crate.on_paid_open = _pay_for_crate
+		crate.setup(part, _part_scene, _drag_service, _tray)
 		crate.set_rest_y(rest.y)
-		var tween := create_tween()
-		tween.tween_interval(0.2 + 0.08 * float(i))
-		tween.tween_property(crate, "modulate:a", 1.0, 0.35).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-		tween.parallel().tween_property(crate, "position:y", rest.y, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		_crates.append(crate)
 
-func _play_intro() -> void:
-	_title.modulate.a = 0.0
-	_subtitle.modulate.a = 0.0
-	var tween := create_tween()
-	tween.tween_property(_title, "modulate:a", 1.0, 0.5).set_trans(Tween.TRANS_SINE)
-	tween.parallel().tween_property(_subtitle, "modulate:a", 1.0, 0.65).set_trans(Tween.TRANS_SINE)
+func _pay_for_crate(crate: Crate) -> bool:
+	if not _match.try_spend(_match.human(), MatchRules.OPEN_CRATE_COST):
+		return false
+	if crate.shop_index >= 0 and crate.shop_index < _match.human().shop_offers.size():
+		_match.human().shop_offers[crate.shop_index] = null
+	_refresh_hud()
+	return true
 
-func _on_slot_fight_pressed(slot: CharacterSlot) -> void:
-	if _fight_director.is_busy():
+func _shop_nodes() -> Array:
+	var nodes: Array = []
+	for crate in _crates:
+		if is_instance_valid(crate):
+			nodes.append(crate)
+	for child in _tray.get_children():
+		if child is PartView and not (child as PartView).is_attached():
+			nodes.append(child)
+	nodes.append(_sell_zone)
+	return nodes
+
+func _refresh_hud() -> void:
+	_prep_hud.refresh_players(_match)
+	_prep_hud.set_time(_match.prep_time_left)
+	_shop_bar.refresh(_match.human(), _match.round_index)
+	if _match.phase == MatchState.Phase.PREP:
+		_prep_hud.show_prep()
+		_shop_bar.set_fight_style(false)
+
+func _on_ready_pressed() -> void:
+	if _match.phase != MatchState.Phase.PREP or _waiting_for_fight:
 		return
-	if not slot.attached_parts_can_fight():
+	_match.ready_up()
+	_begin_fight()
+
+func _on_refresh_pressed() -> void:
+	if _match.phase != MatchState.Phase.PREP:
 		return
-	# Lock the other cards only. The fighting card is locked inside FightDirector
-	# after the fight is accepted (locking it first would cancel the fight).
-	for other in _slots:
-		if other != slot:
-			other.set_fight_locked(true)
-	await _fight_director.play(slot, _tray, _fx_layer, _drag_service)
-	for other in _slots:
-		other.set_fight_locked(false)
+	if _match.refresh_shop(_match.human()):
+		_refresh_shop_crates()
+		_refresh_hud()
+
+func _on_freeze_pressed() -> void:
+	if _match.phase != MatchState.Phase.PREP:
+		return
+	_match.toggle_freeze(_match.human())
+	_refresh_hud()
+
+func _on_upgrade_pressed() -> void:
+	if _match.phase != MatchState.Phase.PREP:
+		return
+	if _match.upgrade_shop(_match.human()):
+		_refresh_hud()
+
+func _on_card_drag_requested(slot: CharacterSlot) -> void:
+	_drag_service.begin_card_drag(slot)
+
+func _on_part_sold(part: PartView) -> void:
+	_match.grant_sell(_match.human())
+	if is_instance_valid(part):
+		part.queue_free()
+	_refresh_hud()
+	GameAudio.part_place()
+
+func _on_card_sold(slot: CharacterSlot) -> void:
+	var stolen := slot.steal_all_parts()
+	for key in stolen.keys():
+		var view: PartView = stolen[key]
+		if is_instance_valid(view):
+			view.queue_free()
+	_match.grant_sell(_match.human())
+	_refresh_hud()
+	GameAudio.part_place()
+
+func _on_cards_swapped(a: CharacterSlot, b: CharacterSlot) -> void:
+	var from_a := a.steal_all_parts()
+	var from_b := b.steal_all_parts()
+	a.receive_parts(from_b)
+	b.receive_parts(from_a)
+	GameAudio.part_place()
+
+func _snapshot_player_board() -> BoardLoadout:
+	var board := BoardLoadout.new()
+	board.fighters[0] = _slots[2].to_loadout()
+	board.fighters[1] = _slots[1].to_loadout()
+	board.fighters[2] = _slots[0].to_loadout()
+	return board
+
+func _begin_fight() -> void:
+	if _waiting_for_fight or _match.phase == MatchState.Phase.GAME_OVER:
+		return
+	_waiting_for_fight = true
+	_match.phase = MatchState.Phase.FIGHT
+	_shop_bar.set_fight_style(true)
+	_shop_bar.refresh(_match.human(), _match.round_index)
+	_prep_hud.show_fight(_match.round_index)
+	var human := _match.human()
+	human.board = _snapshot_player_board()
+	var opponent := _match.opponent_of(human)
+	var player_result := CombatSim.simulate(
+		human.board.duplicate_board(),
+		opponent.board.duplicate_board() if opponent != null else BoardLoadout.new()
+	)
+	var other_results: Array = []
+	for pair in _match.pairings:
+		if pair[0] == human or pair[1] == human:
+			continue
+		var sim := CombatSim.simulate(pair[0].board.duplicate_board(), pair[1].board.duplicate_board())
+		other_results.append({"pair": pair, "result": sim})
+	await _fight_director.play(
+		player_result,
+		_slots,
+		opponent.board if opponent != null else BoardLoadout.new(),
+		_tray,
+		_fx_layer,
+		_drag_service,
+		_fight_overlay,
+		_shop_nodes()
+	)
+	_match.apply_result(human, opponent, player_result)
+	for packed in other_results:
+		_match.apply_result(packed["pair"][0], packed["pair"][1], packed["result"])
+	_waiting_for_fight = false
+	_match.finish_round()
+	if _match.phase == MatchState.Phase.GAME_OVER:
+		_prep_hud.show_game_over(_match.winner_id == human.id)
+		_refresh_hud()
+		return
+	_refresh_shop_crates()
+	_refresh_hud()

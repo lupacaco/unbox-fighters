@@ -2,42 +2,42 @@
 
 Última revisão baseada no código existente. Atualize este arquivo sempre que o escopo mudar.
 
-## Pronto (MVP da montagem)
+## Pronto (MVP do auto-battle contra bots)
 
 | Área | Situação |
 |------|----------|
-| Tela de montagem | Funciona como cena principal |
-| Abrir caixas | 2 cliques com 3 sprites + cursor martelo + SFX |
-| Arrastar e soltar | Mouse, com destaque no encaixe válido + SFX |
-| 3 cartas de personagem | Montagem cabeça / tronco / pernas |
-| Atributos BRN / PWR / SPD | Somam ao encaixar |
-| Visual composto | Só partes separadas; ímãs (`magnet_up` / `magnet_down`) unem as peças |
-| Botão LUTAR | Aparece no policial completo; animação de salto + perfil + ataques bumerangue no shelf |
+| Partida contra 3 bots | 4 vivos, HP 40, último de pé ganha |
+| Preparação | Até 60 s ou botão PRONTO |
+| Loja | 5 caixas, pancadas, atualizar, travar, vender, subir nível |
+| Montagem | 3 cartas (3º / 2º / 1º), misturar peças, carta incompleta vale |
+| Luta em fila | Choque parte contra parte, cópia das cartas, teto de 12 de dano por Freak |
+| Tela de luta | Palco no shelf, tags coloridas, colisão no centro, cartas sobem e somem |
+| Abrir caixas | 2 cliques, custa 1 pancada |
+| Arrastar e soltar | Peças nas cartas; Freak inteiro troca de carta ou vai para VENDER |
+| Visual composto | Ímãs unem cabeça / tronco / pernas |
 | Fundo de arena | Respiração de vinheta + partículas de poeira |
-| Áudio | Efeitos: martelo, caixa, peças, conclusão do lutador |
+| Áudio | Efeitos: martelo, caixa, peças, impacto da luta |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |
-| Dados do vampiro, policial e bruxa | Arquivos `.tres` de personagem e peças |
+| Dados | Vampiro, Policial e Bruxa (um número de combate por peça) |
 | Scripts de verificação | Rodam checagens sem abrir a interface completa |
 
 ## Parcial / provisório
 
 | Item | Observação |
 |------|------------|
-| 3 cartas | Cartas em branco: qualquer peça encaixa em qualquer carta |
-| Loot das 9 caixas | Set completo vampiro + policial + bruxa |
-| Botão LUTAR | Libera quando as 3 peças encaixadas têm poses de perfil/ataque |
-| ThemeTokens | Cores definidas no código, mas pouco (ou não) usadas nas cenas |
 | Arte no padrão `-1/-2/-3` | Frente / perfil / ataque por peça |
+| ThemeTokens | Cores da UI (PREP laranja, tags, pancadas) já usadas na tela nova |
+| IA dos bots | Simples: completar set, preencher carta, atualizar ou subir nível |
 
 ## Ainda não existe
 
-- Combate / luta com oponente (existe só animação solo no shelf)
 - Multiplayer
+- Cachorro / Múmia (sem desenho ainda)
+- Habilidade de set completo
+- Freeze por caixa (hoje trava a prateleira inteira)
 - Áudio de música de fundo / menu de volume
 - Menus / navegação entre telas
 - Salvamento / progressão
-- Economia (moeda, loja)
-- Elenco grande de personagens (hoje: vampiro, policial, bruxa)
 - Controles de gamepad
 
 ## Motor e entrada
