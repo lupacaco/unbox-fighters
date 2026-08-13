@@ -1,0 +1,4 @@
+[2026-08-13T05:57:31.165Z][INFO] Command-line: 'C:\\Program Files\\Unity\\Hub\\Editor\\6000.5.5f1\\Editor\\Data\\Resources\\PackageManager\\Server\\UnityPackageManager.exe' server -s 21184 --ipc-path Unity-Upm-21184 -l 2 --log-file C:\\dev\\unbox-fighters/Logs/upm.log
+[2026-08-13T05:57:31.194Z][INFO] IPC server started (IPC path=Unity-Upm-21184).
+[2026-08-13T05:57:31.194Z][INFO] Hint: To connect to this UPM instance, launch Unity with the command-line parameter -upmIpcPath Upm-21184.
+[2026-08-13T05:57:42.267Z][INFO] Shutting down UnityPackageManager.exe: parent process [21184] is no longer running.
