@@ -6,8 +6,7 @@ enum Phase { PREP, FIGHT, GAME_OVER }
 var round_index: int = 0
 var phase: Phase = Phase.PREP
 var contestants: Array[Contestant] = []
-var pairings: Array = []
-var bye_id: StringName = &""
+var pairings: Array[FightPair] = []
 var rng := RandomNumberGenerator.new()
 var prep_time_left: float = MatchRules.PREP_SECONDS
 var winner_id: StringName = &""
@@ -22,7 +21,7 @@ func start_match() -> void:
 	contestants.clear()
 	var player := Contestant.new()
 	player.id = &"player"
-	player.display_name = "VOCÊ"
+	player.display_name = "Você"
 	player.is_bot = false
 	player.reset_shop_slots()
 	contestants.append(player)
@@ -107,11 +106,18 @@ func grant_sell(contestant: Contestant) -> void:
 
 func opponent_of(contestant: Contestant) -> Contestant:
 	for pair in pairings:
-		if pair[0] == contestant:
-			return pair[1]
-		if pair[1] == contestant:
-			return pair[0]
+		if pair.left == contestant:
+			return pair.right
+		if pair.right == contestant and not pair.right_is_ghost:
+			return pair.left
 	return null
+
+func field_line() -> String:
+	var parts: PackedStringArray = []
+	for contestant in contestants:
+		parts.append("%s %d" % [contestant.display_name, contestant.hp])
+	parts.append("r%d" % round_index)
+	return "     ".join(parts)
 
 func alive_count() -> int:
 	var n := 0
@@ -120,12 +126,14 @@ func alive_count() -> int:
 			n += 1
 	return n
 
-func apply_result(left: Contestant, right: Contestant, result: CombatResult) -> void:
+func apply_result(left: Contestant, right: Contestant, result: CombatResult, right_is_ghost: bool = false) -> void:
+	if result == null:
+		return
 	if left != null:
 		left.hp = maxi(0, left.hp - result.damage_to_left)
-		if right != null:
+		if right != null and not right_is_ghost:
 			left.last_opponent_id = right.id
-	if right != null:
+	if right != null and not right_is_ghost:
 		right.hp = maxi(0, right.hp - result.damage_to_right)
 		if left != null:
 			right.last_opponent_id = left.id
@@ -153,28 +161,35 @@ func _fill_empty_shop_slots(contestant: Contestant) -> void:
 
 func _pair_round() -> void:
 	pairings.clear()
-	bye_id = &""
 	var alive: Array[Contestant] = []
 	for contestant in contestants:
 		if contestant.is_alive():
 			alive.append(contestant)
 	if alive.size() <= 1:
 		return
-	var remaining: Array[Contestant] = alive.duplicate()
 	var player := human()
 	if player != null and player.is_alive():
-		var opponent := _pick_opponent(player, remaining)
+		var bots: Array[Contestant] = []
+		for contestant in alive:
+			if contestant != player:
+				bots.append(contestant)
+		var opponent := _pick_opponent(player, bots)
 		if opponent != null:
-			pairings.append([player, opponent])
-			remaining.erase(player)
-			remaining.erase(opponent)
-	remaining.shuffle()
-	while remaining.size() >= 2:
-		var a: Contestant = remaining.pop_back()
-		var b: Contestant = remaining.pop_back()
-		pairings.append([a, b])
-	if remaining.size() == 1:
-		bye_id = remaining[0].id
+			pairings.append(FightPair.new(player, opponent, false))
+		var leftover: Array[Contestant] = []
+		for bot in bots:
+			if bot != opponent:
+				leftover.append(bot)
+		if leftover.size() >= 2:
+			pairings.append(FightPair.new(leftover[0], leftover[1], false))
+		elif leftover.size() == 1 and opponent != null:
+			pairings.append(FightPair.new(leftover[0], opponent, true))
+		return
+	pairings.append(FightPair.new(alive[0], alive[1], false))
+	if alive.size() >= 4:
+		pairings.append(FightPair.new(alive[2], alive[3], false))
+	elif alive.size() == 3:
+		pairings.append(FightPair.new(alive[2], alive[0], true))
 
 func _pick_opponent(who: Contestant, pool: Array[Contestant]) -> Contestant:
 	var candidates: Array[Contestant] = []

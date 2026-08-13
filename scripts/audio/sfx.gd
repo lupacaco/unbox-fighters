@@ -77,3 +77,15 @@ func part_reject() -> void:
 
 func fighter_complete() -> void:
 	play(&"fighter_complete", 0.0, 1.0)
+
+func impact() -> void:
+	play(&"fighter_complete", 2.0, 0.86)
+
+func land() -> void:
+	play(&"hammer_hit", -4.0, 0.82)
+
+func step() -> void:
+	play(&"part_place", -8.0, randf_range(1.12, 1.28))
+
+func whoosh() -> void:
+	play(&"part_pickup", -6.0, randf_range(0.78, 0.9))

@@ -6,10 +6,11 @@ Interface da preparação e da luta.
 
 | Arquivo | Papel |
 |---------|--------|
-| `scripts/ui/prep_hud.gd` | **PREP.** laranja, relógio, PRONTO, HP dos 4 |
+| `scripts/ui/prep_hud.gd` | **PREP.** / **LUTA**, relógio `1:00`, vs oponente, HP dos 4, PRONTO / NOVA PARTIDA |
 | `scripts/ui/shop_bar.gd` | NÍVEL, bolinhas de pancadas, ATUALIZAR, TRAVAR |
 | `scripts/ui/stat_tag.gd` | Pílula colorida com o número da peça |
-| `scripts/ui/fight_overlay.gd` | Número do choque, 9 > 5, X, dano de HP |
+| `scripts/ui/fight_overlay.gd` | Overlay antigo da luta (a apresentação nova usa placas) |
+| `scripts/ui/fight_plaque.gd` | Placa dourada: nomes, HP, números do choque, KO |
 | `scripts/ui/stat_readout.gd` | Nome e total na carta |
 | `scripts/ui/background_fx.gd` | Fundo de arena, vinheta e poeira |
 | `scripts/ui/theme_tokens.gd` | Paleta: laranja PREP, azul / roxo / verde das tags, vermelho das pancadas |

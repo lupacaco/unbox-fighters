@@ -29,7 +29,7 @@ Arte e recursos (assets/, data/)
 | `CombatSim` | Calcula a luta e devolve uma lista de eventos |
 | `Synergy` | 100% / 75% / 50% na mesma carta |
 | `ShopPool` / `BotBrain` | Sorteio da loja e compras dos bots |
-| `FightDirector` / `FighterPuppet` | Mostra o choque no palco |
+| `FightDirector` / `FighterPuppet` / `FightPlaque` | Mostra o palco: pulo, caminhada, choque, KO |
 | `PrepHud` / `ShopBar` / `StatTag` | PREP., pancadas, tags coloridas |
 | `DragDropService` | Arraste de peça, troca de carta, vender |
 | `Crate` / `PartView` / `CharacterSlot` | Caixa, peça, carta |

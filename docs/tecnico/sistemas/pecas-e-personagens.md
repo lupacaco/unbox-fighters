@@ -14,7 +14,7 @@ Recurso de **uma peça** (script com `@tool` para o editor poder ler/validar ím
 
 - `id`, `display_name`
 - `slot_type` (cabeça / tronco / pernas)
-- `set_id` (vampiro, policial, bruxa) — usado na sinergia
+- `set_id` (vampiro, policial, bruxa, mumia, medico, cachorro) — usado na sinergia
 - `sprite` — frente (pose 1)
 - `sprite_profile` — perfil (pose 2)
 - `sprite_attack` — ataque (pose 3)
@@ -36,6 +36,9 @@ Recurso de **um personagem**:
 - Policial: 7 / 6 / 5
 - Vampiro: 9 / 9 / 8
 - Bruxa: 9 / 4 / 9
+- Múmia: 5 / 8 / 6
+- Médico: 3 / 4 / 4
+- Cachorro: 5 / 5 / 7
 
 A sinergia (100 / 75 / 50) está em `scripts/match/synergy.gd`.
 
@@ -88,3 +91,6 @@ Pasta: `data/parts/`
 | `vampiro_character.tres` + `vampiro_*.tres` | Vampiro |
 | `policial_character.tres` + `policial_*.tres` | Policial |
 | `bruxa_character.tres` + `bruxa_*.tres` | Bruxa |
+| `mumia_character.tres` + `mumia_*.tres` | Múmia |
+| `medico_character.tres` + `medico_*.tres` | Médico |
+| `cachorro_character.tres` + `cachorro_*.tres` | Cachorro |

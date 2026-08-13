@@ -30,7 +30,8 @@ Arrastar pelo rótulo **3º / 2º / 1º**:
 ## Regras de aceite (`CharacterSlot.can_accept`)
 
 - A peça não pode ser nula
-- O slot daquele tipo ainda está vazio (qualquer peça do tipo certo serve em qualquer carta)
+- Qualquer peça do tipo certo serve em qualquer carta
+- Se o encaixe **já tem** peça, a nova entra e a antiga volta para a prateleira
 - Durante a luta a carta fica travada
 
 ## Sinais úteis
@@ -41,4 +42,5 @@ Arrastar pelo rótulo **3º / 2º / 1º**:
 ## Input
 
 Ação configurada no projeto: `pointer_press` (botão esquerdo do mouse).  
-O término do arraste também observa soltar o botão esquerdo.
+O término do arraste também observa soltar o botão esquerdo.  
+O **botão direito** vende a peça embaixo do cursor (na prateleira ou na carta).

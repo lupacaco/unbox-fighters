@@ -179,10 +179,32 @@ func _refresh_hud() -> void:
 		_shop_bar.set_fight_style(false)
 
 func _on_ready_pressed() -> void:
+	if _match.phase == MatchState.Phase.GAME_OVER:
+		_restart_match()
+		return
 	if _match.phase != MatchState.Phase.PREP or _waiting_for_fight:
 		return
 	_match.ready_up()
 	_begin_fight()
+
+func _restart_match() -> void:
+	_drag_service.set_locked(false)
+	_clear_player_pieces()
+	_match.start_match()
+	_refresh_shop_crates()
+	_refresh_hud()
+
+func _clear_player_pieces() -> void:
+	for slot in _slots:
+		slot.set_fight_locked(false)
+		var stolen := slot.steal_all_parts()
+		for key in stolen.keys():
+			var view: PartView = stolen[key]
+			if is_instance_valid(view):
+				view.queue_free()
+	for child in _tray.get_children():
+		if child is PartView:
+			child.queue_free()
 
 func _on_refresh_pressed() -> void:
 	if _match.phase != MatchState.Phase.PREP:
@@ -207,9 +229,11 @@ func _on_card_drag_requested(slot: CharacterSlot) -> void:
 	_drag_service.begin_card_drag(slot)
 
 func _on_part_sold(part: PartView) -> void:
+	if part == null or not is_instance_valid(part):
+		return
+	part.unbind_from_card()
 	_match.grant_sell(_match.human())
-	if is_instance_valid(part):
-		part.queue_free()
+	part.queue_free()
 	_refresh_hud()
 	GameAudio.part_place()
 
@@ -245,37 +269,42 @@ func _begin_fight() -> void:
 	_shop_bar.set_fight_style(true)
 	_shop_bar.refresh(_match.human(), _match.round_index)
 	_prep_hud.show_fight(_match.round_index)
+	_prep_hud.refresh_players(_match)
 	var human := _match.human()
 	human.board = _snapshot_player_board()
 	var opponent := _match.opponent_of(human)
-	var player_result := CombatSim.simulate(
-		human.board.duplicate_board(),
-		opponent.board.duplicate_board() if opponent != null else BoardLoadout.new()
-	)
+	var opponent_board := opponent.board.duplicate_board() if opponent != null else BoardLoadout.new()
+	var player_result := CombatSim.simulate(human.board.duplicate_board(), opponent_board)
 	var other_results: Array = []
 	for pair in _match.pairings:
-		if pair[0] == human or pair[1] == human:
+		if pair.left == human:
 			continue
-		var sim := CombatSim.simulate(pair[0].board.duplicate_board(), pair[1].board.duplicate_board())
+		var sim := CombatSim.simulate(pair.left.board.duplicate_board(), pair.right.board.duplicate_board())
 		other_results.append({"pair": pair, "result": sim})
 	await _fight_director.play(
 		player_result,
 		_slots,
-		opponent.board if opponent != null else BoardLoadout.new(),
+		opponent_board,
 		_tray,
 		_fx_layer,
 		_drag_service,
 		_fight_overlay,
-		_shop_nodes()
+		_shop_nodes(),
+		human.display_name,
+		opponent.display_name if opponent != null else "",
+		human.hp,
+		opponent.hp if opponent != null else 0
 	)
 	_match.apply_result(human, opponent, player_result)
 	for packed in other_results:
-		_match.apply_result(packed["pair"][0], packed["pair"][1], packed["result"])
+		var pair: FightPair = packed["pair"]
+		_match.apply_result(pair.left, pair.right, packed["result"], pair.right_is_ghost)
 	_waiting_for_fight = false
 	_match.finish_round()
 	if _match.phase == MatchState.Phase.GAME_OVER:
+		_drag_service.set_locked(true)
 		_prep_hud.show_game_over(_match.winner_id == human.id)
-		_refresh_hud()
+		_prep_hud.refresh_players(_match)
 		return
 	_refresh_shop_crates()
 	_refresh_hud()

@@ -5,9 +5,9 @@ signal ready_pressed
 
 var _phase: Label
 var _timer: Label
+var _vs: Label
+var _field: Label
 var _ready_button: Button
-var _hp_row: HBoxContainer
-var _chips: Array[Label] = []
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -27,11 +27,28 @@ func _ready() -> void:
 	_timer.add_theme_color_override("font_color", ThemeTokens.TEXT)
 	add_child(_timer)
 
+	_vs = Label.new()
+	_vs.position = Vector2(48, 118)
+	_vs.size = Vector2(420, 28)
+	_vs.add_theme_font_size_override("font_size", 18)
+	_vs.add_theme_color_override("font_color", ThemeTokens.TEXT_DIM)
+	add_child(_vs)
+
+	_field = Label.new()
+	_field.position = Vector2(420, 36)
+	_field.size = Vector2(1180, 40)
+	_field.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_field.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_field.add_theme_font_size_override("font_size", 18)
+	_field.add_theme_color_override("font_color", ThemeTokens.TEXT)
+	add_child(_field)
+
 	_ready_button = Button.new()
 	_ready_button.text = "PRONTO"
 	_ready_button.position = Vector2(1640, 36)
 	_ready_button.size = Vector2(220, 56)
 	_ready_button.focus_mode = Control.FOCUS_NONE
+	_ready_button.mouse_filter = Control.MOUSE_FILTER_STOP
 	_ready_button.add_theme_font_size_override("font_size", 22)
 	var normal := StyleBoxFlat.new()
 	normal.bg_color = ThemeTokens.PREP_ORANGE
@@ -44,55 +61,41 @@ func _ready() -> void:
 	_ready_button.pressed.connect(func() -> void: ready_pressed.emit())
 	add_child(_ready_button)
 
-	_hp_row = HBoxContainer.new()
-	_hp_row.position = Vector2(480, 36)
-	_hp_row.size = Vector2(1100, 56)
-	_hp_row.add_theme_constant_override("separation", 16)
-	add_child(_hp_row)
-
 func show_prep() -> void:
 	_phase.text = "PREP."
 	_phase.add_theme_color_override("font_color", ThemeTokens.PREP_ORANGE)
+	_ready_button.text = "PRONTO"
 	_ready_button.visible = true
 	_timer.visible = true
+	_vs.visible = true
+	_field.visible = true
 
-func show_fight(round_index: int) -> void:
-	_phase.text = "LUTEM!"
+func show_fight(_round_index: int) -> void:
+	_phase.text = "LUTA"
 	_phase.add_theme_color_override("font_color", ThemeTokens.PREP_ORANGE)
 	_ready_button.visible = false
 	_timer.visible = false
-	await get_tree().create_timer(0.85).timeout
-	if is_inside_tree():
-		_phase.text = "ROUND %d" % round_index
+	_vs.visible = true
+	_field.visible = true
 
 func show_game_over(won: bool) -> void:
 	_phase.text = "VOCÊ GANHOU" if won else "VOCÊ PERDEU"
-	_ready_button.visible = false
+	_ready_button.text = "NOVA PARTIDA"
+	_ready_button.visible = true
 	_timer.visible = false
+	_vs.visible = false
 
 func set_time(seconds_left: float) -> void:
-	_timer.text = "%d s" % ceili(seconds_left)
+	var total := maxi(0, ceili(seconds_left))
+	var minutes := total / 60
+	var seconds := total % 60
+	_timer.text = "%d:%02d" % [minutes, seconds]
 
 func refresh_players(match_state: MatchState) -> void:
-	while _chips.size() < match_state.contestants.size():
-		var chip := Label.new()
-		chip.size_flags_horizontal = Control.SIZE_EXPAND | Control.SIZE_FILL
-		chip.add_theme_font_size_override("font_size", 16)
-		chip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		chip.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		_hp_row.add_child(chip)
-		_chips.append(chip)
+	_field.text = match_state.field_line()
 	var opponent := match_state.opponent_of(match_state.human())
-	for i in match_state.contestants.size():
-		var contestant: Contestant = match_state.contestants[i]
-		var chip: Label = _chips[i]
-		var mark := ""
-		if contestant == opponent:
-			mark = "  vs"
-		chip.text = "%s  %d HP%s" % [contestant.display_name, contestant.hp, mark]
-		if not contestant.is_alive():
-			chip.add_theme_color_override("font_color", ThemeTokens.TEXT_DIM)
-		elif contestant == opponent:
-			chip.add_theme_color_override("font_color", ThemeTokens.PREP_ORANGE)
-		else:
-			chip.add_theme_color_override("font_color", ThemeTokens.TEXT)
+	if opponent == null:
+		_vs.text = ""
+	else:
+		_vs.text = "vs  %s" % opponent.display_name
+		_vs.add_theme_color_override("font_color", ThemeTokens.PREP_ORANGE)

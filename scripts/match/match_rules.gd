@@ -21,7 +21,7 @@ const MAX_BOT_REFRESHES := 6
 ## Cost to go from tier 1→2, 2→3, 3→4, 4→5.
 const UPGRADE_COSTS: Array[int] = [4, 5, 6, 7]
 
-const BOT_NAMES: Array[String] = ["RIVAL A", "RIVAL B", "RIVAL C"]
+const BOT_NAMES: Array[String] = ["Sombra", "Ferrugem", "Névoa"]
 
 static func gold_for_round(round_index: int) -> int:
 	return mini(MAX_GOLD, STARTING_GOLD + maxi(round_index, 1) - 1)

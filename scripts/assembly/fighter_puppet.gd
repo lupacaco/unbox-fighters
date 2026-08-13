@@ -90,6 +90,15 @@ func set_tag_value(slot: PartSlotType.Value, value: int) -> void:
 	var tag: StatTag = _tags[slot]
 	tag.setup(value, ThemeTokens.color_for_slot(slot))
 
+func has_living_part() -> bool:
+	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
+		if _part_def(slot) != null and not _dead.get(slot, false):
+			return true
+	return false
+
+func feet_position() -> Vector2:
+	return global_position + Vector2(0, 88)
+
 func get_part_node(slot: PartSlotType.Value) -> Sprite2D:
 	match slot:
 		PartSlotType.Value.HEAD:

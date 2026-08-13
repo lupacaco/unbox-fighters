@@ -43,3 +43,23 @@ static func fighter_complete() -> void:
 	var s := _sfx()
 	if s:
 		s.call("fighter_complete")
+
+static func impact() -> void:
+	var s := _sfx()
+	if s:
+		s.call("impact")
+
+static func land() -> void:
+	var s := _sfx()
+	if s:
+		s.call("land")
+
+static func step() -> void:
+	var s := _sfx()
+	if s:
+		s.call("step")
+
+static func whoosh() -> void:
+	var s := _sfx()
+	if s:
+		s.call("whoosh")

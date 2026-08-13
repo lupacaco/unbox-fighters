@@ -56,6 +56,11 @@ func _process(_delta: float) -> void:
 		_update_card_hover()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+		if not _locked:
+			_try_sell_under_mouse()
+			get_viewport().set_input_as_handled()
+		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
 		if _dragging != null:
 			_finish_drag()
@@ -146,3 +151,41 @@ func _find_card_under_mouse() -> CharacterSlot:
 		if slot.contains_card_point(mouse):
 			return slot
 	return null
+
+func _try_sell_under_mouse() -> void:
+	if _dragging != null:
+		var dragged := _dragging
+		_clear_drag_visuals()
+		part_sold.emit(dragged)
+		return
+	if _dragging_card != null:
+		return
+	var mouse := get_viewport().get_mouse_position()
+	var loose := _find_loose_part_at(mouse)
+	if loose != null:
+		part_sold.emit(loose)
+		return
+	for slot in _slots:
+		var on_card := slot.find_part_at(mouse)
+		if on_card != null:
+			on_card.unbind_from_card()
+			part_sold.emit(on_card)
+			return
+
+func _find_loose_part_at(mouse: Vector2) -> PartView:
+	if _tray == null:
+		return null
+	for child in _tray.get_children():
+		if child is PartView:
+			var part := child as PartView
+			if part.can_interact() and not part.is_attached() and part.contains_point(mouse):
+				return part
+	return null
+
+func _clear_drag_visuals() -> void:
+	if _hover_slot != null:
+		_hover_slot.set_drop_highlight(false, PartSlotType.Value.BODY)
+		_hover_slot = null
+	_dragging = null
+	_dragging_card = null
+	set_process(false)

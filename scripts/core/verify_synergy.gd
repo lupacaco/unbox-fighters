@@ -47,6 +47,21 @@ func _check_part_numbers() -> bool:
 	if bruxa.head.combat_value != 9 or bruxa.body.combat_value != 4 or bruxa.legs.combat_value != 9:
 		push_error("VERIFY_FAIL bruxa combat values")
 		return false
+	var mumia: CharacterDef = load("res://data/parts/mumia_character.tres")
+	var medico: CharacterDef = load("res://data/parts/medico_character.tres")
+	var cachorro: CharacterDef = load("res://data/parts/cachorro_character.tres")
+	if mumia.head.combat_value != 5 or mumia.body.combat_value != 8 or mumia.legs.combat_value != 6:
+		push_error("VERIFY_FAIL mumia combat values")
+		return false
+	if medico.head.combat_value != 3 or medico.body.combat_value != 4 or medico.legs.combat_value != 4:
+		push_error("VERIFY_FAIL medico combat values")
+		return false
+	if cachorro.head.combat_value != 5 or cachorro.body.combat_value != 5 or cachorro.legs.combat_value != 7:
+		push_error("VERIFY_FAIL cachorro combat values")
+		return false
+	if mumia.body.tier != 4 or medico.head.tier != 1 or cachorro.legs.tier != 3:
+		push_error("VERIFY_FAIL extra set shop tiers")
+		return false
 	if policial.head.tier != 3 or vampiro.head.tier != 5 or bruxa.body.tier != 1:
 		push_error("VERIFY_FAIL shop tiers")
 		return false

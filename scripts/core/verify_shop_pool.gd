@@ -23,6 +23,26 @@ func _run() -> void:
 		push_error("VERIFY_FAIL tier 5 should include 9s")
 		quit(1)
 		return
+	if ShopPool.roster().size() != 6:
+		push_error("VERIFY_FAIL expected 6 characters, got %d" % ShopPool.roster().size())
+		quit(1)
+		return
+	var ids: PackedStringArray = []
+	for character in ShopPool.roster():
+		ids.append(String(character.id))
+	for needed in ["vampiro", "policial", "bruxa", "mumia", "medico", "cachorro"]:
+		if needed not in ids:
+			push_error("VERIFY_FAIL missing character %s" % needed)
+			quit(1)
+			return
+	var mumia_body := false
+	for part in ShopPool.parts_up_to_tier(1):
+		if part.id == &"mumia_body":
+			mumia_body = true
+	if mumia_body:
+		push_error("VERIFY_FAIL mummy body should not appear at shop level 1")
+		quit(1)
+		return
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1
 	var offers := ShopPool.roll(1, rng)

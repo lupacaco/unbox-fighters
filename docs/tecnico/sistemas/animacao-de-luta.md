@@ -4,12 +4,13 @@ A luta de verdade é calculada **antes** de aparecer (`CombatSim`). O `FightDire
 
 ## Sequência
 
-1. As peças saltam (cópia visual) para o shelf. As cartas **sobem e somem**.
-2. Caixas da loja saem. Título **LUTEM!**, depois **ROUND N**.
-3. Dois times no palco: jogador à esquerda, oponente à direita. O 1º fica maior, perto do centro.
-4. Cada choque: a peça de cima **cresce e voa ao centro**, aparece **9 > 5**, **X** vermelho em quem morreu.
-5. Freak inteiro cai → o próximo da fila chega perto do centro.
-6. Número de dano no HP. Cartas **descem e voltam**. Tabuleiro de prep intacto.
+1. Flash na tela. As cartas **sobem e somem**. A loja some.
+2. Cada Freak **pula em arco** da carta (ou da direita, se for o oponente) até a prateleira, com um impacto no pouso.
+3. **Anda ~6 passos** de perfil até o lugar da fila (1º maior, perto do centro).
+4. Placas no topo: nomes, HP e **VS**.
+5. Cada choque: a peça **gira, cresce (~2×) e voa em arco** ao centro. Placas douradas com os números. O vencedor mostra o **resto**. O perdedor leva **X** e some. A peça vencedora volta ao corpo.
+6. Freak inteiro cai → placa **KO**, inclina e sai. O próximo anda para frente.
+7. Fim: EMPATE ou nome + dano. Cartas voltam. Freaks pulam de volta.
 
 ## Arquivos
 
@@ -18,7 +19,8 @@ A luta de verdade é calculada **antes** de aparecer (`CombatSim`). O `FightDire
 | Regras (números) | `scripts/match/combat_sim.gd` |
 | Diretor da sequência | `scripts/assembly/fight_director.gd` |
 | Boneco no palco | `scripts/assembly/fighter_puppet.gd` |
-| Placar 9 > 5 / X | `scripts/ui/fight_overlay.gd` |
+| Placas douradas | `scripts/ui/fight_plaque.gd` |
+| Overlay antigo (ainda na cena) | `scripts/ui/fight_overlay.gd` |
 | Tags coloridas | `scripts/ui/stat_tag.gd` |
 
 ## Arte (padrão `-1/-2/-3`)
@@ -26,5 +28,5 @@ A luta de verdade é calculada **antes** de aparecer (`CombatSim`). O `FightDire
 Em `assets/characters/<nome>/`:
 
 - Frente: `<nome>_head-1.png`, `_body-1`, `_legs-1`
-- Perfil: `…-2.png` (usado no palco)
-- Ataque: `…-3.png` (usado no choque)
+- Perfil: `…-2.png` (usado no palco e na caminhada)
+- Ataque: `…-3.png` (usado no choque e no passo)

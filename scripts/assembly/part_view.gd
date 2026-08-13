@@ -56,12 +56,30 @@ func cancel_drag_return() -> void:
 	scale = Vector2.ONE
 	return_to_tray()
 
+func contains_point(global_point: Vector2) -> bool:
+	var shape := _collision.shape as RectangleShape2D
+	if shape == null:
+		return false
+	var local := to_local(global_point)
+	return Rect2(-shape.size * 0.5, shape.size).has_point(local)
+
+func unbind_from_card() -> void:
+	if _attached_slot == null:
+		return
+	_attached_slot.detach_part(part_def.slot_type, true)
+	_attached_slot = null
+	visible = true
+
 func return_to_tray() -> void:
 	_dragging = false
 	_attached_slot = null
 	visible = true
 	z_index = 0
 	_glow.color = Color(0.77, 0.12, 0.23, 0.1)
+	if not is_inside_tree():
+		global_position = tray_home
+		scale = Vector2.ONE
+		return
 	var tween := create_tween()
 	tween.tween_property(self, "global_position", tray_home, 0.24).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(self, "scale", Vector2.ONE, 0.24).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)

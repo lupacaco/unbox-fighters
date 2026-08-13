@@ -5,6 +5,9 @@ const CHARACTER_PATHS: Array[String] = [
 	"res://data/parts/vampiro_character.tres",
 	"res://data/parts/policial_character.tres",
 	"res://data/parts/bruxa_character.tres",
+	"res://data/parts/mumia_character.tres",
+	"res://data/parts/medico_character.tres",
+	"res://data/parts/cachorro_character.tres",
 ]
 
 static var _all_parts: Array[PartDef] = []

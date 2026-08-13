@@ -15,6 +15,9 @@ unbox-fighters/
 │   ├── characters/vampiro/
 │   ├── characters/policial/
 │   ├── characters/bruxa/
+│   ├── characters/mumia/
+│   ├── characters/medico/
+│   ├── characters/cachorro/
 │   └── ui/
 ├── data/                  # Dados do jogo (.tres)
 │   └── parts/

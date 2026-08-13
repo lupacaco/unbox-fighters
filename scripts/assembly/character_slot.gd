@@ -90,14 +90,26 @@ func receive_parts(parts: Dictionary) -> void:
 		if view != null:
 			try_attach(view)
 
+func find_part_at(global_point: Vector2) -> PartView:
+	if _fight_locked:
+		return null
+	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
+		if not _bound_parts.has(slot):
+			continue
+		if _zone_contains(slot, global_point):
+			var view: PartView = _bound_parts[slot]
+			if view != null and is_instance_valid(view):
+				return view
+	return null
+
 func play_leave_for_fight() -> void:
 	set_fight_locked(true)
 	var tween := create_tween()
-	tween.tween_property(self, "position:y", _rest_y - 120.0, 0.42).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tween.parallel().tween_property(self, "modulate:a", 0.0, 0.38).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(self, "position:y", _rest_y - 360.0, 0.48).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(self, "modulate:a", 0.0, 0.4).set_trans(Tween.TRANS_SINE)
 
 func play_return_from_fight() -> void:
-	position.y = _rest_y - 120.0
+	position.y = _rest_y - 360.0
 	var tween := create_tween()
 	tween.tween_property(self, "position:y", _rest_y, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(self, "modulate:a", 1.0, 0.38).set_trans(Tween.TRANS_SINE)
@@ -143,18 +155,17 @@ func set_fighter_visible(visible_flag: bool) -> void:
 func get_fighter_global_position() -> Vector2:
 	return _display_root.global_position
 
+func has_any_part() -> bool:
+	return _has_head or _has_body or _has_legs
+
 func can_accept(part: PartDef) -> bool:
 	if _fight_locked or part == null:
 		return false
-	match part.slot_type:
-		PartSlotType.Value.HEAD:
-			return not _has_head
-		PartSlotType.Value.BODY:
-			return not _has_body
-		PartSlotType.Value.LEGS:
-			return not _has_legs
-		_:
-			return false
+	return (
+		part.slot_type == PartSlotType.Value.HEAD
+		or part.slot_type == PartSlotType.Value.BODY
+		or part.slot_type == PartSlotType.Value.LEGS
+	)
 
 func can_accept_at(part: PartDef, global_point: Vector2) -> bool:
 	if not can_accept(part):
@@ -167,12 +178,15 @@ func _zone_contains(slot: PartSlotType.Value, global_point: Vector2) -> bool:
 	return rect.has_point(to_local(global_point))
 
 func try_attach(part_view: PartView) -> bool:
-	if _fight_locked:
+	if _fight_locked or part_view == null or part_view.part_def == null:
 		return false
 	if not can_accept(part_view.part_def):
 		return false
-	var was_complete := _has_head and _has_body and _has_legs
 	var slot := part_view.part_def.slot_type
+	var displaced: PartView = null
+	if _bound_parts.has(slot):
+		displaced = detach_part(slot, false)
+	var was_complete := _has_head and _has_body and _has_legs
 	_set_flag(slot, true)
 	_bound_parts[slot] = part_view
 	part_view.set_attached_slot(self)
@@ -186,6 +200,8 @@ func try_attach(part_view: PartView) -> bool:
 		GameAudio.fighter_complete()
 	part_attached.emit(self, part_view.part_def)
 	assembly_changed.emit(self)
+	if displaced != null:
+		displaced.return_to_tray()
 	return true
 
 func detach_part(slot: PartSlotType.Value, refresh: bool = true) -> PartView:

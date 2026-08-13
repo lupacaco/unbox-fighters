@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CharacterDef" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/character_def.gd" id="1"]
+[ext_resource type="Resource" path="res://data/parts/cachorro_head.tres" id="2"]
+[ext_resource type="Resource" path="res://data/parts/cachorro_body.tres" id="3"]
+[ext_resource type="Resource" path="res://data/parts/cachorro_legs.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"cachorro"
+display_name = "DOG"
+head = ExtResource("2")
+body = ExtResource("3")
+legs = ExtResource("4")

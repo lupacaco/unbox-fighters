@@ -6,19 +6,20 @@
 
 | Área | Situação |
 |------|----------|
-| Partida contra 3 bots | 4 vivos, HP 40, último de pé ganha |
-| Preparação | Até 60 s ou botão PRONTO |
+| Partida contra 3 bots | 4 vivos, HP 40, último de pé ganha. Bots: Sombra, Ferrugem, Névoa |
+| Preparação | Até 60 s (relógio `1:00`) ou botão PRONTO |
 | Loja | 5 caixas, pancadas, atualizar, travar, vender, subir nível |
 | Montagem | 3 cartas (3º / 2º / 1º), misturar peças, carta incompleta vale |
 | Luta em fila | Choque parte contra parte, cópia das cartas, teto de 12 de dano por Freak |
-| Tela de luta | Palco no shelf, tags coloridas, colisão no centro, cartas sobem e somem |
+| Tela de luta | Pulo na prateleira, caminhada, placas, resto do choque, KO |
+| Fim de partida | VOCÊ GANHOU / VOCÊ PERDEU e botão **NOVA PARTIDA** |
 | Abrir caixas | 2 cliques, custa 1 pancada |
-| Arrastar e soltar | Peças nas cartas; Freak inteiro troca de carta ou vai para VENDER |
+| Arrastar e soltar | Peças nas cartas (troca no lugar ocupado); botão direito vende; Freak inteiro troca de carta ou vai para VENDER |
 | Visual composto | Ímãs unem cabeça / tronco / pernas |
-| Fundo de arena | Respiração de vinheta + partículas de poeira |
+| Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |
 | Áudio | Efeitos: martelo, caixa, peças, impacto da luta |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |
-| Dados | Vampiro, Policial e Bruxa (um número de combate por peça) |
+| Dados | Vampiro, Policial, Bruxa, Múmia, Médico e Cachorro |
 | Scripts de verificação | Rodam checagens sem abrir a interface completa |
 
 ## Parcial / provisório
@@ -32,7 +33,6 @@
 ## Ainda não existe
 
 - Multiplayer
-- Cachorro / Múmia (sem desenho ainda)
 - Habilidade de set completo
 - Freeze por caixa (hoje trava a prateleira inteira)
 - Áudio de música de fundo / menu de volume

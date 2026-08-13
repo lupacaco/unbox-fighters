@@ -8,6 +8,9 @@ func _run() -> void:
 		"res://data/parts/vampiro_character.tres",
 		"res://data/parts/policial_character.tres",
 		"res://data/parts/bruxa_character.tres",
+		"res://data/parts/mumia_character.tres",
+		"res://data/parts/medico_character.tres",
+		"res://data/parts/cachorro_character.tres",
 	]:
 		var c: CharacterDef = load(path)
 		assert(c != null, "Missing character: %s" % path)

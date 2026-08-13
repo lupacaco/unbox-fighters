@@ -35,3 +35,8 @@ func _breathe_vignette() -> void:
 	var tween := create_tween().set_loops()
 	tween.tween_property(_vignette, "modulate:a", 0.55, 4.0).set_trans(Tween.TRANS_SINE)
 	tween.tween_property(_vignette, "modulate:a", 0.75, 4.0).set_trans(Tween.TRANS_SINE)
+
+func set_arena(on: bool) -> void:
+	var target := 0.92 if on else 0.65
+	var tween := create_tween()
+	tween.tween_property(_vignette, "modulate:a", target, 0.35).set_trans(Tween.TRANS_SINE)
