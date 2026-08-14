@@ -38,5 +38,12 @@ func _run() -> void:
 	walker.set_attacking(PartSlotType.Value.BODY)
 	assert(not is_zero_approx(walker.joint_rotation(PartSlotType.Value.ARM_R)), "Body clash should swing an arm")
 	assert(FightDir.DUEL_X >= 260.0, "Fighters should stand far enough to throw kits")
+	_assert_hud_fits(AssemblyLayout.FIGHT_NAME_LEFT, Vector2(280, 54))
+	_assert_hud_fits(AssemblyLayout.FIGHT_HP_LEFT, Vector2(132, 78))
+	_assert_hud_fits(AssemblyLayout.FIGHT_VS, Vector2(220, 52))
 	print("VERIFY_FIGHT_LINE_PASS y=", ys[0], " scale=", scales[0])
 	quit(0)
+
+func _assert_hud_fits(center: Vector2, size: Vector2) -> void:
+	var top := center.y - size.y * 0.5
+	assert(top >= 24.0, "Fight HUD would clip the top of the screen at y=%s" % top)

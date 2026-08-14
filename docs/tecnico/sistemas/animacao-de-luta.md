@@ -6,7 +6,7 @@ Cada choque sorteia um kit vivo de cada Freak (cabeça, tronco+braços ou pernas
 
 ## Sequência
 
-1. Flash na tela. As cartas **sobem ~460 px e somem**. A loja e o HUD de cima somem. A câmera se aproxima um pouco.
+1. Flash na tela. As cartas **sobem ~460 px e somem**. A loja e o HUD de cima somem. A câmera se aproxima um pouco. Os nomes, o HP e o VS ficam **fixos na tela** (não entram no zoom), para não cortar em cima.
 2. Só **um de cada lado** entra: pulam ao mesmo tempo na prateleira (impacto no pouso) e **andam até ficarem afastados**, um de cada lado do centro. Os outros esperam fora do palco.
 3. **Anda** de perfil, em movimento contínuo. Pernas em tempos opostos, braços e cabeça acompanhando, tudo girando no ímã. Leve balanço do tronco. Os dois do duelo ficam **na mesma altura do chão** e do **mesmo tamanho**.
 

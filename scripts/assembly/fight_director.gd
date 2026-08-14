@@ -36,6 +36,7 @@ var _camera: Camera2D
 var _camera_rest_zoom := Vector2.ONE
 var _camera_rest_offset := Vector2.ZERO
 var _stage: Node2D
+var _hud_layer: CanvasLayer
 var _dust_fx: CPUParticles2D
 var _spark_fx: CPUParticles2D
 var _flash_poly: Polygon2D
@@ -86,6 +87,10 @@ func play(
 	_stage.name = "FightStage"
 	_stage.y_sort_enabled = false
 	_fx.add_child(_stage)
+	_hud_layer = CanvasLayer.new()
+	_hud_layer.name = "FightHud"
+	_hud_layer.layer = 20
+	add_child(_hud_layer)
 
 	_left = _build_line(result.left if result != null else BoardLoadout.new(), false, slots)
 	_right = _build_line(opponent_board, true, slots)
@@ -99,17 +104,17 @@ func play(
 		_lift_card(slot)
 	_aim_camera(true)
 
-	var name_l := _plaque(AssemblyLayout.FIGHT_NAME_LEFT, Vector2(280, 54), 22, ThemeTokens.INK)
+	var name_l := _hud_plaque(AssemblyLayout.FIGHT_NAME_LEFT, Vector2(280, 54), 22, ThemeTokens.INK)
 	name_l.set_text(left_name)
 	name_l.set_label_color(ThemeTokens.GOLD)
-	var hp_l := _plaque(AssemblyLayout.FIGHT_HP_LEFT, Vector2(132, 78), 40, ThemeTokens.GOLD_DEEP)
+	var hp_l := _hud_plaque(AssemblyLayout.FIGHT_HP_LEFT, Vector2(132, 78), 40, ThemeTokens.GOLD_DEEP)
 	hp_l.set_text(str(left_hp))
-	var name_r := _plaque(AssemblyLayout.FIGHT_NAME_RIGHT, Vector2(280, 54), 22, ThemeTokens.INK)
+	var name_r := _hud_plaque(AssemblyLayout.FIGHT_NAME_RIGHT, Vector2(280, 54), 22, ThemeTokens.INK)
 	name_r.set_text(right_name)
 	name_r.set_label_color(ThemeTokens.GOLD)
-	var hp_r := _plaque(AssemblyLayout.FIGHT_HP_RIGHT, Vector2(132, 78), 40, ThemeTokens.GOLD_DEEP)
+	var hp_r := _hud_plaque(AssemblyLayout.FIGHT_HP_RIGHT, Vector2(132, 78), 40, ThemeTokens.GOLD_DEEP)
 	hp_r.set_text(str(right_hp))
-	var vs := _plaque(AssemblyLayout.FIGHT_VS, Vector2(220, 52), 22, ThemeTokens.INK)
+	var vs := _hud_plaque(AssemblyLayout.FIGHT_VS, Vector2(220, 52), 22, ThemeTokens.INK)
 	vs.set_text("VS")
 	vs.set_label_color(ThemeTokens.GOLD)
 	var clash_l := _plaque(AssemblyLayout.FIGHT_CLASH + Vector2(-120, 0), Vector2(168, 124), 56, ThemeTokens.THREAT)
@@ -175,6 +180,9 @@ func play(
 	if is_instance_valid(_stage):
 		_stage.queue_free()
 	_stage = null
+	if is_instance_valid(_hud_layer):
+		_hud_layer.queue_free()
+	_hud_layer = null
 	_set_arena(false)
 	_restore_camera()
 	Engine.time_scale = 1.0
@@ -584,10 +592,16 @@ func _fighter_by_queue(line: Array[StageFighter], queue_index: int) -> StageFigh
 			return fighter
 	return null
 
+func _hud_plaque(pos: Vector2, size: Vector2, font_px: int, fill: Color) -> FightPlaque:
+	return _make_plaque(_hud_layer, pos, size, font_px, fill)
+
 func _plaque(pos: Vector2, size: Vector2, font_px: int, fill: Color) -> FightPlaque:
+	return _make_plaque(_stage, pos, size, font_px, fill)
+
+func _make_plaque(host: Node, pos: Vector2, size: Vector2, font_px: int, fill: Color) -> FightPlaque:
 	var plaque := FightPlaque.new()
-	_stage.add_child(plaque)
-	plaque.global_position = pos
+	host.add_child(plaque)
+	plaque.position = pos
 	plaque.setup(size, font_px, fill)
 	return plaque
 

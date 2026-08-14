@@ -23,11 +23,12 @@ const SLOT_X: Array[float] = [380.0, 960.0, 1540.0]
 const SLOT_Y := 400.0
 const CRATE_Y := -58.0
 const FIGHT_CLASH := Vector2(960, 440)
-const FIGHT_NAME_LEFT := Vector2(320, 64)
-const FIGHT_NAME_RIGHT := Vector2(1600, 64)
-const FIGHT_HP_LEFT := Vector2(320, 132)
-const FIGHT_HP_RIGHT := Vector2(1600, 132)
-const FIGHT_VS := Vector2(960, 80)
+## Names, HP and VS sit on a screen layer (not the camera). Keep a margin from the top.
+const FIGHT_NAME_LEFT := Vector2(320, 88)
+const FIGHT_NAME_RIGHT := Vector2(1600, 88)
+const FIGHT_HP_LEFT := Vector2(320, 160)
+const FIGHT_HP_RIGHT := Vector2(1600, 160)
+const FIGHT_VS := Vector2(960, 88)
 const CARD_LIFT := 460.0
 const CARD_SETTLE := 360.0
 
