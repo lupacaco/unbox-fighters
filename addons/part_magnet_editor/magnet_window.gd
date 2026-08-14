@@ -180,7 +180,7 @@ func _show_character(character: CharacterDef) -> void:
 	_status.text = ""
 	var slots := PartSlotType.visual_slots()
 	for i in slots.size():
-		var part := character.get_part(slots[i]) if character != null else null
+		var part := _visual_part(character, slots[i])
 		(_front_tiles[i] as MagnetTile).set_target(part, 0)
 		(_profile_tiles[i] as MagnetTile).set_target(part, 1)
 	_refresh_mix()
@@ -189,7 +189,7 @@ func _refresh_mix() -> void:
 	var parts := {}
 	if _character != null:
 		for slot in PartSlotType.visual_slots():
-			parts[slot] = _character.get_part(slot)
+			parts[slot] = _visual_part(_character, slot)
 	if _front_mix != null:
 		(_front_mix as MagnetMix).set_mix(parts, 0, "Frente")
 	if _profile_mix != null:
@@ -200,9 +200,12 @@ func _save_all() -> void:
 		_status.text = "Escolha um Freak."
 		return
 	var saved := 0
-	for part in _character.visual_parts():
-		if part == null or part.resource_path.is_empty():
+	var seen: Dictionary = {}
+	for slot in PartSlotType.visual_slots():
+		var part := _visual_part(_character, slot)
+		if part == null or part.resource_path.is_empty() or seen.has(part.resource_path):
 			continue
+		seen[part.resource_path] = true
 		var err := ResourceSaver.save(part, part.resource_path)
 		if err != OK:
 			_status.text = "Não consegui salvar %s." % part.resource_path.get_file()
@@ -223,7 +226,7 @@ func _character_for_part(part: PartDef) -> CharacterDef:
 		return by_id
 	for character in _characters:
 		for slot in PartSlotType.visual_slots():
-			if character.get_part(slot) == part:
+			if _visual_part(character, slot) == part:
 				return character
 		if character.legs == part:
 			return character
@@ -237,6 +240,25 @@ func _character_by_id(set_id: String) -> CharacterDef:
 			return character
 	return null
 
+func _visual_part(character: CharacterDef, slot: PartSlotType.Value) -> PartDef:
+	if character == null:
+		return null
+	var key := String(PartSlotType.to_string_name(slot))
+	var part := character.get(key) as PartDef
+	if part != null:
+		return part
+	if character.has_method("get_part"):
+		part = character.get_part(slot)
+		if part != null:
+			return part
+	var set_id := String(character.id)
+	if set_id.is_empty():
+		return null
+	var path := "res://data/parts/%s_%s.tres" % [set_id, key]
+	if ResourceLoader.exists(path):
+		return ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_REPLACE) as PartDef
+	return null
+
 func _load_all_characters() -> Array[CharacterDef]:
 	var found: Array[CharacterDef] = []
 	var dir := DirAccess.open("res://data/parts")
@@ -246,7 +268,8 @@ func _load_all_characters() -> Array[CharacterDef]:
 	var fname := dir.get_next()
 	while fname != "":
 		if not dir.current_is_dir() and fname.ends_with("_character.tres"):
-			var character := load("res://data/parts/%s" % fname) as CharacterDef
+			var path := "res://data/parts/%s" % fname
+			var character := ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_REPLACE) as CharacterDef
 			if character != null:
 				found.append(character)
 		fname = dir.get_next()

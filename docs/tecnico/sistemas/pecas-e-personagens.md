@@ -73,6 +73,8 @@ A loja lê sozinha as fichas `*_character.tres` em `data/parts/`, e depois filtr
    - Tronco: **PESCOÇO**, **OE**, **OD**, **QE**, **QD**
 4. Olhe a prévia embaixo (Freak montado). Clique **Salvar ímãs**.
 
+Se os quadros vierem pretos com **sem peça**, feche a janela e abra de novo. Se continuar, feche o Godot e abra o projeto outra vez — a ferramenta precisa reler as fichas no editor.
+
 Não use o kit `*_legs.tres` (não tem desenho). A ferramenta lê as 6 imagens de desenho × 2 poses.
 
 Marque **frente e perfil**. A carta usa a frente; a luta usa o perfil.

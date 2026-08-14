@@ -84,6 +84,8 @@ Os ímãs dizem onde cada esfera de metal cola na vizinha.
 5. Embaixo aparece o Freak montado, para conferir se pescoço, ombros e quadris batem.
 6. Clique **Salvar ímãs**. Cada bolinha que você solta também já grava aquela peça.
 
+Se os 12 quadros vierem pretos com **sem peça**, feche a janela e abra de novo. Se continuar, feche o Godot por completo e abra o projeto outra vez.
+
 Espaço da imagem: o centro do PNG é `(0, 0)`. **Y cresce para baixo.**
 
 | Peça | Ímãs |
