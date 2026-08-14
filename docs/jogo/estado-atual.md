@@ -15,7 +15,8 @@
 | Fim de partida | **Você venceu!** / **Você saiu** e botão **NOVA PARTIDA** |
 | Abrir caixas | 1 clique, custa 1 pancada |
 | Arrastar e soltar | Peças nas cartas (troca no lugar ocupado); botão direito vende; Freak inteiro troca de carta ou vai para VENDER |
-| Visual composto | Ímãs unem cabeça / tronco / pernas |
+| Visual composto | Ímãs unem cabeça / tronco / pernas (frente, lado e golpe; no tronco também o ponto da arma) |
+| Incluir Freak | Folha 3×3 vira 9 peças + fichas (menu Tools ou script); ímãs se marcam arrastando bolinhas |
 | Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |
 | Áudio | Efeitos: martelo, caixa, peças, impacto da luta |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |

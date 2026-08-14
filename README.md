@@ -8,6 +8,8 @@ Feito em **Godot 4.7**. Ainda em construção, mas a partida contra 3 bots já e
 1. Abra a pasta do projeto no Godot 4.7
 2. Rode a cena principal: `scenes/assembly/Assembly.tscn`
 
+Para marcar ímãs ou incluir um Freak novo a partir de uma folha 3×3: **Project → Tools** (Ímãs das Peças / Incluir personagem). Passo a passo em [docs/tecnico/incluir-personagem.md](docs/tecnico/incluir-personagem.md).
+
 ## Documentação
 
 Tudo sobre o jogo, mecânicas e como o projeto funciona por dentro:

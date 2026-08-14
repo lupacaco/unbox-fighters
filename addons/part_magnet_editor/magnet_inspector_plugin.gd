@@ -3,6 +3,11 @@ extends EditorInspectorPlugin
 
 const MagnetPreview := preload("res://addons/part_magnet_editor/magnet_preview.gd")
 
+var _open_window: Callable = Callable()
+
+func set_open_window(cb: Callable) -> void:
+	_open_window = cb
+
 func _can_handle(object: Object) -> bool:
 	return object is PartDef
 
@@ -14,25 +19,17 @@ func _parse_begin(object: Object) -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 
-	var title := Label.new()
-	title.text = "Ímãs — clique na imagem para marcar o ponto"
-	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(title)
-
-	var hint := Label.new()
-	match part.slot_type:
-		PartSlotType.Value.HEAD:
-			hint.text = "Cabeça: só ímã de baixo. Clique no ponto que cola no tronco."
-		PartSlotType.Value.LEGS:
-			hint.text = "Pernas: só ímã de cima. Clique no ponto que cola no tronco."
-		_:
-			hint.text = "Tronco: ímã de cima (pescoço) e de baixo (cintura). Escolha o botão e clique na imagem."
-	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.modulate = Color(0.75, 0.78, 0.82, 1)
-	box.add_child(hint)
+	var open_btn := Button.new()
+	open_btn.text = "Abrir ferramenta de ímãs (imagem grande)"
+	open_btn.custom_minimum_size.y = 26
+	open_btn.pressed.connect(func() -> void:
+		if _open_window.is_valid():
+			_open_window.call()
+	)
+	box.add_child(open_btn)
 
 	var preview := MagnetPreview.new()
-	preview.setup(part)
+	preview.setup(part, false)
 	box.add_child(preview)
 
 	add_custom_control(box)

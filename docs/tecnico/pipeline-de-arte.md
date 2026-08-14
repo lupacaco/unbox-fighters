@@ -10,6 +10,7 @@ Scripts fora do Godot que preparam imagens dos personagens.
 |--------|--------|
 | `normalize_parts_300.py` | Limpa fundo preto, centraliza a peça num canvas **300×200** |
 | `remove_backgrounds.py` | Remove fundo xadrez / preto de artes de personagem |
+| `slice_character_sheet.py` | Corta uma folha 3×3 em 9 PNG 300×200 e, se pedido, cria as fichas |
 
 ## Convenção de arquivos
 
@@ -19,6 +20,8 @@ Em `assets/characters/<nome>/`:
 - `<nome>_head-2.png` … — perfil
 - `<nome>_head-3.png` … — ataque
 - Canvas **300×200**
+
+Para um set novo a partir de uma folha 3×3: [Incluir personagem](incluir-personagem.md). O Godot também tem **Project → Tools → Incluir personagem**.
 
 ## Por que 300×200
 

@@ -23,8 +23,8 @@ func _run() -> void:
 		push_error("VERIFY_FAIL tier 5 should include 9s")
 		quit(1)
 		return
-	if ShopPool.roster().size() != 6:
-		push_error("VERIFY_FAIL expected 6 characters, got %d" % ShopPool.roster().size())
+	if ShopPool.roster().size() < 6:
+		push_error("VERIFY_FAIL expected at least 6 characters, got %d" % ShopPool.roster().size())
 		quit(1)
 		return
 	var ids: PackedStringArray = []

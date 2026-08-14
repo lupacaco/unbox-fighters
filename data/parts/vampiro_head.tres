@@ -16,3 +16,5 @@ set_id = &"vampiro"
 combat_value = 9
 tier = 5
 magnet_down = Vector2(4, 73)
+magnet_down_profile = Vector2(3, 57)
+magnet_down_attack = Vector2(-1, 57)

@@ -128,10 +128,15 @@ func _part_def(slot: PartSlotType.Value) -> PartDef:
 			return _legs_def
 
 func _refresh() -> void:
-	var plan := CompositeResolver.resolve_parts(_head_def, _body_def, _legs_def)
-	_place(_legs, _texture_for(PartSlotType.Value.LEGS), plan["legs_pos"], PartSlotType.Value.LEGS)
-	_place(_body, _texture_for(PartSlotType.Value.BODY), plan["body_pos"], PartSlotType.Value.BODY)
-	_place(_head, _texture_for(PartSlotType.Value.HEAD), plan["head_pos"], PartSlotType.Value.HEAD)
+	var head_tex := _texture_for(PartSlotType.Value.HEAD)
+	var body_tex := _texture_for(PartSlotType.Value.BODY)
+	var legs_tex := _texture_for(PartSlotType.Value.LEGS)
+	var plan := CompositeResolver.resolve_parts(
+		_head_def, _body_def, _legs_def, head_tex, body_tex, legs_tex
+	)
+	_place(_legs, legs_tex, plan["legs_pos"], PartSlotType.Value.LEGS)
+	_place(_body, body_tex, plan["body_pos"], PartSlotType.Value.BODY)
+	_place(_head, head_tex, plan["head_pos"], PartSlotType.Value.HEAD)
 
 func _texture_for(slot: PartSlotType.Value) -> Texture2D:
 	if _dead.get(slot, false):

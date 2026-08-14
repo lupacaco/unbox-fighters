@@ -40,3 +40,7 @@ dist/
 .env.*
 *.pem
 credentials.json
+
+# Python
+__pycache__/
+*.pyc

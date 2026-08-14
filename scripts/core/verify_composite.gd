@@ -27,6 +27,10 @@ func _run() -> void:
 		push_error("VERIFY_FAIL magnet layout order wrong: %s / %s / %s" % [full["head_pos"], full["body_pos"], full["legs_pos"]])
 		quit(1)
 		return
+	if not full.has("weapon_pos"):
+		push_error("VERIFY_FAIL missing weapon_pos")
+		quit(1)
+		return
 
 	print("VERIFY_COMPOSITE_PASS head=", full["head_pos"], " body=", full["body_pos"], " legs=", full["legs_pos"])
 	quit(0)

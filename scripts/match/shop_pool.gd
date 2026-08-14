@@ -1,17 +1,17 @@
+@tool
 class_name ShopPool
 extends RefCounted
 
-const CHARACTER_PATHS: Array[String] = [
-	"res://data/parts/vampiro_character.tres",
-	"res://data/parts/policial_character.tres",
-	"res://data/parts/bruxa_character.tres",
-	"res://data/parts/mumia_character.tres",
-	"res://data/parts/medico_character.tres",
-	"res://data/parts/cachorro_character.tres",
-]
+const PARTS_DIR := "res://data/parts"
 
 static var _all_parts: Array[PartDef] = []
 static var _roster: Array[CharacterDef] = []
+
+
+static func reload() -> void:
+	_roster = []
+	_all_parts = []
+	_ensure_loaded()
 
 
 static func roster() -> Array[CharacterDef]:
@@ -49,10 +49,22 @@ static func _ensure_loaded() -> void:
 		return
 	_roster = []
 	_all_parts = []
-	for path in CHARACTER_PATHS:
-		var character := load(path) as CharacterDef
+	var dir := DirAccess.open(PARTS_DIR)
+	if dir == null:
+		push_error("ShopPool missing folder: %s" % PARTS_DIR)
+		return
+	var names: PackedStringArray = []
+	dir.list_dir_begin()
+	var fname := dir.get_next()
+	while fname != "":
+		if not dir.current_is_dir() and fname.ends_with("_character.tres"):
+			names.append(fname)
+		fname = dir.get_next()
+	names.sort()
+	for name in names:
+		var character := load("%s/%s" % [PARTS_DIR, name]) as CharacterDef
 		if character == null:
-			push_error("ShopPool missing character: %s" % path)
+			push_error("ShopPool missing character: %s" % name)
 			continue
 		_roster.append(character)
 		for part in [character.head, character.body, character.legs]:

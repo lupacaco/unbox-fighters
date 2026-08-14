@@ -20,9 +20,11 @@ Recurso de **uma peça** (script com `@tool` para o editor poder ler/validar ím
 - `sprite_attack` — ataque (pose 3)
 - `combat_value` — um número só (Ameaça / Força / Agilidade conforme o tipo)
 - `tier` — nível da loja em que a peça pode aparecer
-- **Ímãs** (pontos de união):
+- **Ímãs** (pontos de união, em pixels a partir do centro da imagem):
   - `magnet_up` — cola na peça de cima
   - `magnet_down` — cola na peça de baixo
+  - `magnet_weapon` — no tronco, onde a arma vai na mão (a arma ainda não existe no jogo)
+  - Frente, de lado e golpe podem ter ímãs diferentes (`magnet_*_profile` / `magnet_*_attack`)
 
 ### `CharacterDef` (`scripts/data/character_def.gd`)
 
@@ -42,23 +44,27 @@ Recurso de **um personagem**:
 
 A sinergia (100 / 75 / 50) está em `scripts/match/synergy.gd`.
 
+A loja lê sozinha todas as fichas `*_character.tres` em `data/parts/`. Um set novo entra nas caixas sem precisar ligar nada na tela.
+
 ## Como marcar os ímãs (ponto exato)
 
-1. No Godot, ative o plugin **Part Magnet Editor** (já vem no projeto).
-2. Abra a peça, ex.: `data/parts/vampiro_body.tres`.
-3. No Inspetor, em cima, aparece a **imagem da peça**.
-4. Clique em **Marcar Ímã de Cima** ou **Marcar Ímã de Baixo**.
-5. Clique no ponto exato da imagem (ex.: o círculo do pescoço / cintura).
-6. Salve o recurso (`Ctrl+S`).
+1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**). O plugin **Part Magnet Editor** já vem ativo.
+2. Clique na peça em `data/parts/`, ex.: `vampiro_body.tres`.
+3. Escolha **Frente**, **De lado** ou **Golpe**.
+4. Arraste as bolinhas no desenho (não precisa de botão “marcar”):
+   - **CIMA** (azul) — tronco e pernas
+   - **BAIXO** (vermelho) — cabeça e tronco
+   - **ARMA** (dourada) — só no tronco, na mão
+5. Salve (`Ctrl+S`).
 
-Marcadores:
-- **CIMA** (azul) = `magnet_up` — aparece em tronco e pernas
-- **BAIXO** (vermelho) = `magnet_down` — aparece em cabeça e tronco
+A mesma ferramenta aparece no Inspetor, com o botão **Abrir ferramenta de ímãs (imagem grande)**. Na janela grande dá para misturar cabeça/tronco/pernas de sets diferentes e ver se o pescoço e a cintura batem.
 
 Regras por tipo:
 - **Cabeça** → só ímã de baixo
 - **Pernas** → só ímã de cima
-- **Tronco** → os dois
+- **Tronco** → cima, baixo e arma
+
+Marque as **três poses**. A carta usa a frente; a luta usa lado e golpe.
 
 ### Sistema de coordenadas (se precisar editar o número)
 
@@ -81,6 +87,8 @@ Padrão de arquivos por personagem em `assets/characters/<nome>/`:
 - `<nome>_head-3.png` / `_body-3` / `_legs-3` — ataque
 
 Todos em **300×200**. No jogo todas crescem iguais (ficam com 250 px de largura).
+
+Para colocar um Freak **novo** a partir de uma folha 3×3, veja [Incluir personagem](../incluir-personagem.md).
 
 ## Arquivos de dados atuais
 

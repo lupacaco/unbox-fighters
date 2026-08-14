@@ -29,6 +29,7 @@ unbox-fighters/
 │   ├── core/
 │   ├── data/
 │   └── ui/
+├── addons/                # Ferramentas do editor (ímãs, incluir personagem)
 ├── tools/                 # Scripts Python de preparação de arte
 └── .cursor/               # Regras e skills do Cursor (assistente)
 ```
@@ -44,6 +45,7 @@ unbox-fighters/
 | Mudar regras de luta / loja / bots | `scripts/match/` |
 | Mudar HUD / fundo / tags | `scripts/ui/` |
 | Preparar imagens 300×200 | `tools/` |
+| Incluir um Freak novo | [Incluir personagem](incluir-personagem.md) |
 | Documentação | `docs/` |
 
 ## Pastas que o Godot gera

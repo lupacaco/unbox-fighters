@@ -1,0 +1,18 @@
+---
+description: Ao incluir um personagem novo a partir de uma folha de desenho, seguir o passo a passo documentado
+alwaysApply: true
+---
+
+# Incluir personagem
+
+Quando o jogador mandar uma folha (PNG/WEBP) ou pedir para incluir um set (Múmia, Médico, Cachorro, ou outro):
+
+1. **Leia** `docs/tecnico/incluir-personagem.md` e a skill `incluir-personagem`.
+2. Siga o doc inteiro. Não invente outro fluxo.
+
+Armadilhas:
+
+- Fundo preto: apague só o que toca a **borda**. Mancha, olho e tubo pretos ficam.
+- Ímã: abra **Project → Tools → Ímãs das Peças** e arraste as bolinhas CIMA/BAIXO até o pescoço/cintura. No tronco, arraste a bolinha dourada ARMA até a mão. Não force X = 0. Marque frente, lado e golpe.
+- A loja lê sozinha as fichas `data/parts/*_character.tres`. Não precisa ligar o set na tela na mão.
+- Atualize a tabela em `docs/tecnico/sistemas/pecas-e-personagens.md`.

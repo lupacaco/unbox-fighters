@@ -18,3 +18,7 @@ combat_value = 5
 tier = 1
 magnet_up = Vector2(0, -72)
 magnet_down = Vector2(1, 64)
+magnet_up_profile = Vector2(0, -74)
+magnet_down_profile = Vector2(-1, 51)
+magnet_up_attack = Vector2(-38, -71)
+magnet_down_attack = Vector2(-42, 53)

@@ -29,7 +29,14 @@ static func resolve(character: CharacterDef, has_head: bool, has_body: bool, has
 		character.legs if has_legs else null
 	)
 
-static func resolve_parts(head: PartDef, body: PartDef, legs: PartDef) -> Dictionary:
+static func resolve_parts(
+	head: PartDef,
+	body: PartDef,
+	legs: PartDef,
+	head_tex: Texture2D = null,
+	body_tex: Texture2D = null,
+	legs_tex: Texture2D = null
+) -> Dictionary:
 	var empty := {
 		"mode": "empty",
 		"head": null,
@@ -38,22 +45,27 @@ static func resolve_parts(head: PartDef, body: PartDef, legs: PartDef) -> Dictio
 		"head_pos": Vector2.ZERO,
 		"body_pos": BODY_ORIGIN,
 		"legs_pos": Vector2.ZERO,
+		"weapon_pos": BODY_ORIGIN,
 		"part_size_px": PART_SIZE_PX,
 	}
 
-	var head_tex: Texture2D = head.sprite if head != null else null
-	var body_tex: Texture2D = body.sprite if body != null else null
-	var legs_tex: Texture2D = legs.sprite if legs != null else null
+	if head_tex == null and head != null:
+		head_tex = head.sprite
+	if body_tex == null and body != null:
+		body_tex = body.sprite
+	if legs_tex == null and legs != null:
+		legs_tex = legs.sprite
 
 	if head_tex == null and body_tex == null and legs_tex == null:
 		return empty
 
 	var scale := display_scale()
 	var body_pos := BODY_ORIGIN
-	var body_up := _magnet_up(body) * scale
-	var body_down := _magnet_down(body) * scale
-	var head_down := _head_magnet_down(head) * scale
-	var legs_up := _legs_magnet_up(legs) * scale
+	var body_up := _magnet_up(body, body_tex) * scale
+	var body_down := _magnet_down(body, body_tex) * scale
+	var head_down := _head_magnet_down(head, head_tex) * scale
+	var legs_up := _legs_magnet_up(legs, legs_tex) * scale
+	var weapon := _magnet_weapon(body, body_tex) * scale
 
 	return {
 		"mode": "layered",
@@ -63,25 +75,31 @@ static func resolve_parts(head: PartDef, body: PartDef, legs: PartDef) -> Dictio
 		"head_pos": body_pos + body_up - head_down,
 		"body_pos": body_pos,
 		"legs_pos": body_pos + body_down - legs_up,
+		"weapon_pos": body_pos + weapon,
 		"part_size_px": PART_SIZE_PX,
 	}
 
-static func _magnet_up(body: PartDef) -> Vector2:
+static func _magnet_up(body: PartDef, shown: Texture2D) -> Vector2:
 	if body != null:
-		return body.magnet_up
+		return body.magnet_up_for(shown)
 	return DEFAULT_BODY_UP
 
-static func _magnet_down(body: PartDef) -> Vector2:
+static func _magnet_down(body: PartDef, shown: Texture2D) -> Vector2:
 	if body != null:
-		return body.magnet_down
+		return body.magnet_down_for(shown)
 	return DEFAULT_BODY_DOWN
 
-static func _head_magnet_down(head: PartDef) -> Vector2:
+static func _head_magnet_down(head: PartDef, shown: Texture2D) -> Vector2:
 	if head != null:
-		return head.magnet_down
+		return head.magnet_down_for(shown)
 	return DEFAULT_HEAD_DOWN
 
-static func _legs_magnet_up(legs: PartDef) -> Vector2:
+static func _legs_magnet_up(legs: PartDef, shown: Texture2D) -> Vector2:
 	if legs != null:
-		return legs.magnet_up
+		return legs.magnet_up_for(shown)
 	return DEFAULT_LEGS_UP
+
+static func _magnet_weapon(body: PartDef, shown: Texture2D) -> Vector2:
+	if body != null:
+		return body.magnet_weapon_for(shown)
+	return Vector2.ZERO
