@@ -13,8 +13,10 @@ const TAG_OFFSETS := {
 	PartSlotType.Value.BODY: Vector2(78, -10),
 }
 const _Spring := preload("res://scripts/data/spring_base.gd")
-const HOP_HZ := 1.45
-const HOP_HEIGHT := 54.0
+const HOP_HZ := 1.2
+const HOP_HEIGHT := 86.0
+const HOP_COMPRESS := 0.22
+const HOP_LAND := 0.86
 const ARM_SWING := 0.28
 const IDLE_HZ := 1.35
 
@@ -26,6 +28,7 @@ var _tags: Dictionary = {}
 var _sprites: Dictionary = {}
 var _joints: Dictionary = {}
 var _body_root: Node2D
+var _hop_root: Node2D
 var _spring: Sprite2D
 var _body_rest := CompositeResolver.BODY_ORIGIN
 var _spring_rest := Vector2.ZERO
@@ -35,14 +38,24 @@ var _frozen: bool = false
 var _gait: float = 0.0
 var _life: float = 0.0
 var _hop_y: float = 0.0
+var _hop_squash: float = 1.0
+var _hop_lean: float = 0.0
 var _spring_pressed: bool = true
 var _was_airborne: bool = false
 var _motion: Tween
 
 func _ready() -> void:
+	_hop_root = Node2D.new()
+	_hop_root.name = "HopRoot"
+	add_child(_hop_root)
+	_spring = Sprite2D.new()
+	_spring.name = "Spring"
+	_spring.centered = true
+	_spring.z_index = _Spring.Z_INDEX
+	_hop_root.add_child(_spring)
 	_body_root = Node2D.new()
 	_body_root.name = "BodyRoot"
-	add_child(_body_root)
+	_hop_root.add_child(_body_root)
 	var body_sprite := Sprite2D.new()
 	body_sprite.centered = true
 	body_sprite.z_index = PartSlotType.fight_z_index(PartSlotType.Value.BODY)
@@ -68,11 +81,6 @@ func _ready() -> void:
 		tag.position = TAG_OFFSETS[slot]
 		add_child(tag)
 		_tags[slot] = tag
-	_spring = Sprite2D.new()
-	_spring.name = "Spring"
-	_spring.centered = true
-	_spring.z_index = _Spring.Z_INDEX
-	add_child(_spring)
 	set_process(true)
 
 func _process(delta: float) -> void:
@@ -93,6 +101,8 @@ func setup_loadout(loadout: FighterLoadout, face_left: bool) -> void:
 	_frozen = false
 	_gait = 0.0
 	_hop_y = 0.0
+	_hop_squash = 1.0
+	_hop_lean = 0.0
 	_spring_pressed = true
 	_was_airborne = false
 	_dead.clear()
@@ -118,21 +128,26 @@ func start_walk() -> void:
 	_walking = true
 	_striking = false
 	_frozen = false
+	_gait = 0.0
+	_was_airborne = false
 	_layout_rig()
 
 func stop_walk() -> void:
 	_walking = false
 	_frozen = false
+	_reset_hop()
 
 func freeze_motion(on: bool) -> void:
 	_frozen = on
 	if on:
 		_walking = false
+		_reset_hop()
 		_reset_joints()
 
 func settle_idle() -> void:
 	_walking = false
 	_striking = true
+	_reset_hop()
 	await _tween_rest(0.22)
 	_striking = false
 
@@ -147,6 +162,7 @@ func set_stride_frame(_left_forward: bool) -> void:
 func set_attacking(slot: Variant) -> void:
 	_striking = slot != null
 	_walking = false
+	_reset_hop()
 	_layout_rig()
 	if slot == null:
 		_reset_joints()
@@ -157,6 +173,7 @@ func play_strike(slot: Variant) -> void:
 	_striking = true
 	_walking = false
 	_kill_motion()
+	_reset_hop()
 	_layout_rig()
 	match int(slot) if slot != null else -1:
 		int(PartSlotType.Value.HEAD):
@@ -190,6 +207,7 @@ func play_throw_windup(shop_slot: PartSlotType.Value) -> void:
 	_striking = true
 	_walking = false
 	_kill_motion()
+	_reset_hop()
 	_layout_rig()
 	var tw := create_tween()
 	tw.set_parallel(true)
@@ -299,6 +317,103 @@ func is_spring_pressed() -> bool:
 func hop_lift() -> float:
 	return -_hop_y
 
+func spring_is_airborne() -> bool:
+	return _hop_y < -8.0
+
+func _place_spring() -> void:
+	if _spring == null:
+		return
+	_spring.texture = _Spring.texture(_spring_pressed)
+	_spring.visible = true
+	_spring.scale = Vector2.ONE * _Spring.SCALE
+	_spring.z_index = _Spring.Z_INDEX
+	_spring.position = _spring_rest
+
+func _reset_hop() -> void:
+	_hop_y = 0.0
+	_hop_squash = 1.0
+	_hop_lean = 0.0
+	_apply_hop_transform()
+
+func _apply_hop_transform() -> void:
+	if _hop_root == null:
+		return
+	var squash := _hop_squash
+	_hop_root.scale = Vector2(2.0 - squash, squash)
+	_hop_root.rotation = _hop_lean
+	_hop_root.position = Vector2(0.0, _Spring.GROUND_Y * (1.0 - squash) + _hop_y)
+	if _body_root != null and not _walking:
+		_body_root.position.x = _body_rest.x
+		if not _striking:
+			_body_root.position.y = _body_rest.y
+
+func _set_spring_pressed(pressed: bool) -> void:
+	if _spring_pressed == pressed:
+		_place_spring()
+		return
+	_spring_pressed = pressed
+	_layout_rig()
+
+func _apply_hop(phase: float) -> void:
+	var cycle := fposmod(phase, TAU) / TAU
+	var airborne := false
+	if cycle < HOP_COMPRESS:
+		var u := _smooth(cycle / HOP_COMPRESS)
+		_hop_squash = lerpf(1.0, 0.74, u)
+		_hop_y = 0.0
+		_hop_lean = 0.05 * u
+		_set_spring_pressed(true)
+	elif cycle < HOP_LAND:
+		airborne = true
+		var span := HOP_LAND - HOP_COMPRESS
+		var u := (cycle - HOP_COMPRESS) / span
+		# Ballistic arc: leave the ground, peak, fall. Whole toy rides this.
+		_hop_y = -4.0 * u * (1.0 - u) * HOP_HEIGHT
+		_hop_squash = 1.0
+		_hop_lean = 0.18 * (1.0 - 2.0 * u)
+		_set_spring_pressed(false)
+	else:
+		var u := _smooth((cycle - HOP_LAND) / (1.0 - HOP_LAND))
+		_hop_squash = lerpf(0.7, 1.0, u)
+		_hop_y = 0.0
+		_hop_lean = 0.0
+		_set_spring_pressed(true)
+	_apply_hop_transform()
+	var swing := sin(phase)
+	_set_joint(PartSlotType.Value.ARM_L, swing * ARM_SWING)
+	_set_joint(PartSlotType.Value.ARM_R, sin(phase + PI) * ARM_SWING)
+	_set_joint(PartSlotType.Value.HEAD, swing * -0.12)
+	if _body_root != null:
+		_body_root.rotation = swing * 0.08
+		_body_root.position = Vector2(_body_rest.x, _body_rest.y)
+	if _was_airborne and not airborne:
+		stepped.emit()
+	_was_airborne = airborne
+
+func _apply_idle() -> void:
+	_reset_hop()
+	var want_pressed := _has_visible_part()
+	if _spring_pressed != want_pressed:
+		_spring_pressed = want_pressed
+		_layout_rig()
+	else:
+		_place_spring()
+	var b := sin(_life * IDLE_HZ * TAU)
+	var arm_l := CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_L) if _pose == Pose.FRONT else 0.0
+	var arm_r := CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_R) if _pose == Pose.FRONT else 0.0
+	_set_joint(PartSlotType.Value.ARM_L, arm_l + b * 0.07)
+	_set_joint(PartSlotType.Value.ARM_R, arm_r - b * 0.07)
+	_set_joint(PartSlotType.Value.HEAD, b * 0.04)
+	_set_joint(PartSlotType.Value.LEG_L, 0.0)
+	_set_joint(PartSlotType.Value.LEG_R, 0.0)
+	if _body_root != null:
+		_body_root.rotation = b * 0.02
+		_body_root.position.y = _body_rest.y + b * 1.8
+
+func _smooth(t: float) -> float:
+	var u := clampf(t, 0.0, 1.0)
+	return u * u * (3.0 - 2.0 * u)
+
 func get_part_node(slot: PartSlotType.Value) -> Sprite2D:
 	return _sprites.get(slot) as Sprite2D
 
@@ -346,9 +461,8 @@ func _layout_rig() -> void:
 	var textures := {}
 	for slot in PartSlotType.visual_slots():
 		textures[slot] = _texture_for(slot)
-	# Hop uses the pressed sit height so the body launches off the sphere.
-	# The spring texture still follows _spring_pressed (loose in the air).
-	var pose_pressed := true
+	# Body sits on the sphere of the current spring drawing.
+	var pose_pressed := _spring_pressed
 	if not _walking and not _striking:
 		pose_pressed = _has_visible_part()
 		_spring_pressed = pose_pressed
@@ -364,7 +478,7 @@ func _layout_rig() -> void:
 		_body_rest = Vector2.ZERO
 	_spring_rest = _Spring.center_on_ground(_spring_pressed)
 	_place_spring()
-	_apply_hop_offset()
+	_apply_hop_transform()
 	if not _walking and not _striking:
 		_body_root.rotation = 0.0
 	_place_sprite(PartSlotType.Value.BODY, _sprites[PartSlotType.Value.BODY], body_tex, Vector2.ZERO, body)
@@ -439,63 +553,6 @@ func _has_visible_part() -> bool:
 		if _texture_for(slot) != null:
 			return true
 	return false
-
-func _place_spring() -> void:
-	if _spring == null:
-		return
-	_spring.texture = _Spring.texture(_spring_pressed)
-	_spring.visible = _spring.texture != null
-	_spring.scale = Vector2.ONE * _Spring.SCALE
-	_spring.z_index = _Spring.Z_INDEX
-	_spring.position = _spring_rest
-
-func _apply_hop_offset() -> void:
-	if _spring != null:
-		_spring.position = _spring_rest
-	if _body_root != null:
-		_body_root.position = Vector2(_body_rest.x, _body_rest.y + _hop_y)
-
-func _apply_hop(phase: float) -> void:
-	var cycle := fposmod(phase, TAU) / TAU
-	var airborne := cycle > 0.12 and cycle < 0.82
-	var hop := 0.0
-	if airborne:
-		var u := (cycle - 0.12) / 0.70
-		hop = sin(u * PI) * HOP_HEIGHT
-	_hop_y = -hop
-	if airborne != (not _spring_pressed):
-		_spring_pressed = not airborne
-		_layout_rig()
-	else:
-		_apply_hop_offset()
-	var s := sin(phase)
-	_set_joint(PartSlotType.Value.ARM_L, s * ARM_SWING)
-	_set_joint(PartSlotType.Value.ARM_R, sin(phase + PI) * ARM_SWING)
-	_set_joint(PartSlotType.Value.HEAD, s * -0.12)
-	if _body_root != null:
-		_body_root.rotation = s * 0.06
-	if _was_airborne and not airborne:
-		stepped.emit()
-	_was_airborne = airborne
-
-func _apply_idle() -> void:
-	_hop_y = 0.0
-	if _spring_pressed != _has_visible_part():
-		_spring_pressed = _has_visible_part()
-		_layout_rig()
-	else:
-		_apply_hop_offset()
-	var b := sin(_life * IDLE_HZ * TAU)
-	var arm_l := CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_L) if _pose == Pose.FRONT else 0.0
-	var arm_r := CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_R) if _pose == Pose.FRONT else 0.0
-	_set_joint(PartSlotType.Value.ARM_L, arm_l + b * 0.07)
-	_set_joint(PartSlotType.Value.ARM_R, arm_r - b * 0.07)
-	_set_joint(PartSlotType.Value.HEAD, b * 0.04)
-	_set_joint(PartSlotType.Value.LEG_L, 0.0)
-	_set_joint(PartSlotType.Value.LEG_R, 0.0)
-	if _body_root != null:
-		_body_root.rotation = b * 0.02
-		_body_root.position.y = _body_rest.y + b * 1.8
 
 func _apply_strike_pose(shop_slot: int) -> void:
 	match shop_slot:

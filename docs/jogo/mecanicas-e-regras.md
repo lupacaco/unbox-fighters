@@ -84,7 +84,7 @@ Cada choque sorteia **um kit vivo de cada lado**. Pode ser cabeça contra tronco
 
 Dano no HP do perdedor = soma do que sobrou em cada Freak vivo do vencedor, **no máximo 12 por Freak**.
 
-Na tela: entra **um contra um**. O 1º de cada lado **pula** na prateleira e **anda pulando** até ficar afastado do outro. No chão a mola fica pressionada; no ar ela fica solta; ao pousar, pressiona de novo. Parado, a mola fica pressionada. Só quando um cai inteiro (**KO**) o próximo daquele lado pula e se aproxima. No choque, **só o kit que vai ganhar** sai do corpo e voa até a peça do outro. A que perde **fica colada** até o impacto; aí **voa para fora da tela e some**. A que ganha volta no corpo como bumerangue. Se os números forem iguais, **os dois atacam**, batem no centro e os dois voam para fora. As placas mostram os números. As cartas **sobem e somem** durante a batalha e voltam depois.
+Na tela: entra **um contra um**. O 1º de cada lado **pula** na prateleira e **anda pulando** até ficar afastado do outro: a mola aperta, impulsiona, o brinquedo inteiro sai do chão e cai. Só quando um cai inteiro (**KO**) o próximo daquele lado pula e se aproxima. No choque, **só o kit que vai ganhar** sai do corpo e voa até a peça do outro. A que perde **fica colada** até o impacto; aí **voa para fora da tela e some**. A que ganha volta no corpo como bumerangue. Se os números forem iguais, **os dois atacam**, batem no centro e os dois voam para fora. As placas mostram os números. As cartas **sobem e somem** durante a batalha e voltam depois.
 
 ## Controles
 

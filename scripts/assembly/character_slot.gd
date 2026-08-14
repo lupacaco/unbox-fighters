@@ -318,8 +318,10 @@ func _ensure_layers() -> void:
 		_spring.name = "Spring"
 		_spring.centered = true
 		_display_root.add_child(_spring)
+	_display_root.z_index = 1
 	_display_root.move_child(_spring, 0)
 	_spring.z_index = _Spring.Z_INDEX
+	_spring.visible = true
 	for leg_name in ["LegL", "LegR"]:
 		var leftover_sprite := _display_root.get_node_or_null(leg_name) as Sprite2D
 		if leftover_sprite != null:
@@ -448,13 +450,14 @@ func _place_spring(plan: Dictionary) -> void:
 	if _spring == null:
 		return
 	var tex: Texture2D = plan.get("spring_texture")
-	_spring.texture = tex
-	_spring.visible = tex != null
+	_spring.texture = tex if tex != null else _Spring.texture(false)
+	_spring.visible = true
 	_spring.centered = true
 	_spring.position = plan.get("spring_pos", Vector2.ZERO)
 	var spring_scale := float(plan.get("spring_scale", _Spring.SCALE))
 	_spring.scale = Vector2.ONE * spring_scale
 	_spring.z_index = _Spring.Z_INDEX
+	_display_root.z_index = 1
 
 func _place_sprite(
 	sprite: Sprite2D,

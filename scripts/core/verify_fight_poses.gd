@@ -19,5 +19,7 @@ func _run() -> void:
 	assert(not slot.can_accept(leao.arm_l))
 	assert(not slot.can_accept(leao.leg_r))
 	assert(not slot.can_fight())
+	var spring := slot.get_node("Display/Spring") as Sprite2D
+	assert(spring != null and spring.visible and spring.texture != null, "Empty card should show the spring")
 	print("VERIFY_FIGHT_POSES_PASS")
 	quit(0)

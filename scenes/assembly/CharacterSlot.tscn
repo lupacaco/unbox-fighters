@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://csutnb6o1dqae" path="res://scripts/assembly/character_slot.gd" id="1"]
 [ext_resource type="Script" uid="uid://ckdkyklwtm5gt" path="res://scripts/ui/stat_readout.gd" id="2"]
 [ext_resource type="Texture2D" uid="uid://en1wlomew4t1" path="res://assets/ui/frame_premium.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://dpocxae7hs60h" path="res://assets/objects/base-mola-solta.png" id="4"]
 
 [node name="CharacterSlot" type="Node2D" unique_id=20125605]
 script = ExtResource("1")
@@ -46,6 +47,11 @@ disabled = true
 text = "LUTAR"
 
 [node name="Display" type="Node2D" parent="." unique_id=184040383]
+z_index = 1
+
+[node name="Spring" type="Sprite2D" parent="Display"]
+centered = true
+texture = ExtResource("4")
 
 [node name="Composite" type="Sprite2D" parent="Display" unique_id=1911472191]
 

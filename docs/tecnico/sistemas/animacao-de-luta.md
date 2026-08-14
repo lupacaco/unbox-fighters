@@ -8,7 +8,7 @@ Cada choque sorteia um kit vivo de cada Freak (cabeça ou tronco+braços). Pode 
 
 1. Flash na tela. As cartas **sobem ~460 px e somem**. A loja e o HUD de cima somem. A câmera se aproxima um pouco. Os nomes, o HP e o VS ficam **fixos na tela** (não entram no zoom), para não cortar em cima.
 2. Só **um de cada lado** entra: pulam ao mesmo tempo na prateleira (impacto no pouso) e **andam pulando até ficarem afastados**, um de cada lado do centro. Os outros esperam fora do palco.
-3. **Anda** de perfil, pulando. No chão a mola fica **pressionada**; no ar ela fica **solta**; ao pousar, pressiona de novo. Parado, a mola fica pressionada. Braços e cabeça acompanham, girando no ímã. Leve balanço do tronco. Os dois do duelo ficam **na mesma altura do chão** e do **mesmo tamanho**.
+3. **Anda** de perfil, pulando de verdade. Cada pulo: a mola **aperta** no chão, **impulsiona** e o brinquedo inteiro (base + Freak) **sai do chão** num arco; no ar a mola fica **solta**; ao cair, aperta de novo. Parado, a mola fica pressionada. Braços e cabeça acompanham. Os dois do duelo ficam **na mesma altura do chão** e do **mesmo tamanho**.
 
 Na luta, quem cobre quem é fixo (não usa o Z da ferramenta de ímãs). Da frente para trás:
 

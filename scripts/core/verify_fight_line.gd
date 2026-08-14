@@ -35,7 +35,10 @@ func _run() -> void:
 	walker.set_pose(FighterPuppet.Pose.PROFILE)
 	walker.set_stride_frame(true)
 	assert(walker.hop_lift() > 8.0, "Hop should lift the freak off the ground")
+	assert(walker.spring_is_airborne(), "Spring base should leave the ground with the freak")
 	assert(not walker.is_spring_pressed(), "Airborne hop should use the loose spring")
+	var hop_root := walker.get_node("HopRoot") as Node2D
+	assert(hop_root != null and hop_root.position.y < -8.0, "Whole toy should rise on the hop")
 	walker.set_pose(FighterPuppet.Pose.PROFILE)
 	walker.set_attacking(PartSlotType.Value.BODY)
 	assert(not is_zero_approx(walker.joint_rotation(PartSlotType.Value.ARM_R)), "Body clash should swing an arm")

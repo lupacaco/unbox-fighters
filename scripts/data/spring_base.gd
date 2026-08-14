@@ -15,7 +15,9 @@ const MAGNET_PRESSED := Vector2(0, -48)
 const BOTTOM_LOOSE := 143.0
 const BOTTOM_PRESSED := 145.0
 const GROUND_Y := 118.0
-const Z_INDEX := -1
+## Draw with the other parts (first in the tree, so it stays behind them).
+## Negative Z hid the stand behind the dark card back.
+const Z_INDEX := 0
 
 static func texture(pressed: bool) -> Texture2D:
 	return load(TEX_PRESSED if pressed else TEX_LOOSE) as Texture2D
