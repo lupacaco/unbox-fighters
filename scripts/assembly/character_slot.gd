@@ -13,6 +13,8 @@ const TAG_OFFSETS := {
 	PartSlotType.Value.ARM_R: Vector2(108, 70),
 }
 const _Spring := preload("res://scripts/data/spring_base.gd")
+## Lower the spring and Freak on the card. Fight shelf uses its own floor.
+const TOY_Y := 22.0
 
 @onready var _card_shadow: Sprite2D = $CardShadow
 @onready var _card_frame: Sprite2D = $CardFrame
@@ -328,6 +330,7 @@ func _ensure_layers() -> void:
 	else:
 		_Spring.style_shadow(_spring_shadow)
 	_display_root.z_index = 1
+	_display_root.position.y = TOY_Y
 	_display_root.move_child(_spring_shadow, 0)
 	_display_root.move_child(_spring, 1)
 	_spring.z_index = _Spring.Z_INDEX
@@ -347,10 +350,10 @@ func _setup_zones() -> void:
 		leftover.monitorable = false
 		leftover.visible = false
 	var rects := {
-		PartSlotType.Value.HEAD: Rect2(-95, -190, 190, 110),
-		PartSlotType.Value.BODY: Rect2(-55, -80, 110, 170),
-		PartSlotType.Value.ARM_L: Rect2(-130, -70, 75, 190),
-		PartSlotType.Value.ARM_R: Rect2(55, -70, 75, 190),
+		PartSlotType.Value.HEAD: Rect2(-95, -190 + TOY_Y, 190, 110),
+		PartSlotType.Value.BODY: Rect2(-55, -80 + TOY_Y, 110, 170),
+		PartSlotType.Value.ARM_L: Rect2(-130, -70 + TOY_Y, 75, 190),
+		PartSlotType.Value.ARM_R: Rect2(55, -70 + TOY_Y, 75, 190),
 	}
 	for slot in PartSlotType.shop_slots():
 		var node_name := _layer_name(slot)
@@ -554,7 +557,7 @@ func _ensure_tags() -> void:
 		return
 	for slot in PartSlotType.shop_slots():
 		var tag := StatTag.new()
-		tag.position = TAG_OFFSETS[slot]
+		tag.position = TAG_OFFSETS[slot] + Vector2(0.0, TOY_Y)
 		add_child(tag)
 		_tags[slot] = tag
 

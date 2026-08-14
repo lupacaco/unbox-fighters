@@ -109,7 +109,7 @@ Se uma peça estiver aberta no Inspetor, o botão **Abrir Frente / Perfil deste 
 
 ### Regra de colagem
 
-1. A base-mola fica no chão da carta. A esfera de metal é o ímã.
+1. A base-mola fica no chão da carta, um pouco mais baixa. A esfera de metal é o ímã.
 2. Sem tronco: a cabeça cola nessa esfera.
 3. Com tronco: o meio dos dois ímãs de quadril cola nessa esfera. A cabeça cola no pescoço.
 4. Braços: esfera de cima cola nos ombros. Na **frente**, os braços abrem um pouco, girando nesse ímã (não soltam).
