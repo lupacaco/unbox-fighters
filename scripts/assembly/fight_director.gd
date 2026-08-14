@@ -8,7 +8,6 @@ signal finished
 const SHELF_Y := -148.0
 const LAND_X := 640.0
 const STAND_X: Array[float] = [250.0, 430.0, 610.0]
-const QUEUE_SCALE: Array[float] = [1.18, 0.82, 0.66]
 const CLASH_CENTER := Vector2(960, 440)
 const OPPONENT_ENTER := Vector2(2040, 400)
 const WALK_STEPS := 6
@@ -231,7 +230,6 @@ func _intro_pair(player: StageFighter, enemy: StageFighter, rank: int, heavy: bo
 
 func _jump_walk_in(fighter: StageFighter, land: Vector2, stand: Vector2, heavy: bool, rank: int, done: Callable = Callable()) -> void:
 	_lift_card(fighter.source_slot)
-	var face := -1.0 if fighter.face_left else 1.0
 	fighter.visual.scale = Vector2(1.12, 0.78)
 	GameAudio.whoosh()
 	await _jump_arc(fighter.root, land, JUMP_HEIGHT, JUMP_SEC)
@@ -239,14 +237,15 @@ func _jump_walk_in(fighter: StageFighter, land: Vector2, stand: Vector2, heavy: 
 		await _land_impact(fighter)
 	else:
 		await _squash(fighter.visual, Vector2(1.1, 0.88), 0.08)
+		await _squash(fighter.visual, Vector2.ONE, 0.08)
 	await get_tree().create_timer(0.18).timeout
 	fighter.puppet.set_pose(FighterPuppet.Pose.PROFILE)
 	await _squash(fighter.visual, Vector2(1.06, 0.94), 0.14)
+	await _squash(fighter.visual, Vector2.ONE, 0.1)
 	await get_tree().create_timer(0.2).timeout
 	await _walk_to(fighter, land, stand)
 	fighter.puppet.set_pose(FighterPuppet.Pose.PROFILE)
-	var signed := QUEUE_SCALE[clampi(rank, 0, 2)]
-	fighter.root.scale = Vector2(face * signed, signed)
+	_set_queue_look(fighter, rank)
 	if done.is_valid():
 		done.call()
 
@@ -272,10 +271,13 @@ func _advance_line(line: Array[StageFighter], new_front: int, opponent: bool) ->
 			continue
 		var dest := _stand_pos(opponent, rank)
 		await _walk_to(fighter, fighter.root.global_position, dest)
-		var signed := QUEUE_SCALE[clampi(rank, 0, 2)]
-		var face := -1.0 if opponent else 1.0
-		fighter.root.scale = Vector2(face * signed, signed)
+		_set_queue_look(fighter, rank)
 		rank += 1
+
+func _set_queue_look(fighter: StageFighter, rank: int) -> void:
+	var face := -1.0 if fighter.face_left else 1.0
+	fighter.root.scale = Vector2(face, 1.0)
+	fighter.root.z_index = 12 - clampi(rank, 0, 2)
 
 func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, clash_l: FightPlaque, clash_r: FightPlaque) -> void:
 	if left == null or right == null:

@@ -13,7 +13,7 @@
 | Luta em fila | Choque parte contra parte, cópia das cartas, teto de 12 de dano por Freak |
 | Tela de luta | Os dois Freaks entram juntos; pulo, caminhada, placas, resto do choque, KO |
 | Fim de partida | **Você venceu!** / **Você saiu** e botão **NOVA PARTIDA** |
-| Abrir caixas | 2 cliques, custa 1 pancada |
+| Abrir caixas | 1 clique, custa 1 pancada |
 | Arrastar e soltar | Peças nas cartas (troca no lugar ocupado); botão direito vende; Freak inteiro troca de carta ou vai para VENDER |
 | Visual composto | Ímãs unem cabeça / tronco / pernas |
 | Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |

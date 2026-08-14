@@ -5,7 +5,7 @@ extends Node2D
 
 enum Pose { FRONT, PROFILE, STRIDE }
 
-const PART_SIZE_PX := 170.0
+const PART_SIZE_PX := 250.0
 const TAG_OFFSETS := {
 	PartSlotType.Value.HEAD: Vector2(70, -90),
 	PartSlotType.Value.BODY: Vector2(70, -10),
@@ -97,7 +97,7 @@ func has_living_part() -> bool:
 	return false
 
 func feet_position() -> Vector2:
-	return global_position + Vector2(0, 88)
+	return global_position + Vector2(0, 90.0 * PART_SIZE_PX / 150.0)
 
 func get_part_node(slot: PartSlotType.Value) -> Sprite2D:
 	match slot:

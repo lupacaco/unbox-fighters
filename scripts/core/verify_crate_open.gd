@@ -20,8 +20,7 @@ func _run() -> void:
 		return
 
 	var intact: Texture2D = load("res://assets/boxes/box-01.png")
-	var cracked: Texture2D = load("res://assets/boxes/box-02.png")
-	var broken: Texture2D = load("res://assets/boxes/box-03.png")
+	var smashed: Texture2D = load("res://assets/boxes/box-02.png")
 	var sprite: Sprite2D = crate.get_node("Sprite")
 
 	if sprite.texture != intact:
@@ -31,29 +30,22 @@ func _run() -> void:
 
 	crate.call("_on_clicked")
 	await create_timer(0.05).timeout
-	if sprite.texture != cracked:
-		push_error("VERIFY_FAIL expected box-02 after first click")
+	if not is_instance_valid(crate):
+		push_error("VERIFY_FAIL crate vanished too fast")
 		quit(1)
 		return
-	if crate.get("_hits") != 1:
-		push_error("VERIFY_FAIL hits should be 1")
-		quit(1)
-		return
-
-	crate.call("_on_clicked")
-	await create_timer(0.05).timeout
-	if sprite.texture != broken:
-		push_error("VERIFY_FAIL expected box-03 after second click")
+	if sprite.texture != smashed:
+		push_error("VERIFY_FAIL expected box-02 after one click")
 		quit(1)
 		return
 
-	await create_timer(1.2).timeout
+	await create_timer(0.8).timeout
 	var parts := 0
 	for child in scene.get_node("Tray").get_children():
 		if child is PartView:
 			parts += 1
 	if parts < 1:
-		push_error("VERIFY_FAIL part not revealed after open")
+		push_error("VERIFY_FAIL part not revealed after one smash")
 		quit(1)
 		return
 

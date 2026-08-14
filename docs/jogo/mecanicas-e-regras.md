@@ -25,7 +25,7 @@ Há **1 jogador + 3 bots** (Sombra, Ferrugem, Névoa). HP inicial **40**. Não e
 - Sempre **5 caixas**. Peças do **nível da loja** (e abaixo).
 - Nível 1 não vende peça 9.
 - ATUALIZAR = nova leva, custa 1, solta o travar.
-- Abrir caixa: 2 cliques, como antes, mas só se tiver 1 pancada.
+- Abrir caixa: **1 clique**, custa 1 pancada.
 
 ## Cartas e fila
 

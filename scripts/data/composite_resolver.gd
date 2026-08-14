@@ -5,7 +5,7 @@ extends RefCounted
 ## (magnet_down of the upper part sticks to magnet_up of the lower part).
 
 const BODY_ORIGIN := Vector2(0, -8)
-const PART_SIZE_PX := 150.0
+const PART_SIZE_PX := 250.0
 
 static func resolve(character: CharacterDef, has_head: bool, has_body: bool, has_legs: bool) -> Dictionary:
 	if character == null:

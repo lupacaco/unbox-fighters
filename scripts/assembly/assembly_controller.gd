@@ -116,7 +116,6 @@ func _refresh_shop_crates() -> void:
 		var rest := Vector2(AssemblyLayout.crate_x(i, count), AssemblyLayout.CRATE_Y)
 		crate.position = rest
 		crate.shop_index = i
-		crate.can_afford = func() -> bool: return _match.human().gold >= MatchRules.OPEN_CRATE_COST
 		crate.on_paid_open = _pay_for_crate
 		crate.setup(part, _part_scene, _drag_service, _tray)
 		crate.set_rest_y(rest.y)

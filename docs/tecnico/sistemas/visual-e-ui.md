@@ -37,9 +37,8 @@ Pasta `assets/ui/`:
 
 Pasta `assets/boxes/`:
 
-- `box-01.png` — intacta
-- `box-02.png` — trincada
-- `box-03.png` — quebrada
+- `box-01.png` — fechada
+- `box-02.png` — quebrada (aparece no clique)
 
 Com **TRAVAR** ligado, as caixas ficam com um tom gelado (azul-claro).
 

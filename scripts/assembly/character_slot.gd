@@ -7,7 +7,7 @@ signal card_drag_requested(slot: CharacterSlot)
 signal assembly_changed(slot: CharacterSlot)
 
 const BODY_ORIGIN := Vector2(0, -8)
-const PART_SIZE_PX := 150.0
+const PART_SIZE_PX := 250.0
 const TAG_OFFSETS := {
 	PartSlotType.Value.HEAD: Vector2(108, -150),
 	PartSlotType.Value.BODY: Vector2(108, -20),

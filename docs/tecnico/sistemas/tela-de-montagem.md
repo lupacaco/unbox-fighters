@@ -35,6 +35,6 @@ O botão **NÍVEL 1  (4)** mostra o custo para subir. Clique nele para pagar.
 
 ## Relação com outras cenas
 
-- `Crate` — 2 cliques → some → instancia `PartView`  
+- `Crate` — 1 clique → some → instancia `PartView`  
 - `CharacterSlot` — recebe peças; o rótulo da fila arrasta o Freak inteiro  
 - `FightDirector` — palco da luta

@@ -9,7 +9,7 @@ unbox-fighters/
 ├── README.md
 ├── docs/                  # Esta documentação
 ├── assets/                # Arte (imagens)
-│   ├── boxes/             # Sprites da caixa (intacta / trincada / quebrada)
+│   ├── boxes/             # Sprites da caixa (fechada / quebrada)
 │   ├── objects/           # Objetos de UI (martelo do cursor)
 │   ├── audio/sfx/         # Efeitos sonoros (.wav)
 │   ├── characters/vampiro/

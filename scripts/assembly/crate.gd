@@ -4,10 +4,8 @@ extends Area2D
 signal broken(crate: Crate, part: PartDef)
 
 const TEX_INTACT := preload("res://assets/boxes/box-01.png")
-const TEX_CRACKED := preload("res://assets/boxes/box-02.png")
-const TEX_BROKEN := preload("res://assets/boxes/box-03.png")
-const TARGET_HEIGHT_PX := 185.0
-const BROKEN_HOLD_SEC := 0.5
+const TEX_BROKEN := preload("res://assets/boxes/box-02.png")
+const TARGET_HEIGHT_PX := 228.0
 
 @onready var _sprite: Sprite2D = $Sprite
 @onready var _shadow: Polygon2D = $Shadow
@@ -16,10 +14,7 @@ const BROKEN_HOLD_SEC := 0.5
 
 var reward_part: PartDef
 var shop_index: int = -1
-var can_afford: Callable
 var on_paid_open: Callable
-## 0 = intact, 1 = cracked, 2 = broken / finishing open.
-var _hits: int = 0
 var _opened: bool = false
 var _busy: bool = false
 var _hovered: bool = false
@@ -58,7 +53,7 @@ func _ready() -> void:
 	mouse_entered.connect(_on_hover.bind(true))
 	mouse_exited.connect(_on_hover.bind(false))
 	var shape := RectangleShape2D.new()
-	shape.size = Vector2(190, 180)
+	shape.size = Vector2(230, 220)
 	_collision.shape = shape
 	_label.visible = false
 	_label.text = ""
@@ -74,24 +69,17 @@ func _input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 		get_viewport().set_input_as_handled()
 
 func _on_clicked() -> void:
-	if can_afford.is_valid() and not can_afford.call():
+	if _opened or _busy:
+		return
+	if _drag_service != null and _drag_service.is_locked():
+		return
+	if on_paid_open.is_valid() and not on_paid_open.call(self):
 		GameAudio.part_reject()
 		return
 	HammerCursor.strike()
 	GameAudio.hammer_hit()
-	if _hits == 0:
-		_hits = 1
-		_apply_stage_art(TEX_CRACKED)
-		GameAudio.crate_crack()
-		_play_hit_feedback()
-		return
-	if _hits == 1:
-		if on_paid_open.is_valid() and not on_paid_open.call(self):
-			GameAudio.part_reject()
-			return
-		_hits = 2
-		GameAudio.crate_break()
-		_finish_open()
+	GameAudio.crate_break()
+	_finish_open()
 
 func _clear_hover_cursor() -> void:
 	if not _hovered:
@@ -128,8 +116,8 @@ func _kill_motion() -> void:
 func _start_idle() -> void:
 	_stop_idle()
 	_idle = create_tween().set_loops()
-	_idle.tween_property(_sprite, "position:y", -3.0, 1.8).set_trans(Tween.TRANS_SINE)
-	_idle.tween_property(_sprite, "position:y", 3.0, 1.8).set_trans(Tween.TRANS_SINE)
+	_idle.tween_property(_sprite, "position:y", -6.0, 1.6).set_trans(Tween.TRANS_SINE)
+	_idle.tween_property(_sprite, "position:y", 5.0, 1.6).set_trans(Tween.TRANS_SINE)
 
 func _stop_idle() -> void:
 	if _idle != null and _idle.is_valid():
@@ -144,7 +132,7 @@ func _on_hover(entering: bool) -> void:
 		if not _hovered:
 			_hovered = true
 			HammerCursor.enter_crate()
-		var target_y := _base_y - 10.0
+		var target_y := _base_y - 14.0
 		var target_mod := _rest_modulate() * Color(1.08, 1.06, 1.04, 1)
 		_kill_motion()
 		_motion = create_tween()
@@ -160,38 +148,19 @@ func _on_hover(entering: bool) -> void:
 	_motion.tween_property(self, "position:y", _base_y, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_motion.parallel().tween_property(_sprite, "modulate", _rest_modulate(), 0.18)
 
-func _play_hit_feedback() -> void:
-	_stop_idle()
-	_kill_motion()
-	var base_scale := Vector2.ONE * _display_scale
-	var origin_x := position.x
-	_motion = create_tween()
-	_motion.tween_property(_sprite, "scale", base_scale * 1.06, 0.06)
-	_motion.tween_property(self, "position:x", origin_x + 3.0, 0.03)
-	_motion.tween_property(self, "position:x", origin_x - 3.0, 0.03)
-	_motion.tween_property(self, "position:x", origin_x, 0.03)
-	_motion.tween_property(_sprite, "scale", base_scale, 0.08)
-	_motion.tween_callback(_start_idle)
-
 func _finish_open() -> void:
 	_busy = true
+	_opened = true
 	_stop_idle()
 	_kill_motion()
 	_label.visible = false
 	_apply_stage_art(TEX_BROKEN)
 	input_pickable = false
 	_clear_hover_cursor()
-
-	var base_scale := Vector2.ONE * _display_scale
-	var origin_x := position.x
 	_motion = create_tween()
-	_motion.tween_property(_sprite, "scale", base_scale * 1.08, 0.06)
-	_motion.tween_property(self, "position:x", origin_x + 4.0, 0.03)
-	_motion.tween_property(self, "position:x", origin_x - 4.0, 0.03)
-	_motion.tween_property(self, "position:x", origin_x, 0.03)
-	_motion.tween_property(_sprite, "scale", base_scale, 0.08)
-	_motion.tween_interval(BROKEN_HOLD_SEC)
-	_motion.tween_property(self, "modulate:a", 0.0, 0.12).set_trans(Tween.TRANS_CUBIC)
+	_motion.tween_property(self, "scale", Vector2(1.18, 0.82), 0.08)
+	_motion.tween_property(self, "scale", Vector2.ONE, 0.08)
+	_motion.tween_interval(0.18)
 	_motion.tween_callback(_reveal_part)
 
 func _reveal_part() -> void:
