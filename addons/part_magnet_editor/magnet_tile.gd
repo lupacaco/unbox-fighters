@@ -39,7 +39,7 @@ var _undo_old := Vector2.ZERO
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_MOVE
-	custom_minimum_size = Vector2(220, 220)
+	custom_minimum_size = Vector2(260, 260)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	resized.connect(queue_redraw)
@@ -186,7 +186,7 @@ func _texture() -> Texture2D:
 func _image_rect() -> Rect2:
 	var avail := Vector2(size.x, maxf(size.y - TITLE_H, 1.0))
 	var side := minf(avail.x, avail.y)
-	var origin := Vector2((size.x - side) * 0.5, TITLE_H + (avail.y - side) * 0.5)
+	var origin := Vector2(0.0, TITLE_H + (avail.y - side) * 0.5)
 	return Rect2(origin, Vector2(side, side))
 
 func _draw_marker(magnet: Vector2, label: String, color: Color, active: bool) -> void:

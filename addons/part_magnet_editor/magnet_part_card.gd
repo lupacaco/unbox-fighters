@@ -6,6 +6,7 @@ extends PanelContainer
 signal magnets_changed
 signal slot_chosen(part: PartDef, slot: PartSlotType.Value)
 signal transform_changed
+signal replace_requested(part: PartDef, pose: int)
 
 const MagnetTile := preload("res://addons/part_magnet_editor/magnet_tile.gd")
 
@@ -16,12 +17,13 @@ var _slot_pick: OptionButton
 var _z_spin: SpinBox
 var _flip_btn: Button
 var _rotate_btn: Button
+var _replace_btn: Button
 var _tile: Control
 var _syncing := false
 
 func _ready() -> void:
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	custom_minimum_size = Vector2(440, 236)
+	custom_minimum_size = Vector2(380, 280)
 	_build()
 
 func set_target(next_part: PartDef, next_pose: int) -> void:
@@ -46,15 +48,11 @@ func _build() -> void:
 	margin.add_child(row)
 
 	var controls := VBoxContainer.new()
-	controls.add_theme_constant_override("separation", 6)
-	controls.custom_minimum_size.x = 168
-	controls.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	controls.add_theme_constant_override("separation", 5)
+	controls.custom_minimum_size.x = 132
+	controls.size_flags_horizontal = 0
 	controls.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_child(controls)
-
-	var top := HBoxContainer.new()
-	top.add_theme_constant_override("separation", 6)
-	controls.add_child(top)
 
 	_slot_pick = OptionButton.new()
 	_slot_pick.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -62,7 +60,11 @@ func _build() -> void:
 		_slot_pick.add_item(PartSlotType.display_label(slot))
 		_slot_pick.set_item_metadata(_slot_pick.item_count - 1, int(slot))
 	_slot_pick.item_selected.connect(_on_slot_selected)
-	top.add_child(_slot_pick)
+	controls.add_child(_slot_pick)
+
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override("separation", 6)
+	controls.add_child(top)
 
 	var z_lab := Label.new()
 	z_lab.text = "Z"
@@ -93,8 +95,15 @@ func _build() -> void:
 	_rotate_btn.pressed.connect(_on_rotate_pressed)
 	controls.add_child(_rotate_btn)
 
+	_replace_btn = Button.new()
+	_replace_btn.text = "Trocar imagem"
+	_replace_btn.tooltip_text = "Escolhe um PNG ou WEBP do computador. O jogo grava em 200×200."
+	_replace_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_replace_btn.pressed.connect(_on_replace_pressed)
+	controls.add_child(_replace_btn)
+
 	_tile = MagnetTile.new()
-	_tile.custom_minimum_size = Vector2(220, 220)
+	_tile.custom_minimum_size = Vector2(260, 260)
 	_tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_tile.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	(_tile as MagnetTile).magnets_changed.connect(func() -> void: magnets_changed.emit())
@@ -107,12 +116,14 @@ func _sync_controls() -> void:
 		_z_spin.editable = false
 		_flip_btn.disabled = true
 		_rotate_btn.disabled = true
+		_replace_btn.disabled = true
 		_syncing = false
 		return
 	_slot_pick.disabled = false
 	_z_spin.editable = true
 	_flip_btn.disabled = false
 	_rotate_btn.disabled = false
+	_replace_btn.disabled = false
 	_select_slot(part.slot_type)
 	_z_spin.value = part.effective_draw_z()
 	_flip_btn.button_pressed = part.flip_h_for(pose)
@@ -159,6 +170,11 @@ func _on_rotate_pressed() -> void:
 	if _tile != null:
 		(_tile as MagnetTile).set_target(part, pose)
 	transform_changed.emit()
+
+func _on_replace_pressed() -> void:
+	if part == null:
+		return
+	replace_requested.emit(part, pose)
 
 func _save_part() -> void:
 	if part == null or part.resource_path.is_empty():

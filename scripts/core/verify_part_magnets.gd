@@ -66,5 +66,14 @@ func _run() -> void:
 		quit(1)
 		return
 
+	var Importer := load("res://addons/part_magnet_editor/character_importer.gd")
+	var canvas := Image.create(400, 100, false, Image.FORMAT_RGBA8)
+	canvas.fill(Color.WHITE)
+	var fitted: Image = Importer.fit_to_square(canvas, 200)
+	if fitted == null or fitted.get_width() != 200 or fitted.get_height() != 200:
+		push_error("VERIFY_FAIL swapped art should become 200x200")
+		quit(1)
+		return
+
 	print("VERIFY_PART_MAGNETS_PASS")
 	quit(0)

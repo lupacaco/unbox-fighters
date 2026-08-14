@@ -52,8 +52,8 @@ func _open_magnet_window_for_set(set_id: String) -> void:
 
 func _popup_magnet() -> void:
 	var host := EditorInterface.get_base_control().size
-	var w := clampi(int(host.x * 0.8), 980, 1280)
-	var h := clampi(int(host.y * 0.8), 580, 760)
+	var w := clampi(int(host.x * 0.86), 1080, 1400)
+	var h := clampi(int(host.y * 0.82), 640, 820)
 	_window.popup_centered(Vector2i(w, h))
 
 func _begin_import() -> void:

@@ -16,7 +16,7 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 | `verify_assembly.gd` | 3 cartas, 5 caixas e VENDER à direita |
 | `verify_crate_open.gd` | Um clique na caixa solta a peça |
 | `verify_composite.gd` | Layout por ímãs (6 desenhos) e expansor 3→6 |
-| `verify_part_magnets.gd` | Cabeça só embaixo; tronco com 5 ímãs; virar X; Z da cabeça na frente |
+| `verify_part_magnets.gd` | Cabeça só embaixo; tronco com 5 ímãs; virar X; Z da cabeça na frente; imagem nova vira 200×200 |
 | `verify_part_sizes.gd` | Sprites 200×200 e perfil nos 6 desenhos |
 | `verify_fight_line.gd` | Fila no mesmo chão; perna e braço giram nos ímãs |
 | `verify_fight_poses.gd` | Personagem tem perfil; carta aceita os 3 kits |

@@ -5,6 +5,7 @@ extends Window
 
 const MagnetPartCard := preload("res://addons/part_magnet_editor/magnet_part_card.gd")
 const MagnetMix := preload("res://addons/part_magnet_editor/magnet_mix.gd")
+const CharacterImporter := preload("res://addons/part_magnet_editor/character_importer.gd")
 
 var _picker: OptionButton
 var _help: Label
@@ -14,6 +15,9 @@ var _profile_cards: Array[Control] = []
 var _front_mix: Control
 var _profile_mix: Control
 var _tabs: TabContainer
+var _image_dialog: EditorFileDialog
+var _pending_replace_part: PartDef
+var _pending_replace_pose: int = 0
 
 var _characters: Array[CharacterDef] = []
 var _character: CharacterDef
@@ -22,7 +26,7 @@ var _pending_set_id: String = ""
 
 func _ready() -> void:
 	title = "Ímãs das peças"
-	min_size = Vector2i(980, 580)
+	min_size = Vector2i(1080, 640)
 	unresizable = false
 	exclusive = false
 	close_requested.connect(hide)
@@ -77,7 +81,7 @@ func _build_ui() -> void:
 	_help = Label.new()
 	_help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_help.modulate = Color(0.78, 0.8, 0.84, 1)
-	_help.text = "Frente e perfil em abas. À esquerda: as 6 partes (tipo, virar, girar, Z). Z 1 fica na frente. Arraste as bolinhas até as esferas de metal."
+	_help.text = "Duas colunas de partes. Z 1 fica na frente. Trocar imagem escolhe um PNG do PC (o jogo grava em 200×200). Arraste as bolinhas até as esferas de metal."
 	column.add_child(_help)
 
 	_tabs = TabContainer.new()
@@ -120,28 +124,32 @@ func _make_tab(pose: int, caption: String) -> Control:
 	var row := HSplitContainer.new()
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	row.split_offset = 560
+	row.split_offset = 760
 	tab.add_child(row)
 
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size.x = 460
+	scroll.custom_minimum_size.x = 640
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_stretch_ratio = 0.68
+	scroll.size_flags_stretch_ratio = 0.78
 	row.add_child(scroll)
 
-	var list := VBoxContainer.new()
-	list.add_theme_constant_override("separation", 8)
-	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(list)
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 8)
+	grid.add_theme_constant_override("v_separation", 8)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(grid)
 
 	var cards: Array[Control] = []
 	for _i in PartSlotType.visual_slots().size():
 		var card := MagnetPartCard.new()
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		card.magnets_changed.connect(_refresh_mix)
 		card.transform_changed.connect(_on_transform_changed)
 		card.slot_chosen.connect(_on_slot_chosen)
-		list.add_child(card)
+		card.replace_requested.connect(_on_replace_requested)
+		grid.add_child(card)
 		cards.append(card)
 	if pose == 0:
 		_front_cards = cards
@@ -151,8 +159,8 @@ func _make_tab(pose: int, caption: String) -> Control:
 	var mix := MagnetMix.new()
 	mix.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mix.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	mix.size_flags_stretch_ratio = 0.32
-	mix.custom_minimum_size = Vector2(220, 260)
+	mix.size_flags_stretch_ratio = 0.22
+	mix.custom_minimum_size = Vector2(200, 240)
 	row.add_child(mix)
 	if pose == 0:
 		_front_mix = mix
@@ -226,6 +234,66 @@ func _on_slot_chosen(part: PartDef, new_slot: PartSlotType.Value) -> void:
 		PartSlotType.display_label(new_slot),
 	]
 	_show_character(_character)
+
+func _on_replace_requested(part: PartDef, pose: int) -> void:
+	if part == null:
+		return
+	_pending_replace_part = part
+	_pending_replace_pose = pose
+	_ensure_image_dialog()
+	_image_dialog.popup_file_dialog()
+
+func _ensure_image_dialog() -> void:
+	if _image_dialog != null and is_instance_valid(_image_dialog):
+		return
+	_image_dialog = EditorFileDialog.new()
+	_image_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
+	_image_dialog.access = EditorFileDialog.ACCESS_FILESYSTEM
+	_image_dialog.add_filter("*.png, *.webp", "Imagem da peça")
+	_image_dialog.file_selected.connect(_on_image_file_selected)
+	add_child(_image_dialog)
+
+func _on_image_file_selected(path: String) -> void:
+	var part := _pending_replace_part
+	var pose := _pending_replace_pose
+	if part == null:
+		return
+	var dest := CharacterImporter.part_image_path(part, pose)
+	if dest.is_empty():
+		_status.modulate = Color(0.95, 0.55, 0.4, 1)
+		_status.text = "Não achei o arquivo desta peça."
+		return
+	var err := CharacterImporter.replace_part_image(path, dest)
+	if not err.is_empty():
+		_status.modulate = Color(0.95, 0.55, 0.4, 1)
+		_status.text = err
+		return
+	_reload_replaced_image(part, pose, dest)
+
+func _reload_replaced_image(part: PartDef, pose: int, dest: String) -> void:
+	var fs := EditorInterface.get_resource_filesystem()
+	if fs != null:
+		fs.update_file(dest)
+		fs.scan()
+		var frames := 0
+		while fs.is_scanning() and frames < 90:
+			await get_tree().process_frame
+			frames += 1
+		await get_tree().create_timer(0.2).timeout
+	var tex := ResourceLoader.load(dest, "", ResourceLoader.CACHE_MODE_REPLACE) as Texture2D
+	if tex == null:
+		_status.modulate = Color(0.95, 0.55, 0.4, 1)
+		_status.text = "A imagem entrou, mas o Godot ainda não leu. Feche e abra a janela."
+		return
+	if pose == 1:
+		part.sprite_profile = tex
+	else:
+		part.sprite = tex
+	part.emit_changed()
+	_save_resource(part)
+	_show_character(_character)
+	_status.modulate = Color(0.7, 0.86, 0.62, 1)
+	_status.text = "Troquei a imagem de %s." % PartSlotType.display_label(part.slot_type)
 
 func _refresh_mix() -> void:
 	var parts := {}

@@ -8,7 +8,7 @@ var pose: int = 0
 var caption: String = ""
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(220, 260)
+	custom_minimum_size = Vector2(200, 240)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -45,7 +45,7 @@ func _draw() -> void:
 		return
 	var plan := CompositeResolver.resolve_slots(parts, textures)
 	var side := minf(box.size.x - 24.0, box.size.y - 36.0)
-	var s := clampf(side / 420.0, 0.7, 1.45)
+	var s := clampf(side / 420.0, 0.32, 1.05)
 	var origin := box.get_center() + Vector2(0, 10)
 	var positions: Dictionary = plan.get("positions", {})
 	for slot in PartSlotType.draw_order_for(parts):

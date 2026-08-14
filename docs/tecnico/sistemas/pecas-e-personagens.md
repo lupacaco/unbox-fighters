@@ -67,12 +67,13 @@ A loja lê sozinha as fichas `*_character.tres` em `data/parts/`, e depois filtr
 
 1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**).
 2. No alto, escolha o **Freak**. A janela tem duas abas: **Frente** e **Perfil**.
-3. À esquerda ficam as **6 partes** (caixas ao lado da imagem grande). À direita, a prévia menor do Freak montado.
+3. À esquerda, as **6 partes em duas colunas** (caixas coladas na imagem). À direita, a prévia do Freak montado.
 4. Em cada parte:
    - a caixa escolhe o que ela é (cabeça, tronco, braço E/D, perna E/D)
    - **Virar** espelha a imagem
    - **Girar 90°** gira o desenho
    - **Z** é a ordem da frente/trás: **1 fica na frente**. Exemplo: cabeça 1, tronco 2 → a cabeça cobre o tronco
+   - **Trocar imagem** escolhe um PNG/WEBP no computador. O jogo grava em **200×200** no lugar da peça.
 5. Arraste as bolinhas até o **centro das esferas de metal**:
    - Cabeça: **BAIXO**
    - Braço / perna: **CIMA**
