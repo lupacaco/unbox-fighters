@@ -26,7 +26,7 @@ var _pending_set_id: String = ""
 
 func _ready() -> void:
 	title = "Ímãs das peças"
-	min_size = Vector2i(1080, 640)
+	min_size = Vector2i(820, 480)
 	unresizable = false
 	exclusive = false
 	close_requested.connect(hide)
@@ -81,7 +81,7 @@ func _build_ui() -> void:
 	_help = Label.new()
 	_help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_help.modulate = Color(0.78, 0.8, 0.84, 1)
-	_help.text = "Ampliar abre a peça grande. Roda do mouse amplia. Botão direito arrasta a imagem. Z 1 fica na frente. Trocar imagem escolhe um PNG do PC."
+	_help.text = "Clique Ampliar para marcar o ímã de perto. Z vale só na carta."
 	column.add_child(_help)
 
 	_tabs = TabContainer.new()
@@ -124,20 +124,20 @@ func _make_tab(pose: int, caption: String) -> Control:
 	var row := HSplitContainer.new()
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	row.split_offset = 760
+	row.split_offset = 540
 	tab.add_child(row)
 
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size.x = 640
+	scroll.custom_minimum_size.x = 500
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_stretch_ratio = 0.78
+	scroll.size_flags_stretch_ratio = 0.72
 	row.add_child(scroll)
 
 	var grid := GridContainer.new()
 	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 8)
-	grid.add_theme_constant_override("v_separation", 8)
+	grid.add_theme_constant_override("h_separation", 6)
+	grid.add_theme_constant_override("v_separation", 6)
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(grid)
 
@@ -160,7 +160,7 @@ func _make_tab(pose: int, caption: String) -> Control:
 	mix.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mix.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	mix.size_flags_stretch_ratio = 0.22
-	mix.custom_minimum_size = Vector2(200, 240)
+	mix.custom_minimum_size = Vector2(170, 200)
 	row.add_child(mix)
 	if pose == 0:
 		_front_mix = mix

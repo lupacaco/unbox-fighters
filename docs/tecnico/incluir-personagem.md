@@ -79,8 +79,8 @@ Os ímãs dizem onde cada esfera de metal cola na vizinha.
 
 1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**).
 2. No alto da janela, escolha o **Freak** (ex.: Leão).
-3. Use a aba **Frente** e a aba **Perfil**. As 6 partes ficam em duas colunas, com a imagem ao lado das caixas. À direita: a prévia.
-4. Se um desenho estiver no tipo errado, escolha o certo na caixa (ex.: Perna E). **Virar** e **Girar 90°** corrigem a imagem. **Z** 1 fica na frente **na carta**. Na luta a ordem é fixa (cabeça, braço D, tronco, perna D, perna E, braço E). **Trocar imagem** escolhe um arquivo do PC. **Ampliar** abre a peça grande para marcar o ímã com precisão (roda do mouse amplia).
+3. Use a aba **Frente** e a aba **Perfil**. As 6 partes ficam em duas colunas compactas. À direita: a prévia. A janela cabe na tela do Godot; arraste o canto se quiser maior.
+4. Se um desenho estiver no tipo errado, escolha o certo na caixa (ex.: Perna E). **Virar** e **Girar** corrigem a imagem. **Z** 1 fica na frente **na carta**. Na luta a ordem é fixa (cabeça, braço D, tronco, perna D, perna E, braço E). **Imagem** escolhe um arquivo do PC. **Ampliar** abre a peça grande para marcar o ímã com precisão (roda do mouse amplia).
 5. Arraste cada bolinha até o **centro da esfera de metal**.
 6. Clique **Salvar**. Cada bolinha que você solta também já grava aquela peça.
 

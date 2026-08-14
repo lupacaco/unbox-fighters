@@ -52,8 +52,8 @@ func _open_magnet_window_for_set(set_id: String) -> void:
 
 func _popup_magnet() -> void:
 	var host := EditorInterface.get_base_control().size
-	var w := clampi(int(host.x * 0.86), 1080, 1400)
-	var h := clampi(int(host.y * 0.82), 640, 820)
+	var w := clampi(int(host.x * 0.62), 840, 980)
+	var h := clampi(int(host.y * 0.62), 500, 620)
 	_window.popup_centered(Vector2i(w, h))
 
 func _begin_import() -> void:
@@ -73,15 +73,17 @@ func _on_sheet_chosen(path: String) -> void:
 	var stem := path.get_file().get_basename().to_lower()
 	_id_edit.text = CharacterImporter.clean_id(stem)
 	_name_edit.text = stem.capitalize()
-	_form.popup_centered()
+	_form.popup_centered(Vector2i(440, 380))
 
 func _build_form() -> void:
 	_form = AcceptDialog.new()
 	_form.title = "Incluir personagem"
 	_form.ok_button_text = "Cortar e criar"
+	_form.min_size = Vector2i(420, 360)
 	_form.confirmed.connect(_on_form_confirmed)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
+	box.custom_minimum_size = Vector2(400, 280)
 	_form.add_child(box)
 	box.add_child(_labeled_edit("Id interno (ex: leao)", true))
 	box.add_child(_labeled_edit("Nome na carta (ex: Leão)", false))
@@ -91,7 +93,8 @@ func _build_form() -> void:
 		box.add_child(_labeled_spin(labels[i]))
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.text = "A folha precisa ter 12 recortes: 6 de frente e 6 de perfil. Na loja entram só 3 kits. Depois marque os ímãs em Projeto → Ferramentas → Ímãs das Peças (abas Frente e Perfil)."
+	hint.custom_minimum_size.x = 380
+	hint.text = "Folha com 6 desenhos de frente e 6 de perfil. A loja ganha 3 kits. Depois abra Ímãs das Peças e clique Ampliar para marcar as esferas."
 	box.add_child(hint)
 	EditorInterface.get_base_control().add_child(_form)
 

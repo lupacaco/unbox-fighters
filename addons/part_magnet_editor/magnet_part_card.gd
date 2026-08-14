@@ -26,7 +26,7 @@ var _zoom_tile: Control
 
 func _ready() -> void:
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	custom_minimum_size = Vector2(380, 280)
+	custom_minimum_size = Vector2(268, 156)
 	_build()
 
 func set_target(next_part: PartDef, next_pose: int) -> void:
@@ -40,21 +40,21 @@ func set_target(next_part: PartDef, next_pose: int) -> void:
 
 func _build() -> void:
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 6)
-	margin.add_theme_constant_override("margin_top", 6)
-	margin.add_theme_constant_override("margin_right", 6)
-	margin.add_theme_constant_override("margin_bottom", 6)
+	margin.add_theme_constant_override("margin_left", 5)
+	margin.add_theme_constant_override("margin_top", 5)
+	margin.add_theme_constant_override("margin_right", 5)
+	margin.add_theme_constant_override("margin_bottom", 5)
 	add_child(margin)
 
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", 6)
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(row)
 
 	var controls := VBoxContainer.new()
-	controls.add_theme_constant_override("separation", 5)
-	controls.custom_minimum_size.x = 132
+	controls.add_theme_constant_override("separation", 4)
+	controls.custom_minimum_size.x = 118
 	controls.size_flags_horizontal = 0
 	controls.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_child(controls)
@@ -68,7 +68,7 @@ func _build() -> void:
 	controls.add_child(_slot_pick)
 
 	var top := HBoxContainer.new()
-	top.add_theme_constant_override("separation", 6)
+	top.add_theme_constant_override("separation", 4)
 	controls.add_child(top)
 
 	var z_lab := Label.new()
@@ -80,10 +80,14 @@ func _build() -> void:
 	_z_spin.max_value = 9
 	_z_spin.step = 1
 	_z_spin.rounded = true
-	_z_spin.custom_minimum_size.x = 64
-	_z_spin.tooltip_text = "1 fica na frente. Número maior fica atrás."
+	_z_spin.custom_minimum_size.x = 52
+	_z_spin.tooltip_text = "Só a carta. 1 fica na frente. A luta usa outra ordem."
 	_z_spin.value_changed.connect(_on_z_changed)
 	top.add_child(_z_spin)
+
+	var pose_row := HBoxContainer.new()
+	pose_row.add_theme_constant_override("separation", 4)
+	controls.add_child(pose_row)
 
 	_flip_btn = Button.new()
 	_flip_btn.toggle_mode = true
@@ -91,31 +95,35 @@ func _build() -> void:
 	_flip_btn.tooltip_text = "Espelha a imagem na horizontal."
 	_flip_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_flip_btn.toggled.connect(_on_flip_toggled)
-	controls.add_child(_flip_btn)
+	pose_row.add_child(_flip_btn)
 
 	_rotate_btn = Button.new()
-	_rotate_btn.text = "Girar 90°"
+	_rotate_btn.text = "Girar"
 	_rotate_btn.tooltip_text = "Gira a imagem 90 graus."
 	_rotate_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_rotate_btn.pressed.connect(_on_rotate_pressed)
-	controls.add_child(_rotate_btn)
+	pose_row.add_child(_rotate_btn)
+
+	var file_row := HBoxContainer.new()
+	file_row.add_theme_constant_override("separation", 4)
+	controls.add_child(file_row)
 
 	_replace_btn = Button.new()
-	_replace_btn.text = "Trocar imagem"
+	_replace_btn.text = "Imagem"
 	_replace_btn.tooltip_text = "Escolhe um PNG ou WEBP do computador. O jogo grava em 200×200."
 	_replace_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_replace_btn.pressed.connect(_on_replace_pressed)
-	controls.add_child(_replace_btn)
+	file_row.add_child(_replace_btn)
 
 	_expand_btn = Button.new()
 	_expand_btn.text = "Ampliar"
-	_expand_btn.tooltip_text = "Abre a imagem grande para marcar o ímã com precisão. Roda do mouse amplia. Botão direito arrasta."
+	_expand_btn.tooltip_text = "Abre a imagem grande para marcar o ímã. Roda do mouse amplia."
 	_expand_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_expand_btn.pressed.connect(_on_expand_pressed)
-	controls.add_child(_expand_btn)
+	file_row.add_child(_expand_btn)
 
 	_tile = MagnetTile.new()
-	_tile.custom_minimum_size = Vector2(260, 260)
+	_tile.custom_minimum_size = Vector2(128, 128)
 	_tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_tile.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	(_tile as MagnetTile).magnets_changed.connect(func() -> void: magnets_changed.emit())
@@ -142,7 +150,7 @@ func _sync_controls() -> void:
 	_select_slot(part.slot_type)
 	_z_spin.value = part.effective_draw_z()
 	_flip_btn.button_pressed = part.flip_h_for(pose)
-	_rotate_btn.text = "Girar 90°  (%d°)" % part.rotation_for(pose)
+	_rotate_btn.text = "Girar (%d°)" % part.rotation_for(pose)
 	_syncing = false
 
 func _select_slot(slot: PartSlotType.Value) -> void:

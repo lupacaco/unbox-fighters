@@ -26,6 +26,6 @@ func _parse_begin(object: Object) -> void:
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.modulate = Color(0.78, 0.8, 0.84, 1)
-	hint.text = "Abre Frente e Perfil em abas: 6 partes à esquerda, prévia grande à direita. Dá para virar, girar e escolher o tipo de cada desenho."
+	hint.text = "Abre Frente e Perfil. Clique Ampliar para marcar o ímã de perto."
 	box.add_child(hint)
 	add_custom_control(box)
