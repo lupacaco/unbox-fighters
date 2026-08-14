@@ -117,7 +117,7 @@ func step() -> void:
 	play(&"step", -11.0, randf_range(0.92, 1.1))
 
 func spring_boing() -> void:
-	play(&"spring_boing", -8.5, randf_range(0.94, 1.08))
+	play(&"spring_boing", -6.5, randf_range(0.96, 1.05))
 
 func ui_click() -> void:
 	play(&"part_pickup", -11.0, randf_range(1.1, 1.22))

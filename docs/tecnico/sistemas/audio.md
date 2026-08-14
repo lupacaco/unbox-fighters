@@ -30,7 +30,7 @@ Os efeitos passam por um canal **SFX** com compressão leve (segura o volume qua
 | `fighter_complete` | `fighter_complete.wav` | Carta completa (cabeça + tronco + 2 braços) — só na montagem |
 | `impact` | `impact.wav` | Poom do choque / KO na luta |
 | `step` | `step.wav` | Pouso do pulo ao andar na luta |
-| `spring_boing` | `spring_boing.wav` | Impulso da mola quando o brinquedo sai do chão |
+| `spring_boing` | `spring_boing.wav` | Boing da mola (som de mola de desenho) quando o brinquedo sai do chão |
 
 Na luta tocam o **boing** no impulso do pulo, o passo no pouso e o poom do golpe. Vento, clique de ímã e tom de vitória **não** entram no palco.
 

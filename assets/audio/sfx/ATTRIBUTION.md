@@ -15,4 +15,4 @@ Gerar de novo: `python tools/fetch_sfx.py`
 | `fighter_complete.wav` | 2865 | Success software tone |
 | `impact.wav` | 2143 | Hard and quick punch |
 | `step.wav` | 542 | Footsteps on heels on the pavement (um passo recortado) |
-| `spring_boing.wav` | 3003 | Boing hit sound |
+| `spring_boing.wav` | 736 | Cartoon spring sound |
