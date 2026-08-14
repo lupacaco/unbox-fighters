@@ -45,13 +45,25 @@ func _run() -> void:
 	if sheet.get_format() != Image.FORMAT_RGBA8:
 		sheet.convert(Image.FORMAT_RGBA8)
 	var blobs: Array = SheetSlicer._find_blobs(sheet)
+	if blobs.size() < 12:
+		push_error("VERIFY_FAIL doctor sheet should have at least 12 drawings, got %d" % blobs.size())
+		quit(1)
+		return
 	var named: Dictionary = SheetSlicer._classify(blobs, sheet.get_width(), sheet.get_height())
-	if named.is_empty() or not named.has("front") or not named.has("profile"):
+	if not String(named.get("error", "")).is_empty():
+		push_error("VERIFY_FAIL doctor sheet classify: %s" % named["error"])
+		quit(1)
+		return
+	if not named.has("front") or not named.has("profile"):
 		push_error("VERIFY_FAIL doctor sheet should split into 6 front + 6 profile")
 		quit(1)
 		return
 	for pose in ["front", "profile"]:
 		var group: Dictionary = named[pose]
+		if not SheetSlicer._group_complete(group):
+			push_error("VERIFY_FAIL doctor sheet did not name all six %s parts" % pose)
+			quit(1)
+			return
 		for slot_name in SheetSlicer.SLOT_NAMES:
 			if not group.has(slot_name):
 				push_error("VERIFY_FAIL doctor sheet missing %s in %s" % [slot_name, pose])

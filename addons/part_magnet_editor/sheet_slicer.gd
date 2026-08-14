@@ -7,18 +7,26 @@ const OUT := 200
 const MIN_BLOB := 400
 const SLOT_NAMES: PackedStringArray = ["head", "body", "arm_l", "arm_r", "leg_l", "leg_r"]
 
-static func slice_to_folder(sheet_path: String, set_id: String) -> PackedStringArray:
+static func slice_to_folder(sheet_path: String, set_id: String) -> Dictionary:
+	var empty := PackedStringArray()
+	if set_id.is_empty():
+		return _fail("O id interno precisa ser minúsculo, sem acento. Exemplo: leao.")
 	var img := Image.new()
 	var err := img.load(sheet_path)
 	if err != OK:
-		push_error("Could not load sheet: %s (%s)" % [sheet_path, err])
-		return PackedStringArray()
-	img.convert(Image.FORMAT_RGBA8)
+		var abs_path := ProjectSettings.globalize_path(sheet_path) if sheet_path.begins_with("res://") else sheet_path
+		err = img.load(abs_path)
+	if err != OK:
+		return _fail("Não consegui abrir essa imagem. Use PNG ou WEBP.")
+	if img.get_format() != Image.FORMAT_RGBA8:
+		img.convert(Image.FORMAT_RGBA8)
 	var blobs := _find_blobs(img)
 	var named := _classify(blobs, img.get_width(), img.get_height())
-	if named.is_empty():
-		push_error("Need 6+6 parts: front/profile on the left and right, or front on top and profile below.")
-		return PackedStringArray()
+	var classify_err := String(named.get("error", ""))
+	if not classify_err.is_empty():
+		return _fail(classify_err)
+	if not _group_complete(named.get("front", {})) or not _group_complete(named.get("profile", {})):
+		return _fail("Achei os recortes, mas não soube o que é cabeça, tronco, braço e perna. Separe bem as 6 peças de frente e as 6 de perfil.")
 
 	var out_dir := "res://assets/characters/%s" % set_id
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(out_dir))
@@ -40,30 +48,47 @@ static func slice_to_folder(sheet_path: String, set_id: String) -> PackedStringA
 			var path := "%s/%s_%s-%s.png" % [out_dir, set_id, slot_name, suffix]
 			fitted.save_png(ProjectSettings.globalize_path(path))
 			saved.append(path)
-	return saved
+	if saved.size() != 12:
+		return _fail("O corte não gerou as 12 imagens.")
+	return {"saved": saved, "error": ""}
+
+static func _fail(message: String) -> Dictionary:
+	return {"saved": PackedStringArray(), "error": message}
+
+static func _group_complete(group: Dictionary) -> bool:
+	if group.is_empty():
+		return false
+	for slot_name in SLOT_NAMES:
+		if not group.has(slot_name):
+			return false
+	return true
 
 static func _find_blobs(img: Image) -> Array:
 	var w := img.get_width()
 	var h := img.get_height()
+	var data := img.get_data()
 	var seen := PackedByteArray()
 	seen.resize(w * h)
 	var blobs: Array = []
 	for y in h:
 		for x in w:
-			if seen[y * w + x] != 0 or not _is_ink(img.get_pixel(x, y)):
+			var idx := y * w + x
+			if seen[idx] != 0 or not _is_ink_at(data, idx):
 				continue
-			var cells: Array[Vector2i] = []
 			var q: Array[Vector2i] = [Vector2i(x, y)]
-			seen[y * w + x] = 1
+			var qi := 0
+			seen[idx] = 1
 			var minx := x
 			var maxx := x
 			var miny := y
 			var maxy := y
 			var sx := 0
 			var sy := 0
-			while not q.is_empty():
-				var p: Vector2i = q.pop_front()
-				cells.append(p)
+			var ncells := 0
+			while qi < q.size():
+				var p: Vector2i = q[qi]
+				qi += 1
+				ncells += 1
 				sx += p.x
 				sy += p.y
 				minx = mini(minx, p.x)
@@ -74,14 +99,13 @@ static func _find_blobs(img: Image) -> Array:
 					var n: Vector2i = p + d
 					if n.x < 0 or n.y < 0 or n.x >= w or n.y >= h:
 						continue
-					var i := n.y * w + n.x
-					if seen[i] != 0:
+					var ni := n.y * w + n.x
+					if seen[ni] != 0:
 						continue
-					if not _is_ink(img.get_pixel(n.x, n.y)):
+					if not _is_ink_at(data, ni):
 						continue
-					seen[i] = 1
+					seen[ni] = 1
 					q.append(n)
-			var ncells := cells.size()
 			if ncells < MIN_BLOB:
 				continue
 			blobs.append({
@@ -92,10 +116,11 @@ static func _find_blobs(img: Image) -> Array:
 			})
 	return blobs
 
-static func _is_ink(c: Color) -> bool:
-	if c.a < 0.03:
+static func _is_ink_at(data: PackedByteArray, pixel: int) -> bool:
+	var i := pixel * 4
+	if data[i + 3] < 8:
 		return false
-	return c.r > 0.07 or c.g > 0.07 or c.b > 0.07
+	return data[i] > 18 or data[i + 1] > 18 or data[i + 2] > 18
 
 static func _classify(blobs: Array, width: int, height: int) -> Dictionary:
 	var left: Array = []
@@ -112,19 +137,18 @@ static func _classify(blobs: Array, width: int, height: int) -> Dictionary:
 		else:
 			bottom.append(blob)
 	if left.size() == 6 and right.size() == 6:
-		return {
-			"front": _name_group(left),
-			"profile": _name_group(right),
-		}
+		return {"front": _name_group(left), "profile": _name_group(right), "error": ""}
 	if top.size() == 6 and bottom.size() == 6:
-		return {
-			"front": _name_group(top),
-			"profile": _name_group(bottom),
-		}
-	push_error("Expected 6+6 parts, got left=%d right=%d top=%d bottom=%d" % [left.size(), right.size(), top.size(), bottom.size()])
-	return {}
+		return {"front": _name_group(top), "profile": _name_group(bottom), "error": ""}
+	return {
+		"front": {},
+		"profile": {},
+		"error": "A folha precisa de 6 desenhos de frente e 6 de perfil, separados. Achei %d à esquerda, %d à direita, %d em cima e %d embaixo." % [left.size(), right.size(), top.size(), bottom.size()],
+	}
 
 static func _name_group(group: Array) -> Dictionary:
+	if group.size() != 6:
+		return {}
 	var ordered := group.duplicate()
 	ordered.sort_custom(func(a, b): return a["cy"] < b["cy"])
 	var head: Dictionary = ordered[0]
@@ -168,7 +192,8 @@ static func _name_group(group: Array) -> Dictionary:
 static func _flood_edge_black(im: Image) -> void:
 	var w := im.get_width()
 	var h := im.get_height()
-	var seen := {}
+	var seen := PackedByteArray()
+	seen.resize(w * h)
 	var q: Array[Vector2i] = []
 	for x in w:
 		q.append(Vector2i(x, 0))
@@ -176,14 +201,16 @@ static func _flood_edge_black(im: Image) -> void:
 	for y in h:
 		q.append(Vector2i(0, y))
 		q.append(Vector2i(w - 1, y))
-	while not q.is_empty():
-		var p: Vector2i = q.pop_front()
-		var key := p.x * 100000 + p.y
-		if seen.has(key):
-			continue
+	var qi := 0
+	while qi < q.size():
+		var p: Vector2i = q[qi]
+		qi += 1
 		if p.x < 0 or p.y < 0 or p.x >= w or p.y >= h:
 			continue
-		seen[key] = true
+		var idx := p.y * w + p.x
+		if seen[idx] != 0:
+			continue
+		seen[idx] = 1
 		var c := im.get_pixel(p.x, p.y)
 		if c.a >= 0.04 and not (c.r <= 0.05 and c.g <= 0.05 and c.b <= 0.05):
 			continue

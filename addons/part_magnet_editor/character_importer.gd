@@ -14,7 +14,7 @@ const SLOT_TYPES: Array[PartSlotType.Value] = [
 	PartSlotType.Value.LEG_R,
 ]
 
-static func slice_sheet(sheet_path: String, set_id: String) -> PackedStringArray:
+static func slice_sheet(sheet_path: String, set_id: String) -> Dictionary:
 	return SheetSlicer.slice_to_folder(sheet_path, set_id)
 
 

@@ -34,7 +34,7 @@ Nome na carta: com acento se precisar (`Leão`).
 1. Menu **Project → Tools → Incluir personagem** (se o Godot estiver em português: **Projeto → Ferramentas**).
 2. Escolha a folha PNG ou WEBP.
 3. Preencha o id, o nome na carta e os **3 números** da loja (Cabeça, Tronco, Pernas).
-4. O Godot corta as 12 imagens, cria as fichas e abre a ferramenta de ímãs.
+4. Clique **Cortar e criar**. A janela **fica aberta** e mostra o que está acontecendo (costuma levar poucos segundos). Se a folha estiver errada, o texto fica vermelho na mesma janela. Se der certo, abre a ferramenta de ímãs.
 
 ### B) Quando a folha chega no chat (assistente)
 
