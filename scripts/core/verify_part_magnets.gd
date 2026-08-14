@@ -67,19 +67,34 @@ func _run() -> void:
 		return
 	var fight_front := [
 		PartSlotType.Value.HEAD,
+		PartSlotType.Value.ARM_L,
 		PartSlotType.Value.ARM_R,
 		PartSlotType.Value.BODY,
-		PartSlotType.Value.LEG_R,
-		PartSlotType.Value.LEG_L,
-		PartSlotType.Value.ARM_L,
 	]
 	for i in range(fight_front.size() - 1):
 		var front: PartSlotType.Value = fight_front[i]
 		var behind: PartSlotType.Value = fight_front[i + 1]
-		if PartSlotType.fight_z_index(front) <= PartSlotType.fight_z_index(behind):
-			push_error("VERIFY_FAIL fight Z should be head, right arm, torso, right leg, left leg, left arm")
+		if PartSlotType.fight_z_index(front, false) <= PartSlotType.fight_z_index(behind, false):
+			push_error("VERIFY_FAIL front fight Z should be head, left arm, right arm, torso")
 			quit(1)
 			return
+	var fight_profile := [
+		PartSlotType.Value.ARM_R,
+		PartSlotType.Value.BODY,
+		PartSlotType.Value.HEAD,
+		PartSlotType.Value.ARM_L,
+	]
+	for i in range(fight_profile.size() - 1):
+		var front: PartSlotType.Value = fight_profile[i]
+		var behind: PartSlotType.Value = fight_profile[i + 1]
+		if PartSlotType.fight_z_index(front, true) <= PartSlotType.fight_z_index(behind, true):
+			push_error("VERIFY_FAIL profile fight Z should be right arm, torso, head, left arm")
+			quit(1)
+			return
+	if PartSlotType.fight_spring_z_index() >= PartSlotType.fight_z_index(PartSlotType.Value.ARM_L, true):
+		push_error("VERIFY_FAIL spring should stay behind the parts")
+		quit(1)
+		return
 
 	var Importer := load("res://addons/part_magnet_editor/character_importer.gd")
 	var canvas := Image.create(400, 100, false, Image.FORMAT_RGBA8)

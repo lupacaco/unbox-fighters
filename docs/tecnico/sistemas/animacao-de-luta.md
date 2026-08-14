@@ -10,13 +10,23 @@ Cada choque sorteia um kit vivo de cada Freak (cabeça, tronco, braço E ou bra�
 2. Só **um de cada lado** entra: pulam ao mesmo tempo na prateleira (impacto no pouso) e **dão dois pulos** até o lugar do ataque, um de cada lado do centro. Os outros esperam fora do palco.
 3. **Anda** de perfil, pulando de verdade. Cada pulo: a mola **aperta** no chão, **impulsiona** e o brinquedo inteiro (base + Freak) **sai do chão** num arco; no ar a mola fica **solta**; ao cair, aperta um pouco mais e volta. Uma **sombra oval** fica no chão da mola (encolhe um pouco no ar). Embaixo dela, um **recorte mais escuro na madeira** (quase não some no pulo), para a mola parecer encaixada na prateleira. Parado, a mola fica pressionada. Braços e cabeça acompanham. Os dois do duelo ficam **na mesma altura do chão** e do **mesmo tamanho**, um pouco mais baixos na madeira da prateleira.
 
-Na luta, quem cobre quem é fixo (não usa o Z da ferramenta de ímãs). Da frente para trás:
+Na luta, quem cobre quem **não** usa o Z da ferramenta de ímãs. **1 fica na frente** (a mola é 5, atrás).
+
+**De frente** (parado na carta / início):
 
 1. Cabeça
-2. Braço direito
-3. Tronco
-4. Base-mola (atrás / embaixo)
-5. Braço esquerdo
+2. Braço esquerdo
+3. Braço direito
+4. Tronco
+5. Base-mola
+
+**De perfil** (andando e lutando):
+
+1. Braço direito
+2. Tronco
+3. Cabeça
+4. Braço esquerdo
+5. Base-mola
 
 Depois:
 

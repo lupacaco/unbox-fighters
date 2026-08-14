@@ -81,7 +81,7 @@ func _build() -> void:
 	_z_spin.step = 1
 	_z_spin.rounded = true
 	_z_spin.custom_minimum_size.x = 52
-	_z_spin.tooltip_text = "Só a carta. 1 fica na frente. A luta usa outra ordem."
+	_z_spin.tooltip_text = "Só a carta. 1 fica na frente. A luta tem ordem própria (frente e perfil)."
 	_z_spin.value_changed.connect(_on_z_changed)
 	top.add_child(_z_spin)
 

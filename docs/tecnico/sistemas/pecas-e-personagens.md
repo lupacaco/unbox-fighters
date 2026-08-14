@@ -84,7 +84,7 @@ A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 4 ki
    - a caixa escolhe o que ela é (cabeça, tronco, braço E/D, perna E/D)
    - **Virar** espelha a imagem
    - **Girar** gira o desenho 90°
-   - **Z** é a ordem da frente/trás **na carta**: **1 fica na frente**. Exemplo: cabeça 1, tronco 2 → a cabeça cobre o tronco. **Na luta** a ordem é outra e fixa: cabeça, braço direito, tronco, braço esquerdo.
+   - **Z** é a ordem da frente/trás **na carta**: **1 fica na frente**. Exemplo: cabeça 1, tronco 2 → a cabeça cobre o tronco. **Na luta** a ordem é outra: de frente (cabeça, braço E, braço D, tronco, mola) e de perfil (braço D, tronco, cabeça, braço E, mola).
    - **Imagem** escolhe um PNG/WEBP no computador. O jogo grava em **200×200** no lugar da peça.
    - **Ampliar** abre a peça grande. Roda do mouse amplia; botão direito arrasta a imagem; clique duas vezes na miniatura também abre.
 5. Arraste as bolinhas até o **centro das esferas de metal**:

@@ -70,8 +70,8 @@ func _ready() -> void:
 	_body_root.name = "BodyRoot"
 	_hop_root.add_child(_body_root)
 	var body_sprite := Sprite2D.new()
+	body_sprite.name = "Body"
 	body_sprite.centered = true
-	body_sprite.z_index = PartSlotType.fight_z_index(PartSlotType.Value.BODY)
 	_body_root.add_child(body_sprite)
 	_sprites[PartSlotType.Value.BODY] = body_sprite
 	for slot in [
@@ -82,13 +82,14 @@ func _ready() -> void:
 		PartSlotType.Value.HEAD,
 	]:
 		var joint := Node2D.new()
-		joint.z_index = PartSlotType.fight_z_index(slot)
+		joint.name = String(PartSlotType.to_string_name(slot))
 		_body_root.add_child(joint)
 		_joints[slot] = joint
 		var sprite := Sprite2D.new()
 		sprite.centered = true
 		joint.add_child(sprite)
 		_sprites[slot] = sprite
+	_apply_fight_z()
 	for slot in PartSlotType.shop_slots():
 		var tag := StatTag.new()
 		tag.position = TAG_OFFSETS[slot]
@@ -340,7 +341,6 @@ func _place_spring() -> void:
 	_spring.texture = _Spring.texture(_spring_pressed)
 	_spring.visible = true
 	_spring.scale = Vector2.ONE * _Spring.SCALE
-	_spring.z_index = _Spring.Z_INDEX
 	_spring.position = _spring_rest
 
 func _update_shadow() -> void:
@@ -512,7 +512,6 @@ func _layout_rig() -> void:
 	if not _walking and not _striking:
 		_body_root.rotation = 0.0
 	_place_sprite(PartSlotType.Value.BODY, _sprites[PartSlotType.Value.BODY], body_tex, Vector2.ZERO, body)
-	_sprites[PartSlotType.Value.BODY].z_index = PartSlotType.fight_z_index(PartSlotType.Value.BODY)
 	if body_tex != null:
 		_place_joint(
 			PartSlotType.Value.HEAD,
@@ -554,6 +553,21 @@ func _layout_rig() -> void:
 		)
 	_place_joint(PartSlotType.Value.LEG_L, Vector2.ZERO, null, Vector2.ZERO)
 	_place_joint(PartSlotType.Value.LEG_R, Vector2.ZERO, null, Vector2.ZERO)
+	_apply_fight_z()
+
+func _apply_fight_z() -> void:
+	var profile := _pose != Pose.FRONT
+	if _spring != null:
+		_spring.z_index = PartSlotType.fight_spring_z_index()
+	if _body_root != null:
+		_body_root.z_index = 2
+	var body_sprite: Sprite2D = _sprites.get(PartSlotType.Value.BODY)
+	if body_sprite != null:
+		body_sprite.z_index = PartSlotType.fight_z_index(PartSlotType.Value.BODY, profile)
+	for slot in _joints.keys():
+		var joint: Node2D = _joints[slot]
+		if joint != null:
+			joint.z_index = PartSlotType.fight_z_index(slot, profile)
 
 func _place_joint(slot: PartSlotType.Value, joint_pos: Vector2, texture: Texture2D, magnet: Vector2) -> void:
 	var joint: Node2D = _joints.get(slot)
@@ -562,7 +576,6 @@ func _place_joint(slot: PartSlotType.Value, joint_pos: Vector2, texture: Texture
 		return
 	var part := _part_def(slot)
 	joint.position = joint_pos
-	joint.z_index = PartSlotType.fight_z_index(slot)
 	_place_sprite(slot, sprite, texture, -magnet, part)
 	joint.visible = texture != null
 

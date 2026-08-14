@@ -32,6 +32,12 @@ func _run() -> void:
 	root.add_child(walker)
 	walker.setup_loadout(FighterLoadout.from_character(leao), false)
 	assert(walker.is_spring_pressed(), "Idle freak should keep the spring pressed")
+	_assert_cover_order(walker, [
+		"HopRoot/BodyRoot/head",
+		"HopRoot/BodyRoot/arm_l",
+		"HopRoot/BodyRoot/arm_r",
+		"HopRoot/BodyRoot/Body",
+	], "Front fight Z")
 	walker.set_pose(FighterPuppet.Pose.PROFILE)
 	var hops := [0]
 	walker.hopped.connect(func() -> void: hops[0] += 1)
@@ -44,6 +50,15 @@ func _run() -> void:
 	var hop_root := walker.get_node("HopRoot") as Node2D
 	assert(hop_root != null and hop_root.position.y < -8.0, "Whole toy should rise on the hop")
 	walker.set_pose(FighterPuppet.Pose.PROFILE)
+	_assert_cover_order(walker, [
+		"HopRoot/BodyRoot/arm_r",
+		"HopRoot/BodyRoot/Body",
+		"HopRoot/BodyRoot/head",
+		"HopRoot/BodyRoot/arm_l",
+	], "Profile fight Z")
+	var spring := walker.get_node("HopRoot/Spring") as CanvasItem
+	var body_root := walker.get_node("HopRoot/BodyRoot") as CanvasItem
+	assert(spring != null and body_root != null and spring.z_index < body_root.z_index, "Spring should sit behind the Freak")
 	walker.set_attacking(PartSlotType.Value.BODY)
 	assert(not is_zero_approx(walker.joint_rotation(PartSlotType.Value.ARM_R)), "Body clash should swing an arm")
 	assert(FightDir.ENTRY_HOPS == 2, "Approach the clash in two hops")
@@ -58,6 +73,15 @@ func _run() -> void:
 	_assert_hud_fits(AssemblyLayout.FIGHT_VS, Vector2(220, 52))
 	print("VERIFY_FIGHT_LINE_PASS y=", ys[0], " scale=", scales[0])
 	quit(0)
+
+func _assert_cover_order(puppet: Node, paths: Array[String], label: String) -> void:
+	var zs: Array[int] = []
+	for path in paths:
+		var node := puppet.get_node_or_null(path) as CanvasItem
+		assert(node != null, "%s missing %s" % [label, path])
+		zs.append(node.z_index)
+	for i in range(zs.size() - 1):
+		assert(zs[i] > zs[i + 1], "%s order failed at %s (%d) vs %s (%d)" % [label, paths[i], zs[i], paths[i + 1], zs[i + 1]])
 
 func _assert_hud_fits(center: Vector2, size: Vector2) -> void:
 	var top := center.y - size.y * 0.5

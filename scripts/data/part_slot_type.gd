@@ -48,23 +48,41 @@ static func default_draw_z(slot: Value) -> int:
 		_:
 			return 4
 
-## Palco: número maior fica na frente. Ordem pedida: cabeça, braço D, tronco, perna D, perna E, braço E.
-static func fight_z_index(slot: Value) -> int:
+## Palco: 1 fica na frente (igual à carta). Godot desenha o número maior por cima, então invertemos.
+## Perfil: braço D, tronco, cabeça, braço E, mola. Frente: cabeça, braço E, braço D, tronco, mola.
+static func fight_z_index(slot: Value, profile: bool = true) -> int:
+	return _fight_godot_z(_fight_rank(slot, profile))
+
+static func fight_spring_z_index() -> int:
+	return _fight_godot_z(5)
+
+static func _fight_rank(slot: Value, profile: bool) -> int:
+	if profile:
+		match slot:
+			Value.ARM_R:
+				return 1
+			Value.BODY:
+				return 2
+			Value.HEAD:
+				return 3
+			Value.ARM_L:
+				return 4
+			_:
+				return 5
 	match slot:
 		Value.HEAD:
-			return 5
-		Value.ARM_R:
-			return 4
-		Value.BODY:
-			return 3
-		Value.LEG_R:
-			return 2
-		Value.LEG_L:
 			return 1
 		Value.ARM_L:
-			return 0
+			return 2
+		Value.ARM_R:
+			return 3
+		Value.BODY:
+			return 4
 		_:
-			return 0
+			return 5
+
+static func _fight_godot_z(rank: int) -> int:
+	return 6 - rank
 
 static func draw_order_for(parts: Dictionary) -> Array[Value]:
 	var slots := visual_slots()
