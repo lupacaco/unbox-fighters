@@ -52,7 +52,7 @@ A loja lê `shop_parts()` (3 kits). Braços e pernas soltos **não** entram nas 
 
 ## Números atuais (teste)
 
-Só o **Leão** e o **Médico** estão na loja. As outras fichas (vampiro, policial, etc.) continuam na pasta, mas a loja as ignora (`ShopPool.ACTIVE_SET_IDS`).
+Na loja existem só dois Freaks: **Leão** e **Médico**.
 
 | Set | Kits | Total do set completo |
 |-----|------|------------------------|
@@ -113,4 +113,3 @@ Pasta: `data/parts/`
 | `leao_arm_*.tres`, `leao_leg_l/r.tres` | Só desenho (não vendidos) |
 | `medico_character.tres` + `medico_head/body/legs.tres` | Kits da loja (Médico) |
 | `medico_arm_*.tres`, `medico_leg_l/r.tres` | Só desenho (não vendidos) |
-| `vampiro_*`, `policial_*`, `bruxa_*`, `mumia_*`, `cachorro_*` | Sets antigos de 3 PNGs — desligados da loja |

@@ -53,8 +53,6 @@ Cada kit da loja tem **um** número de combate e um **nível** de loja.
 | Leão | 3 × 4 (nível 1) | 12 |
 | Médico | Cabeça 5 (nível 1), tronco 6 (nível 2), pernas 4 (nível 1) | 15 |
 
-Os outros Freaks (vampiro, policial, bruxa, múmia, cachorro) estão **desligados** da loja neste teste.
-
 Nível da loja pela força do kit: 3–5 → 1; 6 → 2; 7 → 3; 8 → 4; 9 → 5.
 
 ## Sinergia (na mesma carta)

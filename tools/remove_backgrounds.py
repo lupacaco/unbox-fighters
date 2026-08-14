@@ -19,10 +19,6 @@ def is_near_color(p, ref, tol):
     return all(abs(int(p[i]) - int(ref[i])) <= tol for i in range(3))
 
 
-def is_near_black(r, g, b, thr=28):
-    return r <= thr and g <= thr and b <= thr
-
-
 def flood_remove(im, predicate, neighbors8=True):
     """Set alpha=0 for edge-connected pixels matching predicate."""
     w, h = im.size
@@ -94,10 +90,6 @@ def remove_solid_bg(im, tol=28):
     return flood_remove(im, pred)
 
 
-def remove_black_bg(im, thr=22):
-    return flood_remove(im, lambda r, g, b, a: a < 10 or is_near_black(r, g, b, thr))
-
-
 def trim_transparent(im, pad=2):
     bbox = im.getbbox()
     if not bbox:
@@ -119,56 +111,10 @@ def process_ui(path, out_path):
     print(f"UI {os.path.basename(path)}: checker/solid removed~{n1}+{n2}, saved {out_path} {im.size}")
 
 
-def process_vamp(path, out_path):
-    im = Image.open(path).convert("RGBA")
-    n = remove_black_bg(im, thr=24)
-    # Soft fringe cleanup: kill near-black with low saturation still edge-ish leftover
-    w, h = im.size
-    px = im.load()
-    extra = 0
-    for y in range(h):
-        for x in range(w):
-            r, g, b, a = px[x, y]
-            if a == 0:
-                continue
-            # leftover anti-aliased dark fringe against old black bg
-            if r <= 18 and g <= 18 and b <= 18:
-                # only if majority of neighbors transparent
-                trans = 0
-                tot = 0
-                for dy in (-1, 0, 1):
-                    for dx in (-1, 0, 1):
-                        nx, ny = x + dx, y + dy
-                        if 0 <= nx < w and 0 <= ny < h:
-                            tot += 1
-                            if px[nx, ny][3] == 0:
-                                trans += 1
-                if tot and trans / tot >= 0.45:
-                    px[x, y] = (r, g, b, 0)
-                    extra += 1
-    im = trim_transparent(im)
-    im.save(out_path, "PNG")
-    print(f"VAMP {os.path.basename(path)}: removed~{n}+{extra}, saved {out_path} {im.size}")
-
-
 def main():
     ui_dir = os.path.join(ROOT, "ui")
     for name in ["frame_premium.png", "crate_premium.png", "shelf_premium.png"]:
         process_ui(os.path.join(ui_dir, name), os.path.join(ui_dir, name))
-
-    vamp_dir = os.path.join(ROOT, "characters", "vampiro")
-    mapping = [
-        "head.webp",
-        "body.webp",
-        "legs.webp",
-        "body_head.webp",
-        "body_legs.webp",
-        "full.webp",
-    ]
-    for name in mapping:
-        src = os.path.join(vamp_dir, name)
-        out = os.path.join(vamp_dir, name.replace(".webp", ".png"))
-        process_vamp(src, out)
 
     print("DONE")
 
