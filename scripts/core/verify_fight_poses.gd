@@ -21,5 +21,7 @@ func _run() -> void:
 	assert(not slot.can_fight())
 	var spring := slot.get_node("Display/Spring") as Sprite2D
 	assert(spring != null and spring.visible and spring.texture != null, "Empty card should show the spring")
+	var shade := slot.get_node_or_null("Display/SpringShadow") as Polygon2D
+	assert(shade != null and shade.visible, "Card spring should cast a ground shadow")
 	print("VERIFY_FIGHT_POSES_PASS")
 	quit(0)

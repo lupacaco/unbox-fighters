@@ -8,7 +8,6 @@ extends RefCounted
 const PART_WIDTH_PX := 200.0
 const PART_HEIGHT_PX := 200.0
 const PART_SIZE_PX := 200.0
-const FEET_DROP_PX := 118.0
 const BODY_ORIGIN := Vector2(0, -8)
 const _Spring := preload("res://scripts/data/spring_base.gd")
 

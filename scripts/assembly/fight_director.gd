@@ -11,6 +11,7 @@ signal finished
 const SHELF_Y := -148.0
 const LAND_X := 470.0
 const DUEL_X := 305.0
+const ENTRY_HOPS := 2
 const THROW_SEC := 0.34
 const BOOMERANG_SEC := 0.52
 const WRECK_IMPULSE := 1680.0
@@ -282,12 +283,12 @@ func _jump_walk_in(fighter: StageFighter, opponent: bool, heavy: bool, done: Cal
 	await _squash(fighter.visual, Vector2(1.04, 0.96), 0.1)
 	await _squash(fighter.visual, Vector2.ONE, 0.1)
 	var stand := _shelf_pos(opponent, DUEL_X)
-	await _walk_to(fighter, land, stand)
+	await _walk_to(fighter, land, stand, ENTRY_HOPS)
 	_face_on_stage(fighter)
 	if done.is_valid():
 		done.call()
 
-func _walk_to(fighter: StageFighter, from: Vector2, to: Vector2) -> void:
+func _walk_to(fighter: StageFighter, from: Vector2, to: Vector2, hops: int = 0) -> void:
 	from.y = _shelf_y()
 	to.y = _shelf_y()
 	var dist := from.distance_to(to)
@@ -305,7 +306,8 @@ func _walk_to(fighter: StageFighter, from: Vector2, to: Vector2) -> void:
 	fighter.puppet.hopped.connect(on_hop)
 	fighter.puppet.start_walk()
 	fighter.root.global_position = from
-	await _move_to(fighter.root, to, dist / WALK_PX_PER_SEC)
+	var duration := float(hops) / FighterPuppet.HOP_HZ if hops > 0 else dist / WALK_PX_PER_SEC
+	await _move_to(fighter.root, to, duration)
 	fighter.puppet.stop_walk()
 	if fighter.puppet.stepped.is_connected(on_step):
 		fighter.puppet.stepped.disconnect(on_step)

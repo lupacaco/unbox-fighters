@@ -31,6 +31,7 @@ var _joints: Dictionary = {}
 var _body_root: Node2D
 var _hop_root: Node2D
 var _spring: Sprite2D
+var _shadow: Polygon2D
 var _body_rest := CompositeResolver.BODY_ORIGIN
 var _spring_rest := Vector2.ZERO
 var _walking: bool = false
@@ -49,6 +50,9 @@ func _ready() -> void:
 	_hop_root = Node2D.new()
 	_hop_root.name = "HopRoot"
 	add_child(_hop_root)
+	_shadow = _Spring.make_shadow()
+	add_child(_shadow)
+	move_child(_shadow, 0)
 	_spring = Sprite2D.new()
 	_spring.name = "Spring"
 	_spring.centered = true
@@ -309,7 +313,7 @@ func visual_bottom_y() -> float:
 		var half_h := float(sprite.texture.get_height()) * absf(sprite.global_scale.y) * 0.5
 		lowest = maxf(lowest, sprite.global_position.y + half_h)
 	if lowest == -INF:
-		return global_position.y + CompositeResolver.FEET_DROP_PX
+		return global_position.y + _Spring.GROUND_Y
 	return lowest
 
 func is_spring_pressed() -> bool:
@@ -330,6 +334,14 @@ func _place_spring() -> void:
 	_spring.z_index = _Spring.Z_INDEX
 	_spring.position = _spring_rest
 
+func _update_shadow() -> void:
+	if _shadow == null:
+		return
+	_shadow.position = _Spring.shadow_position()
+	var look: Dictionary = _Spring.hop_shadow_look(maxf(0.0, -_hop_y), HOP_HEIGHT)
+	_shadow.scale = look["scale"]
+	_shadow.modulate.a = float(look["alpha"])
+
 func _reset_hop() -> void:
 	_hop_y = 0.0
 	_hop_squash = 1.0
@@ -343,6 +355,7 @@ func _apply_hop_transform() -> void:
 	_hop_root.scale = Vector2(2.0 - squash, squash)
 	_hop_root.rotation = _hop_lean
 	_hop_root.position = Vector2(0.0, _Spring.GROUND_Y * (1.0 - squash) + _hop_y)
+	_update_shadow()
 	if _body_root != null and not _walking:
 		_body_root.position.x = _body_rest.x
 		if not _striking:

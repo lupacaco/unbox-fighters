@@ -46,7 +46,10 @@ func _run() -> void:
 	walker.set_pose(FighterPuppet.Pose.PROFILE)
 	walker.set_attacking(PartSlotType.Value.BODY)
 	assert(not is_zero_approx(walker.joint_rotation(PartSlotType.Value.ARM_R)), "Body clash should swing an arm")
+	assert(FightDir.ENTRY_HOPS == 2, "Approach the clash in two hops")
 	assert(FightDir.DUEL_X >= 260.0, "Fighters should stand far enough to throw kits")
+	var shade := walker.get_node_or_null("SpringShadow") as Polygon2D
+	assert(shade != null and shade.visible, "Fight spring should cast a ground shadow")
 	_assert_hud_fits(AssemblyLayout.FIGHT_NAME_LEFT, Vector2(280, 54))
 	_assert_hud_fits(AssemblyLayout.FIGHT_HP_LEFT, Vector2(132, 78))
 	_assert_hud_fits(AssemblyLayout.FIGHT_VS, Vector2(220, 52))

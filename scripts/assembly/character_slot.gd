@@ -38,6 +38,7 @@ var _grip: Area2D
 var _card_motion: Tween
 var _drop_hot: bool = false
 var _spring: Sprite2D
+var _spring_shadow: Polygon2D
 
 func setup(def: CharacterDef = null, roster: Array[CharacterDef] = []) -> void:
 	character = def
@@ -318,8 +319,15 @@ func _ensure_layers() -> void:
 		_spring.name = "Spring"
 		_spring.centered = true
 		_display_root.add_child(_spring)
+	_spring_shadow = _display_root.get_node_or_null("SpringShadow") as Polygon2D
+	if _spring_shadow == null:
+		_spring_shadow = _Spring.make_shadow()
+		_display_root.add_child(_spring_shadow)
+	else:
+		_Spring.style_shadow(_spring_shadow)
 	_display_root.z_index = 1
-	_display_root.move_child(_spring, 0)
+	_display_root.move_child(_spring_shadow, 0)
+	_display_root.move_child(_spring, 1)
 	_spring.z_index = _Spring.Z_INDEX
 	_spring.visible = true
 	for leg_name in ["LegL", "LegR"]:
@@ -458,6 +466,9 @@ func _place_spring(plan: Dictionary) -> void:
 	_spring.scale = Vector2.ONE * spring_scale
 	_spring.z_index = _Spring.Z_INDEX
 	_display_root.z_index = 1
+	if _spring_shadow != null:
+		_Spring.style_shadow(_spring_shadow)
+		_spring_shadow.visible = true
 
 func _place_sprite(
 	sprite: Sprite2D,
