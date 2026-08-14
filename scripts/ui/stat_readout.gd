@@ -25,15 +25,12 @@ func set_from_loadout(loadout: FighterLoadout) -> void:
 	if loadout == null:
 		set_breakdown(0, 0, 0, 0)
 		return
-	_total_label.text = "C %d  T %d  BE %d  BD %d  PE %d  PD %d  ·  %d" % [
+	set_breakdown(
 		loadout.combat_value_of(PartSlotType.Value.HEAD),
 		loadout.combat_value_of(PartSlotType.Value.BODY),
-		loadout.combat_value_of(PartSlotType.Value.ARM_L),
-		loadout.combat_value_of(PartSlotType.Value.ARM_R),
-		loadout.combat_value_of(PartSlotType.Value.LEG_L),
-		loadout.combat_value_of(PartSlotType.Value.LEG_R),
-		loadout.total_power(),
-	]
+		loadout.combat_value_of(PartSlotType.Value.LEGS),
+		loadout.total_power()
+	)
 
 func set_complete(is_complete: bool) -> void:
 	_complete_glow.visible = is_complete

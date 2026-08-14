@@ -33,7 +33,7 @@ Arte e recursos (assets/, data/)
 | `PrepHud` / `ShopBar` / `StatTag` | PREP, pancadas, tags coloridas |
 | `DragDropService` | Arraste de peça, troca de carta, vender |
 | `Crate` / `PartView` / `CharacterSlot` | Caixa, peça, carta |
-| `CompositeResolver` | Cola as peças pelos ímãs |
+| `CompositeResolver` / `PartKit` | Cola os 6 desenhos pelos ímãs; o kit da loja vira esses desenhos |
 
 ## Organização dos scripts
 

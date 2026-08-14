@@ -6,7 +6,7 @@
 
 ## Ideia em uma frase
 
-Você abre caixas, monta Freaks (6 partes: cabeça, tronco, dois braços e duas pernas) e eles lutam sozinhos em fila contra bots.
+Você abre caixas, monta Freaks com **3 kits** (cabeça, tronco com os braços, pernas juntas) e eles lutam sozinhos em fila contra bots. Por baixo, o desenho ainda tem 6 membros, para andar e atacar como marionete.
 
 ## Loop principal
 

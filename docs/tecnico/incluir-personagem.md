@@ -4,7 +4,7 @@ Este é o jeito certo de colocar um Freak novo no jogo. Siga **todos** os passos
 
 As regras da loja, sinergia e luta (o que o jogador vê) estão em [Mecânicas e regras](../jogo/mecanicas-e-regras.md).
 
-O jogador manda uma folha de desenho. O jogo precisa de **12 peças** soltas (6 de frente + 6 de perfil), números de combate, e uma ficha do personagem. A loja **acha sozinha** qualquer ficha nova em `data/parts/` (depois filtra pelos sets ativos).
+O jogador manda uma folha de desenho. O jogo precisa de **12 recortes** (6 de frente + 6 de perfil) para animar, **3 fichas na loja** (cabeça, tronco com braços, pernas juntas), e uma ficha do personagem. A loja **acha sozinha** qualquer ficha nova em `data/parts/` (depois filtra pelos sets ativos).
 
 ## O que a folha precisa ter
 
@@ -31,7 +31,7 @@ Nome na carta: com acento se precisar (`Leão`).
 
 1. Menu **Project → Tools → Incluir personagem** (se o Godot estiver em português: **Projeto → Ferramentas**).
 2. Escolha a folha PNG ou WEBP.
-3. Preencha o id, o nome na carta e os 6 números.
+3. Preencha o id, o nome na carta e os **3 números** da loja (Cabeça, Tronco, Pernas).
 4. O Godot corta as 12 imagens, cria as fichas e abre a ferramenta de ímãs.
 
 ### B) Quando a folha chega no chat (assistente)
@@ -111,13 +111,13 @@ Grave os dois: `combat_value` e `tier`.
 
 ## 4. Fichas das peças e do personagem
 
-Seis peças em `data/parts/`:
+Doze recortes viram **6 fichas de desenho** + **1 kit de pernas da loja** + a ficha do personagem:
 
-- `{id}_head.tres` `{id}_body.tres` `{id}_arm_l.tres` `{id}_arm_r.tres` `{id}_leg_l.tres` `{id}_leg_r.tres`
+- Desenho: `{id}_head.tres` `{id}_body.tres` `{id}_arm_l.tres` `{id}_arm_r.tres` `{id}_leg_l.tres` `{id}_leg_r.tres`
+- Loja: `{id}_head.tres` `{id}_body.tres` `{id}_legs.tres` (as duas pernas juntas; sem PNG próprio)
+- Personagem: `{id}_character.tres`
 
-Uma ficha em `data/parts/{id}_character.tres`.
-
-A loja (`ShopPool`) lê as fichas `*_character.tres`. Para um teste com um set só, `ACTIVE_SET_IDS` lista esse id. Lista vazia = todos os sets.
+A loja (`ShopPool`) lê as fichas `*_character.tres` e vende só os 3 kits. Braços e pernas soltos não entram nas caixas. Para um teste com um set só, `ACTIVE_SET_IDS` lista esse id. Lista vazia = todos os sets.
 
 ## 5. Documentação
 
@@ -132,11 +132,11 @@ Atualize:
 
 - Os 12 PNG são 200 × 200 e têm transparência de verdade
 - Preto de dentro do desenho não sumiu
-- Play: peça na caixa, encaixa na carta, set completo (6 peças) mostra o nome certo
+- Play: kit na caixa (tronco já com braços, pernas juntas), encaixa na carta, set completo (3 kits) mostra o nome certo
 - Tronco tem 5 ímãs visíveis na ferramenta
 
 ## Sets que já passaram por este fluxo
 
 | id | Nome | Números |
 |----|------|---------|
-| `leao` | Leão | 4 em todas as 6 peças (teste, loja nível 1) |
+| `leao` | Leão | 4 nos 3 kits da loja (teste, loja nível 1, total 12) |

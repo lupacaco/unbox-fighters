@@ -25,7 +25,7 @@ static func resolve(character: CharacterDef, attached: Dictionary = {}) -> Dicti
 	if character == null:
 		return resolve_slots({})
 	var parts := {}
-	for slot in PartSlotType.all_slots():
+	for slot in PartSlotType.visual_slots():
 		var include := true
 		if attached.has(slot):
 			include = bool(attached[slot])
@@ -41,7 +41,7 @@ static func resolve_slots(parts: Dictionary, textures: Dictionary = {}) -> Dicti
 		"part_size_px": PART_SIZE_PX,
 	}
 	var tex := {}
-	for slot in PartSlotType.all_slots():
+	for slot in PartSlotType.visual_slots():
 		var part: PartDef = parts.get(slot)
 		var shown: Texture2D = textures.get(slot)
 		if shown == null and part != null:

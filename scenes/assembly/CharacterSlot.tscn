@@ -77,31 +77,13 @@ collision_mask = 0
 monitoring = false
 monitorable = false
 
-[node name="ArmL" type="Area2D" parent="Zones" unique_id=1138622940]
-collision_layer = 2
-collision_mask = 0
-monitoring = false
-monitorable = false
-
 [node name="Body" type="Area2D" parent="Zones" unique_id=925926322]
 collision_layer = 2
 collision_mask = 0
 monitoring = false
 monitorable = false
 
-[node name="ArmR" type="Area2D" parent="Zones" unique_id=990484069]
-collision_layer = 2
-collision_mask = 0
-monitoring = false
-monitorable = false
-
-[node name="LegL" type="Area2D" parent="Zones" unique_id=1165107613]
-collision_layer = 2
-collision_mask = 0
-monitoring = false
-monitorable = false
-
-[node name="LegR" type="Area2D" parent="Zones" unique_id=555557566]
+[node name="Legs" type="Area2D" parent="Zones" unique_id=1165107613]
 collision_layer = 2
 collision_mask = 0
 monitoring = false

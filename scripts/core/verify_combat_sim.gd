@@ -36,8 +36,8 @@ func _test_clash_leftover(leao: CharacterDef) -> bool:
 	if first.winning_side != CombatEvent.Side.LEFT or first.left_leftover != 2:
 		push_error("VERIFY_FAIL leftover should be 2")
 		return false
-	if result.damage_to_right != 12:
-		push_error("VERIFY_FAIL leftover should cap at 12, got %d" % result.damage_to_right)
+	if result.damage_to_right != 10:
+		push_error("VERIFY_FAIL leftover should be 10, got %d" % result.damage_to_right)
 		return false
 	return true
 

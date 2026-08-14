@@ -18,6 +18,16 @@ func _run() -> void:
 		push_error("VERIFY_FAIL full lion missing textures")
 		quit(1)
 		return
+	var body_kit := PartKit.expand_shop_part(leao.body)
+	if body_kit.size() != 3:
+		push_error("VERIFY_FAIL torso kit should draw torso + 2 arms")
+		quit(1)
+		return
+	var legs_kit := PartKit.expand_shop_part(leao.legs)
+	if legs_kit.size() != 2:
+		push_error("VERIFY_FAIL legs kit should draw both legs")
+		quit(1)
+		return
 	if not (positions[PartSlotType.Value.HEAD].y < positions[PartSlotType.Value.BODY].y):
 		push_error("VERIFY_FAIL head should sit above the torso")
 		quit(1)

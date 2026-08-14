@@ -295,12 +295,38 @@ def write_part_tres(
 	path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def write_character(parts_dir: Path, set_id: str, display_name: str) -> None:
+def write_legs_kit(parts_dir: Path, set_id: str, display_name: str, combat: int) -> None:
+	path = parts_dir / f"{set_id}_legs.tres"
+	tier = 1 if combat <= 5 else (2 if combat == 6 else (3 if combat == 7 else (4 if combat == 8 else 5)))
+	path.write_text(
+		"\n".join(
+			[
+				'[gd_resource type="Resource" script_class="PartDef" format=3]',
+				"",
+				'[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]',
+				"",
+				"[resource]",
+				'script = ExtResource("1")',
+				f'id = &"{set_id}_legs"',
+				f'display_name = "{display_name} Pernas"',
+				"slot_type = 6",
+				f'set_id = &"{set_id}"',
+				f"combat_value = {combat}",
+				f"tier = {tier}",
+				"",
+			]
+		),
+		encoding="utf-8",
+	)
+
+
+def write_character(parts_dir: Path, set_id: str, display_name: str, combat: int) -> None:
+	write_legs_kit(parts_dir, set_id, display_name, combat)
 	path = parts_dir / f"{set_id}_character.tres"
 	path.write_text(
 		"\n".join(
 			[
-				'[gd_resource type="Resource" script_class="CharacterDef" load_steps=8 format=3]',
+				'[gd_resource type="Resource" script_class="CharacterDef" load_steps=9 format=3]',
 				"",
 				'[ext_resource type="Script" path="res://scripts/data/character_def.gd" id="1"]',
 				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_head.tres" id="2"]',
@@ -309,6 +335,7 @@ def write_character(parts_dir: Path, set_id: str, display_name: str) -> None:
 				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_arm_r.tres" id="5"]',
 				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_leg_l.tres" id="6"]',
 				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_leg_r.tres" id="7"]',
+				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_legs.tres" id="8"]',
 				"",
 				"[resource]",
 				'script = ExtResource("1")',
@@ -320,6 +347,7 @@ def write_character(parts_dir: Path, set_id: str, display_name: str) -> None:
 				'arm_r = ExtResource("5")',
 				'leg_l = ExtResource("6")',
 				'leg_r = ExtResource("7")',
+				'legs = ExtResource("8")',
 				"",
 			]
 		),
@@ -383,7 +411,7 @@ def main() -> None:
 				report["front"][slot],
 				report["profile"][slot],
 			)
-		write_character(parts_dir, set_id, display_name)
+		write_character(parts_dir, set_id, display_name, args.value)
 	print("done")
 
 

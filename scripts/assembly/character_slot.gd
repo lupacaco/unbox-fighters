@@ -9,10 +9,7 @@ signal assembly_changed(slot: CharacterSlot)
 const TAG_OFFSETS := {
 	PartSlotType.Value.HEAD: Vector2(108, -150),
 	PartSlotType.Value.BODY: Vector2(108, -20),
-	PartSlotType.Value.ARM_L: Vector2(-108, -50),
-	PartSlotType.Value.ARM_R: Vector2(108, -50),
-	PartSlotType.Value.LEG_L: Vector2(-108, 110),
-	PartSlotType.Value.LEG_R: Vector2(108, 110),
+	PartSlotType.Value.LEGS: Vector2(108, 110),
 }
 
 @onready var _card_shadow: Sprite2D = $CardShadow
@@ -69,13 +66,13 @@ func set_queue_rank(rank: int) -> void:
 
 func to_loadout() -> FighterLoadout:
 	var loadout := FighterLoadout.new()
-	for slot in PartSlotType.all_slots():
+	for slot in PartSlotType.shop_slots():
 		loadout.set_part(slot, get_attached_part(slot))
 	return loadout
 
 func steal_all_parts() -> Dictionary:
 	var stolen := {}
-	for slot in PartSlotType.all_slots():
+	for slot in PartSlotType.shop_slots():
 		var view := detach_part(slot, false)
 		if view != null:
 			stolen[slot] = view
@@ -92,7 +89,7 @@ func receive_parts(parts: Dictionary) -> void:
 func find_part_at(global_point: Vector2) -> PartView:
 	if _fight_locked:
 		return null
-	for slot in PartSlotType.all_slots():
+	for slot in PartSlotType.shop_slots():
 		if not _bound_parts.has(slot):
 			continue
 		if _zone_contains(slot, global_point):
@@ -141,7 +138,7 @@ func contains_card_point(global_point: Vector2) -> bool:
 	return Rect2(Vector2(-135, -205), Vector2(270, 400)).has_point(to_local(global_point))
 
 func is_complete() -> bool:
-	for slot in PartSlotType.all_slots():
+	for slot in PartSlotType.shop_slots():
 		if get_attached_part(slot) == null:
 			return false
 	return true
@@ -165,9 +162,10 @@ func set_fight_locked(locked: bool) -> void:
 func attached_parts_can_fight() -> bool:
 	if not is_complete():
 		return false
-	for slot in PartSlotType.all_slots():
-		var part := get_attached_part(slot)
-		if part == null or not part.has_fight_poses():
+	var visual := PartKit.expand_shop_parts(_shop_parts_map())
+	for slot in PartSlotType.visual_slots():
+		var part: PartDef = visual.get(slot)
+		if part != null and part.sprite_profile == null:
 			return false
 	return true
 
@@ -181,7 +179,7 @@ func get_fighter_global_position() -> Vector2:
 	return _display_root.global_position
 
 func has_any_part() -> bool:
-	for slot in PartSlotType.all_slots():
+	for slot in PartSlotType.shop_slots():
 		if get_attached_part(slot) != null:
 			return true
 	return false
@@ -189,10 +187,7 @@ func has_any_part() -> bool:
 func can_accept(part: PartDef) -> bool:
 	if _fight_locked or part == null:
 		return false
-	for slot in PartSlotType.all_slots():
-		if part.slot_type == slot:
-			return true
-	return false
+	return PartSlotType.is_shop_slot(part.slot_type)
 
 func can_accept_at(part: PartDef, global_point: Vector2) -> bool:
 	if not can_accept(part):
@@ -303,6 +298,8 @@ func _layer_name(slot: PartSlotType.Value) -> String:
 			return "ArmR"
 		PartSlotType.Value.LEG_L:
 			return "LegL"
+		PartSlotType.Value.LEGS:
+			return "Legs"
 		_:
 			return "LegR"
 
@@ -320,14 +317,11 @@ func _ensure_layers() -> void:
 func _setup_zones() -> void:
 	var zones_root: Node2D = $Zones
 	var rects := {
-		PartSlotType.Value.HEAD: Rect2(-55, -198, 110, 85),
-		PartSlotType.Value.ARM_L: Rect2(-125, -108, 72, 105),
-		PartSlotType.Value.BODY: Rect2(-52, -108, 104, 125),
-		PartSlotType.Value.ARM_R: Rect2(53, -108, 72, 105),
-		PartSlotType.Value.LEG_L: Rect2(-120, 28, 115, 125),
-		PartSlotType.Value.LEG_R: Rect2(5, 28, 115, 125),
+		PartSlotType.Value.HEAD: Rect2(-95, -190, 190, 110),
+		PartSlotType.Value.BODY: Rect2(-105, -85, 210, 130),
+		PartSlotType.Value.LEGS: Rect2(-95, 45, 190, 120),
 	}
-	for slot in PartSlotType.all_slots():
+	for slot in PartSlotType.shop_slots():
 		var node_name := _layer_name(slot)
 		var zone := zones_root.get_node_or_null(node_name) as Area2D
 		if zone == null:
@@ -391,11 +385,14 @@ func _contains_point_expanded(global_point: Vector2) -> bool:
 	var local := to_local(global_point)
 	return Rect2(Vector2(-135, -205), Vector2(270, 400)).has_point(local)
 
+func _shop_parts_map() -> Dictionary:
+	var shop := {}
+	for slot in PartSlotType.shop_slots():
+		shop[slot] = get_attached_part(slot)
+	return shop
+
 func _refresh_display(animate: bool) -> void:
-	var parts := {}
-	for slot in PartSlotType.all_slots():
-		parts[slot] = get_attached_part(slot)
-	var plan := CompositeResolver.resolve_slots(parts)
+	var plan := CompositeResolver.resolve_slots(PartKit.expand_shop_parts(_shop_parts_map()))
 	var complete := is_complete()
 	_glow.visible = complete
 	_readout.set_complete(complete)
@@ -448,7 +445,7 @@ func _resolve_display_name() -> String:
 		if def == null:
 			continue
 		var same := true
-		for slot in PartSlotType.all_slots():
+		for slot in PartSlotType.shop_slots():
 			var attached := get_attached_part(slot)
 			var expected := def.get_part(slot)
 			if attached == null or expected == null or attached.id != expected.id:
@@ -484,7 +481,7 @@ func _ensure_rank_label() -> void:
 func _ensure_tags() -> void:
 	if not _tags.is_empty():
 		return
-	for slot in PartSlotType.all_slots():
+	for slot in PartSlotType.shop_slots():
 		var tag := StatTag.new()
 		tag.position = TAG_OFFSETS[slot]
 		add_child(tag)

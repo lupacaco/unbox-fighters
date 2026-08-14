@@ -11,14 +11,15 @@ func _run() -> void:
 	assert(is_equal_approx(scale, 1.0))
 	var c: CharacterDef = load("res://data/parts/leao_character.tres")
 	assert(c != null, "Missing lion")
-	for part in c.all_parts():
+	for part in c.visual_parts():
 		_assert_part_art(part)
-	assert(c.can_fight(), "Lion needs a side view on every part")
+	assert(c.can_fight(), "Lion needs a side view on every drawing")
+	assert(c.shop_parts().size() == 3)
 	var full := CompositeResolver.resolve(c)
 	assert(full["mode"] == "layered")
 	var textures: Dictionary = full["textures"]
 	var positions: Dictionary = full["positions"]
-	for slot in PartSlotType.all_slots():
+	for slot in PartSlotType.visual_slots():
 		assert(textures.get(slot) != null, "Missing texture %s" % slot)
 		assert(positions.has(slot), "Missing position %s" % slot)
 	assert(positions[PartSlotType.Value.HEAD].y < positions[PartSlotType.Value.BODY].y)

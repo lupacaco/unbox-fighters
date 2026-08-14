@@ -361,27 +361,34 @@ func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, cl
 	clash_r.show_plaque(false)
 	GameAudio.part_place()
 
-func _make_ghost(fighter: StageFighter, slot: PartSlotType.Value) -> Sprite2D:
-	var src := fighter.puppet.get_part_node(slot)
-	var ghost := Sprite2D.new()
-	ghost.texture = src.texture
-	ghost.centered = true
+func _make_ghost(fighter: StageFighter, slot: PartSlotType.Value) -> Node2D:
+	var ghost := Node2D.new()
 	ghost.z_index = 80
 	_stage.add_child(ghost)
-	ghost.global_position = src.global_position
-	ghost.global_scale = src.global_scale.abs()
-	ghost.flip_h = fighter.face_left
-	src.visible = false
+	ghost.global_position = fighter.puppet.kit_anchor(slot)
+	for visual in PartSlotType.visual_slots_for(slot):
+		var src := fighter.puppet.get_part_node(visual)
+		if src == null or src.texture == null:
+			continue
+		var copy := Sprite2D.new()
+		copy.texture = src.texture
+		copy.centered = true
+		ghost.add_child(copy)
+		copy.global_transform = src.global_transform
+		src.visible = false
 	return ghost
 
-func _return_ghost(ghost: Sprite2D, fighter: StageFighter, slot: PartSlotType.Value) -> void:
-	var src := fighter.puppet.get_part_node(slot)
-	await _jump_arc_scale(ghost, src.global_position, src.global_scale.abs(), 110.0, 0.48)
-	src.visible = true
+func _return_ghost(ghost: Node2D, fighter: StageFighter, slot: PartSlotType.Value) -> void:
+	var dest := fighter.puppet.kit_anchor(slot)
+	await _jump_arc_scale(ghost, dest, Vector2.ONE, 110.0, 0.48)
+	for visual in PartSlotType.visual_slots_for(slot):
+		var src := fighter.puppet.get_part_node(visual)
+		if src != null and not fighter.puppet.is_visual_dead(visual):
+			src.visible = true
 	if is_instance_valid(ghost):
 		ghost.queue_free()
 
-func _kill_ghost(fighter: StageFighter, slot: PartSlotType.Value, ghost: Sprite2D) -> void:
+func _kill_ghost(fighter: StageFighter, slot: PartSlotType.Value, ghost: Node2D) -> void:
 	fighter.puppet.set_part_dead(slot, true)
 	var mark := Label.new()
 	mark.text = "X"

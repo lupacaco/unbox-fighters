@@ -39,21 +39,29 @@ static func write_defs(set_id: String, display_name: String, values: Array) -> S
 		return "O id interno precisa ser minúsculo, sem acento. Exemplo: leao."
 	if display_name.strip_edges().is_empty():
 		display_name = set_id.capitalize()
-	if values.size() < 6:
-		return "Faltam os 6 números de combate."
+	if values.size() < 3:
+		return "Faltam os 3 números da loja (cabeça, tronco, pernas)."
 
+	var visual_values: Array = _visual_values(values)
+	var legs_value := int(values[2]) if values.size() == 3 else int(values[4])
 	var parts: Array[PartDef] = []
 	for i in SLOT_NAMES.size():
 		var slot_name: String = SLOT_NAMES[i]
 		var tex1 := load("res://assets/characters/%s/%s_%s-1.png" % [set_id, set_id, slot_name]) as Texture2D
 		if tex1 == null:
 			return "Ainda não achei as imagens de %s. Espere o Godot importar e tente de novo." % slot_name
-		var part := _make_part(set_id, display_name, slot_name, SLOT_TYPES[i], int(values[i]))
+		var part := _make_part(set_id, display_name, slot_name, SLOT_TYPES[i], int(visual_values[i]))
 		var path := "res://data/parts/%s_%s.tres" % [set_id, slot_name]
 		var save_err := ResourceSaver.save(part, path)
 		if save_err != OK:
 			return "Falha ao salvar %s" % path
 		parts.append(load(path) as PartDef)
+
+	var legs_kit := _make_legs_kit(set_id, display_name, legs_value)
+	var legs_path := "res://data/parts/%s_legs.tres" % set_id
+	var legs_err := ResourceSaver.save(legs_kit, legs_path)
+	if legs_err != OK:
+		return "Falha ao salvar %s" % legs_path
 
 	var character := CharacterDef.new()
 	character.id = StringName(set_id)
@@ -64,6 +72,7 @@ static func write_defs(set_id: String, display_name: String, values: Array) -> S
 	character.arm_r = parts[3]
 	character.leg_l = parts[4]
 	character.leg_r = parts[5]
+	character.legs = load(legs_path) as PartDef
 	var char_path := "res://data/parts/%s_character.tres" % set_id
 	var char_err := ResourceSaver.save(character, char_path)
 	if char_err != OK:
@@ -71,6 +80,21 @@ static func write_defs(set_id: String, display_name: String, values: Array) -> S
 
 	ShopPool.reload()
 	return ""
+
+static func _visual_values(values: Array) -> Array:
+	if values.size() >= 6:
+		return values
+	return [int(values[0]), int(values[1]), int(values[1]), int(values[1]), int(values[2]), int(values[2])]
+
+static func _make_legs_kit(set_id: String, display_name: String, combat_value: int) -> PartDef:
+	var part := PartDef.new()
+	part.id = StringName("%s_legs" % set_id)
+	part.display_name = "%s Pernas" % display_name
+	part.slot_type = PartSlotType.Value.LEGS
+	part.set_id = StringName(set_id)
+	part.combat_value = combat_value
+	part.tier = PartDef.tier_for(combat_value)
+	return part
 
 static func _make_part(
 	set_id: String,

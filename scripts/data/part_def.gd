@@ -166,6 +166,9 @@ func texture_for_pose(pose: int) -> Texture2D:
 
 func _validate_property(property: Dictionary) -> void:
 	var name := String(property.name)
+	if is_legs_kit() and (name.begins_with("magnet_") or name.begins_with("sprite")):
+		property.usage = PROPERTY_USAGE_NO_EDITOR
+		return
 	if name.begins_with("magnet_") and name.contains("profile"):
 		property.usage = PROPERTY_USAGE_NO_EDITOR
 		return
@@ -179,7 +182,4 @@ func _validate_property(property: Dictionary) -> void:
 				property.usage = PROPERTY_USAGE_NO_EDITOR
 		"magnet_down":
 			if slot_type != PartSlotType.Value.HEAD:
-				property.usage = PROPERTY_USAGE_NO_EDITOR
-		"sprite", "sprite_profile", "sprite_attack":
-			if is_legs_kit():
 				property.usage = PROPERTY_USAGE_NO_EDITOR

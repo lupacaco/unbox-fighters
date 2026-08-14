@@ -22,4 +22,6 @@ position = Vector2(8, 14)
 
 [node name="Sprite" type="Sprite2D" parent="." unique_id=1468578764]
 
+[node name="KitRoot" type="Node2D" parent="." unique_id=1882441101]
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1459853779]

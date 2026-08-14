@@ -2,55 +2,70 @@
 
 Como o jogo descreve personagens e decide o que desenhar na carta.
 
+## O que o jogador vê vs o desenho
+
+Na **loja** e na **carta** existem 3 kits:
+
+- **Cabeça**
+- **Tronco** = tronco + os dois braços (já vêm juntos)
+- **Pernas** = as duas pernas juntas
+
+O **desenho** ainda tem 6 recortes 200×200, para o Freak andar e atacar mexendo braços e pernas. `PartKit` (`scripts/data/part_kit.gd`) transforma o kit da loja nesses 6 desenhos.
+
 ## Tipos de dados
 
 ### `PartSlotType` (`scripts/data/part_slot_type.gd`)
 
-Seis encaixes: `HEAD`, `BODY`, `ARM_L`, `ARM_R`, `LEG_L`, `LEG_R`.
+- Loja / luta: `HEAD`, `BODY`, `LEGS`
+- Desenho: `HEAD`, `BODY`, `ARM_L`, `ARM_R`, `LEG_L`, `LEG_R`
 
-Esquerda/direita = lado **de quem olha** o desenho de frente.
+Esquerda/direita no desenho = lado **de quem olha** a frente.
 
 ### `PartDef` (`scripts/data/part_def.gd`)
 
-Recurso de **uma peça**:
+Recurso de **uma peça** (kit da loja ou recorte de desenho):
 
 - `id`, `display_name`
-- `slot_type` (um dos 6 encaixes)
+- `slot_type`
 - `set_id` (hoje o teste usa `leao`)
-- `sprite` — frente (pose 1)
-- `sprite_profile` — perfil (pose 2). Precisa existir para a luta.
-- `sprite_attack` — golpe (opcional; se faltar, a luta usa o perfil)
-- `combat_value` — número da peça
-- `tier` — nível da loja em que a peça pode aparecer
+- `sprite` — frente (pose 1). O kit de pernas da loja **não** tem PNG próprio.
+- `sprite_profile` — perfil (pose 2). Precisa existir nos 6 desenhos para a luta.
+- `combat_value` — número do kit na loja
+- `tier` — nível da loja em que o kit pode aparecer
 - **Ímãs** (pontos de união, em pixels a partir do centro da imagem 200×200):
   - Cabeça: `magnet_down` (esfera na base do pescoço)
   - Braço / perna: `magnet_up` (esfera no topo)
   - Tronco: **5 ímãs** — `magnet_neck`, `magnet_shoulder_l`, `magnet_shoulder_r`, `magnet_hip_l`, `magnet_hip_r`
   - Frente e perfil podem ser diferentes (`magnet_*_profile`)
 
+A luta **não** usa pose de golpe. O ataque mexe os membros no palco.
+
 ### `CharacterDef` (`scripts/data/character_def.gd`)
 
 Recurso de **um personagem**:
 
 - `id`, `display_name`
-- Referências `head`, `body`, `arm_l`, `arm_r`, `leg_l`, `leg_r`
+- Desenho: `head`, `body`, `arm_l`, `arm_r`, `leg_l`, `leg_r`
+- Loja: `head`, `body`, `legs` (kit das duas pernas)
+
+A loja lê `shop_parts()` (3 kits). Braços e pernas soltos **não** entram nas caixas.
 
 ## Números atuais (teste)
 
 Só o **Leão** está na loja. As outras fichas (vampiro, policial, etc.) continuam na pasta, mas a loja as ignora (`ShopPool.ACTIVE_SET_IDS = ["leao"]`).
 
-| Set | Cada peça | Total do set completo |
-|-----|-----------|------------------------|
-| Leão | 4 (nível 1) | 24 |
+| Set | Cada kit | Total do set completo |
+|-----|----------|------------------------|
+| Leão | 4 (nível 1) | 12 |
 
-A sinergia (6 iguais = 100%, 3–5 = 75%, 1–2 = 50%) está em `scripts/match/synergy.gd`.
+A sinergia (3 iguais = 100%, 2 = 75%, 1 = 50%) está em `scripts/match/synergy.gd`.
 
 A loja lê sozinha as fichas `*_character.tres` em `data/parts/`, e depois filtra pelos ids ativos.
 
 ## Como marcar os ímãs
 
 1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**).
-2. Clique na peça em `data/parts/`, ex.: `leao_body.tres`.
+2. Clique no **desenho** em `data/parts/`, ex.: `leao_body.tres` (não no kit `leao_legs.tres`).
 3. Escolha **Frente** ou **De lado**.
 4. Arraste as bolinhas até o **centro das esferas de metal**:
    - Cabeça: **BAIXO**
@@ -58,7 +73,7 @@ A loja lê sozinha as fichas `*_character.tres` em `data/parts/`, e depois filtr
    - Tronco: **PESCOÇO**, **OMBRO E**, **OMBRO D**, **QUADRIL E**, **QUADRIL D**
 5. Salve (`Ctrl+S`).
 
-A mesma ferramenta aparece no Inspetor, com o botão **Abrir ferramenta de ímãs (imagem grande)**. Na janela grande dá para misturar as 6 peças e ver se os encaixes batem.
+A mesma ferramenta aparece no Inspetor, com o botão **Abrir ferramenta de ímãs (imagem grande)**. Na janela grande dá para misturar os 6 desenhos e ver se os encaixes batem.
 
 Marque **frente e perfil**. A carta usa a frente; a luta usa o perfil.
 
@@ -92,5 +107,6 @@ Pasta: `data/parts/`
 
 | Arquivo | Conteúdo |
 |---------|----------|
-| `leao_character.tres` + `leao_*.tres` | Leão (único set ativo na loja) |
-| `vampiro_*`, `policial_*`, `bruxa_*`, `mumia_*`, `medico_*`, `cachorro_*` | Sets antigos de 3 peças — desligados da loja |
+| `leao_character.tres` + `leao_head/body/legs.tres` | Kits da loja (Leão) |
+| `leao_arm_*.tres`, `leao_leg_l/r.tres` | Só desenho (não vendidos) |
+| `vampiro_*`, `policial_*`, `bruxa_*`, `mumia_*`, `medico_*`, `cachorro_*` | Sets antigos de 3 PNGs — desligados da loja |

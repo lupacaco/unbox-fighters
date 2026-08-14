@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://c2i8i6homfw00" path="res://scripts/assembly/assembly_controller.gd" id="1"]
 [ext_resource type="Script" uid="uid://btyepuuc3404r" path="res://scripts/ui/background_fx.gd" id="2"]
 [ext_resource type="Script" uid="uid://dlxuaogko1lqp" path="res://scripts/assembly/drag_drop_service.gd" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/assembly/CharacterSlot.tscn" id="4"]
-[ext_resource type="PackedScene" path="res://scenes/assembly/Crate.tscn" id="5"]
+[ext_resource type="PackedScene" uid="uid://b7sgdo30ttuoq" path="res://scenes/assembly/CharacterSlot.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://bybfdwqe4xpfp" path="res://scenes/assembly/Crate.tscn" id="5"]
 [ext_resource type="Texture2D" uid="uid://dggow7pil84dp" path="res://assets/ui/bg_premium.png" id="6"]
 [ext_resource type="Texture2D" uid="uid://cluxunvn3e03k" path="res://assets/ui/shelf_premium.png" id="7"]
 

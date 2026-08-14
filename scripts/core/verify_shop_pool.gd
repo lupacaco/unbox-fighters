@@ -5,13 +5,17 @@ func _init() -> void:
 
 func _run() -> void:
 	var pool := ShopPool.parts_up_to_tier(1)
-	if pool.size() != 6:
-		push_error("VERIFY_FAIL shop level 1 should sell the 6 lion parts, got %d" % pool.size())
+	if pool.size() != 3:
+		push_error("VERIFY_FAIL shop level 1 should sell the 3 lion kits, got %d" % pool.size())
 		quit(1)
 		return
 	for part in pool:
 		if String(part.set_id) != "leao" or part.tier != 1 or part.combat_value != 4:
 			push_error("VERIFY_FAIL unexpected shop part: %s" % part.id)
+			quit(1)
+			return
+		if not PartSlotType.is_shop_slot(part.slot_type):
+			push_error("VERIFY_FAIL shop sold a visual limb: %s" % part.id)
 			quit(1)
 			return
 	var roster := ShopPool.roster()
@@ -20,7 +24,7 @@ func _run() -> void:
 		quit(1)
 		return
 	var high := ShopPool.parts_up_to_tier(5)
-	if high.size() != 6:
+	if high.size() != 3:
 		push_error("VERIFY_FAIL other freaks should stay out of the shop")
 		quit(1)
 		return

@@ -39,6 +39,14 @@ func shop_parts() -> Array[PartDef]:
 			list.append(part)
 	return list
 
+func visual_parts() -> Array[PartDef]:
+	var list: Array[PartDef] = []
+	for slot in PartSlotType.visual_slots():
+		var part := get_part(slot)
+		if part != null and part not in list:
+			list.append(part)
+	return list
+
 func all_parts() -> Array[PartDef]:
 	return shop_parts()
 

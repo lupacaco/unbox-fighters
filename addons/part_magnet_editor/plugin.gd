@@ -59,7 +59,7 @@ func _begin_import() -> void:
 		_file_dialog = EditorFileDialog.new()
 		_file_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
 		_file_dialog.access = EditorFileDialog.ACCESS_FILESYSTEM
-		_file_dialog.add_filter("*.png, *.webp", "Folha com 6 partes de frente e 6 de perfil")
+		_file_dialog.add_filter("*.png, *.webp", "Folha com 6 desenhos de frente e 6 de perfil")
 		_file_dialog.file_selected.connect(_on_sheet_chosen)
 		EditorInterface.get_base_control().add_child(_file_dialog)
 	_file_dialog.popup_file_dialog()
@@ -83,13 +83,13 @@ func _build_form() -> void:
 	_form.add_child(box)
 	box.add_child(_labeled_edit("Id interno (ex: leao)", true))
 	box.add_child(_labeled_edit("Nome na carta (ex: Leão)", false))
-	var labels: PackedStringArray = ["Cabeça", "Tronco", "Braço E", "Braço D", "Perna E", "Perna D"]
+	var labels: PackedStringArray = ["Cabeça", "Tronco", "Pernas"]
 	_value_spins.clear()
 	for i in labels.size():
 		box.add_child(_labeled_spin(labels[i]))
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.text = "A folha precisa ter 6 partes de frente à esquerda e 6 de perfil à direita. Cada peça vai para um quadrado 200×200. Depois marque os ímãs nas esferas: Projeto → Ferramentas → Ímãs das Peças."
+	hint.text = "A folha precisa ter 6 partes de frente à esquerda e 6 de perfil à direita (12 recortes). Na loja entram só 3 kits: cabeça, tronco com os dois braços, e as duas pernas juntas. Depois marque os ímãs nas 6 imagens: Projeto → Ferramentas → Ímãs das Peças."
 	box.add_child(hint)
 	EditorInterface.get_base_control().add_child(_form)
 

@@ -24,7 +24,7 @@ Ele usa um **pool** de 8 players (reaproveita canais) para vários sons ao mesmo
 | `part_pickup` | `part_pickup.wav` | Começa a arrastar uma peça |
 | `part_place` | `part_place.wav` | Peça encaixa na carta |
 | `part_reject` | `part_reject.wav` | Soltou no lugar errado / voltou |
-| `fighter_complete` | `fighter_complete.wav` | Carta completa (6 peças) e impacto do choque na luta |
+| `fighter_complete` | `fighter_complete.wav` | Carta completa (3 kits) e impacto do choque na luta |
 
 ## Gerar de novo
 

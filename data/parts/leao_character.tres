@@ -7,6 +7,7 @@
 [ext_resource type="Resource" uid="uid://uxqv11p8s620" path="res://data/parts/leao_arm_r.tres" id="5"]
 [ext_resource type="Resource" path="res://data/parts/leao_leg_l.tres" id="6"]
 [ext_resource type="Resource" path="res://data/parts/leao_leg_r.tres" id="7"]
+[ext_resource type="Resource" path="res://data/parts/leao_legs.tres" id="8"]
 
 [resource]
 script = ExtResource("1")
@@ -18,3 +19,4 @@ arm_l = ExtResource("4")
 arm_r = ExtResource("5")
 leg_l = ExtResource("6")
 leg_r = ExtResource("7")
+legs = ExtResource("8")

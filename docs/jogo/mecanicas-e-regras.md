@@ -31,53 +31,52 @@ Há **1 jogador + 3 bots** (Sombra, Ferrugem, Névoa). HP inicial **40**. Não e
 
 - 3 cartas, da esquerda para a direita: **3º**, **2º**, **1º**.
 - O **1º** (direita) luta primeiro.
-- Pode ir incompleto (só uma perna, por exemplo). Carta vazia é pulada.
+- Pode ir incompleto (só a cabeça, por exemplo). Carta vazia é pulada.
 - Arrastar o Freak pelo rótulo **3º/2º/1º** troca a ordem com outra carta.
 
 ## Peças
 
-Cada peça ocupa **um** tipo de encaixe:
+Na caixa e na carta existem só **3 kits**. Cada um ocupa um encaixe:
 
-| Tipo | Significado | Tag |
-|------|-------------|-----|
+| Tipo | O que o jogador recebe | Tag |
+|------|------------------------|-----|
 | HEAD | Cabeça | Azul |
-| BODY | Tronco | Roxo |
-| ARM_L | Braço esquerdo (de quem olha) | Laranja |
-| ARM_R | Braço direito | Vermelho-claro |
-| LEG_L | Perna esquerda | Verde |
-| LEG_R | Perna direita | Verde-água |
+| BODY | Tronco **com os dois braços já grudados** (não se separam) | Roxo |
+| LEGS | As **duas pernas juntas** (não se separam) | Verde |
 
-Cada peça tem **um** número de combate e um **nível** de loja.
+Por baixo, o desenho ainda tem 6 recortes 200×200 (cabeça, tronco, 2 braços, 2 pernas), colados nas esferas de metal. Isso serve para o Freak **andar e atacar** mexendo os membros.
 
-| Set | Peças | Total |
-|-----|-------|-------|
-| Leão (único na loja agora) | 6 × 4 | 24 |
+Cada kit da loja tem **um** número de combate e um **nível** de loja.
+
+| Set | Kits | Total |
+|-----|------|-------|
+| Leão (único na loja agora) | 3 × 4 | 12 |
 
 Os outros Freaks (vampiro, policial, bruxa, múmia, médico, cachorro) estão **desligados** da loja neste teste.
 
-Nível da loja pela força da peça: 3–5 → 1; 6 → 2; 7 → 3; 8 → 4; 9 → 5.
+Nível da loja pela força do kit: 3–5 → 1; 6 → 2; 7 → 3; 8 → 4; 9 → 5.
 
 ## Sinergia (na mesma carta)
 
-Conta quantas peças do **mesmo set** estão na carta. Arredonda para cima.
+Conta quantos kits do **mesmo set** estão na carta. Arredonda para cima.
 
-- 6 iguais: 100%
-- 3, 4 ou 5 iguais: 75%
-- 1 ou 2: 50%
+- 3 iguais: 100%
+- 2 iguais: 75%
+- 1: 50%
 
-Exemplo: cabeça 4 sozinha vira **2**. Completar as 6 ainda vale muito mais.
+Exemplo: cabeça 4 sozinha vira **2**. Completar as 3 ainda vale o número cheio (12 no leão).
 
 ## Luta
 
-Ordem do choque: cabeça, braço E, braço D, tronco, perna E, perna D. Pula o que estiver vazio.
+Ordem do choque: **cabeça → tronco → pernas**. Pula o que estiver vazio.
 
 - Se A > B: B morre, A fica A−B e segue.
-- Se empatar: as duas partes morrem.
+- Se empatar: os dois kits morrem.
 - Quando o Freak inteiro cai, entra o próximo da fila.
 
 Dano no HP do perdedor = soma do que sobrou em cada Freak vivo do vencedor, **no máximo 12 por Freak**.
 
-Na tela: os Freaks **pulam** da carta para a prateleira, **andam** até a fila (todos na **mesma altura**, ninguém mais à frente, **mesmo tamanho**), e no choque a peça **gira, cresce e voa ao centro**. Placas douradas mostram os números; o vencedor fica com o **resto** (9 contra 5 → 4). Quem perde leva **X** vermelho. Freak inteiro cai → **KO**. As cartas **sobem e somem** durante a batalha e voltam depois.
+Na tela: os Freaks **pulam** da carta para a prateleira, **andam** com passos nas pernas (braços balançam um pouco), todos na **mesma altura**, **mesmo tamanho**. No choque o kit **gira, cresce e voa ao centro**. O boneco também **mexe o membro** do golpe (soco, chute ou um avanço da cabeça). Placas douradas mostram os números; o vencedor fica com o **resto**. Quem perde leva **X** vermelho e some o kit inteiro (cabeça, ou tronco+braços, ou as duas pernas). Freak inteiro cai → **KO**. As cartas **sobem e somem** durante a batalha e voltam depois.
 
 ## Controles
 
