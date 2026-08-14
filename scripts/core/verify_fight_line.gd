@@ -2,6 +2,8 @@ extends SceneTree
 
 ## Every fighter in the queue uses the same floor Y and the same scale.
 
+const FightDir := preload("res://scripts/assembly/fight_director.gd")
+
 func _init() -> void:
 	call_deferred("_run")
 
@@ -35,5 +37,6 @@ func _run() -> void:
 	walker.set_pose(FighterPuppet.Pose.PROFILE)
 	walker.set_attacking(PartSlotType.Value.BODY)
 	assert(not is_zero_approx(walker.joint_rotation(PartSlotType.Value.ARM_R)), "Body clash should swing an arm")
+	assert(FightDir.DUEL_X >= 260.0, "Fighters should stand far enough to throw kits")
 	print("VERIFY_FIGHT_LINE_PASS y=", ys[0], " scale=", scales[0])
 	quit(0)

@@ -3,15 +3,20 @@ extends Node
 
 ## Plays a simulated queue fight on the shelf: one pair at a time, walk in, clash, KO.
 
+const KitThrow := preload("res://scripts/assembly/thrown_kit.gd")
+
 signal finished
 
 ## All fighters share this one floor line (same Y). Never shift it per freak.
 const SHELF_Y := -148.0
-const LAND_X := 420.0
-const DUEL_X := 125.0
+const LAND_X := 470.0
+const DUEL_X := 305.0
+const THROW_SEC := 0.34
+const BOOMERANG_SEC := 0.52
+const WRECK_IMPULSE := 980.0
+const SHELF_HALF := 850.0
 const OPPONENT_ENTER := Vector2(2040, 400)
 const WALK_PX_PER_SEC := 280.0
-const LUNGE_PX := 82.0
 const JUMP_SEC := 0.5
 const JUMP_HEIGHT := 260.0
 const CAMERA_FIGHT_ZOOM := Vector2(1.12, 1.12)
@@ -37,6 +42,7 @@ var _spark_fx: CPUParticles2D
 var _flash_poly: Polygon2D
 var _burst_poly: Polygon2D
 var _slash: Line2D
+var _shock: Line2D
 var _left: Array[StageFighter] = []
 var _right: Array[StageFighter] = []
 var _lifted: Dictionary = {}
@@ -81,6 +87,7 @@ func play(
 	_stage.name = "FightStage"
 	_stage.y_sort_enabled = false
 	_fx.add_child(_stage)
+	_ensure_physics_shelf()
 
 	_left = _build_line(result.left if result != null else BoardLoadout.new(), false, slots)
 	_right = _build_line(opponent_board, true, slots)
@@ -309,11 +316,10 @@ func _face_on_stage(fighter: StageFighter) -> void:
 func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, clash_l: FightPlaque, clash_r: FightPlaque) -> void:
 	if left == null or right == null:
 		return
-	var stand_l := _shelf_pos(false, DUEL_X)
-	var stand_r := _shelf_pos(true, DUEL_X)
-	left.root.global_position.y = _shelf_y()
-	right.root.global_position.y = _shelf_y()
-	var mid := (stand_l + stand_r) * 0.5
+	left.root.global_position = _shelf_pos(false, DUEL_X)
+	right.root.global_position = _shelf_pos(true, DUEL_X)
+	_face_on_stage(left)
+	_face_on_stage(right)
 	clash_l.global_position = AssemblyLayout.FIGHT_CLASH + Vector2(-120, 0)
 	clash_r.global_position = AssemblyLayout.FIGHT_CLASH + Vector2(120, 0)
 	clash_l.set_fill(ThemeTokens.color_for_slot(event.left_slot))
@@ -326,121 +332,137 @@ func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, cl
 	clash_r.show_plaque(true)
 	clash_l.punch()
 	clash_r.punch()
-	var hit := [false]
-	var on_hit := func() -> void:
-		hit[0] = true
-	_clear_struck(left)
-	_clear_struck(right)
-	left.puppet.struck.connect(on_hit)
-	right.puppet.struck.connect(on_hit)
-	var done := [0]
-	_lunge_and_strike(left, stand_l.move_toward(mid, LUNGE_PX), event.left_slot, func() -> void: done[0] += 1)
-	_lunge_and_strike(right, stand_r.move_toward(mid, LUNGE_PX), event.right_slot, func() -> void: done[0] += 1)
-	while not hit[0] and done[0] < 2:
-		await get_tree().process_frame
-	if hit[0]:
-		await _clash_impact(left, right, event, mid)
-	while done[0] < 2:
-		await get_tree().process_frame
-	_clear_struck(left)
-	_clear_struck(right)
+	Feel.punch(left.visual, Vector2(0.9, 1.1), Vector2.ONE)
+	Feel.punch(right.visual, Vector2(0.9, 1.1), Vector2.ONE)
+	await _windup_pair(left, event.left_slot, right, event.right_slot)
+	left.puppet.snap_rest()
+	right.puppet.snap_rest()
+	var kit_l := _spawn_thrown_kit(left, event.left_slot)
+	var kit_r := _spawn_thrown_kit(right, event.right_slot)
+	_recoil_pair(left, event.left_slot, right, event.right_slot)
+	var meet := (kit_l.global_position + kit_r.global_position) * 0.5
+	kit_l.launch_toward(meet, THROW_SEC)
+	kit_r.launch_toward(meet, THROW_SEC)
+	var hit := await _wait_kit_hit(kit_l, kit_r, meet)
+	if not hit:
+		kit_l.global_position = meet + Vector2(-36.0, 0.0)
+		kit_r.global_position = meet + Vector2(36.0, 0.0)
+	kit_l.linear_velocity = Vector2.ZERO
+	kit_r.linear_velocity = Vector2.ZERO
+	kit_l.angular_velocity = 0.0
+	kit_r.angular_velocity = 0.0
+	kit_l.freeze = true
+	kit_r.freeze = true
+	kit_l.flash_hit()
+	kit_r.flash_hit()
+	await _clash_impact(left, right, event, meet)
 	var left_dies := event.winning_side != CombatEvent.Side.LEFT
 	var right_dies := event.winning_side != CombatEvent.Side.RIGHT
 	if left_dies:
-		await _break_kit(left, event.left_slot)
 		clash_l.set_fill(Color(0.28, 0.08, 0.1, 0.95))
 		clash_l.set_label_color(ThemeTokens.X_RED)
 	else:
 		clash_l.set_text(str(event.left_leftover))
 		clash_l.punch()
-		left.puppet.set_tag_value(event.left_slot, event.left_leftover)
 	if right_dies:
-		await _break_kit(right, event.right_slot)
 		clash_r.set_fill(Color(0.28, 0.08, 0.1, 0.95))
 		clash_r.set_label_color(ThemeTokens.X_RED)
 	else:
 		clash_r.set_text(str(event.right_leftover))
 		clash_r.punch()
-		right.puppet.set_tag_value(event.right_slot, event.right_leftover)
-	if left_dies or right_dies:
-		GameAudio.impact()
-	await get_tree().create_timer(0.12).timeout
-	var recover := [0]
-	if left.puppet.has_living_part():
-		_recover_stand(left, stand_l, func() -> void: recover[0] += 1)
-	else:
-		recover[0] += 1
-	if right.puppet.has_living_part():
-		_recover_stand(right, stand_r, func() -> void: recover[0] += 1)
-	else:
-		recover[0] += 1
-	while recover[0] < 2:
+	var resolved := [0]
+	_resolve_thrown_kit(kit_l, left, event.left_slot, left_dies, event.left_leftover, func() -> void: resolved[0] += 1)
+	_resolve_thrown_kit(kit_r, right, event.right_slot, right_dies, event.right_leftover, func() -> void: resolved[0] += 1)
+	while resolved[0] < 2:
 		await get_tree().process_frame
 	clash_l.show_plaque(false)
 	clash_r.show_plaque(false)
 
-func _clear_struck(fighter: StageFighter) -> void:
-	if fighter == null or fighter.puppet == null or not is_instance_valid(fighter.puppet):
-		return
-	for conn in fighter.puppet.struck.get_connections():
-		fighter.puppet.struck.disconnect(conn["callable"])
-
-func _lunge_and_strike(fighter: StageFighter, lunge: Vector2, slot: PartSlotType.Value, done: Callable) -> void:
-	lunge.y = _shelf_y()
-	var flags := {"move": false, "strike": false}
-	_finish_lunge(fighter, lunge, flags)
-	_finish_strike(fighter, slot, flags)
-	while not flags.move or not flags.strike:
+func _windup_pair(left: StageFighter, left_slot: PartSlotType.Value, right: StageFighter, right_slot: PartSlotType.Value) -> void:
+	var done := [0]
+	_windup_one(left, left_slot, func() -> void: done[0] += 1)
+	_windup_one(right, right_slot, func() -> void: done[0] += 1)
+	while done[0] < 2:
 		await get_tree().process_frame
+
+func _windup_one(fighter: StageFighter, slot: PartSlotType.Value, done: Callable) -> void:
+	await fighter.puppet.play_throw_windup(slot)
 	if done.is_valid():
 		done.call()
 
-func _finish_lunge(fighter: StageFighter, lunge: Vector2, flags: Dictionary) -> void:
-	await _lunge_to(fighter.root, lunge, 0.28)
-	flags.move = true
+func _recoil_pair(left: StageFighter, left_slot: PartSlotType.Value, right: StageFighter, right_slot: PartSlotType.Value) -> void:
+	left.puppet.play_throw_recoil(left_slot)
+	right.puppet.play_throw_recoil(right_slot)
 
-func _finish_move(fighter: StageFighter, lunge: Vector2, flags: Dictionary) -> void:
-	await _move_to(fighter.root, lunge, 0.22)
-	flags.move = true
+func _spawn_thrown_kit(fighter: StageFighter, slot: PartSlotType.Value) -> KitThrow:
+	var kit := KitThrow.new()
+	_stage.add_child(kit)
+	kit.setup_from_puppet(fighter.puppet, slot, fighter.face_left)
+	fighter.puppet.detach_kit(slot)
+	return kit
 
-func _finish_strike(fighter: StageFighter, slot: PartSlotType.Value, flags: Dictionary) -> void:
-	await fighter.puppet.play_strike(slot)
-	flags.strike = true
+func _wait_kit_hit(kit_l: KitThrow, kit_r: KitThrow, meet: Vector2) -> bool:
+	var hit := [false]
+	var on_hit := func() -> void:
+		hit[0] = true
+	kit_l.collided.connect(on_hit)
+	kit_r.collided.connect(on_hit)
+	var waited := 0.0
+	while not hit[0] and waited < THROW_SEC + 0.28:
+		await get_tree().physics_frame
+		waited += get_physics_process_delta_time()
+		if kit_l.global_position.distance_to(kit_r.global_position) <= 118.0:
+			hit[0] = true
+			break
+		if kit_l.global_position.distance_to(meet) < 28.0 and kit_r.global_position.distance_to(meet) < 28.0:
+			hit[0] = true
+			break
+	return hit[0]
 
-func _recover_stand(fighter: StageFighter, stand: Vector2, done: Callable) -> void:
-	if fighter == null or fighter.down or not is_instance_valid(fighter.root):
-		if done.is_valid():
-			done.call()
-		return
-	stand.y = _shelf_y()
-	var flags := {"move": false, "settle": false}
-	_finish_move(fighter, stand, flags)
-	_finish_settle(fighter, flags)
-	while not flags.move or not flags.settle:
-		await get_tree().process_frame
+func _resolve_thrown_kit(
+	kit: KitThrow,
+	fighter: StageFighter,
+	slot: PartSlotType.Value,
+	dies: bool,
+	leftover: int,
+	done: Callable
+) -> void:
+	if dies:
+		var away := WRECK_IMPULSE if fighter.face_left else -WRECK_IMPULSE
+		kit.begin_wreck(away)
+		await kit.settle_as_wreck(1.15)
+		fighter.puppet.set_part_dead(slot, true)
+	else:
+		await kit.fly_boomerang_to(func() -> Vector2: return fighter.puppet.kit_anchor(slot), BOOMERANG_SEC)
+		if is_instance_valid(kit):
+			kit.queue_free()
+		fighter.puppet.attach_kit(slot)
+		fighter.puppet.set_tag_value(slot, leftover)
+		await fighter.puppet.play_catch_kit()
 	if done.is_valid():
 		done.call()
 
-func _finish_settle(fighter: StageFighter, flags: Dictionary) -> void:
-	await fighter.puppet.settle_idle()
-	flags.settle = true
+func _ensure_physics_shelf() -> void:
+	if _stage == null or _tray == null:
+		return
+	var floor_y := _shelf_y() + 118.0
+	var cx := _tray.global_position.x
+	_add_static_box(Vector2(cx, floor_y + 28.0), Vector2(SHELF_HALF * 2.0 + 80.0, 56.0))
+	_add_static_box(Vector2(cx - SHELF_HALF, floor_y - 70.0), Vector2(52.0, 220.0))
+	_add_static_box(Vector2(cx + SHELF_HALF, floor_y - 70.0), Vector2(52.0, 220.0))
 
-func _break_kit(fighter: StageFighter, slot: PartSlotType.Value) -> void:
-	var mark := Label.new()
-	mark.text = "X"
-	mark.add_theme_font_size_override("font_size", 64)
-	mark.add_theme_color_override("font_color", ThemeTokens.X_RED)
-	mark.size = Vector2(80, 80)
-	mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_stage.add_child(mark)
-	mark.global_position = fighter.puppet.kit_anchor(slot) - Vector2(40, 40)
-	await fighter.puppet.drop_kit(slot)
-	var fade := create_tween()
-	fade.tween_property(mark, "modulate:a", 0.0, 0.28)
-	fade.tween_callback(func() -> void:
-		if is_instance_valid(mark):
-			mark.queue_free()
-	)
+func _add_static_box(world_pos: Vector2, size: Vector2) -> void:
+	var body := StaticBody2D.new()
+	body.collision_layer = KitThrow.LAYER_SHELF
+	body.collision_mask = KitThrow.LAYER_KIT
+	_stage.add_child(body)
+	body.global_position = world_pos
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = size
+	shape.shape = rect
+	body.add_child(shape)
+	Feel.hide_collision_debug(shape)
 
 func _drop_out(fighter: StageFighter, ko: FightPlaque) -> void:
 	if fighter == null or fighter.down or not is_instance_valid(fighter.root):
@@ -553,49 +575,31 @@ func _move_to(node: Node2D, to: Vector2, duration: float) -> void:
 	tween.tween_property(node, "global_position", to, duration).set_trans(Tween.TRANS_SINE)
 	await tween.finished
 
-func _lunge_to(node: Node2D, to: Vector2, duration: float) -> void:
-	var from := node.global_position
-	to.y = _shelf_y()
-	var tween := create_tween()
-	tween.tween_method(
-		func(t: float) -> void:
-			var p := from.lerp(to, t)
-			p.y = _shelf_y() - sin(t * PI) * 26.0
-			node.global_position = p,
-		0.0,
-		1.0,
-		duration
-	).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	await tween.finished
-	node.global_position = to
-
 func _clash_impact(left: StageFighter, right: StageFighter, event: CombatEvent, mid: Vector2) -> void:
 	var tint := ThemeTokens.color_for_slot(event.left_slot).lerp(ThemeTokens.color_for_slot(event.right_slot), 0.5)
-	_flash(Color(tint.r, tint.g, tint.b, 0.22), 0.1)
-	_camera_punch(18.0, 0.22)
+	_flash(Color(tint.r, tint.g, tint.b, 0.28), 0.12)
+	_camera_punch(26.0, 0.28)
+	_shelf_thump()
 	_hit_spark(mid, tint)
 	_impact_burst(mid, tint)
+	_shockwave(mid, tint)
 	GameAudio.impact()
 	Feel.punch(left.visual, Vector2(1.22, 0.78), Vector2.ONE)
 	Feel.punch(right.visual, Vector2(1.22, 0.78), Vector2.ONE)
 	_hit_flash(left)
 	_hit_flash(right)
-	if event.winning_side == CombatEvent.Side.LEFT:
-		_knock(right, 1.0, 58.0)
-		_knock(left, -1.0, 12.0)
-	elif event.winning_side == CombatEvent.Side.RIGHT:
-		_knock(left, -1.0, 58.0)
-		_knock(right, 1.0, 12.0)
-	else:
-		_knock(left, -1.0, 38.0)
-		_knock(right, 1.0, 38.0)
-	await _hit_stop(0.07)
+	left.puppet.play_flinch(-1.0)
+	right.puppet.play_flinch(1.0)
+	await _hit_stop(0.09)
 
-func _knock(fighter: StageFighter, dir: float, pixels: float) -> void:
-	if fighter == null or fighter.down or not is_instance_valid(fighter.root):
+func _shelf_thump() -> void:
+	if _tray == null:
 		return
-	fighter.root.global_position.x += dir * pixels
-	fighter.root.global_position.y = _shelf_y()
+	var origin := _tray.position
+	var shake := create_tween()
+	shake.tween_property(_tray, "position", origin + Vector2(0, 10), 0.04)
+	shake.tween_property(_tray, "position", origin + Vector2(0, -6), 0.05)
+	shake.tween_property(_tray, "position", origin, 0.08)
 
 func _hit_flash(fighter: StageFighter) -> void:
 	if fighter == null or not is_instance_valid(fighter.visual):
@@ -639,6 +643,25 @@ func _impact_burst(pos: Vector2, tint: Color) -> void:
 	slash.tween_callback(func() -> void:
 		if is_instance_valid(_slash):
 			_slash.visible = false
+	)
+
+func _shockwave(pos: Vector2, tint: Color) -> void:
+	_ensure_fx_pool()
+	if _shock == null or not is_instance_valid(_shock):
+		return
+	_shock.global_position = pos
+	_shock.default_color = Color(tint.r, tint.g, tint.b, 0.95)
+	_shock.width = 14.0
+	_shock.modulate.a = 1.0
+	_shock.scale = Vector2(0.18, 0.18)
+	_shock.visible = true
+	var wave := create_tween()
+	wave.tween_property(_shock, "scale", Vector2(2.4, 2.4), 0.28).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	wave.parallel().tween_property(_shock, "modulate:a", 0.0, 0.28)
+	wave.parallel().tween_property(_shock, "width", 2.0, 0.28)
+	wave.tween_callback(func() -> void:
+		if is_instance_valid(_shock):
+			_shock.visible = false
 	)
 
 func _star_points(count: int, outer: float, inner: float) -> PackedVector2Array:
@@ -729,12 +752,12 @@ func _ensure_fx_pool() -> void:
 		_spark_fx.emitting = false
 		_spark_fx.one_shot = true
 		_spark_fx.explosiveness = 1.0
-		_spark_fx.amount = 22
-		_spark_fx.lifetime = 0.32
+		_spark_fx.amount = 36
+		_spark_fx.lifetime = 0.38
 		_spark_fx.direction = Vector2(0, -1)
 		_spark_fx.spread = 180.0
-		_spark_fx.initial_velocity_min = 90.0
-		_spark_fx.initial_velocity_max = 210.0
+		_spark_fx.initial_velocity_min = 120.0
+		_spark_fx.initial_velocity_max = 280.0
 		_spark_fx.gravity = Vector2(0, 240)
 		_spark_fx.scale_amount_min = 0.5
 		_spark_fx.scale_amount_max = 1.4
@@ -764,6 +787,20 @@ func _ensure_fx_pool() -> void:
 		_slash.z_index = 71
 		_slash.visible = false
 		_fx.add_child(_slash)
+	if _shock == null or not is_instance_valid(_shock):
+		_shock = Line2D.new()
+		var ring := PackedVector2Array()
+		for i in 28:
+			var ang := TAU * float(i) / 28.0
+			ring.append(Vector2(cos(ang), sin(ang)) * 70.0)
+		ring.append(ring[0])
+		_shock.points = ring
+		_shock.width = 14.0
+		_shock.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		_shock.end_cap_mode = Line2D.LINE_CAP_ROUND
+		_shock.z_index = 72
+		_shock.visible = false
+		_fx.add_child(_shock)
 
 func _restore_camera() -> void:
 	if _camera == null:

@@ -21,6 +21,7 @@ const IDLE_HZ := 1.35
 var _parts: Dictionary = {}
 var _pose: Pose = Pose.FRONT
 var _dead: Dictionary = {}
+var _detached: Dictionary = {}
 var _tags: Dictionary = {}
 var _sprites: Dictionary = {}
 var _joints: Dictionary = {}
@@ -87,6 +88,7 @@ func setup_loadout(loadout: FighterLoadout, face_left: bool) -> void:
 	_frozen = false
 	_gait = 0.0
 	_dead.clear()
+	_detached.clear()
 	scale.x = -absf(scale.x) if face_left else absf(scale.x)
 	_layout_rig()
 	refresh_tags(loadout)
@@ -155,26 +157,88 @@ func play_strike(slot: Variant) -> void:
 		_:
 			await _strike_punch()
 
-func drop_kit(slot: PartSlotType.Value) -> void:
-	_striking = true
-	_kill_motion()
-	for visual in PartSlotType.visual_slots_for(slot):
+func sprite_of(slot: PartSlotType.Value) -> Sprite2D:
+	return _sprites.get(slot) as Sprite2D
+
+func detach_kit(shop_slot: PartSlotType.Value) -> void:
+	for visual in PartSlotType.visual_slots_for(shop_slot):
+		_detached[visual] = true
 		var sprite: Sprite2D = _sprites.get(visual)
-		if sprite == null or not sprite.visible:
-			continue
-		var tw := create_tween()
-		tw.set_parallel(true)
-		tw.tween_property(sprite, "modulate:a", 0.0, 0.42).set_trans(Tween.TRANS_SINE)
-		tw.tween_property(sprite, "position:y", sprite.position.y + 58.0, 0.42).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-		tw.tween_property(sprite, "rotation", sprite.rotation + deg_to_rad(48.0), 0.42)
-		tw.tween_property(sprite, "scale", sprite.scale * 0.72, 0.42)
-	await get_tree().create_timer(0.42).timeout
-	set_part_dead(slot, true)
+		if sprite != null:
+			sprite.visible = false
+
+func attach_kit(shop_slot: PartSlotType.Value) -> void:
+	for visual in PartSlotType.visual_slots_for(shop_slot):
+		_detached.erase(visual)
+	_layout_rig()
+
+func snap_rest() -> void:
+	_kill_motion()
+	_reset_joints()
+	_layout_rig()
+
+func play_throw_windup(shop_slot: PartSlotType.Value) -> void:
+	_striking = true
+	_walking = false
+	_kill_motion()
+	_layout_rig()
+	var tw := create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(_body_root, "position", _body_rest + Vector2(-26.0, 10.0), 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(_body_root, "rotation", 0.22, 0.2)
+	match int(shop_slot):
+		int(PartSlotType.Value.HEAD):
+			_tween_joint(tw, PartSlotType.Value.HEAD, 0.42, 0.2)
+			_tween_joint(tw, PartSlotType.Value.ARM_L, -0.28, 0.2)
+			_tween_joint(tw, PartSlotType.Value.ARM_R, 0.28, 0.2)
+		int(PartSlotType.Value.LEGS):
+			_tween_joint(tw, PartSlotType.Value.LEG_R, 0.55, 0.2)
+			_tween_joint(tw, PartSlotType.Value.LEG_L, -0.22, 0.2)
+			_tween_joint(tw, PartSlotType.Value.ARM_L, 0.2, 0.2)
+			_tween_joint(tw, PartSlotType.Value.ARM_R, -0.2, 0.2)
+		_:
+			_tween_joint(tw, PartSlotType.Value.ARM_R, 0.85, 0.2)
+			_tween_joint(tw, PartSlotType.Value.ARM_L, -0.55, 0.2)
+			_tween_joint(tw, PartSlotType.Value.HEAD, 0.12, 0.2)
+	await tw.finished
+	await get_tree().create_timer(0.06).timeout
+
+func play_throw_recoil(shop_slot: PartSlotType.Value) -> void:
+	_striking = true
+	var tw := create_tween()
+	tw.set_parallel(true)
+	var hop := Vector2(22.0, -8.0)
+	if shop_slot == PartSlotType.Value.LEGS:
+		hop = Vector2(16.0, -28.0)
+	tw.tween_property(_body_root, "position", _body_rest + hop, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	tw.tween_property(_body_root, "rotation", -0.2, 0.12)
+	await tw.finished
+	await _tween_rest(0.22)
+	_striking = false
+
+func play_catch_kit() -> void:
+	_striking = true
+	Feel.punch(self, Vector2(1.16, 0.84), Vector2.ONE)
+	modulate = Color(1.35, 1.22, 0.95)
+	var tw := create_tween()
+	tw.tween_property(self, "modulate", Color.WHITE, 0.2)
+	await _tween_rest(0.16)
+	_striking = false
+
+func play_flinch(away: float) -> void:
+	_striking = true
+	var tw := create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(_body_root, "position", _body_rest + Vector2(away * 18.0, 6.0), 0.08)
+	tw.tween_property(_body_root, "rotation", away * 0.16, 0.08)
+	await tw.finished
+	await _tween_rest(0.18)
 	_striking = false
 
 func set_part_dead(slot: PartSlotType.Value, dead: bool) -> void:
 	for visual in PartSlotType.visual_slots_for(slot):
 		_dead[visual] = dead
+		_detached.erase(visual)
 	_layout_rig()
 	if _tags.has(slot) and dead:
 		(_tags[slot] as StatTag).visible = false
@@ -235,7 +299,7 @@ func kit_anchor(shop_slot: PartSlotType.Value) -> Vector2:
 	var count := 0
 	for visual in PartSlotType.visual_slots_for(shop_slot):
 		var sprite: Sprite2D = _sprites.get(visual)
-		if sprite == null or sprite.texture == null or not sprite.visible:
+		if sprite == null or sprite.texture == null or is_visual_dead(visual):
 			continue
 		acc += sprite.global_position
 		count += 1
@@ -277,7 +341,7 @@ func _layout_rig() -> void:
 		_body_root.rotation = 0.0
 	var body: PartDef = _parts.get(PartSlotType.Value.BODY)
 	var body_tex: Texture2D = textures.get(PartSlotType.Value.BODY)
-	_place_sprite(_sprites[PartSlotType.Value.BODY], body_tex, Vector2.ZERO, body)
+	_place_sprite(PartSlotType.Value.BODY, _sprites[PartSlotType.Value.BODY], body_tex, Vector2.ZERO, body)
 	_sprites[PartSlotType.Value.BODY].z_index = PartSlotType.fight_z_index(PartSlotType.Value.BODY)
 	_place_joint(
 		PartSlotType.Value.HEAD,
@@ -318,17 +382,17 @@ func _place_joint(slot: PartSlotType.Value, joint_pos: Vector2, texture: Texture
 	var part := _part_def(slot)
 	joint.position = joint_pos
 	joint.z_index = PartSlotType.fight_z_index(slot)
-	_place_sprite(sprite, texture, -magnet, part)
+	_place_sprite(slot, sprite, texture, -magnet, part)
 	joint.visible = texture != null
 
-func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2, part: PartDef = null) -> void:
+func _place_sprite(slot: PartSlotType.Value, sprite: Sprite2D, texture: Texture2D, pos: Vector2, part: PartDef = null) -> void:
 	if sprite == null:
 		return
 	if texture == null:
 		sprite.visible = false
 		sprite.texture = null
 		return
-	sprite.visible = true
+	sprite.visible = not bool(_detached.get(slot, false))
 	sprite.texture = texture
 	sprite.position = pos
 	sprite.scale = Vector2.ONE * CompositeResolver.display_scale()
@@ -488,6 +552,11 @@ func _set_joint(slot: Variant, radians: float) -> void:
 	var joint: Node2D = _joints.get(slot)
 	if joint != null:
 		joint.rotation = radians
+
+func _tween_joint(tw: Tween, slot: PartSlotType.Value, radians: float, duration: float) -> void:
+	var joint: Node2D = _joints.get(slot)
+	if joint != null:
+		tw.tween_property(joint, "rotation", radians, duration)
 
 func _kill_motion() -> void:
 	if _motion != null and _motion.is_valid():

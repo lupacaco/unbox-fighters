@@ -38,7 +38,7 @@ Recurso de **uma peça** (kit da loja ou recorte de desenho):
   - Tronco: **5 ímãs** — `magnet_neck`, `magnet_shoulder_l`, `magnet_shoulder_r`, `magnet_hip_l`, `magnet_hip_r`
   - Frente e perfil podem ser diferentes (`magnet_*_profile`)
 
-A luta **não** usa pose de golpe. O ataque mexe os membros no palco.
+A luta **não** usa pose de golpe. O ataque arremessa o kit inteiro até o centro do palco.
 
 ### `CharacterDef` (`scripts/data/character_def.gd`)
 
