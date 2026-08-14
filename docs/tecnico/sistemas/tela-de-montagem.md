@@ -36,5 +36,5 @@ O botão **NÍVEL 1  (4)** mostra o custo para subir. Clique nele para pagar.
 ## Relação com outras cenas
 
 - `Crate` — 1 clique → some → instancia `PartView`  
-- `CharacterSlot` — recebe 4 kits em cima da base-mola (cabeça, tronco, braço E, braço D; mola um pouco menor, Freak mais baixo, sombra no chão); o rótulo da fila arrasta o Freak inteiro  
+- `CharacterSlot` — recebe 4 kits em cima da base-mola (cabeça, tronco, braço E, braço D; mola menor que as peças, Freak mais baixo, sombra no chão); o rótulo da fila arrasta o Freak inteiro  
 - `FightDirector` — palco da luta

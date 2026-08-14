@@ -8,7 +8,7 @@ extends Object
 const TEX_LOOSE := "res://assets/objects/base-mola-solta.png"
 const TEX_PRESSED := "res://assets/objects/base-mola-pressionada.png"
 ## 300px art, scaled to sit under 200px parts.
-const SCALE := 0.70
+const SCALE := 0.55
 ## Magnet (chrome sphere) from the image center. Y negative = up.
 const MAGNET_LOOSE := Vector2(0, -112)
 const MAGNET_PRESSED := Vector2(0, -48)
