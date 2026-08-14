@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="CharacterDef" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="CharacterDef" format=3 uid="uid://dcuvuepc8mxgo"]
 
-[ext_resource type="Script" path="res://scripts/data/character_def.gd" id="1"]
-[ext_resource type="Resource" path="res://data/parts/vampiro_head.tres" id="2"]
-[ext_resource type="Resource" path="res://data/parts/vampiro_body.tres" id="3"]
+[ext_resource type="Script" uid="uid://dxa8yuntrbh2d" path="res://scripts/data/character_def.gd" id="1"]
+[ext_resource type="Resource" uid="uid://cgw3pvuy10bml" path="res://data/parts/vampiro_head.tres" id="2"]
+[ext_resource type="Resource" uid="uid://1d1c8u8sb6pg" path="res://data/parts/vampiro_body.tres" id="3"]
 [ext_resource type="Resource" path="res://data/parts/vampiro_legs.tres" id="4"]
 
 [resource]

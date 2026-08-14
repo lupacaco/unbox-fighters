@@ -1,10 +1,10 @@
-[gd_resource type="Resource" script_class="CharacterDef" load_steps=8 format=3]
+[gd_resource type="Resource" script_class="CharacterDef" format=3 uid="uid://chwofulduv51k"]
 
-[ext_resource type="Script" path="res://scripts/data/character_def.gd" id="1"]
+[ext_resource type="Script" uid="uid://dxa8yuntrbh2d" path="res://scripts/data/character_def.gd" id="1"]
 [ext_resource type="Resource" path="res://data/parts/leao_head.tres" id="2"]
-[ext_resource type="Resource" path="res://data/parts/leao_body.tres" id="3"]
-[ext_resource type="Resource" path="res://data/parts/leao_arm_l.tres" id="4"]
-[ext_resource type="Resource" path="res://data/parts/leao_arm_r.tres" id="5"]
+[ext_resource type="Resource" uid="uid://bi3jx6i16i4l7" path="res://data/parts/leao_body.tres" id="3"]
+[ext_resource type="Resource" uid="uid://b6qljgh34ah4n" path="res://data/parts/leao_arm_l.tres" id="4"]
+[ext_resource type="Resource" uid="uid://uxqv11p8s620" path="res://data/parts/leao_arm_r.tres" id="5"]
 [ext_resource type="Resource" path="res://data/parts/leao_leg_l.tres" id="6"]
 [ext_resource type="Resource" path="res://data/parts/leao_leg_r.tres" id="7"]
 

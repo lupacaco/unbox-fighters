@@ -9,12 +9,11 @@
 script = ExtResource("1")
 id = &"vampiro_head"
 display_name = "Vampire Head"
+set_id = &"vampiro"
 sprite = ExtResource("2")
 sprite_profile = ExtResource("3")
 sprite_attack = ExtResource("4")
-set_id = &"vampiro"
 combat_value = 9
 tier = 5
 magnet_down = Vector2(4, 73)
 magnet_down_profile = Vector2(3, 57)
-magnet_down_attack = Vector2(-1, 57)

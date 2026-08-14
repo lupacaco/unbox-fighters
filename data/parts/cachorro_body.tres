@@ -1,24 +1,21 @@
-[gd_resource type="Resource" script_class="PartDef" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://bovpqm0pwd6c7"]
 
-[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/characters/cachorro/cachorro_body-1.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/characters/cachorro/cachorro_body-2.png" id="3"]
-[ext_resource type="Texture2D" path="res://assets/characters/cachorro/cachorro_body-3.png" id="4"]
+[ext_resource type="Script" uid="uid://71ffw17l5buf" path="res://scripts/data/part_def.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://drbwm1u3yx80n" path="res://assets/characters/cachorro/cachorro_body-1.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://cpf0014q3nyga" path="res://assets/characters/cachorro/cachorro_body-2.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://brnko1odj4pnp" path="res://assets/characters/cachorro/cachorro_body-3.png" id="4"]
 
 [resource]
 script = ExtResource("1")
 id = &"cachorro_body"
 display_name = "Dog Body"
 slot_type = 1
+set_id = &"cachorro"
 sprite = ExtResource("2")
 sprite_profile = ExtResource("3")
 sprite_attack = ExtResource("4")
-set_id = &"cachorro"
 combat_value = 5
-tier = 1
 magnet_up = Vector2(0, -72)
 magnet_down = Vector2(1, 64)
 magnet_up_profile = Vector2(0, -74)
 magnet_down_profile = Vector2(-1, 51)
-magnet_up_attack = Vector2(-38, -71)
-magnet_down_attack = Vector2(-42, 53)

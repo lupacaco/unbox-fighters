@@ -1,19 +1,18 @@
-[gd_resource type="Resource" script_class="PartDef" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://bqfbay4tsq66q"]
 
-[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/characters/medico/medico_legs-1.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/characters/medico/medico_legs-2.png" id="3"]
-[ext_resource type="Texture2D" path="res://assets/characters/medico/medico_legs-3.png" id="4"]
+[ext_resource type="Script" uid="uid://71ffw17l5buf" path="res://scripts/data/part_def.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://toxepieiuhxp" path="res://assets/characters/medico/medico_legs-1.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://1x1bt56picb7" path="res://assets/characters/medico/medico_legs-2.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://b8xh6s3jfcn8j" path="res://assets/characters/medico/medico_legs-3.png" id="4"]
 
 [resource]
 script = ExtResource("1")
 id = &"medico_legs"
 display_name = "Doctor Legs"
 slot_type = 2
+set_id = &"medico"
 sprite = ExtResource("2")
 sprite_profile = ExtResource("3")
 sprite_attack = ExtResource("4")
-set_id = &"medico"
 combat_value = 4
-tier = 1
 magnet_up = Vector2(0, -72)

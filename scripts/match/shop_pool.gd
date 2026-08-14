@@ -71,6 +71,6 @@ static func _ensure_loaded() -> void:
 		if not ACTIVE_SET_IDS.is_empty() and String(character.id) not in ACTIVE_SET_IDS:
 			continue
 		_roster.append(character)
-		for part in character.all_parts():
+		for part in character.shop_parts():
 			if part != null and part not in _all_parts:
 				_all_parts.append(part)

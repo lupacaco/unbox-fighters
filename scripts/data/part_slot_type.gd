@@ -1,6 +1,7 @@
 class_name PartSlotType
 extends Object
 
+## Shop / fight use three kits. Drawing uses six limbs.
 enum Value {
 	HEAD,
 	BODY,
@@ -8,9 +9,13 @@ enum Value {
 	ARM_R,
 	LEG_L,
 	LEG_R,
+	LEGS,
 }
 
-static func all_slots() -> Array[Value]:
+static func shop_slots() -> Array[Value]:
+	return [Value.HEAD, Value.BODY, Value.LEGS]
+
+static func visual_slots() -> Array[Value]:
 	return [
 		Value.HEAD,
 		Value.BODY,
@@ -20,15 +25,11 @@ static func all_slots() -> Array[Value]:
 		Value.LEG_R,
 	]
 
+static func all_slots() -> Array[Value]:
+	return visual_slots()
+
 static func fight_order() -> Array[Value]:
-	return [
-		Value.HEAD,
-		Value.ARM_L,
-		Value.ARM_R,
-		Value.BODY,
-		Value.LEG_L,
-		Value.LEG_R,
-	]
+	return shop_slots()
 
 static func draw_order() -> Array[Value]:
 	return [
@@ -39,6 +40,20 @@ static func draw_order() -> Array[Value]:
 		Value.ARM_R,
 		Value.HEAD,
 	]
+
+static func is_shop_slot(value: Value) -> bool:
+	return value == Value.HEAD or value == Value.BODY or value == Value.LEGS
+
+static func visual_slots_for(shop_slot: Value) -> Array[Value]:
+	match shop_slot:
+		Value.HEAD:
+			return [Value.HEAD]
+		Value.BODY:
+			return [Value.BODY, Value.ARM_L, Value.ARM_R]
+		Value.LEGS:
+			return [Value.LEG_L, Value.LEG_R]
+		_:
+			return [shop_slot]
 
 static func to_string_name(value: Value) -> StringName:
 	match value:
@@ -54,6 +69,8 @@ static func to_string_name(value: Value) -> StringName:
 			return &"leg_l"
 		Value.LEG_R:
 			return &"leg_r"
+		Value.LEGS:
+			return &"legs"
 		_:
 			return &"unknown"
 
@@ -71,5 +88,7 @@ static func display_label(value: Value) -> String:
 			return "Perna E"
 		Value.LEG_R:
 			return "Perna D"
+		Value.LEGS:
+			return "Pernas"
 		_:
 			return "Peça"

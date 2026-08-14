@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CharacterDef" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="CharacterDef" format=3 uid="uid://bxy0c7viulhx4"]
 
-[ext_resource type="Script" path="res://scripts/data/character_def.gd" id="1"]
-[ext_resource type="Resource" path="res://data/parts/policial_head.tres" id="2"]
-[ext_resource type="Resource" path="res://data/parts/policial_body.tres" id="3"]
-[ext_resource type="Resource" path="res://data/parts/policial_legs.tres" id="4"]
+[ext_resource type="Script" uid="uid://dxa8yuntrbh2d" path="res://scripts/data/character_def.gd" id="1"]
+[ext_resource type="Resource" uid="uid://cn3gwop2hscop" path="res://data/parts/policial_head.tres" id="2"]
+[ext_resource type="Resource" uid="uid://bfe21dyox1g7y" path="res://data/parts/policial_body.tres" id="3"]
+[ext_resource type="Resource" uid="uid://rxjscidx0gaj" path="res://data/parts/policial_legs.tres" id="4"]
 
 [resource]
 script = ExtResource("1")

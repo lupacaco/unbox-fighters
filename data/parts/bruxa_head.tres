@@ -9,10 +9,10 @@
 script = ExtResource("1")
 id = &"bruxa_head"
 display_name = "Witch Head"
+set_id = &"bruxa"
 sprite = ExtResource("2")
 sprite_profile = ExtResource("3")
 sprite_attack = ExtResource("4")
-set_id = &"bruxa"
 combat_value = 9
 tier = 5
 magnet_down = Vector2(4, 70)

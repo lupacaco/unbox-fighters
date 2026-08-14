@@ -9,12 +9,11 @@
 script = ExtResource("1")
 id = &"policial_head"
 display_name = "Police Head"
+set_id = &"policial"
 sprite = ExtResource("2")
 sprite_profile = ExtResource("3")
 sprite_attack = ExtResource("4")
-set_id = &"policial"
 combat_value = 7
 tier = 3
 magnet_down = Vector2(1, 75)
 magnet_down_profile = Vector2(-8, 72)
-magnet_down_attack = Vector2(-9, 71)

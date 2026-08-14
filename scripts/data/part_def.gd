@@ -46,11 +46,19 @@ static func tier_for(value: int) -> int:
 func is_torso() -> bool:
 	return slot_type == PartSlotType.Value.BODY
 
+func is_legs_kit() -> bool:
+	return slot_type == PartSlotType.Value.LEGS
+
 func uses_hub_sockets() -> bool:
 	return is_torso() and magnet_neck.length_squared() > 0.01
 
 func uses_magnet_up() -> bool:
-	return not is_torso() and slot_type != PartSlotType.Value.HEAD
+	return (
+		slot_type == PartSlotType.Value.ARM_L
+		or slot_type == PartSlotType.Value.ARM_R
+		or slot_type == PartSlotType.Value.LEG_L
+		or slot_type == PartSlotType.Value.LEG_R
+	)
 
 func uses_magnet_down() -> bool:
 	return slot_type == PartSlotType.Value.HEAD
@@ -60,9 +68,13 @@ func socket_names() -> PackedStringArray:
 		return PackedStringArray(["neck", "shoulder_l", "shoulder_r", "hip_l", "hip_r"])
 	if slot_type == PartSlotType.Value.HEAD:
 		return PackedStringArray(["down"])
-	return PackedStringArray(["up"])
+	if uses_magnet_up():
+		return PackedStringArray(["up"])
+	return PackedStringArray()
 
 func has_fight_poses() -> bool:
+	if is_legs_kit():
+		return true
 	return sprite_profile != null
 
 func profile_magnets_marked() -> bool:
@@ -167,4 +179,7 @@ func _validate_property(property: Dictionary) -> void:
 				property.usage = PROPERTY_USAGE_NO_EDITOR
 		"magnet_down":
 			if slot_type != PartSlotType.Value.HEAD:
+				property.usage = PROPERTY_USAGE_NO_EDITOR
+		"sprite", "sprite_profile", "sprite_attack":
+			if is_legs_kit():
 				property.usage = PROPERTY_USAGE_NO_EDITOR

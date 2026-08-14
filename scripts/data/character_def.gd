@@ -9,7 +9,7 @@ extends Resource
 @export var arm_r: PartDef
 @export var leg_l: PartDef
 @export var leg_r: PartDef
-## Old 3-part sets used a single legs piece. Kept so those files still load.
+## Shop kit: both legs together. Old 3-part sets used this as the only legs drawing.
 @export var legs: PartDef
 
 func get_part(slot: PartSlotType.Value) -> PartDef:
@@ -26,18 +26,30 @@ func get_part(slot: PartSlotType.Value) -> PartDef:
 			return leg_l if leg_l != null else legs
 		PartSlotType.Value.LEG_R:
 			return leg_r if leg_r != null else legs
+		PartSlotType.Value.LEGS:
+			return legs
 		_:
 			return null
 
-func all_parts() -> Array[PartDef]:
+func shop_parts() -> Array[PartDef]:
 	var list: Array[PartDef] = []
-	for slot in PartSlotType.all_slots():
-		list.append(get_part(slot))
+	for slot in PartSlotType.shop_slots():
+		var part := get_part(slot)
+		if part != null:
+			list.append(part)
 	return list
 
+func all_parts() -> Array[PartDef]:
+	return shop_parts()
+
 func can_fight() -> bool:
-	for slot in PartSlotType.all_slots():
+	for slot in PartSlotType.shop_slots():
+		if get_part(slot) == null:
+			return false
+	for slot in PartSlotType.visual_slots():
 		var part := get_part(slot)
-		if part == null or not part.has_fight_poses():
+		if part == null:
+			continue
+		if part.sprite_profile == null:
 			return false
 	return true

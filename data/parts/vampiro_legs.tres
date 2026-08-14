@@ -1,19 +1,19 @@
-[gd_resource type="Resource" script_class="PartDef" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://so555lyyn5ms"]
 
-[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/characters/vampiro/vampiro_legs-1.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/characters/vampiro/vampiro_legs-2.png" id="3"]
-[ext_resource type="Texture2D" path="res://assets/characters/vampiro/vampiro_legs-3.png" id="4"]
+[ext_resource type="Script" uid="uid://71ffw17l5buf" path="res://scripts/data/part_def.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bp05fnst2eg1v" path="res://assets/characters/vampiro/vampiro_legs-1.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://hkceqrr63bb8" path="res://assets/characters/vampiro/vampiro_legs-2.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://dsu85iqfv5a2k" path="res://assets/characters/vampiro/vampiro_legs-3.png" id="4"]
 
 [resource]
 script = ExtResource("1")
 id = &"vampiro_legs"
 display_name = "Vampire Legs"
 slot_type = 2
+set_id = &"vampiro"
 sprite = ExtResource("2")
 sprite_profile = ExtResource("3")
 sprite_attack = ExtResource("4")
-set_id = &"vampiro"
 combat_value = 8
 tier = 4
 magnet_up = Vector2(0, -80)
