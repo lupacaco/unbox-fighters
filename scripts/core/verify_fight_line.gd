@@ -11,7 +11,7 @@ func _run() -> void:
 	var tray := Node2D.new()
 	tray.position = AssemblyLayout.TRAY
 	root.add_child(tray)
-	var floor_y := tray.global_position.y - 148.0
+	var floor_y := tray.global_position.y + FightDir.SHELF_Y
 
 	var leao: CharacterDef = load("res://data/parts/leao_character.tres")
 	var ys: Array[float] = []

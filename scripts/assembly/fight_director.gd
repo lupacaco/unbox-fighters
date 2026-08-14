@@ -8,7 +8,8 @@ const KitThrow := preload("res://scripts/assembly/thrown_kit.gd")
 signal finished
 
 ## All fighters share this one floor line (same Y). Never shift it per freak.
-const SHELF_Y := -148.0
+## Larger (less negative) sits the toys lower on the shelf board.
+const SHELF_Y := -124.0
 const LAND_X := 470.0
 const DUEL_X := 305.0
 const ENTRY_HOPS := 2
