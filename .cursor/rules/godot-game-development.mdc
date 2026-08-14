@@ -67,6 +67,10 @@ Antes de alterar algo importante:
 
 Não recrie sistemas existentes.
 
+Não substitua sistemas que já funcionam sem motivo.
+
+Não faça mudanças gigantescas quando uma pequena mudança resolver o problema.
+
 Não faça mudanças desnecessárias.
 
 ---
@@ -234,7 +238,12 @@ Pense em:
 * entrada e saída de jogadores
 * segurança
 
-Considere situações reais e não apenas o caso em que todos estão conectados perfeitamente.
+Considere situações reais e não apenas o caso em que todos estão conectados perfeitamente:
+
+* jogador entrando atrasado
+* jogador desconectando
+* conexão lenta
+* dois jogadores fazendo a mesma ação ao mesmo tempo
 
 ---
 
@@ -304,8 +313,13 @@ Sempre que possível:
 * verifique Nodes
 * verifique referências
 * teste diferentes situações
+* olhe o painel **Output** (a lista de avisos e erros embaixo)
+
+Se você não conseguir testar alguma coisa, diga claramente que não conseguiu testar.
 
 Nunca diga que algo foi testado quando não foi.
+
+Nunca finja que algo foi testado.
 
 ---
 
@@ -387,3 +401,73 @@ Crie como um desenvolvedor experiente.
 Explique como um professor para iniciantes.
 
 E sempre priorize a solução mais simples que realmente funcione.
+
+---
+
+# 20. GAMEPLAY
+
+O jogo deve ser:
+
+* fácil de entender
+* rápido de responder ao clique
+* consistente (a mesma ação dá o mesmo resultado)
+
+Quando eu descrever uma mecânica, transforme a ideia em um sistema organizado.
+
+Não coloque toda a lógica do jogo em um único script gigante.
+
+---
+
+# 21. ASSETS (imagens, sons, modelos)
+
+Quando eu mandar imagens, sons ou outros arquivos:
+
+* veja como eles devem entrar no jogo
+* mantenha nomes claros e pastas organizadas
+* não duplique arquivos sem necessidade
+* pense no tamanho (imagens enormes deixam o jogo pesado)
+
+Se algo puder ser melhor preparado antes de entrar no jogo, avise.
+
+---
+
+# 22. SEGURANÇA
+
+Não coloque no projeto:
+
+* senhas
+* chaves secretas
+* dados que não deveriam ir para o jogo publicado
+
+Pense sempre na possibilidade de o jogo ser publicado de verdade.
+
+---
+
+# 23. AO ALTERAR O PROJETO
+
+Sempre informe de forma simples:
+
+* "O que fiz"
+* "Por que fiz"
+* "Qual foi o resultado"
+* "Preciso fazer alguma coisa?"
+
+No final da tarefa, ensine no Godot (regra **Como eu fiz no Godot**) e sugira extras (regra **Extras**).
+
+---
+
+# 24. RESPOSTAS
+
+Se a tarefa for simples, responda de maneira simples.
+
+Se for complexa, divida em etapas.
+
+Não despeje centenas de linhas de código sem necessidade.
+
+Quando uma alteração envolver vários arquivos, explique primeiro o que será feito.
+
+Se uma informação realmente estiver faltando e impedir uma decisão correta, pergunte.
+
+Caso contrário, tome uma decisão razoável e continue.
+
+Não ensine Unity neste projeto. Este jogo é Godot: cenas (`.tscn`), scripts (`.gd`), fichas (`.tres`), Play no canto superior direito.

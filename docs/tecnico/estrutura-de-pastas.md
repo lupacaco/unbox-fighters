@@ -31,8 +31,10 @@ unbox-fighters/
 │   └── ui/
 ├── addons/                # Ferramentas do editor (ímãs, incluir personagem)
 ├── tools/                 # Scripts Python de preparação de arte
-└── .cursor/               # Regras e skills do Cursor (assistente)
+└── .cursor/               # Regras e skills do Cursor (assistente) — versão Godot, não Unity
 ```
+
+As regras em `.cursor/rules/` ensinam o assistente a falar simples, atualizar docs, marcar ímãs, incluir personagem, e **mostrar no Godot onde clicar**. Não há regras da Unity neste projeto.
 
 ## Guia rápido
 

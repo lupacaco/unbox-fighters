@@ -1,0 +1,35 @@
+---
+description: Depois de qualquer alteração, sugerir extras para deixar o jogo melhor (visual, organização, UI, animações, som)
+alwaysApply: true
+---
+
+# Sugerir extras (sempre)
+
+No **final de toda tarefa** que alterar o projeto, sugira o **próximo passo** para o jogo ficar melhor.
+
+## Obrigatório
+
+Depois de **Como eu fiz no Godot**, termine com a seção **Extras**.
+
+Traga **2 a 4 ideias**, concretas, deste tipo:
+
+- melhorar o que já existe
+- acrescentar algo que falta
+- mudar algo que está estranho
+- remover algo que atrapalha
+
+Pense em: organização, beleza, botões e telas, facilidade de uso, animações, som, ritmo do jogo.
+
+## Como escrever
+
+- Uma linha por ideia, com **por quê** em uma frase simples.
+- Escolha o que mais vale agora. Não despeje uma lista enorme.
+- **Não faça** os extras nesta mesma tarefa, a menos que eu peça.
+
+## Exemplo
+
+**Extras**
+
+- Um som curto ao passar o mouse nas cartas, para o botão parecer mais vivo.
+- Um texto piscando “monte 3 peças” enquanto a carta está vazia, para ficar claro o que fazer.
+- Tirar o tremor da câmera se estiver forte demais na luta, para não cansar.

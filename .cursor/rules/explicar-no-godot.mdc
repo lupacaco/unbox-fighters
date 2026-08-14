@@ -1,0 +1,48 @@
+---
+description: Sempre ensinar no Godot onde clicar e onde editar, em passos simples, depois de qualquer mudança
+alwaysApply: true
+---
+
+# Ensinar no Godot — SEMPRE LIGADA
+
+Esta regra vale em **toda** resposta deste projeto. Não espere o usuário pedir.
+
+Depois de **qualquer** coisa que você fizer (jogo, tela, som, botão, peça, luta), no final ensine **como isso foi feito no Godot**: onde clicar, onde olhar, onde editar.
+
+## Obrigatório
+
+Toda resposta de tarefa termina com a seção **Como eu fiz no Godot**, em passos 1, 2, 3…
+
+Não basta dizer “aperte Play”. Tem que mostrar o caminho na tela do Godot.
+
+## O que os passos precisam ter
+
+1. **Onde clicar** — lista de arquivos (FileSystem / Sistema de arquivos), lista da cena (Cena), objeto certo, botão Play.
+2. **Onde olhar** — o que aparece no jogo ou no painel da direita (Inspetor).
+3. **Onde editar** — se a pessoa quiser mexer: qual objeto clicar e qual caixa/número/texto no Inspetor. Se a mudança foi nas instruções do jogo (código), diga o objeto que usa isso e que você já alterou; não jogue texto de programador.
+4. **Como testar** — Play (triângulo em cima à direita) e o que fazer no jogo para ver o resultado.
+
+Se o Godot estiver em português, use os nomes em português e, entre parênteses, o nome em inglês na primeira vez. Exemplos: **Projeto → Ferramentas** (Project → Tools), **Sistema de arquivos** (FileSystem), **Cena** (Scene), **Inspetor** (Inspector).
+
+## Linguagem
+
+- Como se eu nunca tivesse usado Godot.
+- Uma ação por passo. Frases curtas.
+- Se usar um nome da tela (lista de arquivos, lista da cena, Inspetor, Play), explique em uma frase.
+
+## Errado
+
+- Só “aperte Play e veja”.
+- Só lista de arquivos `.gd`.
+- Pular esta seção.
+- Ensinar no Unity, ou falar em Hierarchy / GameObject / Inspector da Unity.
+
+## Certo (exemplo)
+
+**Como eu fiz no Godot**
+
+1. No Godot, na lista de arquivos embaixo (é a pasta do projeto), abra **scenes**, depois **assembly**, e clique em **Assembly.tscn**. É a tela principal do jogo.
+2. Na lista da **Cena** (é a lista de tudo que existe nessa tela), clique em **Assembly**.
+3. As cartas ficam nos objetos de carta. O lutador da carta é o desenho da cabeça, do tronco e das pernas juntos.
+4. Eu já liguei o clique: ao clicar na peça, ela solta e volta para a prateleira. Você não precisa digitar nada.
+5. Em cima à direita, clique no triângulo **Play**. Monte uma peça na carta, clique nela e arraste para a prateleira.
