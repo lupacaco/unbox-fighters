@@ -16,7 +16,7 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 | `verify_match_state.gd` | 4 vivos, HP 40, nomes dos bots, oponente-fantasma |
 | `verify_assembly.gd` | 3 cartas, 5 caixas e VENDER à direita |
 | `verify_crate_open.gd` | Um clique na caixa solta a peça |
-| `verify_composite.gd` | Layout por ímãs (6 desenhos) e expansor 3→6 |
+| `verify_composite.gd` | Layout por ímãs (6 desenhos), expansor 3→6, braços abertos na frente sem soltar o ombro |
 | `verify_part_magnets.gd` | Cabeça só embaixo; tronco com 5 ímãs; virar X; Z da cabeça na frente; imagem nova vira 200×200 |
 | `verify_part_sizes.gd` | Sprites 200×200 e perfil nos 6 desenhos |
 | `verify_fight_line.gd` | Fila no mesmo chão; perna e braço giram nos ímãs; duelistas afastados o bastante para arremessar |

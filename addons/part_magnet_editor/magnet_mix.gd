@@ -49,7 +49,7 @@ func _draw() -> void:
 	var origin := box.get_center() + Vector2(0, 10)
 	var positions: Dictionary = plan.get("positions", {})
 	for slot in PartSlotType.draw_order_for(parts):
-		_draw_part(parts.get(slot) as PartDef, textures.get(slot), positions.get(slot, Vector2.ZERO), s, origin)
+		_draw_part(slot, parts.get(slot) as PartDef, textures.get(slot), positions.get(slot, Vector2.ZERO), s, origin)
 
 func _tex_for(part: PartDef) -> Texture2D:
 	if part == null:
@@ -57,12 +57,24 @@ func _tex_for(part: PartDef) -> Texture2D:
 	var tex := part.texture_for_pose(pose)
 	return tex if tex != null else part.sprite
 
-func _draw_part(part: PartDef, tex: Texture2D, image_pos: Vector2, scale: float, origin: Vector2) -> void:
+func _draw_part(
+	slot: PartSlotType.Value,
+	part: PartDef,
+	tex: Texture2D,
+	image_pos: Vector2,
+	scale: float,
+	origin: Vector2
+) -> void:
 	if tex == null:
 		return
+	var extra := 0.0
+	if pose == 0:
+		var spread: Dictionary = CompositeResolver.spread_front_arm(slot, part, tex, image_pos, 1.0)
+		image_pos = spread["center"]
+		extra = float(spread["extra"])
 	var size := tex.get_size() * scale
 	var r := Rect2(origin + image_pos * scale - size * 0.5, size)
 	if part != null:
-		part.draw_transformed(self, tex, r, pose)
+		part.draw_transformed(self, tex, r, pose, extra)
 	else:
 		draw_texture_rect(tex, r, false)

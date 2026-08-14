@@ -229,11 +229,11 @@ func apply_to_sprite(sprite: Sprite2D, shown: Texture2D, apply_z: bool = true) -
 	if apply_z:
 		sprite.z_index = godot_z()
 
-func draw_transformed(ci: CanvasItem, tex: Texture2D, dest: Rect2, pose: int) -> void:
+func draw_transformed(ci: CanvasItem, tex: Texture2D, dest: Rect2, pose: int, extra_radians: float = 0.0) -> void:
 	if ci == null or tex == null:
 		return
 	var xf := Transform2D(0.0, dest.get_center())
-	xf *= Transform2D(deg_to_rad(float(rotation_for(pose))), Vector2.ZERO)
+	xf *= Transform2D(deg_to_rad(float(rotation_for(pose))) + extra_radians, Vector2.ZERO)
 	if flip_h_for(pose):
 		xf *= Transform2D(Vector2(-1, 0), Vector2(0, 1), Vector2.ZERO)
 	ci.draw_set_transform_matrix(xf)

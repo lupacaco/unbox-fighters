@@ -101,7 +101,7 @@ Se uma peça estiver aberta no Inspetor, o botão **Abrir Frente / Perfil deste 
 
 1. O tronco fica no centro da carta
 2. Cabeça: esfera de baixo cola na esfera do pescoço do tronco
-3. Braços: esfera de cima cola nos ombros
+3. Braços: esfera de cima cola nos ombros. Na **frente**, os braços abrem um pouco, girando nesse ímã (não soltam).
 4. Pernas: esfera de cima cola nos quadris
 
 ## Arte relacionada

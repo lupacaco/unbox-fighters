@@ -19,6 +19,9 @@ const DEFAULT_HIP_R := Vector2(40, 70)
 const DEFAULT_HEAD_DOWN := Vector2(0, 80)
 const DEFAULT_LIMB_UP := Vector2(0, -90)
 
+## Frente: braços um pouco abertos, girando no ímã do ombro (~19°).
+const FRONT_ARM_SPREAD := 0.34
+
 static func display_scale(_texture: Texture2D = null) -> float:
 	return PART_SIZE_PX / PART_WIDTH_PX
 
@@ -84,6 +87,36 @@ static func resolve_slots(parts: Dictionary, textures: Dictionary = {}) -> Dicti
 
 static func socket_of(part: PartDef, socket: String, shown: Texture2D) -> Vector2:
 	return _socket(part, socket, shown)
+
+static func front_arm_spread(slot: PartSlotType.Value) -> float:
+	match slot:
+		PartSlotType.Value.ARM_L:
+			return FRONT_ARM_SPREAD
+		PartSlotType.Value.ARM_R:
+			return -FRONT_ARM_SPREAD
+		_:
+			return 0.0
+
+static func center_after_pivot(center: Vector2, magnet_from_center: Vector2, extra_radians: float) -> Vector2:
+	if is_zero_approx(extra_radians):
+		return center
+	return center + magnet_from_center - magnet_from_center.rotated(extra_radians)
+
+static func spread_front_arm(
+	slot: PartSlotType.Value,
+	part: PartDef,
+	shown: Texture2D,
+	center: Vector2,
+	scale: float
+) -> Dictionary:
+	var extra := front_arm_spread(slot)
+	if is_zero_approx(extra):
+		return {"center": center, "extra": 0.0}
+	var magnet := _socket(part, "up", shown) * scale
+	return {
+		"center": center_after_pivot(center, magnet, extra),
+		"extra": extra,
+	}
 
 static func _socket(part: PartDef, socket: String, shown: Texture2D) -> Vector2:
 	var raw := Vector2.ZERO

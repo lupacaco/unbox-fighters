@@ -199,6 +199,11 @@ func _apply_kit(expanded: Dictionary) -> void:
 		var part := expanded.get(slot) as PartDef
 		if part != null:
 			part.apply_to_sprite(sprite, texture)
+		var spread: Dictionary = CompositeResolver.spread_front_arm(
+			slot, part, texture, sprite.position, s
+		)
+		sprite.position = spread["center"]
+		sprite.rotation += float(spread["extra"])
 	_center_kit()
 	_fit_kit_hitbox()
 

@@ -36,5 +36,26 @@ func _run() -> void:
 		push_error("VERIFY_FAIL legs should sit below the torso")
 		quit(1)
 		return
+	if CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_L) <= 0.0:
+		push_error("VERIFY_FAIL front left arm should open outward")
+		quit(1)
+		return
+	if not is_equal_approx(
+		CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_R),
+		-CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_L)
+	):
+		push_error("VERIFY_FAIL front arms should open as a pair")
+		quit(1)
+		return
+	var center := Vector2(10, 20)
+	var magnet := Vector2(0, -50)
+	var extra := CompositeResolver.FRONT_ARM_SPREAD
+	var pivoted := CompositeResolver.center_after_pivot(center, magnet, extra)
+	var old_joint := center + magnet
+	var new_joint := pivoted + magnet.rotated(extra)
+	if not old_joint.is_equal_approx(new_joint):
+		push_error("VERIFY_FAIL arm spread should keep the shoulder magnet")
+		quit(1)
+		return
 	print("VERIFY_COMPOSITE_PASS head=", positions[PartSlotType.Value.HEAD], " body=", positions[PartSlotType.Value.BODY])
 	quit(0)

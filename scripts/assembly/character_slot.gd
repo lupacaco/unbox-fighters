@@ -418,9 +418,15 @@ func _apply_plan(plan: Dictionary) -> void:
 		var sprite: Sprite2D = _layer_sprites.get(slot)
 		if sprite == null:
 			continue
-		_place_sprite(sprite, textures.get(slot), positions.get(slot, Vector2.ZERO), expanded.get(slot) as PartDef)
+		_place_sprite(sprite, textures.get(slot), positions.get(slot, Vector2.ZERO), expanded.get(slot) as PartDef, slot)
 
-func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2, part: PartDef = null) -> void:
+func _place_sprite(
+	sprite: Sprite2D,
+	texture: Texture2D,
+	pos: Vector2,
+	part: PartDef = null,
+	slot: PartSlotType.Value = PartSlotType.Value.BODY
+) -> void:
 	if texture == null:
 		sprite.texture = null
 		sprite.visible = false
@@ -434,6 +440,11 @@ func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2, part: Par
 	sprite.rotation = 0.0
 	if part != null:
 		part.apply_to_sprite(sprite, texture)
+	var spread: Dictionary = CompositeResolver.spread_front_arm(
+		slot, part, texture, sprite.position, CompositeResolver.display_scale()
+	)
+	sprite.position = spread["center"]
+	sprite.rotation += float(spread["extra"])
 
 func _update_stats() -> void:
 	var loadout := to_loadout()

@@ -15,7 +15,7 @@
 | Fim de partida | **Você venceu!** / **Você saiu** e botão **NOVA PARTIDA** |
 | Abrir caixas | 1 clique, custa 1 pancada |
 | Arrastar e soltar | Peças nas cartas (troca no lugar ocupado); botão direito vende; Freak inteiro troca de carta ou vai para VENDER. Sem retângulo vermelho: a carta acende ouro |
-| Visual composto | Ímãs unem os 6 desenhos pelas esferas de metal (frente e perfil; tronco tem 5 ímãs) |
+| Visual composto | Ímãs unem os 6 desenhos pelas esferas de metal (frente e perfil; tronco tem 5 ímãs). Na frente os braços abrem um pouco no ombro |
 | Incluir Freak | Folha 6+6 vira 12 PNG 200×200 + 3 fichas na loja; ímãs em janela compacta (Ampliar para precisão) |
 | Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |
 | Áudio | Efeitos gravados (martelo, caixa, ímã). Na luta: só passo e poom do golpe |

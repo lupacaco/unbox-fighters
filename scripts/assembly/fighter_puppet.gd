@@ -419,8 +419,10 @@ func _apply_gait(phase: float) -> void:
 
 func _apply_idle() -> void:
 	var b := sin(_life * IDLE_HZ * TAU)
-	_set_joint(PartSlotType.Value.ARM_L, b * 0.07)
-	_set_joint(PartSlotType.Value.ARM_R, -b * 0.07)
+	var arm_l := CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_L) if _pose == Pose.FRONT else 0.0
+	var arm_r := CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_R) if _pose == Pose.FRONT else 0.0
+	_set_joint(PartSlotType.Value.ARM_L, arm_l + b * 0.07)
+	_set_joint(PartSlotType.Value.ARM_R, arm_r - b * 0.07)
 	_set_joint(PartSlotType.Value.HEAD, b * 0.04)
 	_set_joint(PartSlotType.Value.LEG_L, 0.0)
 	_set_joint(PartSlotType.Value.LEG_R, 0.0)
@@ -537,16 +539,21 @@ func _tween_rest(duration: float) -> void:
 	for slot in _joints.keys():
 		var joint: Node2D = _joints[slot]
 		if joint != null:
-			_motion.tween_property(joint, "rotation", 0.0, duration).set_trans(Tween.TRANS_SINE)
+			_motion.tween_property(joint, "rotation", _rest_joint(slot), duration).set_trans(Tween.TRANS_SINE)
 	await _motion.finished
 	_reset_joints()
 
 func _reset_joints() -> void:
 	for slot in _joints.keys():
-		_set_joint(slot, 0.0)
+		_set_joint(slot, _rest_joint(slot))
 	if _body_root != null:
 		_body_root.rotation = 0.0
 		_body_root.position = _body_rest
+
+func _rest_joint(slot: Variant) -> float:
+	if _pose != Pose.FRONT:
+		return 0.0
+	return CompositeResolver.front_arm_spread(slot as PartSlotType.Value)
 
 func _set_joint(slot: Variant, radians: float) -> void:
 	var joint: Node2D = _joints.get(slot)
