@@ -11,7 +11,7 @@ Interface da preparação e da luta. As posições da tela seguem o mesmo mapa d
 | `scripts/ui/shop_bar.gd` | NÍVEL (com custo), 10 bolinhas douradas, ATUALIZAR, TRAVAR |
 | `scripts/ui/stat_tag.gd` | Pílula colorida com o número da peça |
 | `scripts/ui/fight_plaque.gd` | Placa dourada: nomes, HP, números do choque, KO |
-| `scripts/ui/stat_readout.gd` | Nome + linha **Ameaça / Força / Agilidade · total** |
+| `scripts/ui/stat_readout.gd` | Nome + números das 6 peças · total |
 | `scripts/ui/background_fx.gd` | Fundo de arena, vinheta e poeira |
 | `scripts/ui/theme_tokens.gd` | Paleta: ouro, creme, vermelho do PRONTO, gelo do travar |
 | `scripts/ui/hammer_cursor.gd` | Cursor martelo ao passar / bater nas caixas |
@@ -21,9 +21,12 @@ Durante a luta, o HUD de cima e a loja somem. Só ficam as placas da luta. No fi
 
 ## Cores das tags
 
-- Cabeça / Ameaça = azul
-- Tronco / Força = roxo
-- Pernas / Agilidade = verde
+- Cabeça = azul
+- Tronco = roxo
+- Braço E = laranja
+- Braço D = vermelho-claro
+- Perna E = verde
+- Perna D = verde-água
 
 ## Arte de UI
 
@@ -33,7 +36,7 @@ Pasta `assets/ui/`:
 - `frame_premium.png` — moldura da carta
 - `shelf_premium.png` — prateleira (vira palco na luta)
 
-As peças dos Freaks são arquivos **300×200**. No jogo todas aumentam iguais.
+As peças dos Freaks são arquivos **200×200**. No jogo todas ficam no mesmo tamanho.
 
 ## Arte das caixas
 

@@ -1,15 +1,15 @@
 class_name Synergy
 extends RefCounted
 
-## Combat value on a card: 3 matching parts = full, 2 = 75%, 1 = 50%.
+## Combat value on a card: 6 matching parts = full, 3–5 = 75%, 1–2 = 50%.
 ## Always rounds up.
 
 static func scaled_value(base: int, same_set_count: int) -> int:
 	if base <= 0 or same_set_count <= 0:
 		return 0
-	if same_set_count >= 3:
+	if same_set_count >= 6:
 		return base
-	if same_set_count == 2:
+	if same_set_count >= 3:
 		return ceili(float(base) * 0.75)
 	return ceili(float(base) * 0.5)
 

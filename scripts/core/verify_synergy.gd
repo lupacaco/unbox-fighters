@@ -14,17 +14,29 @@ func _run() -> void:
 	quit(0)
 
 func _check_synergy() -> bool:
-	if Synergy.scaled_value(5, 1) != 3:
-		push_error("VERIFY_FAIL head 5 alone should be 3")
+	if Synergy.scaled_value(4, 1) != 2:
+		push_error("VERIFY_FAIL 4 alone should be 2")
+		return false
+	if Synergy.scaled_value(4, 2) != 2:
+		push_error("VERIFY_FAIL 4 with 2 matching should stay 2")
+		return false
+	if Synergy.scaled_value(4, 3) != 3:
+		push_error("VERIFY_FAIL 4 at 75% should be 3")
+		return false
+	if Synergy.scaled_value(4, 6) != 4:
+		push_error("VERIFY_FAIL 4 with full set should stay 4")
 		return false
 	if Synergy.scaled_value(9, 1) != 5:
 		push_error("VERIFY_FAIL 9 at 50% should be 5")
 		return false
-	if Synergy.scaled_value(9, 2) != 7:
+	if Synergy.scaled_value(9, 2) != 5:
+		push_error("VERIFY_FAIL 9 with 2 matching should stay 50%")
+		return false
+	if Synergy.scaled_value(9, 3) != 7:
 		push_error("VERIFY_FAIL 9 at 75% should be 7")
 		return false
-	if Synergy.scaled_value(9, 3) != 9:
-		push_error("VERIFY_FAIL 9 at 100% should be 9")
+	if Synergy.scaled_value(9, 6) != 9:
+		push_error("VERIFY_FAIL 9 with 6 matching should stay 9")
 		return false
 	if MatchRules.gold_for_round(1) != 3 or MatchRules.gold_for_round(8) != 10:
 		push_error("VERIFY_FAIL gold curve")
@@ -35,48 +47,24 @@ func _check_synergy() -> bool:
 	return true
 
 func _check_part_numbers() -> bool:
-	var policial: CharacterDef = load("res://data/parts/policial_character.tres")
-	var vampiro: CharacterDef = load("res://data/parts/vampiro_character.tres")
-	var bruxa: CharacterDef = load("res://data/parts/bruxa_character.tres")
-	if policial.head.combat_value != 7 or policial.body.combat_value != 6 or policial.legs.combat_value != 5:
-		push_error("VERIFY_FAIL policial combat values")
+	var leao: CharacterDef = load("res://data/parts/leao_character.tres")
+	if leao == null:
+		push_error("VERIFY_FAIL missing leao")
 		return false
-	if vampiro.head.combat_value != 9 or vampiro.body.combat_value != 9 or vampiro.legs.combat_value != 8:
-		push_error("VERIFY_FAIL vampiro combat values")
+	for part in leao.all_parts():
+		if part == null or part.combat_value != 4 or part.tier != 1:
+			push_error("VERIFY_FAIL lion parts should all be 4 / shop level 1")
+			return false
+	var full := FighterLoadout.from_character(leao)
+	if full.total_power() != 24:
+		push_error("VERIFY_FAIL lion full should be 24, got %d" % full.total_power())
 		return false
-	if bruxa.head.combat_value != 9 or bruxa.body.combat_value != 4 or bruxa.legs.combat_value != 9:
-		push_error("VERIFY_FAIL bruxa combat values")
+	var solo := FighterLoadout.from_parts(leao.head, null, null)
+	if solo.combat_value_of(PartSlotType.Value.HEAD) != 2:
+		push_error("VERIFY_FAIL lone lion head should be 2")
 		return false
-	var mumia: CharacterDef = load("res://data/parts/mumia_character.tres")
-	var medico: CharacterDef = load("res://data/parts/medico_character.tres")
-	var cachorro: CharacterDef = load("res://data/parts/cachorro_character.tres")
-	if mumia.head.combat_value != 5 or mumia.body.combat_value != 8 or mumia.legs.combat_value != 6:
-		push_error("VERIFY_FAIL mumia combat values")
-		return false
-	if medico.head.combat_value != 3 or medico.body.combat_value != 4 or medico.legs.combat_value != 4:
-		push_error("VERIFY_FAIL medico combat values")
-		return false
-	if cachorro.head.combat_value != 5 or cachorro.body.combat_value != 5 or cachorro.legs.combat_value != 7:
-		push_error("VERIFY_FAIL cachorro combat values")
-		return false
-	if mumia.body.tier != 4 or medico.head.tier != 1 or cachorro.legs.tier != 3:
-		push_error("VERIFY_FAIL extra set shop tiers")
-		return false
-	if policial.head.tier != 3 or vampiro.head.tier != 5 or bruxa.body.tier != 1:
-		push_error("VERIFY_FAIL shop tiers")
-		return false
-	var full := FighterLoadout.from_parts(policial.head, policial.body, policial.legs)
-	if full.total_power() != 18:
-		push_error("VERIFY_FAIL policial full should be 18, got %d" % full.total_power())
-		return false
-	var mix := FighterLoadout.from_parts(vampiro.head, policial.body, bruxa.legs)
-	if mix.combat_value_of(PartSlotType.Value.HEAD) != 5:
-		push_error("VERIFY_FAIL mix vamp head should be 5")
-		return false
-	if mix.combat_value_of(PartSlotType.Value.BODY) != 3:
-		push_error("VERIFY_FAIL mix police body should be 3")
-		return false
-	if mix.combat_value_of(PartSlotType.Value.LEGS) != 5:
-		push_error("VERIFY_FAIL mix witch legs should be 5")
+	var trio := FighterLoadout.from_parts(leao.head, leao.body, null, leao.arm_l)
+	if trio.combat_value_of(PartSlotType.Value.HEAD) != 3:
+		push_error("VERIFY_FAIL three matching lion parts should be 75%")
 		return false
 	return true

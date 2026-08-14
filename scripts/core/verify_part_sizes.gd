@@ -1,6 +1,6 @@
 extends SceneTree
 
-const EXPECTED := Vector2(300, 200)
+const EXPECTED := Vector2(200, 200)
 
 func _init() -> void:
 	call_deferred("_run")
@@ -8,31 +8,30 @@ func _init() -> void:
 func _run() -> void:
 	var scale := CompositeResolver.display_scale()
 	assert(is_equal_approx(scale, CompositeResolver.PART_SIZE_PX / CompositeResolver.PART_WIDTH_PX))
-	for path in [
-		"res://data/parts/vampiro_character.tres",
-		"res://data/parts/policial_character.tres",
-		"res://data/parts/bruxa_character.tres",
-		"res://data/parts/mumia_character.tres",
-		"res://data/parts/medico_character.tres",
-		"res://data/parts/cachorro_character.tres",
-	]:
-		var c: CharacterDef = load(path)
-		assert(c != null, "Missing character: %s" % path)
-		for part in [c.head, c.body, c.legs]:
-			_assert_part_art(part, path)
-		assert(c.can_fight(), "Missing fight poses: %s" % path)
-		var layered := CompositeResolver.resolve(c, true, false, false)
-		assert(layered["mode"] == "layered")
-		assert(layered["head"] != null)
-		var full := CompositeResolver.resolve(c, true, true, true)
-		assert(full["mode"] == "layered")
-		assert(full["head"] != null and full["body"] != null and full["legs"] != null)
+	assert(is_equal_approx(scale, 1.0))
+	var c: CharacterDef = load("res://data/parts/leao_character.tres")
+	assert(c != null, "Missing lion")
+	for part in c.all_parts():
+		_assert_part_art(part)
+	assert(c.can_fight(), "Lion needs a side view on every part")
+	var full := CompositeResolver.resolve(c)
+	assert(full["mode"] == "layered")
+	var textures: Dictionary = full["textures"]
+	var positions: Dictionary = full["positions"]
+	for slot in PartSlotType.all_slots():
+		assert(textures.get(slot) != null, "Missing texture %s" % slot)
+		assert(positions.has(slot), "Missing position %s" % slot)
+	assert(positions[PartSlotType.Value.HEAD].y < positions[PartSlotType.Value.BODY].y)
+	assert(positions[PartSlotType.Value.LEG_L].y > positions[PartSlotType.Value.BODY].y)
+	assert(positions[PartSlotType.Value.LEG_R].y > positions[PartSlotType.Value.BODY].y)
 	print("SIZE_AND_LAYOUT_OK")
 	quit(0)
 
-func _assert_part_art(part: PartDef, owner_path: String) -> void:
-	assert(part != null, "Missing part on %s" % owner_path)
-	for tex in [part.sprite, part.sprite_profile, part.sprite_attack]:
-		assert(tex != null, "Missing pose texture on %s" % part.id)
-		assert(tex.get_size() == EXPECTED, "%s size %s expected %s" % [part.id, tex.get_size(), EXPECTED])
-	assert(is_equal_approx(CompositeResolver.display_scale(part.sprite), CompositeResolver.display_scale()))
+func _assert_part_art(part: PartDef) -> void:
+	assert(part != null, "Missing lion part")
+	assert(part.sprite != null, "Missing front on %s" % part.id)
+	assert(part.sprite_profile != null, "Missing profile on %s" % part.id)
+	assert(part.sprite.get_size() == EXPECTED, "%s front size %s" % [part.id, part.sprite.get_size()])
+	assert(part.sprite_profile.get_size() == EXPECTED, "%s profile size %s" % [part.id, part.sprite_profile.get_size()])
+	if part.sprite_attack != null:
+		assert(part.sprite_attack.get_size() == EXPECTED, "%s attack size %s" % [part.id, part.sprite_attack.get_size()])

@@ -98,17 +98,15 @@ static func _score_placement(card: FighterLoadout, part: PartDef) -> int:
 	if card == null or part == null:
 		return 0
 	var same := 0
-	if card.head != null and card.head.set_id == part.set_id:
-		same += 1
-	if card.body != null and card.body.set_id == part.set_id:
-		same += 1
-	if card.legs != null and card.legs.set_id == part.set_id:
-		same += 1
+	for slot in PartSlotType.all_slots():
+		var owned := card.get_part(slot)
+		if owned != null and owned.set_id == part.set_id:
+			same += 1
 	if card.get_part(part.slot_type) != null:
 		same -= 1
-	if same >= 2:
+	if same >= 3:
 		return 30 + part.combat_value
-	if same == 1:
+	if same >= 1:
 		return 12 + part.combat_value
 	if card.is_empty():
 		return 3 + part.combat_value
@@ -123,10 +121,12 @@ static func _shop_helps_board(bot: Contestant) -> bool:
 		for card in bot.board.fighters:
 			if card.get_part(part.slot_type) != null:
 				continue
-			if (
-				(card.head != null and card.head.set_id == part.set_id)
-				or (card.body != null and card.body.set_id == part.set_id)
-				or (card.legs != null and card.legs.set_id == part.set_id)
-			):
+			var helps := false
+			for slot in PartSlotType.all_slots():
+				var owned := card.get_part(slot)
+				if owned != null and owned.set_id == part.set_id:
+					helps = true
+					break
+			if helps:
 				return true
 	return false

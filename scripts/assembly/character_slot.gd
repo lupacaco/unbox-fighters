@@ -9,7 +9,10 @@ signal assembly_changed(slot: CharacterSlot)
 const TAG_OFFSETS := {
 	PartSlotType.Value.HEAD: Vector2(108, -150),
 	PartSlotType.Value.BODY: Vector2(108, -20),
-	PartSlotType.Value.LEGS: Vector2(108, 110),
+	PartSlotType.Value.ARM_L: Vector2(-108, -50),
+	PartSlotType.Value.ARM_R: Vector2(108, -50),
+	PartSlotType.Value.LEG_L: Vector2(-108, 110),
+	PartSlotType.Value.LEG_R: Vector2(108, 110),
 }
 
 @onready var _card_shadow: Sprite2D = $CardShadow
@@ -17,12 +20,6 @@ const TAG_OFFSETS := {
 @onready var _empty_hint: Label = $EmptyHint
 @onready var _display_root: Node2D = $Display
 @onready var _sprite_composite: Sprite2D = $Display/Composite
-@onready var _sprite_head: Sprite2D = $Display/Head
-@onready var _sprite_body: Sprite2D = $Display/Body
-@onready var _sprite_legs: Sprite2D = $Display/Legs
-@onready var _zone_head: Area2D = $Zones/Head
-@onready var _zone_body: Area2D = $Zones/Body
-@onready var _zone_legs: Area2D = $Zones/Legs
 @onready var _highlight: Line2D = $DropHighlight
 @onready var _glow: Polygon2D = $CompleteGlow
 @onready var _readout: StatReadout = $StatReadout
@@ -31,10 +28,9 @@ const TAG_OFFSETS := {
 var character: CharacterDef
 var queue_rank: int = 3
 var _roster: Array[CharacterDef] = []
-var _has_head: bool = false
-var _has_body: bool = false
-var _has_legs: bool = false
 var _bound_parts: Dictionary = {}
+var _layer_sprites: Dictionary = {}
+var _zones: Dictionary = {}
 var _crossfade_busy: bool = false
 var _rest_y: float = 0.0
 var _fight_locked: bool = false
@@ -53,7 +49,7 @@ func setup(def: CharacterDef = null, roster: Array[CharacterDef] = []) -> void:
 	scale = Vector2.ONE
 	modulate.a = 1.0
 	_readout.set_display_name("???")
-	_readout.set_breakdown(0, 0, 0, 0)
+	_readout.set_from_loadout(FighterLoadout.new())
 	_readout.set_complete(false)
 	_glow.visible = false
 	_highlight.visible = false
@@ -72,15 +68,14 @@ func set_queue_rank(rank: int) -> void:
 	_rank_label.text = "%dº" % rank
 
 func to_loadout() -> FighterLoadout:
-	return FighterLoadout.from_parts(
-		get_attached_part(PartSlotType.Value.HEAD),
-		get_attached_part(PartSlotType.Value.BODY),
-		get_attached_part(PartSlotType.Value.LEGS)
-	)
+	var loadout := FighterLoadout.new()
+	for slot in PartSlotType.all_slots():
+		loadout.set_part(slot, get_attached_part(slot))
+	return loadout
 
 func steal_all_parts() -> Dictionary:
 	var stolen := {}
-	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
+	for slot in PartSlotType.all_slots():
 		var view := detach_part(slot, false)
 		if view != null:
 			stolen[slot] = view
@@ -97,7 +92,7 @@ func receive_parts(parts: Dictionary) -> void:
 func find_part_at(global_point: Vector2) -> PartView:
 	if _fight_locked:
 		return null
-	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
+	for slot in PartSlotType.all_slots():
 		if not _bound_parts.has(slot):
 			continue
 		if _zone_contains(slot, global_point):
@@ -146,7 +141,10 @@ func contains_card_point(global_point: Vector2) -> bool:
 	return Rect2(Vector2(-135, -205), Vector2(270, 400)).has_point(to_local(global_point))
 
 func is_complete() -> bool:
-	return _has_head and _has_body and _has_legs
+	for slot in PartSlotType.all_slots():
+		if get_attached_part(slot) == null:
+			return false
+	return true
 
 func get_attached_part(slot: PartSlotType.Value) -> PartDef:
 	if not _bound_parts.has(slot):
@@ -167,7 +165,7 @@ func set_fight_locked(locked: bool) -> void:
 func attached_parts_can_fight() -> bool:
 	if not is_complete():
 		return false
-	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
+	for slot in PartSlotType.all_slots():
 		var part := get_attached_part(slot)
 		if part == null or not part.has_fight_poses():
 			return false
@@ -183,16 +181,18 @@ func get_fighter_global_position() -> Vector2:
 	return _display_root.global_position
 
 func has_any_part() -> bool:
-	return _has_head or _has_body or _has_legs
+	for slot in PartSlotType.all_slots():
+		if get_attached_part(slot) != null:
+			return true
+	return false
 
 func can_accept(part: PartDef) -> bool:
 	if _fight_locked or part == null:
 		return false
-	return (
-		part.slot_type == PartSlotType.Value.HEAD
-		or part.slot_type == PartSlotType.Value.BODY
-		or part.slot_type == PartSlotType.Value.LEGS
-	)
+	for slot in PartSlotType.all_slots():
+		if part.slot_type == slot:
+			return true
+	return false
 
 func can_accept_at(part: PartDef, global_point: Vector2) -> bool:
 	if not can_accept(part):
@@ -201,6 +201,8 @@ func can_accept_at(part: PartDef, global_point: Vector2) -> bool:
 
 func _zone_contains(slot: PartSlotType.Value, global_point: Vector2) -> bool:
 	var zone := _zone_for(slot)
+	if zone == null or not zone.has_meta("rect"):
+		return false
 	var rect: Rect2 = zone.get_meta("rect")
 	return rect.has_point(to_local(global_point))
 
@@ -213,8 +215,7 @@ func try_attach(part_view: PartView) -> bool:
 	var displaced: PartView = null
 	if _bound_parts.has(slot):
 		displaced = detach_part(slot, false)
-	var was_complete := _has_head and _has_body and _has_legs
-	_set_flag(slot, true)
+	var was_complete := is_complete()
 	_bound_parts[slot] = part_view
 	part_view.set_attached_slot(self)
 	part_view.snap_hide_for_slot()
@@ -222,7 +223,7 @@ func try_attach(part_view: PartView) -> bool:
 	_update_stats()
 	_pulse_attach()
 	GameAudio.part_place()
-	var now_complete := _has_head and _has_body and _has_legs
+	var now_complete := is_complete()
 	if now_complete and not was_complete:
 		GameAudio.fighter_complete()
 	part_attached.emit(self, part_view.part_def)
@@ -238,7 +239,6 @@ func detach_part(slot: PartSlotType.Value, refresh: bool = true) -> PartView:
 		return null
 	var part_view: PartView = _bound_parts[slot]
 	_bound_parts.erase(slot)
-	_set_flag(slot, false)
 	part_view.set_attached_slot(null)
 	if refresh:
 		_refresh_display(true)
@@ -252,6 +252,8 @@ func set_drop_highlight(enabled: bool, slot: PartSlotType.Value) -> void:
 	if not enabled:
 		return
 	var zone := _zone_for(slot)
+	if zone == null or not zone.has_meta("rect"):
+		return
 	var rect: Rect2 = zone.get_meta("rect")
 	_highlight.points = PackedVector2Array([
 		rect.position,
@@ -287,17 +289,69 @@ func _build_visuals() -> void:
 		Vector2(-130, -200), Vector2(130, -200), Vector2(130, 180), Vector2(-130, 180)
 	])
 	_glow.color = Color(0.79, 0.7, 0.49, 0.1)
+	_ensure_layers()
+
+func _layer_name(slot: PartSlotType.Value) -> String:
+	match slot:
+		PartSlotType.Value.HEAD:
+			return "Head"
+		PartSlotType.Value.BODY:
+			return "Body"
+		PartSlotType.Value.ARM_L:
+			return "ArmL"
+		PartSlotType.Value.ARM_R:
+			return "ArmR"
+		PartSlotType.Value.LEG_L:
+			return "LegL"
+		_:
+			return "LegR"
+
+func _ensure_layers() -> void:
+	for slot in PartSlotType.draw_order():
+		var node_name := _layer_name(slot)
+		var sprite := _display_root.get_node_or_null(node_name) as Sprite2D
+		if sprite == null:
+			sprite = Sprite2D.new()
+			sprite.name = node_name
+			sprite.centered = true
+			_display_root.add_child(sprite)
+		_layer_sprites[slot] = sprite
 
 func _setup_zones() -> void:
-	_configure_zone(_zone_head, Rect2(-95, -190, 190, 110))
-	_configure_zone(_zone_body, Rect2(-105, -85, 210, 130))
-	_configure_zone(_zone_legs, Rect2(-95, 45, 190, 120))
+	var zones_root: Node2D = $Zones
+	var rects := {
+		PartSlotType.Value.HEAD: Rect2(-55, -198, 110, 85),
+		PartSlotType.Value.ARM_L: Rect2(-125, -108, 72, 105),
+		PartSlotType.Value.BODY: Rect2(-52, -108, 104, 125),
+		PartSlotType.Value.ARM_R: Rect2(53, -108, 72, 105),
+		PartSlotType.Value.LEG_L: Rect2(-120, 28, 115, 125),
+		PartSlotType.Value.LEG_R: Rect2(5, 28, 115, 125),
+	}
+	for slot in PartSlotType.all_slots():
+		var node_name := _layer_name(slot)
+		var zone := zones_root.get_node_or_null(node_name) as Area2D
+		if zone == null:
+			zone = Area2D.new()
+			zone.name = node_name
+			zone.collision_layer = 2
+			zone.collision_mask = 0
+			zones_root.add_child(zone)
+		_configure_zone(zone, rects[slot])
+		_zones[slot] = zone
 
 func _configure_zone(zone: Area2D, rect: Rect2) -> void:
 	zone.set_meta("rect", rect)
 	zone.monitoring = false
 	zone.monitorable = false
 	zone.input_pickable = true
+	if zone.get_meta("wired", false):
+		for child in zone.get_children():
+			var shape_node := child as CollisionShape2D
+			if shape_node != null and shape_node.shape is RectangleShape2D:
+				(shape_node.shape as RectangleShape2D).size = rect.size
+				shape_node.position = rect.position + rect.size * 0.5
+		return
+	zone.set_meta("wired", true)
 	var shape_owner := CollisionShape2D.new()
 	var shape := RectangleShape2D.new()
 	shape.size = rect.size
@@ -325,49 +379,27 @@ func _on_zone_input(_viewport: Node, event: InputEvent, _shape_idx: int, zone: A
 	get_viewport().set_input_as_handled()
 
 func _slot_for_zone(zone: Area2D) -> PartSlotType.Value:
-	if zone == _zone_head:
-		return PartSlotType.Value.HEAD
-	if zone == _zone_body:
-		return PartSlotType.Value.BODY
-	return PartSlotType.Value.LEGS
+	for slot in _zones.keys():
+		if _zones[slot] == zone:
+			return slot
+	return PartSlotType.Value.BODY
 
 func _zone_for(slot: PartSlotType.Value) -> Area2D:
-	match slot:
-		PartSlotType.Value.HEAD:
-			return _zone_head
-		PartSlotType.Value.BODY:
-			return _zone_body
-		_:
-			return _zone_legs
+	return _zones.get(slot) as Area2D
 
 func _contains_point_expanded(global_point: Vector2) -> bool:
 	var local := to_local(global_point)
 	return Rect2(Vector2(-135, -205), Vector2(270, 400)).has_point(local)
 
-func _set_flag(slot: PartSlotType.Value, value: bool) -> void:
-	match slot:
-		PartSlotType.Value.HEAD:
-			_has_head = value
-		PartSlotType.Value.BODY:
-			_has_body = value
-		PartSlotType.Value.LEGS:
-			_has_legs = value
-
 func _refresh_display(animate: bool) -> void:
-	var plan := CompositeResolver.resolve_parts(
-		get_attached_part(PartSlotType.Value.HEAD),
-		get_attached_part(PartSlotType.Value.BODY),
-		get_attached_part(PartSlotType.Value.LEGS)
-	)
+	var parts := {}
+	for slot in PartSlotType.all_slots():
+		parts[slot] = get_attached_part(slot)
+	var plan := CompositeResolver.resolve_slots(parts)
 	var complete := is_complete()
 	_glow.visible = complete
 	_readout.set_complete(complete)
-	_empty_hint.visible = plan["mode"] == "empty" or (
-		plan["mode"] == "layered"
-		and plan["head"] == null
-		and plan["body"] == null
-		and plan["legs"] == null
-	)
+	_empty_hint.visible = plan["mode"] == "empty"
 
 	if not animate or _crossfade_busy:
 		_apply_plan(plan)
@@ -382,14 +414,13 @@ func _refresh_display(animate: bool) -> void:
 
 func _apply_plan(plan: Dictionary) -> void:
 	_sprite_composite.visible = false
-	_sprite_head.visible = false
-	_sprite_body.visible = false
-	_sprite_legs.visible = false
-
-	if plan["mode"] == "layered":
-		_place_sprite(_sprite_legs, plan["legs"], plan["legs_pos"])
-		_place_sprite(_sprite_body, plan["body"], plan["body_pos"])
-		_place_sprite(_sprite_head, plan["head"], plan["head_pos"])
+	var textures: Dictionary = plan.get("textures", {})
+	var positions: Dictionary = plan.get("positions", {})
+	for slot in PartSlotType.draw_order():
+		var sprite: Sprite2D = _layer_sprites.get(slot)
+		if sprite == null:
+			continue
+		_place_sprite(sprite, textures.get(slot), positions.get(slot, Vector2.ZERO))
 
 func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2) -> void:
 	if texture == null:
@@ -404,12 +435,7 @@ func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2) -> void:
 
 func _update_stats() -> void:
 	var loadout := to_loadout()
-	_readout.set_breakdown(
-		loadout.combat_value_of(PartSlotType.Value.HEAD),
-		loadout.combat_value_of(PartSlotType.Value.BODY),
-		loadout.combat_value_of(PartSlotType.Value.LEGS),
-		loadout.total_power()
-	)
+	_readout.set_from_loadout(loadout)
 	_readout.set_display_name(_resolve_display_name())
 	_refresh_tags()
 
@@ -418,13 +444,17 @@ func _resolve_display_name() -> String:
 		if to_loadout().is_empty():
 			return "—"
 		return "???"
-	var head := get_attached_part(PartSlotType.Value.HEAD)
-	var body := get_attached_part(PartSlotType.Value.BODY)
-	var legs := get_attached_part(PartSlotType.Value.LEGS)
 	for def in _roster:
-		if def == null or def.head == null or def.body == null or def.legs == null:
+		if def == null:
 			continue
-		if head.id == def.head.id and body.id == def.body.id and legs.id == def.legs.id:
+		var same := true
+		for slot in PartSlotType.all_slots():
+			var attached := get_attached_part(slot)
+			var expected := def.get_part(slot)
+			if attached == null or expected == null or attached.id != expected.id:
+				same = false
+				break
+		if same:
 			return def.display_name
 	return "MIX"
 
@@ -454,7 +484,7 @@ func _ensure_rank_label() -> void:
 func _ensure_tags() -> void:
 	if not _tags.is_empty():
 		return
-	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
+	for slot in PartSlotType.all_slots():
 		var tag := StatTag.new()
 		tag.position = TAG_OFFSETS[slot]
 		add_child(tag)

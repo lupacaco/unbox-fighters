@@ -5,42 +5,23 @@ func _init() -> void:
 
 func _run() -> void:
 	var pool := ShopPool.parts_up_to_tier(1)
-	if pool.is_empty():
-		push_error("VERIFY_FAIL shop tier 1 empty")
+	if pool.size() != 6:
+		push_error("VERIFY_FAIL shop level 1 should sell the 6 lion parts, got %d" % pool.size())
 		quit(1)
 		return
 	for part in pool:
-		if part.tier > 1 or part.combat_value >= 9:
-			push_error("VERIFY_FAIL tier 1 sold a high part: %s" % part.id)
+		if String(part.set_id) != "leao" or part.tier != 1 or part.combat_value != 4:
+			push_error("VERIFY_FAIL unexpected shop part: %s" % part.id)
 			quit(1)
 			return
+	var roster := ShopPool.roster()
+	if roster.size() != 1 or String(roster[0].id) != "leao":
+		push_error("VERIFY_FAIL shop roster should be only the lion")
+		quit(1)
+		return
 	var high := ShopPool.parts_up_to_tier(5)
-	var has_nine := false
-	for part in high:
-		if part.combat_value == 9:
-			has_nine = true
-	if not has_nine:
-		push_error("VERIFY_FAIL tier 5 should include 9s")
-		quit(1)
-		return
-	if ShopPool.roster().size() < 6:
-		push_error("VERIFY_FAIL expected at least 6 characters, got %d" % ShopPool.roster().size())
-		quit(1)
-		return
-	var ids: PackedStringArray = []
-	for character in ShopPool.roster():
-		ids.append(String(character.id))
-	for needed in ["vampiro", "policial", "bruxa", "mumia", "medico", "cachorro"]:
-		if needed not in ids:
-			push_error("VERIFY_FAIL missing character %s" % needed)
-			quit(1)
-			return
-	var mumia_body := false
-	for part in ShopPool.parts_up_to_tier(1):
-		if part.id == &"mumia_body":
-			mumia_body = true
-	if mumia_body:
-		push_error("VERIFY_FAIL mummy body should not appear at shop level 1")
+	if high.size() != 6:
+		push_error("VERIFY_FAIL other freaks should stay out of the shop")
 		quit(1)
 		return
 	var rng := RandomNumberGenerator.new()

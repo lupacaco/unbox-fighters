@@ -12,9 +12,7 @@ var _file_dialog: EditorFileDialog
 var _form: AcceptDialog
 var _id_edit: LineEdit
 var _name_edit: LineEdit
-var _head_spin: SpinBox
-var _body_spin: SpinBox
-var _legs_spin: SpinBox
+var _value_spins: Array[SpinBox] = []
 var _pending_sheet := ""
 
 func _enter_tree() -> void:
@@ -51,7 +49,7 @@ func _open_magnet_window() -> void:
 	if _window == null or not is_instance_valid(_window):
 		_window = MagnetWindowScene.new()
 		EditorInterface.get_base_control().add_child(_window)
-	_window.popup_centered(Vector2i(480, 680))
+	_window.popup_centered(Vector2i(520, 760))
 	_window_part = EditorInterface.get_inspector().get_edited_object() as PartDef
 	_window.set_part(_window_part)
 	set_process(true)
@@ -61,7 +59,7 @@ func _begin_import() -> void:
 		_file_dialog = EditorFileDialog.new()
 		_file_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
 		_file_dialog.access = EditorFileDialog.ACCESS_FILESYSTEM
-		_file_dialog.add_filter("*.png, *.webp", "Folha 3x3")
+		_file_dialog.add_filter("*.png, *.webp", "Folha com 6 partes de frente e 6 de perfil")
 		_file_dialog.file_selected.connect(_on_sheet_chosen)
 		EditorInterface.get_base_control().add_child(_file_dialog)
 	_file_dialog.popup_file_dialog()
@@ -83,14 +81,15 @@ func _build_form() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	_form.add_child(box)
-	box.add_child(_labeled_edit("Id interno (ex: zumbi)", true))
-	box.add_child(_labeled_edit("Nome na carta (ex: Zumbi)", false))
-	box.add_child(_labeled_spin("Ameaça (cabeça)", 0))
-	box.add_child(_labeled_spin("Força (tronco)", 1))
-	box.add_child(_labeled_spin("Agilidade (pernas)", 2))
+	box.add_child(_labeled_edit("Id interno (ex: leao)", true))
+	box.add_child(_labeled_edit("Nome na carta (ex: Leão)", false))
+	var labels: PackedStringArray = ["Cabeça", "Tronco", "Braço E", "Braço D", "Perna E", "Perna D"]
+	_value_spins.clear()
+	for i in labels.size():
+		box.add_child(_labeled_spin(labels[i]))
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.text = "A folha precisa ser uma grade 3×3 (de preferência 900×600). Depois marque os ímãs: Project → Tools → Ímãs das Peças."
+	hint.text = "A folha precisa ter 6 partes de frente à esquerda e 6 de perfil à direita. Cada peça vai para um quadrado 200×200. Depois marque os ímãs nas esferas: Projeto → Ferramentas → Ímãs das Peças."
 	box.add_child(hint)
 	EditorInterface.get_base_control().add_child(_form)
 
@@ -107,7 +106,7 @@ func _labeled_edit(caption: String, is_id: bool) -> Control:
 		_name_edit = edit
 	return row
 
-func _labeled_spin(caption: String, which: int) -> Control:
+func _labeled_spin(caption: String) -> Control:
 	var row := HBoxContainer.new()
 	var lab := Label.new()
 	lab.text = caption
@@ -118,13 +117,7 @@ func _labeled_spin(caption: String, which: int) -> Control:
 	spin.max_value = 9
 	spin.value = 4
 	row.add_child(spin)
-	match which:
-		0:
-			_head_spin = spin
-		1:
-			_body_spin = spin
-		_:
-			_legs_spin = spin
+	_value_spins.append(spin)
 	return row
 
 func _on_form_confirmed() -> void:
@@ -133,21 +126,18 @@ func _on_form_confirmed() -> void:
 func _run_import() -> void:
 	var set_id := CharacterImporter.clean_id(_id_edit.text)
 	var pngs := CharacterImporter.slice_sheet(_pending_sheet, set_id)
-	if pngs.size() != 9:
-		push_error("Não consegui cortar a folha em 9 peças.")
+	if pngs.size() != 12:
+		push_error("Não consegui cortar a folha em 12 peças (6 de frente e 6 de perfil).")
 		return
 	CharacterImporter.keep_source_sheet(_pending_sheet, set_id)
 	var fs := EditorInterface.get_resource_filesystem()
 	var err := ""
+	var values: Array = []
+	for spin in _value_spins:
+		values.append(int(spin.value))
 	for _attempt in 8:
 		await _wait_filesystem(fs)
-		err = CharacterImporter.write_defs(
-			set_id,
-			_name_edit.text,
-			int(_head_spin.value),
-			int(_body_spin.value),
-			int(_legs_spin.value)
-		)
+		err = CharacterImporter.write_defs(set_id, _name_edit.text, values)
 		if err.is_empty():
 			break
 	if not err.is_empty():

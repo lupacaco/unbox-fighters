@@ -4,33 +4,27 @@ func _init() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
-	var c: CharacterDef = load("res://data/parts/vampiro_character.tres")
-	var only_head := CompositeResolver.resolve(c, true, false, false)
-	var head_body := CompositeResolver.resolve(c, true, true, false)
-	var full := CompositeResolver.resolve(c, true, true, true)
+	var leao: CharacterDef = load("res://data/parts/leao_character.tres")
+	var only_head := CompositeResolver.resolve_slots({PartSlotType.Value.HEAD: leao.head})
+	var full := CompositeResolver.resolve(leao)
 
-	if only_head["mode"] != "layered" or only_head["head"] == null:
+	if only_head["mode"] != "layered" or only_head["textures"].get(PartSlotType.Value.HEAD) == null:
 		push_error("VERIFY_FAIL head-only should be layered with head texture")
 		quit(1)
 		return
-	if head_body["body"] == null or head_body["head"] == null:
-		push_error("VERIFY_FAIL head+body missing textures")
+	var textures: Dictionary = full["textures"]
+	var positions: Dictionary = full["positions"]
+	if textures.get(PartSlotType.Value.BODY) == null or textures.get(PartSlotType.Value.ARM_L) == null:
+		push_error("VERIFY_FAIL full lion missing textures")
 		quit(1)
 		return
-	if full["legs"] == null:
-		push_error("VERIFY_FAIL full set missing legs")
+	if not (positions[PartSlotType.Value.HEAD].y < positions[PartSlotType.Value.BODY].y):
+		push_error("VERIFY_FAIL head should sit above the torso")
 		quit(1)
 		return
-
-	# Magnets should pull head above body (smaller Y) and legs below body (larger Y).
-	if not (full["head_pos"].y < full["body_pos"].y and full["legs_pos"].y > full["body_pos"].y):
-		push_error("VERIFY_FAIL magnet layout order wrong: %s / %s / %s" % [full["head_pos"], full["body_pos"], full["legs_pos"]])
+	if not (positions[PartSlotType.Value.LEG_L].y > positions[PartSlotType.Value.BODY].y):
+		push_error("VERIFY_FAIL legs should sit below the torso")
 		quit(1)
 		return
-	if not full.has("weapon_pos"):
-		push_error("VERIFY_FAIL missing weapon_pos")
-		quit(1)
-		return
-
-	print("VERIFY_COMPOSITE_PASS head=", full["head_pos"], " body=", full["body_pos"], " legs=", full["legs_pos"])
+	print("VERIFY_COMPOSITE_PASS head=", positions[PartSlotType.Value.HEAD], " body=", positions[PartSlotType.Value.BODY])
 	quit(0)

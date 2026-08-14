@@ -6,51 +6,48 @@ extends Node2D
 enum Pose { FRONT, PROFILE, STRIDE }
 
 const TAG_OFFSETS := {
-	PartSlotType.Value.HEAD: Vector2(70, -90),
-	PartSlotType.Value.BODY: Vector2(70, -10),
-	PartSlotType.Value.LEGS: Vector2(70, 70),
+	PartSlotType.Value.HEAD: Vector2(78, -110),
+	PartSlotType.Value.BODY: Vector2(78, -10),
+	PartSlotType.Value.ARM_L: Vector2(-78, -40),
+	PartSlotType.Value.ARM_R: Vector2(78, -40),
+	PartSlotType.Value.LEG_L: Vector2(-78, 80),
+	PartSlotType.Value.LEG_R: Vector2(78, 80),
 }
 
-var _head_def: PartDef
-var _body_def: PartDef
-var _legs_def: PartDef
+var _parts: Dictionary = {}
 var _pose: Pose = Pose.FRONT
 var _stride_attack: bool = false
 var _attack_slot: Variant = null
 var _dead: Dictionary = {}
 var _tags: Dictionary = {}
-
-var _legs: Sprite2D
-var _body: Sprite2D
-var _head: Sprite2D
+var _sprites: Dictionary = {}
 
 func _ready() -> void:
-	_legs = Sprite2D.new()
-	_body = Sprite2D.new()
-	_head = Sprite2D.new()
-	for sprite in [_legs, _body, _head]:
+	for slot in PartSlotType.draw_order():
+		var sprite := Sprite2D.new()
 		sprite.centered = true
 		add_child(sprite)
-	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
+		_sprites[slot] = sprite
+	for slot in PartSlotType.all_slots():
 		var tag := StatTag.new()
 		tag.position = TAG_OFFSETS[slot]
 		add_child(tag)
 		_tags[slot] = tag
 
 func setup_loadout(loadout: FighterLoadout, face_left: bool) -> void:
-	setup_parts(loadout.head, loadout.body, loadout.legs)
-	scale.x = -absf(scale.x) if face_left else absf(scale.x)
-	refresh_tags(loadout)
-
-func setup_parts(head: PartDef, body: PartDef, legs: PartDef) -> void:
-	_head_def = head
-	_body_def = body
-	_legs_def = legs
+	_parts.clear()
+	for slot in PartSlotType.all_slots():
+		_parts[slot] = loadout.get_part(slot) if loadout != null else null
 	_pose = Pose.FRONT
 	_stride_attack = false
 	_attack_slot = null
 	_dead.clear()
+	scale.x = -absf(scale.x) if face_left else absf(scale.x)
 	_refresh()
+	refresh_tags(loadout)
+
+func setup_parts(head: PartDef, body: PartDef, legs: PartDef) -> void:
+	setup_loadout(FighterLoadout.from_parts(head, body, legs), scale.x < 0)
 
 func set_pose(pose: Pose) -> void:
 	_pose = pose
@@ -78,9 +75,10 @@ func set_part_dead(slot: PartSlotType.Value, dead: bool) -> void:
 func refresh_tags(loadout: FighterLoadout) -> void:
 	for slot in _tags.keys():
 		var tag: StatTag = _tags[slot]
-		if _dead.get(slot, false) or loadout.get_part(slot) == null:
+		if _dead.get(slot, false) or loadout == null or loadout.get_part(slot) == null:
 			tag.visible = false
 			continue
+		tag.visible = true
 		tag.setup(loadout.combat_value_of(slot), ThemeTokens.color_for_slot(slot))
 
 func set_tag_value(slot: PartSlotType.Value, value: int) -> void:
@@ -90,7 +88,7 @@ func set_tag_value(slot: PartSlotType.Value, value: int) -> void:
 	tag.setup(value, ThemeTokens.color_for_slot(slot))
 
 func has_living_part() -> bool:
-	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
+	for slot in PartSlotType.all_slots():
 		if _part_def(slot) != null and not _dead.get(slot, false):
 			return true
 	return false
@@ -100,7 +98,8 @@ func feet_position() -> Vector2:
 
 func visual_bottom_y() -> float:
 	var lowest := -INF
-	for sprite in [_head, _body, _legs]:
+	for slot in _sprites.keys():
+		var sprite: Sprite2D = _sprites[slot]
 		if sprite == null or not sprite.visible or sprite.texture == null:
 			continue
 		var half_h := float(sprite.texture.get_height()) * absf(sprite.global_scale.y) * 0.5
@@ -110,33 +109,19 @@ func visual_bottom_y() -> float:
 	return lowest
 
 func get_part_node(slot: PartSlotType.Value) -> Sprite2D:
-	match slot:
-		PartSlotType.Value.HEAD:
-			return _head
-		PartSlotType.Value.BODY:
-			return _body
-		_:
-			return _legs
+	return _sprites.get(slot) as Sprite2D
 
 func _part_def(slot: PartSlotType.Value) -> PartDef:
-	match slot:
-		PartSlotType.Value.HEAD:
-			return _head_def
-		PartSlotType.Value.BODY:
-			return _body_def
-		_:
-			return _legs_def
+	return _parts.get(slot) as PartDef
 
 func _refresh() -> void:
-	var head_tex := _texture_for(PartSlotType.Value.HEAD)
-	var body_tex := _texture_for(PartSlotType.Value.BODY)
-	var legs_tex := _texture_for(PartSlotType.Value.LEGS)
-	var plan := CompositeResolver.resolve_parts(
-		_head_def, _body_def, _legs_def, head_tex, body_tex, legs_tex
-	)
-	_place(_legs, legs_tex, plan["legs_pos"], PartSlotType.Value.LEGS)
-	_place(_body, body_tex, plan["body_pos"], PartSlotType.Value.BODY)
-	_place(_head, head_tex, plan["head_pos"], PartSlotType.Value.HEAD)
+	var textures := {}
+	for slot in PartSlotType.all_slots():
+		textures[slot] = _texture_for(slot)
+	var plan := CompositeResolver.resolve_slots(_parts, textures)
+	var positions: Dictionary = plan.get("positions", {})
+	for slot in PartSlotType.draw_order():
+		_place(_sprites[slot], textures.get(slot), positions.get(slot, Vector2.ZERO), slot)
 
 func _texture_for(slot: PartSlotType.Value) -> Texture2D:
 	if _dead.get(slot, false):
@@ -156,6 +141,8 @@ func _texture_for(slot: PartSlotType.Value) -> Texture2D:
 	return part.sprite
 
 func _place(sprite: Sprite2D, texture: Texture2D, pos: Vector2, slot: PartSlotType.Value) -> void:
+	if sprite == null:
+		return
 	if texture == null:
 		sprite.visible = false
 		sprite.texture = null

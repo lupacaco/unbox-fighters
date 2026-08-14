@@ -1,24 +1,29 @@
 # Incluir um personagem
 
-Este é o jeito certo de colocar um Freak novo no jogo (como Múmia, Médico e Cachorro). Siga **todos** os passos.
+Este é o jeito certo de colocar um Freak novo no jogo. Siga **todos** os passos.
 
 As regras da loja, sinergia e luta (o que o jogador vê) estão em [Mecânicas e regras](../jogo/mecanicas-e-regras.md).
 
-O jogador manda uma folha de desenho. O jogo precisa de **9 peças** soltas, números de combate, e uma ficha do personagem. A loja **acha sozinha** qualquer ficha nova em `data/parts/` (não precisa ligar o personagem na tela na mão).
+O jogador manda uma folha de desenho. O jogo precisa de **12 peças** soltas (6 de frente + 6 de perfil), números de combate, e uma ficha do personagem. A loja **acha sozinha** qualquer ficha nova em `data/parts/` (depois filtra pelos sets ativos).
 
 ## O que a folha precisa ter
 
-Uma grade **3 × 3**, de preferência **900 × 600** (cada célula já é 300 × 200).
+**6 partes de frente à esquerda** e **6 de perfil à direita**, cada uma solta (não grudada na vizinha).
 
-| | Frente (`-1`) | De lado (`-2`) | Golpe (`-3`) |
-|---|---|---|---|
-| Linha 1 | cabeça de frente | cabeça de perfil | cabeça gritando / atacando |
-| Linha 2 | tronco de frente | tronco de lado | tronco socando |
-| Linha 3 | pernas de frente | pernas de lado | pernas no passo |
+As 6 partes:
 
-Nome interno (`id` / pasta): minúsculo, sem acento. Exemplos: `mumia`, `medico`, `cachorro`.
+1. Cabeça
+2. Tronco (com **5 esferas** de metal: pescoço, dois ombros, dois quadris)
+3. Braço esquerdo (de quem olha)
+4. Braço direito
+5. Perna esquerda
+6. Perna direita
 
-Nome na carta: com acento se precisar (`Múmia`, `Médico`, `Cachorro`).
+Cabeça, braços e pernas têm **1 esfera** cada, no ponto de união.
+
+Nome interno (`id` / pasta): minúsculo, sem acento. Exemplo: `leao`.
+
+Nome na carta: com acento se precisar (`Leão`).
 
 ## Duas formas de incluir
 
@@ -26,66 +31,71 @@ Nome na carta: com acento se precisar (`Múmia`, `Médico`, `Cachorro`).
 
 1. Menu **Project → Tools → Incluir personagem** (se o Godot estiver em português: **Projeto → Ferramentas**).
 2. Escolha a folha PNG ou WEBP.
-3. Preencha o id, o nome na carta e os três números (Ameaça / Força / Agilidade).
-4. O Godot corta as 9 imagens, cria as fichas e abre a ferramenta de ímãs.
+3. Preencha o id, o nome na carta e os 6 números.
+4. O Godot corta as 12 imagens, cria as fichas e abre a ferramenta de ímãs.
 
 ### B) Quando a folha chega no chat (assistente)
 
-1. Cortar a grade com `tools/slice_character_sheet.py` (9 PNG **300×200** transparentes em `assets/characters/{id}/`).
+1. Cortar com `tools/slice_character_sheet.py` (12 PNG **200×200** transparentes em `assets/characters/{id}/`).
 2. Criar as fichas em `data/parts/` (`--write-defs`, ou o menu do Godot).
 3. Marcar os ímãs no Godot (passo 2 abaixo). Não chute X = 0.
 
-Não apague todo pixel preto da folha. Só o preto ligado às **bordas** (mancha de dálmata, estetoscópio e olho ficam).
+Não apague todo pixel preto da folha. Só o preto ligado às **bordas**.
 
-A folha original (`{id}.png` ou `{id}.webp`) pode ficar na mesma pasta. O jogo usa só os 9 recortes.
+A folha original pode ficar em `assets/characters/{id}/`. O jogo usa os 12 recortes.
 
-## 1. Cortar as 9 imagens
+## 1. Cortar as 12 imagens
 
 Pasta: `assets/characters/{id}/`
 
-Arquivos:
+Arquivos (`-1` = frente, `-2` = perfil):
 
-- `{id}_head-1.png` `{id}_head-2.png` `{id}_head-3.png`
-- `{id}_body-1.png` `{id}_body-2.png` `{id}_body-3.png`
-- `{id}_legs-1.png` `{id}_legs-2.png` `{id}_legs-3.png`
+- `{id}_head-1.png` `{id}_head-2.png`
+- `{id}_body-1.png` `{id}_body-2.png`
+- `{id}_arm_l-1.png` `{id}_arm_l-2.png`
+- `{id}_arm_r-1.png` `{id}_arm_r-2.png`
+- `{id}_leg_l-1.png` `{id}_leg_l-2.png`
+- `{id}_leg_r-1.png` `{id}_leg_r-2.png`
 
 Cada PNG:
 
-- **300 × 200** pixels
+- **200 × 200** pixels
 - Fundo **transparente**
-- Não esticar o desenho. Se a célula for quadrada, encaixar no retângulo com faixa vazia nas laterais
+- Não esticar o desenho. Encaixar no quadrado, proporcional
+
+Comando:
+
+```
+python tools/slice_character_sheet.py CAMINHO_DA_FOLHA --id ID --name NOME --value 4 --write-defs
+```
 
 ## 2. Pontos de encaixe (ímãs)
 
-Os ímãs dizem onde a cabeça cola no pescoço, as pernas na cintura, e (no tronco) onde a arma vai ficar na mão.
+Os ímãs dizem onde cada esfera de metal cola na vizinha.
 
 **Não chute os números.** Marque na imagem:
 
 1. No Godot, menu **Project → Tools → Ímãs das Peças**.
-2. Na pasta **FileSystem**, clique na peça (`data/parts/cachorro_head.tres`, `medico_body.tres`…).
-3. Escolha **Frente**, **De lado** ou **Golpe**.
-4. Arraste a bolinha **CIMA** (azul) ou **BAIXO** (vermelha) até o pescoço ou a cintura. No **tronco**, arraste também a bolinha dourada **ARMA** até a mão. Não precisa de botão “marcar”.
+2. Na pasta **FileSystem**, clique na peça (`data/parts/leao_body.tres`…).
+3. Escolha **Frente** ou **De lado**.
+4. Arraste cada bolinha até o **centro da esfera de metal**. Não precisa de botão “marcar”.
 5. Salve a ficha (`Ctrl+S`).
 
-Espaço da imagem: o centro do PNG é `(0, 0)`. **Y cresce para baixo.** O X pode ser diferente de 0 se o pescoço ou a mão não estiverem no meio (cabeça de lado, por exemplo).
+Espaço da imagem: o centro do PNG é `(0, 0)`. **Y cresce para baixo.**
 
-A prévia embaixo aceita misturar sets: cabeça de cachorro + tronco de médico, para conferir o pescoço. No tronco aparece um ponto dourado no lugar da arma (a arma ainda não existe no jogo).
+| Peça | Ímãs |
+|------|------|
+| Cabeça | 1: BAIXO (base do pescoço) |
+| Tronco | 5: PESCOÇO, OMBRO E, OMBRO D, QUADRIL E, QUADRIL D |
+| Braço / perna | 1: CIMA (topo da peça) |
 
-| Peça | ímã de cima | ímã de baixo | arma |
-|------|-------------|--------------|------|
-| Cabeça | não usa | base do pescoço | não usa |
-| Tronco | coto do pescoço | cintura | mão (bolinha dourada) |
-| Pernas | cintura | não usa | não usa |
-
-Marque as **três poses**. A carta usa a frente; a luta usa lado e golpe. Se só a frente estiver marcada, o pescoço de lado fica torto. A arma também muda de lugar no golpe — marque as três.
+Marque **frente e perfil**. A carta usa a frente; a luta usa o lado. Se só a frente estiver marcada, o pescoço de lado fica torto.
 
 O mesmo desenho de ímãs também aparece no Inspetor quando você abre uma peça, com o botão **Abrir ferramenta de ímãs (imagem grande)**.
 
 ## 3. Números de combate
 
 Se o jogador pedir números, use os dele.
-
-Se não pedir, escolha um conjunto **diferente** dos sets que já existem. Cabeça = Ameaça, tronco = Força, pernas = Agilidade.
 
 O nível da loja sai do número:
 
@@ -101,15 +111,13 @@ Grave os dois: `combat_value` e `tier`.
 
 ## 4. Fichas das peças e do personagem
 
-Três peças em `data/parts/`:
+Seis peças em `data/parts/`:
 
-- `{id}_head.tres`
-- `{id}_body.tres`
-- `{id}_legs.tres`
+- `{id}_head.tres` `{id}_body.tres` `{id}_arm_l.tres` `{id}_arm_r.tres` `{id}_leg_l.tres` `{id}_leg_r.tres`
 
 Uma ficha em `data/parts/{id}_character.tres`.
 
-A loja (`ShopPool`) lê **todas** as fichas `*_character.tres` dessa pasta. Set novo entra nas caixas sozinho.
+A loja (`ShopPool`) lê as fichas `*_character.tres`. Para um teste com um set só, `ACTIVE_SET_IDS` lista esse id. Lista vazia = todos os sets.
 
 ## 5. Documentação
 
@@ -122,18 +130,13 @@ Atualize:
 
 ## 6. Conferir
 
-- Os 9 PNG são 300 × 200 e têm transparência de verdade
-- Preto de dentro do desenho (mancha, olho, tubo) não sumiu
-- Play: peça na caixa, encaixa na carta, set completo mostra o nome certo
-- Loja: peça 3–5 no nível 1; peça 9 só no nível 5
+- Os 12 PNG são 200 × 200 e têm transparência de verdade
+- Preto de dentro do desenho não sumiu
+- Play: peça na caixa, encaixa na carta, set completo (6 peças) mostra o nome certo
+- Tronco tem 5 ímãs visíveis na ferramenta
 
 ## Sets que já passaram por este fluxo
 
 | id | Nome | Números |
 |----|------|---------|
-| `vampiro` | Vampiro | 9 / 9 / 8 |
-| `policial` | Policial | 7 / 6 / 5 |
-| `bruxa` | Bruxa | 9 / 4 / 9 |
-| `mumia` | Múmia | 5 / 8 / 6 |
-| `medico` | Médico | 3 / 4 / 4 |
-| `cachorro` | Cachorro | 5 / 5 / 7 |
+| `leao` | Leão | 4 em todas as 6 peças (teste, loja nível 1) |

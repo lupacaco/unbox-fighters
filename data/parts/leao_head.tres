@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PartDef" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/characters/leao/leao_head-1.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/characters/leao/leao_head-2.png" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = &"leao_head"
+display_name = "Leão Cabeça"
+slot_type = 0
+sprite = ExtResource("2")
+sprite_profile = ExtResource("3")
+set_id = &"leao"
+combat_value = 4
+tier = 1
+magnet_down = Vector2(0, 86)
+magnet_down_profile = Vector2(-12, 83)

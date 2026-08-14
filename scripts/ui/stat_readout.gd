@@ -19,7 +19,21 @@ func set_total(total: int) -> void:
 	set_breakdown(0, 0, 0, total)
 
 func set_breakdown(threat: int, might: int, agility: int, power: int) -> void:
-	_total_label.text = "Ameaça %d   Força %d   Agilidade %d   ·  %d" % [threat, might, agility, power]
+	_total_label.text = "Cabeça %d   Tronco %d   Pernas %d   ·  %d" % [threat, might, agility, power]
+
+func set_from_loadout(loadout: FighterLoadout) -> void:
+	if loadout == null:
+		set_breakdown(0, 0, 0, 0)
+		return
+	_total_label.text = "C %d  T %d  BE %d  BD %d  PE %d  PD %d  ·  %d" % [
+		loadout.combat_value_of(PartSlotType.Value.HEAD),
+		loadout.combat_value_of(PartSlotType.Value.BODY),
+		loadout.combat_value_of(PartSlotType.Value.ARM_L),
+		loadout.combat_value_of(PartSlotType.Value.ARM_R),
+		loadout.combat_value_of(PartSlotType.Value.LEG_L),
+		loadout.combat_value_of(PartSlotType.Value.LEG_R),
+		loadout.total_power(),
+	]
 
 func set_complete(is_complete: bool) -> void:
 	_complete_glow.visible = is_complete

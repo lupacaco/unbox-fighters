@@ -9,17 +9,17 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 
 | Script | O que verifica |
 |--------|----------------|
-| `verify_synergy.gd` | 100/75/50, números dos 6 sets, curva de pancadas |
+| `verify_synergy.gd` | 100/75/50 no modelo de 6 peças, números do leão, curva de pancadas |
 | `verify_combat_sim.gd` | Choque, empate, teto de 12 de dano no HP |
-| `verify_shop_pool.gd` | Pelo menos 6 personagens; loja nível 1 não vende 9 nem tronco da múmia; 5 ofertas |
+| `verify_shop_pool.gd` | Só o leão; 6 peças nível 1; 5 ofertas |
 | `verify_match_state.gd` | 4 vivos, HP 40, nomes dos bots, oponente-fantasma |
 | `verify_assembly.gd` | 3 cartas, 5 caixas e VENDER à direita |
 | `verify_crate_open.gd` | Um clique na caixa solta a peça |
-| `verify_composite.gd` | Layout por ímãs |
-| `verify_part_magnets.gd` | Ímã de lado, poses e ponto da arma |
-| `verify_part_sizes.gd` | Sprites 300×200 e poses |
+| `verify_composite.gd` | Layout por ímãs (6 partes) |
+| `verify_part_magnets.gd` | Cabeça só embaixo; tronco com 5 ímãs |
+| `verify_part_sizes.gd` | Sprites 200×200 e perfil |
 | `verify_fight_line.gd` | Fila da luta no mesmo chão e no mesmo tamanho |
-| `verify_fight_poses.gd` | Personagens têm poses; carta aceita qualquer set |
+| `verify_fight_poses.gd` | Personagem tem perfil; carta aceita os 6 encaixes |
 | `verify_fight_lock.gd` | Travamento da carta; soltar peça em lugar ocupado devolve a antiga |
 | `debug_parts.gd` | Carrega peça e checa visibilidade do sprite |
 | `debug_reveal.gd` | Força revelar peça da caixa e checa transparência |

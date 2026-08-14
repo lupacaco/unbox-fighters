@@ -15,19 +15,19 @@
 | Fim de partida | **Você venceu!** / **Você saiu** e botão **NOVA PARTIDA** |
 | Abrir caixas | 1 clique, custa 1 pancada |
 | Arrastar e soltar | Peças nas cartas (troca no lugar ocupado); botão direito vende; Freak inteiro troca de carta ou vai para VENDER |
-| Visual composto | Ímãs unem cabeça / tronco / pernas (frente, lado e golpe; no tronco também o ponto da arma) |
-| Incluir Freak | Folha 3×3 vira 9 peças + fichas (menu Tools ou script); ímãs se marcam arrastando bolinhas |
+| Visual composto | Ímãs unem as 6 partes pelas esferas de metal (frente e perfil; tronco tem 5 ímãs) |
+| Incluir Freak | Folha 6+6 vira 12 peças 200×200 + fichas (menu Tools ou script); ímãs se marcam arrastando bolinhas |
 | Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |
 | Áudio | Efeitos: martelo, caixa, peças, impacto da luta |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |
-| Dados | Vampiro, Policial, Bruxa, Múmia, Médico e Cachorro (nomes em português na carta) |
+| Dados | **Leão** na loja (6 peças nível 1). Outros Freaks desligados neste teste |
 | Scripts de verificação | Rodam checagens sem abrir a interface completa |
 
 ## Parcial / provisório
 
 | Item | Observação |
 |------|------------|
-| Arte no padrão `-1/-2/-3` | Frente / perfil / ataque por peça, arquivos **300×200** |
+| Arte no padrão `-1/-2` | Frente / perfil por peça, arquivos **200×200**. Golpe (`-3`) é opcional |
 | ThemeTokens | Cores iguais às da Unity (ouro, creme, vermelho do PRONTO) |
 | IA dos bots | Completa set, preenche carta, só troca se a carta ficar mais forte, sobe nível com calma |
 

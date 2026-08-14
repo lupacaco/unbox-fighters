@@ -31,7 +31,7 @@ Há **1 jogador + 3 bots** (Sombra, Ferrugem, Névoa). HP inicial **40**. Não e
 
 - 3 cartas, da esquerda para a direita: **3º**, **2º**, **1º**.
 - O **1º** (direita) luta primeiro.
-- Pode ir incompleto (só pernas, por exemplo). Carta vazia é pulada.
+- Pode ir incompleto (só uma perna, por exemplo). Carta vazia é pulada.
 - Arrastar o Freak pelo rótulo **3º/2º/1º** troca a ordem com outra carta.
 
 ## Peças
@@ -40,36 +40,36 @@ Cada peça ocupa **um** tipo de encaixe:
 
 | Tipo | Significado | Tag |
 |------|-------------|-----|
-| HEAD | Cabeça | Ameaça (azul) |
-| BODY | Tronco | Força (roxo) |
-| LEGS | Pernas | Agilidade (verde) |
+| HEAD | Cabeça | Azul |
+| BODY | Tronco | Roxo |
+| ARM_L | Braço esquerdo (de quem olha) | Laranja |
+| ARM_R | Braço direito | Vermelho-claro |
+| LEG_L | Perna esquerda | Verde |
+| LEG_R | Perna direita | Verde-água |
 
 Cada peça tem **um** número de combate e um **nível** de loja.
 
-| Set | Cabeça | Tronco | Pernas | Total |
-|-----|--------|--------|--------|-------|
-| Policial | 7 | 6 | 5 | 18 |
-| Vampiro | 9 | 9 | 8 | 26 |
-| Bruxa | 9 | 4 | 9 | 22 |
-| Múmia | 5 | 8 | 6 | 19 |
-| Médico | 3 | 4 | 4 | 11 |
-| Cachorro | 5 | 5 | 7 | 17 |
+| Set | Peças | Total |
+|-----|-------|-------|
+| Leão (único na loja agora) | 6 × 4 | 24 |
 
-Nível da loja pela força da peça: 4–5 → 1; 6 → 2; 7 → 3; 8 → 4; 9 → 5.
+Os outros Freaks (vampiro, policial, bruxa, múmia, médico, cachorro) estão **desligados** da loja neste teste.
+
+Nível da loja pela força da peça: 3–5 → 1; 6 → 2; 7 → 3; 8 → 4; 9 → 5.
 
 ## Sinergia (na mesma carta)
 
 Conta quantas peças do **mesmo set** estão na carta. Arredonda para cima.
 
-- 3 iguais: 100%
-- 2 iguais: 75%
-- 1 só: 50%
+- 6 iguais: 100%
+- 3, 4 ou 5 iguais: 75%
+- 1 ou 2: 50%
 
-Exemplo: cabeça 5 sozinha vira **3**. Completar o set ainda vale muito mais.
+Exemplo: cabeça 4 sozinha vira **2**. Completar as 6 ainda vale muito mais.
 
 ## Luta
 
-De cima para baixo: cabeça, senão tronco, senão pernas.
+Ordem do choque: cabeça, braço E, braço D, tronco, perna E, perna D. Pula o que estiver vazio.
 
 - Se A > B: B morre, A fica A−B e segue.
 - Se empatar: as duas partes morrem.

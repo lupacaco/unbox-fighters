@@ -32,7 +32,7 @@ func _ready() -> void:
 
 	_empty = Label.new()
 	_empty.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_empty.text = "Clique numa peça na pasta FileSystem: data → parts.\nExemplo: cachorro_head ou medico_body."
+	_empty.text = "Clique numa peça na pasta FileSystem: data → parts.\nExemplo: leao_head ou leao_body."
 	column.add_child(_empty)
 
 	var open_folder := Button.new()

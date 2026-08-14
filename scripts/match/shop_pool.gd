@@ -3,6 +3,8 @@ class_name ShopPool
 extends RefCounted
 
 const PARTS_DIR := "res://data/parts"
+## Empty = every character file. For this test, only the lion is sold.
+const ACTIVE_SET_IDS: PackedStringArray = ["leao"]
 
 static var _all_parts: Array[PartDef] = []
 static var _roster: Array[CharacterDef] = []
@@ -66,7 +68,9 @@ static func _ensure_loaded() -> void:
 		if character == null:
 			push_error("ShopPool missing character: %s" % name)
 			continue
+		if not ACTIVE_SET_IDS.is_empty() and String(character.id) not in ACTIVE_SET_IDS:
+			continue
 		_roster.append(character)
-		for part in [character.head, character.body, character.legs]:
-			if part != null:
+		for part in character.all_parts():
+			if part != null and part not in _all_parts:
 				_all_parts.append(part)

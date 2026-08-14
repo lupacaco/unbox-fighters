@@ -35,5 +35,11 @@ static func color_for_slot(slot: PartSlotType.Value) -> Color:
 			return THREAT
 		PartSlotType.Value.BODY:
 			return MIGHT
-		_:
+		PartSlotType.Value.ARM_L:
+			return Color(0.96, 0.55, 0.22)
+		PartSlotType.Value.ARM_R:
+			return Color(0.95, 0.35, 0.28)
+		PartSlotType.Value.LEG_L:
 			return AGILITY
+		_:
+			return Color(0.22, 0.78, 0.72)

@@ -129,7 +129,7 @@ static func _queue_from_board(board: BoardLoadout) -> Array[LiveFighter]:
 static func _live_from_loadout(loadout: FighterLoadout, queue_index: int) -> LiveFighter:
 	var fighter := LiveFighter.new()
 	fighter.queue_index = queue_index
-	for slot in [PartSlotType.Value.HEAD, PartSlotType.Value.BODY, PartSlotType.Value.LEGS]:
+	for slot in PartSlotType.fight_order():
 		var live := LivePart.new()
 		live.slot = slot
 		live.part = loadout.get_part(slot)

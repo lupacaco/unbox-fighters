@@ -4,51 +4,48 @@ func _init() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
-	var policial: CharacterDef = load("res://data/parts/policial_character.tres")
-	var vampiro: CharacterDef = load("res://data/parts/vampiro_character.tres")
-	var bruxa: CharacterDef = load("res://data/parts/bruxa_character.tres")
-
-	if not _test_clash_leftover(policial, bruxa):
+	var leao: CharacterDef = load("res://data/parts/leao_character.tres")
+	if not _test_clash_leftover(leao):
 		quit(1)
 		return
-	if not _test_tie_kills_both(policial):
+	if not _test_tie_kills_both(leao):
 		quit(1)
 		return
-	if not _test_damage_cap(vampiro):
+	if not _test_damage_cap(leao):
 		quit(1)
 		return
-	if not _test_empty_vs_full(vampiro):
+	if not _test_empty_vs_full(leao):
 		quit(1)
 		return
 	print("VERIFY_COMBAT_SIM_PASS")
 	quit(0)
 
-func _test_clash_leftover(policial: CharacterDef, bruxa: CharacterDef) -> bool:
+func _test_clash_leftover(leao: CharacterDef) -> bool:
 	var left := BoardLoadout.new()
-	left.fighters[0] = FighterLoadout.from_parts(policial.head, policial.body, policial.legs)
+	left.fighters[0] = FighterLoadout.from_character(leao)
 	var right := BoardLoadout.new()
-	right.fighters[0] = FighterLoadout.from_parts(null, bruxa.body, null)
+	right.fighters[0] = FighterLoadout.from_parts(null, leao.body, null)
 	var result := CombatSim.simulate(left, right)
 	var first = result.events[0]
 	if first.kind != CombatEvent.Kind.CLASH:
 		push_error("VERIFY_FAIL expected a clash")
 		return false
-	if first.left_value != 7 or first.right_value != 2:
-		push_error("VERIFY_FAIL expected 7 vs 2 (witch body solo 50%), got %d vs %d" % [first.left_value, first.right_value])
+	if first.left_value != 4 or first.right_value != 2:
+		push_error("VERIFY_FAIL expected 4 vs 2 (body solo 50%), got %d vs %d" % [first.left_value, first.right_value])
 		return false
-	if first.winning_side != CombatEvent.Side.LEFT or first.left_leftover != 5:
-		push_error("VERIFY_FAIL leftover should be 5")
+	if first.winning_side != CombatEvent.Side.LEFT or first.left_leftover != 2:
+		push_error("VERIFY_FAIL leftover should be 2")
 		return false
 	if result.damage_to_right != 12:
-		push_error("VERIFY_FAIL police leftover should cap at 12, got %d" % result.damage_to_right)
+		push_error("VERIFY_FAIL leftover should cap at 12, got %d" % result.damage_to_right)
 		return false
 	return true
 
-func _test_tie_kills_both(policial: CharacterDef) -> bool:
+func _test_tie_kills_both(leao: CharacterDef) -> bool:
 	var left := BoardLoadout.new()
-	left.fighters[0] = FighterLoadout.from_parts(policial.legs, null, null)
+	left.fighters[0] = FighterLoadout.from_parts(leao.head, null, null)
 	var right := BoardLoadout.new()
-	right.fighters[0] = FighterLoadout.from_parts(policial.legs, null, null)
+	right.fighters[0] = FighterLoadout.from_parts(leao.head, null, null)
 	var result := CombatSim.simulate(left, right)
 	var first = result.events[0]
 	if first.winning_side != CombatEvent.Side.TIE:
@@ -62,24 +59,24 @@ func _test_tie_kills_both(policial: CharacterDef) -> bool:
 		return false
 	return true
 
-func _test_damage_cap(vampiro: CharacterDef) -> bool:
+func _test_damage_cap(leao: CharacterDef) -> bool:
 	var left := BoardLoadout.new()
-	left.fighters[0] = FighterLoadout.from_parts(vampiro.head, vampiro.body, vampiro.legs)
-	left.fighters[1] = FighterLoadout.from_parts(vampiro.head, vampiro.body, vampiro.legs)
-	left.fighters[2] = FighterLoadout.from_parts(vampiro.head, vampiro.body, vampiro.legs)
+	left.fighters[0] = FighterLoadout.from_character(leao)
+	left.fighters[1] = FighterLoadout.from_character(leao)
+	left.fighters[2] = FighterLoadout.from_character(leao)
 	var right := BoardLoadout.new()
 	var result := CombatSim.simulate(left, right)
 	if result.damage_to_right != 36:
-		push_error("VERIFY_FAIL three vampires vs empty should deal 36, got %d" % result.damage_to_right)
+		push_error("VERIFY_FAIL three lions vs empty should deal 36, got %d" % result.damage_to_right)
 		return false
 	return true
 
-func _test_empty_vs_full(vampiro: CharacterDef) -> bool:
+func _test_empty_vs_full(leao: CharacterDef) -> bool:
 	var left := BoardLoadout.new()
 	var right := BoardLoadout.new()
-	right.fighters[0] = FighterLoadout.from_parts(vampiro.head, vampiro.body, vampiro.legs)
+	right.fighters[0] = FighterLoadout.from_character(leao)
 	var result := CombatSim.simulate(left, right)
 	if result.winning_side != CombatEvent.Side.RIGHT or result.damage_to_left != 12:
-		push_error("VERIFY_FAIL empty board should take 12 from one vampire")
+		push_error("VERIFY_FAIL empty board should take 12 from one lion")
 		return false
 	return true

@@ -50,10 +50,19 @@ text = "LUTAR"
 [node name="Composite" type="Sprite2D" parent="Display"]
 centered = true
 
-[node name="Legs" type="Sprite2D" parent="Display"]
+[node name="LegL" type="Sprite2D" parent="Display"]
+centered = true
+
+[node name="LegR" type="Sprite2D" parent="Display"]
 centered = true
 
 [node name="Body" type="Sprite2D" parent="Display"]
+centered = true
+
+[node name="ArmL" type="Sprite2D" parent="Display"]
+centered = true
+
+[node name="ArmR" type="Sprite2D" parent="Display"]
 centered = true
 
 [node name="Head" type="Sprite2D" parent="Display"]
@@ -75,13 +84,31 @@ collision_mask = 0
 monitoring = false
 monitorable = false
 
+[node name="ArmL" type="Area2D" parent="Zones"]
+collision_layer = 2
+collision_mask = 0
+monitoring = false
+monitorable = false
+
 [node name="Body" type="Area2D" parent="Zones"]
 collision_layer = 2
 collision_mask = 0
 monitoring = false
 monitorable = false
 
-[node name="Legs" type="Area2D" parent="Zones"]
+[node name="ArmR" type="Area2D" parent="Zones"]
+collision_layer = 2
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="LegL" type="Area2D" parent="Zones"]
+collision_layer = 2
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="LegR" type="Area2D" parent="Zones"]
 collision_layer = 2
 collision_mask = 0
 monitoring = false

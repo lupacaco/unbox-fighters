@@ -2,11 +2,16 @@
 extends RefCounted
 
 const SheetSlicer := preload("res://addons/part_magnet_editor/sheet_slicer.gd")
-const SLOT_LABELS: PackedStringArray = ["Head", "Body", "Legs"]
+
+const SLOT_NAMES: PackedStringArray = ["head", "body", "arm_l", "arm_r", "leg_l", "leg_r"]
+const SLOT_LABELS: PackedStringArray = ["Cabeça", "Tronco", "Braço E", "Braço D", "Perna E", "Perna D"]
 const SLOT_TYPES: Array[PartSlotType.Value] = [
 	PartSlotType.Value.HEAD,
 	PartSlotType.Value.BODY,
-	PartSlotType.Value.LEGS,
+	PartSlotType.Value.ARM_L,
+	PartSlotType.Value.ARM_R,
+	PartSlotType.Value.LEG_L,
+	PartSlotType.Value.LEG_R,
 ]
 
 static func slice_sheet(sheet_path: String, set_id: String) -> PackedStringArray:
@@ -28,27 +33,22 @@ static func keep_source_sheet(sheet_path: String, set_id: String) -> void:
 		DirAccess.copy_absolute(abs_sheet, keep)
 
 
-static func write_defs(
-	set_id: String,
-	display_name: String,
-	head_value: int,
-	body_value: int,
-	legs_value: int
-) -> String:
+static func write_defs(set_id: String, display_name: String, values: Array) -> String:
 	set_id = clean_id(set_id)
 	if set_id.is_empty():
-		return "O id interno precisa ser minúsculo, sem acento. Exemplo: zumbi."
+		return "O id interno precisa ser minúsculo, sem acento. Exemplo: leao."
 	if display_name.strip_edges().is_empty():
 		display_name = set_id.capitalize()
+	if values.size() < 6:
+		return "Faltam os 6 números de combate."
 
-	var values: Array[int] = [head_value, body_value, legs_value]
 	var parts: Array[PartDef] = []
-	for i in 3:
-		var slot_name: String = ["head", "body", "legs"][i]
+	for i in SLOT_NAMES.size():
+		var slot_name: String = SLOT_NAMES[i]
 		var tex1 := load("res://assets/characters/%s/%s_%s-1.png" % [set_id, set_id, slot_name]) as Texture2D
 		if tex1 == null:
 			return "Ainda não achei as imagens de %s. Espere o Godot importar e tente de novo." % slot_name
-		var part := _make_part(set_id, display_name, slot_name, SLOT_TYPES[i], values[i])
+		var part := _make_part(set_id, display_name, slot_name, SLOT_TYPES[i], int(values[i]))
 		var path := "res://data/parts/%s_%s.tres" % [set_id, slot_name]
 		var save_err := ResourceSaver.save(part, path)
 		if save_err != OK:
@@ -60,7 +60,10 @@ static func write_defs(
 	character.display_name = display_name
 	character.head = parts[0]
 	character.body = parts[1]
-	character.legs = parts[2]
+	character.arm_l = parts[2]
+	character.arm_r = parts[3]
+	character.leg_l = parts[4]
+	character.leg_r = parts[5]
 	var char_path := "res://data/parts/%s_character.tres" % set_id
 	var char_err := ResourceSaver.save(character, char_path)
 	if char_err != OK:
@@ -78,18 +81,31 @@ static func _make_part(
 ) -> PartDef:
 	var part := PartDef.new()
 	part.id = StringName("%s_%s" % [set_id, slot_name])
-	part.display_name = "%s %s" % [display_name, SLOT_LABELS[["head", "body", "legs"].find(slot_name)]]
+	part.display_name = "%s %s" % [display_name, SLOT_LABELS[SLOT_NAMES.find(slot_name)]]
 	part.slot_type = slot_type
 	part.set_id = StringName(set_id)
 	part.combat_value = combat_value
 	part.tier = PartDef.tier_for(combat_value)
 	part.sprite = load("res://assets/characters/%s/%s_%s-1.png" % [set_id, set_id, slot_name]) as Texture2D
 	part.sprite_profile = load("res://assets/characters/%s/%s_%s-2.png" % [set_id, set_id, slot_name]) as Texture2D
-	part.sprite_attack = load("res://assets/characters/%s/%s_%s-3.png" % [set_id, set_id, slot_name]) as Texture2D
-	if slot_type != PartSlotType.Value.HEAD:
-		part.magnet_up = CompositeResolver.DEFAULT_LEGS_UP if slot_type == PartSlotType.Value.LEGS else CompositeResolver.DEFAULT_BODY_UP
-	if slot_type != PartSlotType.Value.LEGS:
-		part.magnet_down = CompositeResolver.DEFAULT_HEAD_DOWN if slot_type == PartSlotType.Value.HEAD else CompositeResolver.DEFAULT_BODY_DOWN
+	match slot_type:
+		PartSlotType.Value.HEAD:
+			part.magnet_down = CompositeResolver.DEFAULT_HEAD_DOWN
+			part.magnet_down_profile = CompositeResolver.DEFAULT_HEAD_DOWN
+		PartSlotType.Value.BODY:
+			part.magnet_neck = CompositeResolver.DEFAULT_NECK
+			part.magnet_shoulder_l = CompositeResolver.DEFAULT_SHOULDER_L
+			part.magnet_shoulder_r = CompositeResolver.DEFAULT_SHOULDER_R
+			part.magnet_hip_l = CompositeResolver.DEFAULT_HIP_L
+			part.magnet_hip_r = CompositeResolver.DEFAULT_HIP_R
+			part.magnet_neck_profile = CompositeResolver.DEFAULT_NECK
+			part.magnet_shoulder_l_profile = CompositeResolver.DEFAULT_SHOULDER_L
+			part.magnet_shoulder_r_profile = CompositeResolver.DEFAULT_SHOULDER_R
+			part.magnet_hip_l_profile = CompositeResolver.DEFAULT_HIP_L
+			part.magnet_hip_r_profile = CompositeResolver.DEFAULT_HIP_R
+		_:
+			part.magnet_up = CompositeResolver.DEFAULT_LIMB_UP
+			part.magnet_up_profile = CompositeResolver.DEFAULT_LIMB_UP
 	return part
 
 static func clean_id(raw: String) -> String:

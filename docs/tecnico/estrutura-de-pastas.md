@@ -12,6 +12,7 @@ unbox-fighters/
 │   ├── boxes/             # Sprites da caixa (fechada / quebrada)
 │   ├── objects/           # Objetos de UI (martelo do cursor)
 │   ├── audio/sfx/         # Efeitos sonoros (.wav)
+│   ├── characters/leao/
 │   ├── characters/vampiro/
 │   ├── characters/policial/
 │   ├── characters/bruxa/
@@ -46,7 +47,7 @@ As regras em `.cursor/rules/` ensinam o assistente a falar simples, atualizar do
 | Mudar regras de composição visual | `scripts/data/composite_resolver.gd` |
 | Mudar regras de luta / loja / bots | `scripts/match/` |
 | Mudar HUD / fundo / tags | `scripts/ui/` |
-| Preparar imagens 300×200 | `tools/` |
+| Preparar imagens 200×200 | `tools/` |
 | Incluir um Freak novo | [Incluir personagem](incluir-personagem.md) |
 | Documentação | `docs/` |
 
