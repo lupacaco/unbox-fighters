@@ -18,7 +18,7 @@
 | Visual composto | Base-mola em toda carta (menor que as peças e um pouco mais baixa; solta vazia, pressionada com peça). Ímãs unem cabeça e tronco pelas esferas; cada braço cola no ombro. Na frente os braços abrem um pouco |
 | Interface | Fontes de jogo, botões com borda ouro, loja nas laterais (não em cima da esteira) |
 | Incluir Freak | Folha 6+6 vira 12 PNG 200×200 + 4 kits na loja; ímãs em janela compacta (Ampliar para precisão). A mola já está na carta |
-| Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |
+| Fundo de arena | Respiração de vinheta + partículas de poeira. Fundo e esteira não mudam na luta |
 | Áudio | Efeitos gravados (martelo, caixa, ímã). Na luta: boing de mola de desenho no impulso, passo no pouso e poom do golpe |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |
 | Dados | Loja lê sozinha todo `*_character.tres` (Leão, Médico, Vampiro, Bruxa) |

@@ -38,6 +38,16 @@ func _run() -> void:
 		push_error("VERIFY_FAIL belt should span the full screen width")
 		quit(1)
 		return
+	var cam := scene.get_node_or_null("Camera2D") as Camera2D
+	if cam == null or not cam.zoom.is_equal_approx(Vector2.ONE):
+		push_error("VERIFY_FAIL camera should stay at rest so the field does not jump")
+		quit(1)
+		return
+	var tray := scene.get_node("Tray") as Node2D
+	if tray == null or not tray.position.is_equal_approx(AssemblyLayout.TRAY):
+		push_error("VERIFY_FAIL conveyor tray should stay planted")
+		quit(1)
+		return
 	if AssemblyLayout.REFRESH.y + 40.0 >= AssemblyLayout.belt_world_top():
 		push_error("VERIFY_FAIL shop buttons should sit above the conveyor")
 		quit(1)

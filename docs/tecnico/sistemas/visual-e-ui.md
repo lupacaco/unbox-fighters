@@ -19,7 +19,7 @@ Interface da preparação e da luta. As posições da tela seguem o mesmo mapa d
 | `scripts/ui/hammer_cursor.gd` | Cursor martelo ao passar / bater nas caixas |
 | `scripts/assembly/sell_zone.gd` | Área **VENDER +1** à direita; fica dourada quando a peça passa por cima |
 
-Durante a luta, o HUD de cima e a loja somem. Só ficam as placas da luta (nomes, HP e VS **fixos na tela**, para o zoom da câmera não cortar). No fim: **Você venceu!** ou **Você saiu**.
+Durante a luta, o HUD de cima e a loja somem. O **fundo e a esteira ficam iguais**. Só ficam as placas da luta (nomes, HP e VS no topo). No fim: **Você venceu!** ou **Você saiu**.
 
 ## Cores das tags
 

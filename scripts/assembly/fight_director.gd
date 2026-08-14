@@ -2,6 +2,7 @@ class_name FightDirector
 extends Node
 
 ## Plays a simulated queue fight on the conveyor: one pair at a time, walk in, clash, KO.
+## Background and belt stay planted. Cards, shop and fighters enter and leave.
 
 const KitThrow := preload("res://scripts/assembly/thrown_kit.gd")
 
@@ -19,7 +20,6 @@ const OPPONENT_ENTER := Vector2(2040, 400)
 const WALK_PX_PER_SEC := 280.0
 const JUMP_SEC := 0.5
 const JUMP_HEIGHT := 260.0
-const CAMERA_FIGHT_ZOOM := Vector2(1.12, 1.12)
 
 class StageFighter:
 	var root: Node2D
@@ -33,14 +33,10 @@ class StageFighter:
 var _busy: bool = false
 var _tray: Node2D
 var _fx: Node2D
-var _camera: Camera2D
-var _camera_rest_zoom := Vector2.ONE
-var _camera_rest_offset := Vector2.ZERO
 var _stage: Node2D
 var _hud_layer: CanvasLayer
 var _dust_fx: CPUParticles2D
 var _spark_fx: CPUParticles2D
-var _flash_poly: Polygon2D
 var _burst_poly: Polygon2D
 var _slash: Line2D
 var _shock: Line2D
@@ -75,13 +71,7 @@ func play(
 	Engine.time_scale = 1.0
 	if drag_service != null:
 		drag_service.set_locked(true)
-	_camera = _ensure_camera()
-	_camera_rest_zoom = _camera.zoom
-	_camera_rest_offset = _camera.offset
 	_ensure_fx_pool()
-	_set_arena(true)
-	_flash(Color(1, 0.92, 0.75, 0.22), 0.12)
-	_camera_punch(8.0, 0.16)
 	_hide_shop(shop_nodes)
 
 	_stage = Node2D.new()
@@ -103,7 +93,6 @@ func play(
 		slot.set_fight_locked(true)
 		slot.set_fighter_visible(false)
 		_lift_card(slot)
-	_aim_camera(true)
 
 	var name_l := _hud_plaque(AssemblyLayout.FIGHT_NAME_LEFT, Vector2(280, 54), 22, ThemeTokens.INK, false)
 	name_l.set_text(left_name)
@@ -179,13 +168,14 @@ func play(
 		slot.set_fighter_visible(true)
 	_show_shop(shop_nodes)
 	if is_instance_valid(_stage):
+		_stage.position = Vector2.ZERO
 		_stage.queue_free()
 	_stage = null
 	if is_instance_valid(_hud_layer):
 		_hud_layer.queue_free()
 	_hud_layer = null
-	_set_arena(false)
-	_restore_camera()
+	if _tray != null and is_instance_valid(_tray):
+		_tray.position = AssemblyLayout.TRAY
 	Engine.time_scale = 1.0
 	if drag_service != null:
 		drag_service.set_locked(false)
@@ -562,19 +552,10 @@ func _jump_home_one(fighter: StageFighter, opponent: bool, done: Callable) -> vo
 
 func _land_impact(fighter: StageFighter) -> void:
 	_dust(fighter.puppet.feet_position())
-	_flash(Color(1, 0.95, 0.8, 0.16), 0.08)
-	_camera_punch(12.0, 0.22)
 	await _squash(fighter.visual, Vector2(1.24, 0.64), 0.07)
 	await _squash(fighter.visual, Vector2(0.94, 1.10), 0.10)
 	await _squash(fighter.visual, Vector2.ONE, 0.16)
-	if _tray == null:
-		return
-	var origin := _tray.position
-	var shake := create_tween()
-	shake.tween_property(_tray, "position", origin + Vector2(0, 14), 0.05)
-	shake.tween_property(_tray, "position", origin + Vector2(0, -8), 0.05)
-	shake.tween_property(_tray, "position", origin, 0.08)
-	await shake.finished
+	_shake_fighters(14.0, 0.18)
 
 func _lift_card(slot: CharacterSlot) -> void:
 	if slot == null or _lifted.has(slot):
@@ -634,9 +615,7 @@ func _move_to(node: Node2D, to: Vector2, duration: float) -> void:
 
 func _clash_impact(left: StageFighter, right: StageFighter, event: CombatEvent, mid: Vector2) -> void:
 	var tint := ThemeTokens.color_for_slot(event.left_slot).lerp(ThemeTokens.color_for_slot(event.right_slot), 0.5)
-	_flash(Color(tint.r, tint.g, tint.b, 0.28), 0.12)
-	_camera_punch(26.0, 0.28)
-	_shelf_thump()
+	_shake_fighters(10.0, 0.17)
 	_hit_spark(mid, tint)
 	_impact_burst(mid, tint)
 	_shockwave(mid, tint)
@@ -649,14 +628,14 @@ func _clash_impact(left: StageFighter, right: StageFighter, event: CombatEvent, 
 	right.puppet.play_flinch(1.0)
 	await _hit_stop(0.09)
 
-func _shelf_thump() -> void:
-	if _tray == null:
+func _shake_fighters(amount: float, duration: float) -> void:
+	if _stage == null or not is_instance_valid(_stage):
 		return
-	var origin := _tray.position
+	var origin := _stage.position
 	var shake := create_tween()
-	shake.tween_property(_tray, "position", origin + Vector2(0, 10), 0.04)
-	shake.tween_property(_tray, "position", origin + Vector2(0, -6), 0.05)
-	shake.tween_property(_tray, "position", origin, 0.08)
+	shake.tween_property(_stage, "position", origin + Vector2(0, amount), duration * 0.3)
+	shake.tween_property(_stage, "position", origin + Vector2(0, -amount * 0.4), duration * 0.25)
+	shake.tween_property(_stage, "position", origin, duration * 0.45)
 
 func _hit_flash(fighter: StageFighter) -> void:
 	if fighter == null or not is_instance_valid(fighter.visual):
@@ -734,38 +713,6 @@ func _squash(node: Node2D, to: Vector2, duration: float) -> void:
 	tween.tween_property(node, "scale", to, duration)
 	await tween.finished
 
-func _flash(color: Color, duration: float) -> void:
-	_ensure_fx_pool()
-	if _flash_poly == null:
-		return
-	_flash_poly.color = color
-	_flash_poly.modulate.a = 1.0
-	_flash_poly.visible = true
-	var tween := create_tween()
-	tween.tween_property(_flash_poly, "modulate:a", 0.0, duration)
-	tween.tween_callback(func() -> void:
-		if is_instance_valid(_flash_poly):
-			_flash_poly.visible = false
-	)
-
-func _camera_punch(amount: float, duration: float) -> void:
-	if _camera == null:
-		return
-	var origin := _camera.offset
-	var tween := create_tween()
-	tween.tween_property(_camera, "offset", origin + Vector2(amount * 0.45, amount), duration * 0.3)
-	tween.tween_property(_camera, "offset", origin + Vector2(-amount * 0.25, amount * 0.2), duration * 0.25)
-	tween.tween_property(_camera, "offset", origin, duration * 0.45)
-
-func _aim_camera(on: bool) -> void:
-	if _camera == null:
-		return
-	var zoom := CAMERA_FIGHT_ZOOM if on else _camera_rest_zoom
-	var offset := _camera_rest_offset + (Vector2(0, 26) if on else Vector2.ZERO)
-	var tween := create_tween()
-	tween.tween_property(_camera, "zoom", zoom, 0.38).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(_camera, "offset", offset, 0.38)
-
 func _dust(pos: Vector2) -> void:
 	_ensure_fx_pool()
 	if _dust_fx == null:
@@ -821,14 +768,6 @@ func _ensure_fx_pool() -> void:
 		_spark_fx.color = Color(1.0, 0.86, 0.45, 0.9)
 		_spark_fx.z_index = 60
 		_fx.add_child(_spark_fx)
-	if _flash_poly == null or not is_instance_valid(_flash_poly):
-		_flash_poly = Polygon2D.new()
-		_flash_poly.polygon = PackedVector2Array([
-			Vector2(0, 0), Vector2(1920, 0), Vector2(1920, 1080), Vector2(0, 1080)
-		])
-		_flash_poly.z_index = 200
-		_flash_poly.visible = false
-		_fx.add_child(_flash_poly)
 	if _burst_poly == null or not is_instance_valid(_burst_poly):
 		_burst_poly = Polygon2D.new()
 		_burst_poly.polygon = _star_points(8, 42.0, 16.0)
@@ -859,27 +798,6 @@ func _ensure_fx_pool() -> void:
 		_shock.visible = false
 		_fx.add_child(_shock)
 
-func _restore_camera() -> void:
-	if _camera == null:
-		return
-	_camera.zoom = _camera_rest_zoom
-	_camera.offset = _camera_rest_offset
-
-func _ensure_camera() -> Camera2D:
-	var cam := get_viewport().get_camera_2d()
-	if cam != null:
-		return cam
-	cam = Camera2D.new()
-	cam.position = Vector2(960, 540)
-	get_parent().add_child(cam)
-	cam.make_current()
-	return cam
-
-func _set_arena(on: bool) -> void:
-	var bg := get_parent().get_node_or_null("BackgroundFX") as BackgroundFX
-	if bg != null:
-		bg.set_arena(on)
-
 func _hide_shop(nodes: Array) -> void:
 	for node in nodes:
 		if node is Node2D and is_instance_valid(node):
@@ -888,6 +806,8 @@ func _hide_shop(nodes: Array) -> void:
 
 func _show_shop(nodes: Array) -> void:
 	for node in nodes:
+		if node is Crate:
+			continue
 		if node is Node2D and is_instance_valid(node):
 			var tween := create_tween()
 			tween.tween_property(node, "modulate:a", 1.0, 0.28)

@@ -6,7 +6,7 @@ Cada choque sorteia um kit vivo de cada Freak (cabeça, tronco, braço E ou bra�
 
 ## Sequência
 
-1. Flash na tela. As cartas **sobem ~460 px e somem**. A loja e o HUD de cima somem. A câmera se aproxima um pouco. Os nomes, o HP e o VS ficam **fixos na tela** (não entram no zoom), para não cortar em cima.
+1. As cartas **sobem e somem**. A loja e o HUD de cima saem. **O fundo e a esteira ficam parados** (sem zoom, sem piscar, sem tremer). Os nomes, o HP e o VS aparecem no topo.
 2. Só **um de cada lado** entra: pulam ao mesmo tempo na esteira (impacto no pouso) e **dão dois pulos** até o lugar do ataque, um de cada lado do centro. Os outros esperam fora do palco.
 3. **Anda** de perfil, pulando de verdade. Cada pulo: a mola **aperta** no chão, **impulsiona** e o brinquedo inteiro (base + Freak) **sai do chão** num arco; no ar a mola fica **solta**; ao cair, aperta um pouco mais e volta. Uma **sombra oval** fica no chão da mola (encolhe um pouco no ar). Embaixo dela, um **recorte mais escuro** nos rolos (quase não some no pulo), para a mola parecer encaixada na esteira. Parado, a mola fica pressionada e **o disco da base encosta nos rolos**. Braços e cabeça acompanham. Os dois do duelo ficam **na mesma altura do chão** e do **mesmo tamanho**.
 
@@ -31,9 +31,9 @@ Na luta, quem cobre quem **não** usa o Z da ferramenta de ímãs. **1 fica na f
 Depois:
 
 4. Placas no topo: nomes, HP e **VS**.
-5. Cada choque: **só o kit vencedor** se prepara e **sai do corpo**. A peça perdedora **fica colada** no Freak. O kit voa até o ponto da peça alvo, a tela trava um instante, a câmera treme, faísca e anel de impacto. Aí a peça atingida é **arrancada e arremessada para fora da tela e some**. A que ganha **volta no corpo como um bumerangue**. Se empatar, **os dois atacam juntos**, batem no centro com física (o jogo calcula o tombo de verdade) e **os dois voam para fora da tela**. Placas com os números; o vencedor mostra o **resto**.
+5. Cada choque: **só o kit vencedor** se prepara e **sai do corpo**. A peça perdedora **fica colada** no Freak. O kit voa até o ponto da peça alvo, a tela trava um instante, os lutadores tremem (a esteira não), faísca e anel de impacto. Aí a peça atingida é **arrancada e arremessada para fora da tela e some**. A que ganha **volta no corpo como um bumerangue**. Se empatar, **os dois atacam juntos**, batem no centro com física (o jogo calcula o tombo de verdade) e **os dois voam para fora da tela**. Placas com os números; o vencedor mostra o **resto**.
 6. Freak inteiro cai → placa **KO**, inclina e sai. **Aí** o próximo daquele lado pula no palco e se aproxima. O que ganhou fica esperando.
-7. Fim: EMPATE ou nome + dano. Cartas voltam. Quem ainda está de pé pula de volta. Aí a esteira é limpa.
+7. Fim: EMPATE ou nome + dano. Cartas voltam. Quem ainda está de pé pula de volta. Fundo e esteira continuam iguais.
 
 A poeira dos passos é **um** efeito reaproveitado, não um novo a cada passo. Isso deixa a luta mais leve no computador.
 
