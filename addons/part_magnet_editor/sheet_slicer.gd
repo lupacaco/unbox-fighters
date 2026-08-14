@@ -8,7 +8,6 @@ const MIN_BLOB := 400
 const SLOT_NAMES: PackedStringArray = ["head", "body", "arm_l", "arm_r", "leg_l", "leg_r"]
 
 static func slice_to_folder(sheet_path: String, set_id: String) -> Dictionary:
-	var empty := PackedStringArray()
 	if set_id.is_empty():
 		return _fail("O id interno precisa ser minúsculo, sem acento. Exemplo: leao.")
 	var img := Image.new()
@@ -20,8 +19,13 @@ static func slice_to_folder(sheet_path: String, set_id: String) -> Dictionary:
 		return _fail("Não consegui abrir essa imagem. Use PNG ou WEBP.")
 	if img.get_format() != Image.FORMAT_RGBA8:
 		img.convert(Image.FORMAT_RGBA8)
-	var blobs := _find_blobs(img)
+	var keep_dark := _uses_alpha_background(img)
+	var blobs := _find_blobs(img, keep_dark)
 	var named := _classify(blobs, img.get_width(), img.get_height())
+	if not _named_ok(named):
+		keep_dark = not keep_dark
+		blobs = _find_blobs(img, keep_dark)
+		named = _classify(blobs, img.get_width(), img.get_height())
 	var classify_err := String(named.get("error", ""))
 	if not classify_err.is_empty():
 		return _fail(classify_err)
@@ -43,7 +47,7 @@ static func slice_to_folder(sheet_path: String, set_id: String) -> Dictionary:
 			var x1 := mini(img.get_width(), box.end.x + pad)
 			var y1 := mini(img.get_height(), box.end.y + pad)
 			var crop := img.get_region(Rect2i(x0, y0, x1 - x0, y1 - y0))
-			_flood_edge_black(crop)
+			_flood_edge_black(crop, keep_dark)
 			var fitted := _fit_canvas(crop, OUT, OUT)
 			var path := "%s/%s_%s-%s.png" % [out_dir, set_id, slot_name, suffix]
 			fitted.save_png(ProjectSettings.globalize_path(path))
@@ -63,7 +67,28 @@ static func _group_complete(group: Dictionary) -> bool:
 			return false
 	return true
 
-static func _find_blobs(img: Image) -> Array:
+static func _named_ok(named: Dictionary) -> bool:
+	if not String(named.get("error", "")).is_empty():
+		return false
+	return _group_complete(named.get("front", {})) and _group_complete(named.get("profile", {}))
+
+static func _uses_alpha_background(img: Image) -> bool:
+	var w := img.get_width()
+	var h := img.get_height()
+	var hits := 0
+	for p in [
+		Vector2i(0, 0),
+		Vector2i(w - 1, 0),
+		Vector2i(0, h - 1),
+		Vector2i(w - 1, h - 1),
+		Vector2i(int(w / 2.0), 0),
+		Vector2i(0, int(h / 2.0)),
+	]:
+		if img.get_pixel(p.x, p.y).a < 0.04:
+			hits += 1
+	return hits >= 4
+
+static func _find_blobs(img: Image, opaque_is_ink: bool) -> Array:
 	var w := img.get_width()
 	var h := img.get_height()
 	var data := img.get_data()
@@ -73,7 +98,7 @@ static func _find_blobs(img: Image) -> Array:
 	for y in h:
 		for x in w:
 			var idx := y * w + x
-			if seen[idx] != 0 or not _is_ink_at(data, idx):
+			if seen[idx] != 0 or not _is_ink_at(data, idx, opaque_is_ink):
 				continue
 			var q: Array[Vector2i] = [Vector2i(x, y)]
 			var qi := 0
@@ -102,7 +127,7 @@ static func _find_blobs(img: Image) -> Array:
 					var ni := n.y * w + n.x
 					if seen[ni] != 0:
 						continue
-					if not _is_ink_at(data, ni):
+					if not _is_ink_at(data, ni, opaque_is_ink):
 						continue
 					seen[ni] = 1
 					q.append(n)
@@ -116,10 +141,12 @@ static func _find_blobs(img: Image) -> Array:
 			})
 	return blobs
 
-static func _is_ink_at(data: PackedByteArray, pixel: int) -> bool:
+static func _is_ink_at(data: PackedByteArray, pixel: int, opaque_is_ink: bool) -> bool:
 	var i := pixel * 4
 	if data[i + 3] < 8:
 		return false
+	if opaque_is_ink:
+		return true
 	return data[i] > 18 or data[i + 1] > 18 or data[i + 2] > 18
 
 static func _classify(blobs: Array, width: int, height: int) -> Dictionary:
@@ -143,7 +170,7 @@ static func _classify(blobs: Array, width: int, height: int) -> Dictionary:
 	return {
 		"front": {},
 		"profile": {},
-		"error": "A folha precisa de 6 desenhos de frente e 6 de perfil, separados. Achei %d à esquerda, %d à direita, %d em cima e %d embaixo." % [left.size(), right.size(), top.size(), bottom.size()],
+		"error": "A folha precisa de 6 desenhos de frente e 6 de perfil, separados. Achei %d à esquerda, %d à direita, %d em cima e %d embaixo. Se o Freak tem roupa preta, use PNG com fundo transparente (não JPG)." % [left.size(), right.size(), top.size(), bottom.size()],
 	}
 
 static func _name_group(group: Array) -> Dictionary:
@@ -189,7 +216,7 @@ static func _name_group(group: Array) -> Dictionary:
 		"leg_r": legs[1],
 	}
 
-static func _flood_edge_black(im: Image) -> void:
+static func _flood_edge_black(im: Image, keep_dark_clothes: bool = false) -> void:
 	var w := im.get_width()
 	var h := im.get_height()
 	var seen := PackedByteArray()
@@ -212,13 +239,20 @@ static func _flood_edge_black(im: Image) -> void:
 			continue
 		seen[idx] = 1
 		var c := im.get_pixel(p.x, p.y)
-		if c.a >= 0.04 and not (c.r <= 0.05 and c.g <= 0.05 and c.b <= 0.05):
+		if not _is_sheet_background(c, keep_dark_clothes):
 			continue
 		im.set_pixel(p.x, p.y, Color(c.r, c.g, c.b, 0.0))
 		q.append(Vector2i(p.x - 1, p.y))
 		q.append(Vector2i(p.x + 1, p.y))
 		q.append(Vector2i(p.x, p.y - 1))
 		q.append(Vector2i(p.x, p.y + 1))
+
+static func _is_sheet_background(c: Color, keep_dark_clothes: bool) -> bool:
+	if c.a < 0.04:
+		return true
+	if keep_dark_clothes:
+		return false
+	return c.r <= 0.05 and c.g <= 0.05 and c.b <= 0.05
 
 static func _fit_canvas(im: Image, width: int, height: int) -> Image:
 	if im.get_width() == width and im.get_height() == height:

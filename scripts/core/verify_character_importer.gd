@@ -14,7 +14,7 @@ func _run() -> void:
 		quit(1)
 		return
 
-	for set_id in ["leao", "medico"]:
+	for set_id in ["leao", "medico", "vampiro"]:
 		var path := "res://data/parts/%s_character.tres" % set_id
 		var character := load(path) as CharacterDef
 		if character == null:
@@ -44,7 +44,7 @@ func _run() -> void:
 		return
 	if sheet.get_format() != Image.FORMAT_RGBA8:
 		sheet.convert(Image.FORMAT_RGBA8)
-	var blobs: Array = SheetSlicer._find_blobs(sheet)
+	var blobs: Array = SheetSlicer._find_blobs(sheet, SheetSlicer._uses_alpha_background(sheet))
 	if blobs.size() < 12:
 		push_error("VERIFY_FAIL doctor sheet should have at least 12 drawings, got %d" % blobs.size())
 		quit(1)

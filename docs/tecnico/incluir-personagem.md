@@ -42,7 +42,7 @@ Nome na carta: com acento se precisar (`Leão`).
 2. Criar as fichas em `data/parts/` (`--write-defs`, ou o menu do Godot).
 3. Marcar os ímãs no Godot (passo 2 abaixo). Não chute X = 0.
 
-Não apague todo pixel preto da folha. Só o preto ligado às **bordas**.
+Não apague todo pixel preto da folha. Só o preto ligado às **bordas**. Se o Freak tem **roupa preta**, a folha precisa ser **PNG com fundo transparente**. JPG com fundo preto mistura a roupa com o fundo e o corte falha.
 
 A folha original pode ficar em `assets/characters/{id}/`. O jogo usa os 12 recortes.
 
@@ -146,3 +146,4 @@ Atualize:
 |----|------|---------|
 | `leao` | Leão | 4 nos 3 kits da loja (nível 1, total 12) |
 | `medico` | Médico | Cabeça 5 (nível 1), tronco 6 (nível 2), pernas 4 (nível 1). Total 15 |
+| `vampiro` | Vampiro | Cabeça 3, tronco 4, pernas 3 (nível 1). Total 10 |

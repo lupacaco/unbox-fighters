@@ -14,6 +14,7 @@ unbox-fighters/
 │   ├── audio/sfx/         # Efeitos sonoros (.wav)
 │   ├── characters/leao/
 │   ├── characters/medico/
+│   ├── characters/vampiro/
 │   └── ui/
 ├── data/                  # Dados do jogo (.tres)
 │   └── parts/
@@ -38,7 +39,7 @@ As regras em `.cursor/rules/` ensinam o assistente a falar simples, atualizar do
 |------------|----------|
 | Mudar a tela principal | `scenes/assembly/Assembly.tscn` + `scripts/assembly/assembly_controller.gd` |
 | Mudar comportamento de caixa / peça / carta | `scripts/assembly/` |
-| Mudar atributos ou sprites do leão / médico | `data/parts/` |
+| Mudar atributos ou sprites do leão / médico / vampiro | `data/parts/` |
 | Mudar regras de composição visual | `scripts/data/composite_resolver.gd` |
 | Mudar regras de luta / loja / bots | `scripts/match/` |
 | Mudar HUD / fundo / tags | `scripts/ui/` |

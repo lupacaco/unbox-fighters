@@ -27,48 +27,58 @@ SLOT_LABELS = {
 SLOT_TYPES = {"head": 0, "body": 1, "arm_l": 2, "arm_r": 3, "leg_l": 4, "leg_r": 5}
 
 
-def is_ink(px, x: int, y: int) -> bool:
+def uses_alpha_background(im: Image.Image) -> bool:
+	w, h = im.size
+	px = im.load()
+	samples = [(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1), (w // 2, 0), (0, h // 2)]
+	return sum(1 for x, y in samples if px[x, y][3] < 10) >= 4
+
+
+def is_ink(px, x: int, y: int, opaque_is_ink: bool) -> bool:
 	r, g, b, a = px[x, y]
 	if a < 8:
 		return False
+	if opaque_is_ink:
+		return True
 	return r > 18 or g > 18 or b > 18
 
 
-def find_blobs(im: Image.Image) -> list[dict]:
+def find_blobs(im: Image.Image, opaque_is_ink: bool) -> list[dict]:
 	w, h = im.size
 	px = im.load()
 	seen = [[False] * w for _ in range(h)]
 	blobs: list[dict] = []
 	for y in range(h):
 		for x in range(w):
-			if seen[y][x] or not is_ink(px, x, y):
+			if seen[y][x] or not is_ink(px, x, y, opaque_is_ink):
 				continue
 			q = deque([(x, y)])
 			seen[y][x] = True
-			cells: list[tuple[int, int]] = []
+			n = 0
 			minx = maxx = x
 			miny = maxy = y
+			sx = sy = 0
 			while q:
 				cx, cy = q.popleft()
-				cells.append((cx, cy))
+				n += 1
+				sx += cx
+				sy += cy
 				minx = min(minx, cx)
 				maxx = max(maxx, cx)
 				miny = min(miny, cy)
 				maxy = max(maxy, cy)
 				for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
 					nx, ny = cx + dx, cy + dy
-					if 0 <= nx < w and 0 <= ny < h and not seen[ny][nx] and is_ink(px, nx, ny):
+					if 0 <= nx < w and 0 <= ny < h and not seen[ny][nx] and is_ink(px, nx, ny, opaque_is_ink):
 						seen[ny][nx] = True
 						q.append((nx, ny))
-			n = len(cells)
 			if n < 400:
 				continue
 			blobs.append(
 				{
-					"cells": cells,
 					"n": n,
-					"cx": sum(p[0] for p in cells) / n,
-					"cy": sum(p[1] for p in cells) / n,
+					"cx": sx / n,
+					"cy": sy / n,
 					"box": (minx, miny, maxx + 1, maxy + 1),
 				}
 			)
@@ -85,7 +95,9 @@ def classify(blobs: list[dict], width: int, height: int) -> dict[str, dict]:
 	if len(top) == 6 and len(bottom) == 6:
 		return {"front": _name_group(top), "profile": _name_group(bottom)}
 	raise RuntimeError(
-		f"Expected 6+6 parts (left/right or top/bottom), got left={len(left)} right={len(right)} top={len(top)} bottom={len(bottom)}"
+		"A folha precisa de 6 desenhos de frente e 6 de perfil, separados. "
+		f"Achei {len(left)} à esquerda, {len(right)} à direita, {len(top)} em cima e {len(bottom)} embaixo. "
+		"Se o Freak tem roupa preta, use PNG com fundo transparente (não JPG)."
 	)
 
 
@@ -117,7 +129,7 @@ def _name_group(group: list[dict]) -> dict[str, dict]:
 	}
 
 
-def flood_edge_black(im: Image.Image) -> None:
+def flood_edge_black(im: Image.Image, keep_dark_clothes: bool = False) -> None:
 	w, h = im.size
 	px = im.load()
 	seen = set()
@@ -127,6 +139,8 @@ def flood_edge_black(im: Image.Image) -> None:
 		r, g, b, a = px[x, y]
 		if a < 10:
 			return True
+		if keep_dark_clothes:
+			return False
 		return r <= 13 and g <= 13 and b <= 13
 
 	def try_add(x: int, y: int) -> None:
@@ -153,8 +167,8 @@ def flood_edge_black(im: Image.Image) -> None:
 		try_add(x, y + 1)
 
 
-def fit_canvas(im: Image.Image) -> tuple[Image.Image, float, tuple[int, int]]:
-	flood_edge_black(im)
+def fit_canvas(im: Image.Image, keep_dark_clothes: bool = False) -> tuple[Image.Image, float, tuple[int, int]]:
+	flood_edge_black(im, keep_dark_clothes)
 	bbox = im.getbbox()
 	if not bbox:
 		empty = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
@@ -371,7 +385,12 @@ def write_character(parts_dir: Path, set_id: str, display_name: str, combat: int
 
 def slice_sheet(sheet_path: Path, set_id: str, out_dir: Path) -> dict:
 	sheet = Image.open(sheet_path).convert("RGBA")
-	named = classify(find_blobs(sheet), sheet.width, sheet.height)
+	keep_dark = uses_alpha_background(sheet)
+	try:
+		named = classify(find_blobs(sheet, keep_dark), sheet.width, sheet.height)
+	except RuntimeError:
+		keep_dark = not keep_dark
+		named = classify(find_blobs(sheet, keep_dark), sheet.width, sheet.height)
 	out_dir.mkdir(parents=True, exist_ok=True)
 	report: dict = {}
 	for pose, suffix in (("front", "1"), ("profile", "2")):
@@ -386,9 +405,9 @@ def slice_sheet(sheet_path: Path, set_id: str, out_dir: Path) -> dict:
 			y1 = min(sheet.height, box[3] + pad)
 			crop = sheet.crop((x0, y0, x1, y1)).convert("RGBA")
 			raw = crop.copy()
-			flood_edge_black(raw)
+			flood_edge_black(raw, keep_dark)
 			bbox = raw.getbbox()
-			canvas, scale, origin = fit_canvas(crop)
+			canvas, scale, origin = fit_canvas(crop, keep_dark)
 			dest = out_dir / f"{set_id}_{slot}-{suffix}.png"
 			canvas.save(dest, "PNG")
 			points = []

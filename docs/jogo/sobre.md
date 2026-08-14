@@ -20,7 +20,7 @@ Arena escura, prateleira como palco, tags coloridas com os números, spotlight n
 
 ## Conteúdo atual
 
-- **6 personagens:** Vampiro, Policial, Bruxa, Múmia, Médico e Cachorro
+- **3 personagens na loja:** Leão, Médico e Vampiro
 - **3 cartas** (fila 3º / 2º / 1º)
 - **5 caixas** por rodada, com nível de loja
 - **3 bots** na mesma partida

@@ -6,26 +6,26 @@ func _init() -> void:
 func _run() -> void:
 	ShopPool.reload()
 	var roster := ShopPool.roster()
-	if roster.size() != 2:
-		push_error("VERIFY_FAIL shop roster should be lion + doctor, got %d" % roster.size())
+	if roster.size() != 3:
+		push_error("VERIFY_FAIL shop roster should be lion + doctor + vampire, got %d" % roster.size())
 		quit(1)
 		return
 	var ids: PackedStringArray = []
 	for character in roster:
 		ids.append(String(character.id))
 	ids.sort()
-	if ids != PackedStringArray(["leao", "medico"]):
+	if ids != PackedStringArray(["leao", "medico", "vampiro"]):
 		push_error("VERIFY_FAIL unexpected roster: %s" % ", ".join(ids))
 		quit(1)
 		return
 
 	var tier1 := ShopPool.parts_up_to_tier(1)
-	if tier1.size() != 5:
-		push_error("VERIFY_FAIL shop level 1 should sell 5 kits (3 lion + doctor head/legs), got %d" % tier1.size())
+	if tier1.size() != 8:
+		push_error("VERIFY_FAIL shop level 1 should sell 8 kits, got %d" % tier1.size())
 		quit(1)
 		return
 	for part in tier1:
-		if String(part.set_id) not in ["leao", "medico"]:
+		if String(part.set_id) not in ["leao", "medico", "vampiro"]:
 			push_error("VERIFY_FAIL unexpected shop part: %s" % part.id)
 			quit(1)
 			return
@@ -39,8 +39,8 @@ func _run() -> void:
 			return
 
 	var high := ShopPool.parts_up_to_tier(5)
-	if high.size() != 6:
-		push_error("VERIFY_FAIL both sets should sell 6 kits, got %d" % high.size())
+	if high.size() != 9:
+		push_error("VERIFY_FAIL three sets should sell 9 kits, got %d" % high.size())
 		quit(1)
 		return
 	var body: PartDef = load("res://data/parts/medico_body.tres")
