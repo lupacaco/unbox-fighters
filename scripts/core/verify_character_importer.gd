@@ -14,23 +14,39 @@ func _run() -> void:
 		quit(1)
 		return
 
-	for set_id in ["leao", "medico", "vampiro"]:
-		var path := "res://data/parts/%s_character.tres" % set_id
-		var character := load(path) as CharacterDef
-		if character == null:
-			push_error("VERIFY_FAIL missing %s" % path)
-			quit(1)
-			return
-		for slot in PartSlotType.visual_slots():
-			var part := character.get_part(slot)
-			if part == null:
-				push_error("VERIFY_FAIL %s missing %s" % [set_id, PartSlotType.to_string_name(slot)])
+	var dir := DirAccess.open("res://data/parts")
+	if dir == null:
+		push_error("VERIFY_FAIL missing data/parts")
+		quit(1)
+		return
+	dir.list_dir_begin()
+	var found := 0
+	var fname := dir.get_next()
+	while fname != "":
+		if not dir.current_is_dir() and fname.ends_with("_character.tres"):
+			found += 1
+			var path := "res://data/parts/%s" % fname
+			var character := load(path) as CharacterDef
+			if character == null:
+				push_error("VERIFY_FAIL missing %s" % path)
 				quit(1)
 				return
-			if part.sprite == null or part.sprite_profile == null:
-				push_error("VERIFY_FAIL %s %s needs front and profile art" % [set_id, part.id])
-				quit(1)
-				return
+			var set_id := String(character.id)
+			for slot in PartSlotType.visual_slots():
+				var part := character.get_part(slot)
+				if part == null:
+					push_error("VERIFY_FAIL %s missing %s" % [set_id, PartSlotType.to_string_name(slot)])
+					quit(1)
+					return
+				if part.sprite == null or part.sprite_profile == null:
+					push_error("VERIFY_FAIL %s %s needs front and profile art" % [set_id, part.id])
+					quit(1)
+					return
+		fname = dir.get_next()
+	if found == 0:
+		push_error("VERIFY_FAIL no character files")
+		quit(1)
+		return
 
 	var tex := load("res://assets/characters/medico/medico.png") as Texture2D
 	if tex == null:

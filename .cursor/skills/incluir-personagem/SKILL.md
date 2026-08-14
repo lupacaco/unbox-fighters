@@ -20,5 +20,5 @@ Antes de cortar ou ligar qualquer coisa, leia `docs/tecnico/incluir-personagem.m
    - Ou no Godot: **Project → Tools → Incluir personagem** (3 números da loja: cabeça, tronco, pernas)
 2. Medir ímãs com **Project → Tools → Ímãs das Peças**: abas **Frente** e **Perfil**, 6 partes à esquerda, prévia à direita. Arraste cada bolinha até a esfera de metal. No tronco são 5 (pescoço, ombros, quadris). Não marque o kit `*_legs.tres`.
 3. Números: os 3 da loja que o jogador pediu; senão um conjunto diferente dos sets atuais. `tier` pela tabela da loja (3–5 → nível 1; 9 → nível 5).
-4. Conferir `data/parts/{id}_*.tres` e `{id}_character.tres` (loja = head/body/legs). A loja pega o set sozinha (ou via `ACTIVE_SET_IDS` se houver filtro de teste).
+4. Conferir `data/parts/{id}_*.tres` e `{id}_character.tres` (loja = head/body/legs). A loja lê sozinha todo `*_character.tres`.
 5. Atualizar `pecas-e-personagens.md`, `estado-atual.md`, `estrutura-de-pastas.md`.

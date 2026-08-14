@@ -20,7 +20,7 @@ Arena escura, prateleira como palco, tags coloridas com os números, spotlight n
 
 ## Conteúdo atual
 
-- **3 personagens na loja:** Leão, Médico e Vampiro
+- **Personagens na loja:** todos os Freaks com ficha (hoje Leão, Médico, Vampiro, Bruxa)
 - **3 cartas** (fila 3º / 2º / 1º)
 - **5 caixas** por rodada, com nível de loja
 - **3 bots** na mesma partida

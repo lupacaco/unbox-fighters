@@ -33,6 +33,12 @@ func _run() -> void:
 	assert(vampiro.head.combat_value == 3)
 	assert(vampiro.body.combat_value == 4)
 	assert(vampiro.legs.combat_value == 3)
+	var bruxa: CharacterDef = load("res://data/parts/bruxa_character.tres")
+	assert(bruxa != null, "Missing witch")
+	for part in bruxa.visual_parts():
+		_assert_part_art(part)
+	assert(bruxa.can_fight(), "Witch needs a side view on every drawing")
+	assert(bruxa.shop_parts().size() == 3)
 	var full := CompositeResolver.resolve(leao)
 	assert(full["mode"] == "layered")
 	var textures: Dictionary = full["textures"]

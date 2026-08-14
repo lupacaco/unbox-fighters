@@ -5,30 +5,27 @@ func _init() -> void:
 
 func _run() -> void:
 	ShopPool.reload()
-	var roster := ShopPool.roster()
-	if roster.size() != 3:
-		push_error("VERIFY_FAIL shop roster should be lion + doctor + vampire, got %d" % roster.size())
+	var on_disk := _character_ids_on_disk()
+	if on_disk.is_empty():
+		push_error("VERIFY_FAIL no *_character.tres in data/parts")
 		quit(1)
 		return
+	var roster := ShopPool.roster()
 	var ids: PackedStringArray = []
 	for character in roster:
 		ids.append(String(character.id))
 	ids.sort()
-	if ids != PackedStringArray(["leao", "medico", "vampiro"]):
-		push_error("VERIFY_FAIL unexpected roster: %s" % ", ".join(ids))
+	if ids != on_disk:
+		push_error("VERIFY_FAIL shop should sell every Freak file, got %s expected %s" % [", ".join(ids), ", ".join(on_disk)])
 		quit(1)
 		return
 
 	var tier1 := ShopPool.parts_up_to_tier(1)
-	if tier1.size() != 8:
-		push_error("VERIFY_FAIL shop level 1 should sell 8 kits, got %d" % tier1.size())
+	if tier1.is_empty():
+		push_error("VERIFY_FAIL shop level 1 should sell kits")
 		quit(1)
 		return
 	for part in tier1:
-		if String(part.set_id) not in ["leao", "medico", "vampiro"]:
-			push_error("VERIFY_FAIL unexpected shop part: %s" % part.id)
-			quit(1)
-			return
 		if not PartSlotType.is_shop_slot(part.slot_type):
 			push_error("VERIFY_FAIL shop sold a visual limb: %s" % part.id)
 			quit(1)
@@ -39,8 +36,8 @@ func _run() -> void:
 			return
 
 	var high := ShopPool.parts_up_to_tier(5)
-	if high.size() != 9:
-		push_error("VERIFY_FAIL three sets should sell 9 kits, got %d" % high.size())
+	if high.size() != roster.size() * 3:
+		push_error("VERIFY_FAIL shop should sell 3 kits per Freak, got %d" % high.size())
 		quit(1)
 		return
 	var body: PartDef = load("res://data/parts/medico_body.tres")
@@ -58,3 +55,19 @@ func _run() -> void:
 		return
 	print("VERIFY_SHOP_POOL_PASS")
 	quit(0)
+
+func _character_ids_on_disk() -> PackedStringArray:
+	var ids: PackedStringArray = []
+	var dir := DirAccess.open("res://data/parts")
+	if dir == null:
+		return ids
+	dir.list_dir_begin()
+	var fname := dir.get_next()
+	while fname != "":
+		if not dir.current_is_dir() and fname.ends_with("_character.tres"):
+			var character := load("res://data/parts/%s" % fname) as CharacterDef
+			if character != null and not String(character.id).is_empty():
+				ids.append(String(character.id))
+		fname = dir.get_next()
+	ids.sort()
+	return ids

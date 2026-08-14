@@ -122,7 +122,7 @@ Doze recortes viram **6 fichas de desenho** + **1 kit de pernas da loja** + a fi
 - Loja: `{id}_head.tres` `{id}_body.tres` `{id}_legs.tres` (as duas pernas juntas; sem PNG próprio)
 - Personagem: `{id}_character.tres`
 
-A loja (`ShopPool`) lê as fichas `*_character.tres` e vende só os 3 kits. Braços e pernas soltos não entram nas caixas. Para um teste com um set só, `ACTIVE_SET_IDS` lista esse id. Lista vazia = todos os sets.
+A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 3 kits de cada Freak. Braços e pernas soltos não entram nas caixas. Freak novo entra no Play seguinte, sem lista na mão.
 
 ## 5. Documentação
 
@@ -147,3 +147,4 @@ Atualize:
 | `leao` | Leão | 4 nos 3 kits da loja (nível 1, total 12) |
 | `medico` | Médico | Cabeça 5 (nível 1), tronco 6 (nível 2), pernas 4 (nível 1). Total 15 |
 | `vampiro` | Vampiro | Cabeça 3, tronco 4, pernas 3 (nível 1). Total 10 |
+| `bruxa` | Bruxa | Cabeça 4, tronco 3, pernas 3 (nível 1). Total 10 |

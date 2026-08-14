@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://8w5apalptihd"]
+
+[ext_resource type="Script" uid="uid://71ffw17l5buf" path="res://scripts/data/part_def.gd" id="1_uxwly"]
+[ext_resource type="Texture2D" uid="uid://dolpxn3g6xnvc" path="res://assets/characters/bruxa/bruxa_arm_l-1.png" id="2_r0lq5"]
+[ext_resource type="Texture2D" uid="uid://d1dajbi2pre2o" path="res://assets/characters/bruxa/bruxa_arm_l-2.png" id="3_67es7"]
+
+[resource]
+script = ExtResource("1_uxwly")
+id = &"bruxa_arm_l"
+display_name = "Bruxa Braço E"
+slot_type = 2
+set_id = &"bruxa"
+sprite = ExtResource("2_r0lq5")
+sprite_profile = ExtResource("3_67es7")
+combat_value = 3
+magnet_up = Vector2(4, -91)
+magnet_up_profile = Vector2(3, -90)

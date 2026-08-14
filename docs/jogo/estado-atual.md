@@ -20,7 +20,7 @@
 | Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |
 | Áudio | Efeitos gravados (martelo, caixa, ímã, soco, passo, whoosh). Sem bipes de script |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |
-| Dados | **Leão**, **Médico** e **Vampiro** na loja |
+| Dados | Loja lê sozinha todo `*_character.tres` (Leão, Médico, Vampiro, Bruxa) |
 | Scripts de verificação | Rodam checagens sem abrir a interface completa |
 
 ## Parcial / provisório

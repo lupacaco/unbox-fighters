@@ -204,7 +204,7 @@ func _run_import() -> void:
 		push_error(err)
 		return
 	await _wait_filesystem(fs)
-	_set_form_status("Pronto. Abrindo os ímãs…", false)
+	_set_form_status("Pronto. O Freak já entra nas caixas no próximo Play. Abrindo os ímãs…", false)
 	var part_path := "res://data/parts/%s_body.tres" % set_id
 	var part := load(part_path) as PartDef
 	if part != null:

@@ -27,7 +27,7 @@ Recurso de **uma peça** (kit da loja ou recorte de desenho):
 
 - `id`, `display_name`
 - `slot_type`
-- `set_id` (hoje: `leao`, `medico`, `vampiro`)
+- `set_id`
 - `sprite` — frente (pose 1). O kit de pernas da loja **não** tem PNG próprio.
 - `sprite_profile` — perfil (pose 2). Precisa existir nos 6 desenhos para a luta.
 - `combat_value` — número do kit na loja
@@ -52,17 +52,18 @@ A loja lê `shop_parts()` (3 kits). Braços e pernas soltos **não** entram nas 
 
 ## Números atuais (teste)
 
-Na loja existem três Freaks: **Leão**, **Médico** e **Vampiro**.
+Na loja entram **todos** os Freaks que tiverem ficha `*_character.tres`. Hoje:
 
 | Set | Kits | Total do set completo |
 |-----|------|------------------------|
 | Leão | 4, 4, 4 (nível 1) | 12 |
 | Médico | Cabeça 5 (nível 1), tronco 6 (nível 2), pernas 4 (nível 1) | 15 |
 | Vampiro | Cabeça 3, tronco 4, pernas 3 (nível 1) | 10 |
+| Bruxa | Cabeça 4, tronco 3, pernas 3 (nível 1) | 10 |
 
 A sinergia (3 iguais = 100%, 2 = 75%, 1 = 50%) está em `scripts/match/synergy.gd`.
 
-A loja lê sozinha as fichas `*_character.tres` em `data/parts/`, e depois filtra pelos ids ativos.
+A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 3 kits de cada uma.
 
 ## Como marcar os ímãs
 
@@ -126,3 +127,5 @@ Pasta: `data/parts/`
 | `medico_arm_*.tres`, `medico_leg_l/r.tres` | Só desenho (não vendidos) |
 | `vampiro_character.tres` + `vampiro_head/body/legs.tres` | Kits da loja (Vampiro) |
 | `vampiro_arm_*.tres`, `vampiro_leg_l/r.tres` | Só desenho (não vendidos) |
+| `bruxa_character.tres` + `bruxa_head/body/legs.tres` | Kits da loja (Bruxa) |
+| `bruxa_arm_*.tres`, `bruxa_leg_l/r.tres` | Só desenho (não vendidos) |
