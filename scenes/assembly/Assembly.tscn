@@ -55,19 +55,19 @@ position = Vector2(0, 68)
 texture = ExtResource("7")
 
 [node name="Crate0" parent="Tray" unique_id=271263522 instance=ExtResource("5")]
-position = Vector2(-660, -110)
+position = Vector2(-660, -72)
 
 [node name="Crate1" parent="Tray" unique_id=1055760682 instance=ExtResource("5")]
-position = Vector2(-495, -110)
+position = Vector2(-495, -72)
 
 [node name="Crate2" parent="Tray" unique_id=408890494 instance=ExtResource("5")]
-position = Vector2(-330, -110)
+position = Vector2(-330, -72)
 
 [node name="Crate3" parent="Tray" unique_id=897639340 instance=ExtResource("5")]
-position = Vector2(-165, -110)
+position = Vector2(-165, -72)
 
 [node name="Crate4" parent="Tray" unique_id=1334653743 instance=ExtResource("5")]
-position = Vector2(0, -110)
+position = Vector2(0, -72)
 
 [node name="FxLayer" type="Node2D" parent="." unique_id=1892017742]
 z_index = 50

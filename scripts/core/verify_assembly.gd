@@ -38,6 +38,18 @@ func _run() -> void:
 		push_error("VERIFY_FAIL belt should span the full screen width")
 		quit(1)
 		return
+	var crate_y := AssemblyLayout.crate_y()
+	var sit := crate_y + AssemblyLayout.CRATE_SIT_OFFSET
+	var roller_local := AssemblyLayout.belt_roller_y() - AssemblyLayout.TRAY.y
+	if absf(sit - roller_local) > 1.0:
+		push_error("VERIFY_FAIL crates should sit on the conveyor rollers")
+		quit(1)
+		return
+	for child in scene.get_node("Tray").get_children():
+		if child is Crate and absf((child as Crate).position.y - crate_y) > 1.0:
+			push_error("VERIFY_FAIL crate Y should match the belt sit line")
+			quit(1)
+			return
 	var sell := scene.get_node_or_null("Tray/SellZone")
 	if sell == null or sell.position.x < 0.0:
 		push_error("VERIFY_FAIL sell zone should sit on the right of the belt")

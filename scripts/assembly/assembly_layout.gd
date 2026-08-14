@@ -21,12 +21,14 @@ const SELL_TRAY := Vector2(792, -150)
 const TRAY := Vector2(960, 920)
 const SLOT_X: Array[float] = [380.0, 960.0, 1540.0]
 const SLOT_Y := 400.0
-## Boxes sit on the conveyor rollers (tray-local Y).
-const CRATE_Y := -110.0
 const BELT_TEX := "res://assets/ui/esteira-01.png"
 const BELT_HEIGHT := 184.0
-## Pixels from the top of the belt art down to the roller walking surface.
-const BELT_ROLLER_FROM_TOP := 22.0
+## Pixels from the top of the belt art down to the roller walking surface
+## (crown of the cylinders, just below the red lip).
+const BELT_ROLLER_FROM_TOP := 40.0
+## From the crate origin (center) down to the visible 3/4 sit line.
+## The front tip of the box tucks a little into the rollers.
+const CRATE_SIT_OFFSET := 88.0
 const FIGHT_CLASH := Vector2(960, 440)
 ## Names, HP and VS sit on a screen layer (not the camera). Keep a margin from the top.
 const FIGHT_NAME_LEFT := Vector2(320, 88)
@@ -59,6 +61,14 @@ static func belt_world_top() -> float:
 
 static func belt_roller_y() -> float:
 	return belt_world_top() + BELT_ROLLER_FROM_TOP
+
+
+static func crate_y() -> float:
+	return belt_roller_y() - TRAY.y - CRATE_SIT_OFFSET
+
+
+static func fight_shelf_y() -> float:
+	return belt_roller_y() - TRAY.y - SpringBase.GROUND_Y
 
 
 static func top_left(center: Vector2, size: Vector2) -> Vector2:

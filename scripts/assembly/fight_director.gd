@@ -9,7 +9,6 @@ signal finished
 
 ## All fighters share this one floor line (same Y). Never shift it per freak.
 ## Spring origin so the disc sits on the conveyor rollers, not the red panel.
-const SHELF_Y := -130.0
 const LAND_X := 470.0
 const DUEL_X := 305.0
 const ENTRY_HOPS := 2
@@ -584,7 +583,7 @@ func _lift_card(slot: CharacterSlot) -> void:
 	slot.play_leave_for_fight()
 
 func _shelf_y() -> float:
-	return _tray.global_position.y + SHELF_Y
+	return _tray.global_position.y + AssemblyLayout.fight_shelf_y()
 
 func _shelf_pos(opponent: bool, x: float) -> Vector2:
 	var side := 1.0 if opponent else -1.0

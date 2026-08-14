@@ -12,7 +12,7 @@ func _run() -> void:
 	var tray := Node2D.new()
 	tray.position = AssemblyLayout.TRAY
 	root.add_child(tray)
-	var floor_y := tray.global_position.y + FightDir.SHELF_Y
+	var floor_y := tray.global_position.y + AssemblyLayout.fight_shelf_y()
 	assert(
 		is_equal_approx(floor_y + Spring.GROUND_Y, AssemblyLayout.belt_roller_y()),
 		"Fight floor should land on the conveyor rollers"

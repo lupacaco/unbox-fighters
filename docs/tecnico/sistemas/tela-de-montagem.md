@@ -23,7 +23,7 @@ A cena principal do jogo hoje: preparação + loja + luta no mesmo palco.
 ## Layout
 
 - Cartas em X = 380, 960, 1540; Y = 400 — etiquetas 3º, 2º, 1º (1º à direita)
-- Esteira no rodapé da tela, largura 1920, colada embaixo. As caixas e a luta sentam nos rolos
+- Esteira no rodapé da tela, largura 1920, colada embaixo. As caixas e as peças ficam **coladas nos rolos** (sem flutuar). Na luta, a mola também encosta nos rolos
 - 5 caixas, espaçadas 250 px
 - Área **VENDER +1** à **direita** da esteira
 - HUD: PREP à esquerda, relógio no centro do topo, PRONTO à direita; NÍVEL / PANCADAS / ATUALIZAR / TRAVAR embaixo

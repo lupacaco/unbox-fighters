@@ -117,7 +117,7 @@ func _refresh_shop_crates() -> void:
 			continue
 		var crate: Crate = _crate_scene.instantiate() as Crate
 		_tray.add_child(crate)
-		var rest := Vector2(AssemblyLayout.crate_x(i, count), AssemblyLayout.CRATE_Y)
+		var rest := Vector2(AssemblyLayout.crate_x(i, count), AssemblyLayout.crate_y())
 		crate.position = rest
 		crate.shop_index = i
 		crate.on_paid_open = _pay_for_crate

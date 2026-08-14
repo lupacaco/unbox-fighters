@@ -14,8 +14,8 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 | `verify_shop_pool.gd` | Loja vende todo Freak com ficha; tronco e braços do médico só no nível 2; 5 ofertas |
 | `verify_character_importer.gd` | Id `Leão` → `leao`; cada Freak com 12 desenhos; folha do médico vira 6+6 |
 | `verify_match_state.gd` | 4 vivos, HP 40, nomes dos bots, oponente-fantasma |
-| `verify_assembly.gd` | 3 cartas, 5 caixas, VENDER à direita, esteira no rodapé em 1920 |
-| `verify_crate_open.gd` | Um clique na caixa solta a peça |
+| `verify_assembly.gd` | 3 cartas, 5 caixas coladas nos rolos, VENDER à direita, esteira no rodapé em 1920 |
+| `verify_crate_open.gd` | Um clique na caixa solta a peça colada nos rolos |
 | `verify_composite.gd` | Layout na mola (carta vazia solta; peça pressiona; cabeça na esfera) |
 | `verify_part_magnets.gd` | Cabeça só embaixo; tronco com 5 ímãs; virar X; Z da cabeça na frente na carta; Z da luta frente e perfil; imagem nova vira 200×200 |
 | `verify_part_sizes.gd` | Sprites 200×200 e perfil nos desenhos visíveis |

@@ -23,7 +23,6 @@ var _display_scale: float = 1.0
 var _part_scene: PackedScene
 var _drag_service: DragDropService
 var _tray: Node2D
-var _idle: Tween
 var _motion: Tween
 var _frozen_look: bool = false
 
@@ -35,7 +34,6 @@ func setup(part: PartDef, part_scene: PackedScene, drag_service: DragDropService
 	_base_y = position.y
 	_apply_stage_art(TEX_INTACT)
 	set_frozen_look(false)
-	_start_idle()
 
 func set_rest_y(value: float) -> void:
 	_base_y = value
@@ -106,24 +104,12 @@ func _layout_ground_shadow() -> void:
 		points.append(Vector2(cos(angle) * half_w, sin(angle) * half_h))
 	_shadow.polygon = points
 	_shadow.color = Color(0.02, 0.02, 0.04, 0.4)
-	_shadow.position = Vector2(0.0, TARGET_HEIGHT_PX * 0.48)
+	_shadow.position = Vector2(0.0, AssemblyLayout.CRATE_SIT_OFFSET)
 
 func _kill_motion() -> void:
 	if _motion != null and _motion.is_valid():
 		_motion.kill()
 	_motion = null
-
-func _start_idle() -> void:
-	_stop_idle()
-	_idle = create_tween().set_loops()
-	_idle.tween_property(_sprite, "position:y", -6.0, 1.6).set_trans(Tween.TRANS_SINE)
-	_idle.tween_property(_sprite, "position:y", 5.0, 1.6).set_trans(Tween.TRANS_SINE)
-
-func _stop_idle() -> void:
-	if _idle != null and _idle.is_valid():
-		_idle.kill()
-	_idle = null
-	_sprite.position.y = 0.0
 
 func _on_hover(entering: bool) -> void:
 	if entering:
@@ -132,7 +118,7 @@ func _on_hover(entering: bool) -> void:
 		if not _hovered:
 			_hovered = true
 			HammerCursor.enter_crate()
-		var target_y := _base_y - 14.0
+		var target_y := _base_y - 8.0
 		var target_mod := _rest_modulate() * Color(1.08, 1.06, 1.04, 1)
 		_kill_motion()
 		_motion = create_tween()
@@ -153,7 +139,6 @@ func _on_hover(entering: bool) -> void:
 func _finish_open() -> void:
 	_busy = true
 	_opened = true
-	_stop_idle()
 	_kill_motion()
 	_label.visible = false
 	_apply_stage_art(TEX_BROKEN)
@@ -172,8 +157,8 @@ func _reveal_part() -> void:
 	var part := _part_scene.instantiate() as PartView
 	_tray.add_child(part)
 	part.global_position = spawn_pos
-	part.tray_home = spawn_pos
 	part.setup(reward_part, _drag_service)
+	part.rest_on_belt()
 	part.scale = Vector2.ONE * 0.85
 	part.modulate.a = 0.0
 	var tween := part.create_tween()

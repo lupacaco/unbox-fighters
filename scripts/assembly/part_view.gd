@@ -16,7 +16,6 @@ var tray_home: Vector2 = Vector2.ZERO
 var _interaction_locked: bool = false
 var _dragging: bool = false
 var _attached_slot: CharacterSlot = null
-var _float_tween: Tween
 var _drag_service: DragDropService
 var _kit_root: Node2D
 var _kit_sprites: Dictionary = {}
@@ -51,7 +50,6 @@ func setup(def: PartDef, drag_service: DragDropService) -> void:
 			_shadow.flip_h = _sprite.flip_h
 			_shadow.rotation = _sprite.rotation
 		_fit_single()
-	_start_idle_float()
 
 func can_interact() -> bool:
 	return not _interaction_locked and part_def != null
@@ -132,7 +130,6 @@ func return_to_tray() -> void:
 	var tween := create_tween()
 	tween.tween_property(self, "global_position", tray_home, 0.24).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(self, "scale", Vector2.ONE, 0.24).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.finished.connect(_start_idle_float, CONNECT_ONE_SHOT)
 
 func snap_hide_for_slot() -> void:
 	_clear_drag_pose()
@@ -266,22 +263,33 @@ func _fit_single() -> void:
 	_glow.color = Color(0, 0, 0, 0)
 	Feel.hide_collision_debug(_collision)
 
-func _start_idle_float() -> void:
-	_stop_idle_float()
-	if not visible or _dragging:
-		return
-	_float_tween = create_tween().set_loops()
-	if _shows_kit:
-		_float_tween.tween_property(_kit_root, "position:y", _kit_home.y - 2.5, 1.6).set_trans(Tween.TRANS_SINE)
-		_float_tween.tween_property(_kit_root, "position:y", _kit_home.y + 2.5, 1.6).set_trans(Tween.TRANS_SINE)
-	else:
-		_float_tween.tween_property(_sprite, "position:y", -2.5, 1.6).set_trans(Tween.TRANS_SINE)
-		_float_tween.tween_property(_sprite, "position:y", 2.5, 1.6).set_trans(Tween.TRANS_SINE)
+func rest_on_belt() -> void:
+	var local_bottom := _visual_bottom_local()
+	global_position.y = AssemblyLayout.belt_roller_y() - local_bottom
+	tray_home = global_position
+
+func _visual_bottom_local() -> float:
+	if _shows_kit and _kit_root != null:
+		var max_y := 0.0
+		var any := false
+		for slot in _kit_sprites.keys():
+			var sprite: Sprite2D = _kit_sprites.get(slot)
+			if sprite == null or not sprite.visible or sprite.texture == null:
+				continue
+			var half := sprite.texture.get_size().y * absf(sprite.scale.y) * 0.5
+			var bottom := _kit_root.position.y + sprite.position.y + half
+			if not any or bottom > max_y:
+				max_y = bottom
+				any = true
+		if any:
+			return max_y
+	if _sprite != null and _sprite.texture != null:
+		return _sprite.position.y + _sprite.texture.get_size().y * absf(_sprite.scale.y) * 0.5
+	return AssemblyLayout.CRATE_SIT_OFFSET
 
 func _stop_idle_float() -> void:
-	if _float_tween != null and _float_tween.is_valid():
-		_float_tween.kill()
-	_sprite.position.y = 0.0
+	if _sprite != null:
+		_sprite.position.y = 0.0
 	if _kit_root != null:
 		_kit_root.position = _kit_home
 

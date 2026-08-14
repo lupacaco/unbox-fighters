@@ -8,7 +8,7 @@
 |------|----------|
 | Partida contra 3 bots | 4 vivos, HP 40, último de pé ganha. Bots: Sombra, Ferrugem, Névoa |
 | Preparação | Até 60 s (relógio `1:00`) ou botão PRONTO |
-| Loja | 5 caixas, pancadas douradas, atualizar, travar (caixas azuis), vender à direita, subir nível |
+| Loja | 5 caixas coladas nos rolos da esteira, pancadas douradas, atualizar, travar (caixas azuis), vender à direita, subir nível |
 | Montagem | 3 cartas (3º / 2º / 1º), misturar peças, carta incompleta vale |
 | Luta em fila | Choque de kits sorteados (pode misturar cabeça vs braço), só o vencedor ataca, empate os dois atacam no centro, cópia das cartas, teto de 12 de dano por Freak |
 | Tela de luta | Um contra um na esteira: pulo na mola, dois pulos até o ataque (base sai do chão junto, sombra + recorte nos rolos), o kit vencedor voa até a peça do outro (empate: os dois batem no centro), KO. Nomes/HP/VS ficam inteiros no topo. Peça destruída voa para fora da tela. Cobertura: frente (cabeça, braço E, braço D, tronco, mola) e perfil (braço D, tronco, cabeça, braço E, mola) |

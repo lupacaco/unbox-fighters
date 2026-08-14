@@ -48,6 +48,16 @@ func _run() -> void:
 		push_error("VERIFY_FAIL part not revealed after one smash")
 		quit(1)
 		return
+	var revealed: PartView = null
+	for child in scene.get_node("Tray").get_children():
+		if child is PartView:
+			revealed = child
+			break
+	var bottom := revealed.global_position.y + revealed._visual_bottom_local()
+	if absf(bottom - AssemblyLayout.belt_roller_y()) > 3.0:
+		push_error("VERIFY_FAIL opened part should sit on the conveyor rollers")
+		quit(1)
+		return
 
 	print("VERIFY_CRATE_OPEN_PASS")
 	quit(0)
