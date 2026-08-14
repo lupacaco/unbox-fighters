@@ -18,7 +18,7 @@
 | Visual composto | Base-mola em toda carta (solta vazia, pressionada com peça). Ímãs unem cabeça e tronco pelas esferas de metal (frente e perfil; tronco tem 5 ímãs). Na frente os braços abrem um pouco no ombro |
 | Incluir Freak | Folha 6+6 vira 12 PNG 200×200 + 2 fichas na loja; ímãs em janela compacta (Ampliar para precisão). A mola já está na carta |
 | Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |
-| Áudio | Efeitos gravados (martelo, caixa, ímã). Na luta: só passo e poom do golpe |
+| Áudio | Efeitos gravados (martelo, caixa, ímã). Na luta: boing no impulso da mola, passo no pouso e poom do golpe |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |
 | Dados | Loja lê sozinha todo `*_character.tres` (Leão, Médico, Vampiro, Bruxa) |
 | Scripts de verificação | Rodam checagens sem abrir a interface completa |

@@ -29,9 +29,10 @@ Os efeitos passam por um canal **SFX** com compressão leve (segura o volume qua
 | `part_reject` | `part_reject.wav` | Soltou no lugar errado / voltou / sem pancada |
 | `fighter_complete` | `fighter_complete.wav` | Carta completa (cabeça + tronco) — só na montagem |
 | `impact` | `impact.wav` | Poom do choque / KO na luta |
-| `step` | `step.wav` | Passo ao andar na luta |
+| `step` | `step.wav` | Pouso do pulo ao andar na luta |
+| `spring_boing` | `spring_boing.wav` | Impulso da mola quando o brinquedo sai do chão |
 
-Na luta tocam **só** passo e o poom do golpe. Pulo, vento, clique de ímã e tom de vitória **não** entram no palco.
+Na luta tocam o **boing** no impulso do pulo, o passo no pouso e o poom do golpe. Vento, clique de ímã e tom de vitória **não** entram no palco.
 
 Abrir a caixa toca martelo e, um instante depois, a madeira quebrando — os dois juntos, sem o mesmo arquivo servindo para tudo.
 
@@ -42,6 +43,8 @@ Origem e licença: [assets/audio/sfx/ATTRIBUTION.md](../../assets/audio/sfx/ATTR
 ```bash
 python tools/fetch_sfx.py
 ```
+
+Para baixar só um som: `python tools/fetch_sfx.py spring_boing`.
 
 (Precisa de `miniaudio` e `numpy` no Python.) Isso baixa de novo as gravações da Mixkit e recorta/normaliza. Não use o gerador antigo de bipes.
 

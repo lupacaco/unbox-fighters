@@ -19,7 +19,7 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 | `verify_composite.gd` | Layout na mola (carta vazia solta; peça pressiona; cabeça na esfera) |
 | `verify_part_magnets.gd` | Cabeça só embaixo; tronco com 5 ímãs; virar X; Z da cabeça na frente; imagem nova vira 200×200 |
 | `verify_part_sizes.gd` | Sprites 200×200 e perfil nos desenhos visíveis |
-| `verify_fight_line.gd` | Fila no mesmo chão; pulo da mola inteira; duelistas afastados; placas de HP cabem no topo |
+| `verify_fight_line.gd` | Fila no mesmo chão; pulo da mola inteira; um boing ao sair do chão; duelistas afastados; placas de HP cabem no topo |
 | `verify_thrown_kit.gd` | Kit copiado do boneco some do corpo e pode voltar |
 | `verify_fight_poses.gd` | Personagem tem perfil; carta mostra a mola; aceita cabeça e tronco, recusa pernas |
 | `verify_fight_lock.gd` | Travamento da carta; soltar kit em lugar ocupado devolve o antigo |

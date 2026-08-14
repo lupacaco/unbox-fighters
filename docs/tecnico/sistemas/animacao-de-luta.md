@@ -27,7 +27,7 @@ Depois:
 
 A poeira dos passos é **um** efeito reaproveitado, não um novo a cada passo. Isso deixa a luta mais leve no computador.
 
-Sons da luta: **só** o passo ao andar e o poom do choque / KO. Sem vento, laser ou clique de ímã no palco.
+Sons da luta: **boing** no impulso da mola, passo no pouso e poom do choque / KO. Sem vento, laser ou clique de ímã no palco.
 
 ## Arquivos
 

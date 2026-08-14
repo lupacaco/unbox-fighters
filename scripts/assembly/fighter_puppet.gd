@@ -4,6 +4,7 @@ extends Node2D
 ## Jointed on-stage fighter. Limbs rotate around magnet sockets.
 
 signal stepped
+signal hopped
 signal struck
 
 enum Pose { FRONT, PROFILE, STRIDE }
@@ -386,6 +387,8 @@ func _apply_hop(phase: float) -> void:
 	if _body_root != null:
 		_body_root.rotation = swing * 0.08
 		_body_root.position = Vector2(_body_rest.x, _body_rest.y)
+	if not _was_airborne and airborne:
+		hopped.emit()
 	if _was_airborne and not airborne:
 		stepped.emit()
 	_was_airborne = airborne

@@ -298,13 +298,19 @@ func _walk_to(fighter: StageFighter, from: Vector2, to: Vector2) -> void:
 		if fighter.puppet != null and is_instance_valid(fighter.puppet):
 			GameAudio.step()
 			_dust(fighter.puppet.feet_position())
+	var on_hop := func() -> void:
+		if fighter.puppet != null and is_instance_valid(fighter.puppet):
+			GameAudio.spring_boing()
 	fighter.puppet.stepped.connect(on_step)
+	fighter.puppet.hopped.connect(on_hop)
 	fighter.puppet.start_walk()
 	fighter.root.global_position = from
 	await _move_to(fighter.root, to, dist / WALK_PX_PER_SEC)
 	fighter.puppet.stop_walk()
 	if fighter.puppet.stepped.is_connected(on_step):
 		fighter.puppet.stepped.disconnect(on_step)
+	if fighter.puppet.hopped.is_connected(on_hop):
+		fighter.puppet.hopped.disconnect(on_hop)
 	await fighter.puppet.settle_idle()
 	fighter.root.global_position = Vector2(to.x, _shelf_y())
 	fighter.visual.rotation_degrees = 0.0

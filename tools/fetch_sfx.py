@@ -3,11 +3,13 @@
 Substitui os bipes antigos gerados por seno/ruído.
 
   python tools/fetch_sfx.py
+  python tools/fetch_sfx.py spring_boing
 
 Precisa: pip install miniaudio numpy
 """
 from __future__ import annotations
 
+import sys
 import tempfile
 import urllib.request
 import wave
@@ -33,6 +35,7 @@ JOBS: dict[str, dict] = {
 	"fighter_complete": {"id": 2865, "fade_out": 0.1},
 	"impact": {"id": 2143, "fade_out": 0.08},
 	"step": {"id": 542, "start": 0.15, "end": 0.40, "fade_in": 0.008, "fade_out": 0.07},
+	"spring_boing": {"id": 3003, "end": 0.34, "fade_out": 0.05},
 }
 
 
@@ -125,7 +128,10 @@ def _write_wav(path: Path, x: np.ndarray, sr: int) -> None:
 def main() -> None:
 	_opener()
 	OUT.mkdir(parents=True, exist_ok=True)
+	wanted = set(sys.argv[1:])
 	for name, job in JOBS.items():
+		if wanted and name not in wanted:
+			continue
 		src = _download(int(job["id"]))
 		x, sr = _decode_stereo(src)
 		x = _resample(x, sr, SR_OUT)

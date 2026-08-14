@@ -16,6 +16,7 @@ const PATHS := {
 	"fighter_complete": "res://assets/audio/sfx/fighter_complete.wav",
 	"impact": "res://assets/audio/sfx/impact.wav",
 	"step": "res://assets/audio/sfx/step.wav",
+	"spring_boing": "res://assets/audio/sfx/spring_boing.wav",
 }
 
 var _streams: Dictionary = {}
@@ -114,6 +115,9 @@ func impact() -> void:
 
 func step() -> void:
 	play(&"step", -11.0, randf_range(0.92, 1.1))
+
+func spring_boing() -> void:
+	play(&"spring_boing", -8.5, randf_range(0.94, 1.08))
 
 func ui_click() -> void:
 	play(&"part_pickup", -11.0, randf_range(1.1, 1.22))

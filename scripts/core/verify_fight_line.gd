@@ -33,7 +33,11 @@ func _run() -> void:
 	walker.setup_loadout(FighterLoadout.from_character(leao), false)
 	assert(walker.is_spring_pressed(), "Idle freak should keep the spring pressed")
 	walker.set_pose(FighterPuppet.Pose.PROFILE)
+	var hops := [0]
+	walker.hopped.connect(func() -> void: hops[0] += 1)
 	walker.set_stride_frame(true)
+	assert(hops[0] == 1, "Leaving the ground should fire one hop")
+	assert(ResourceLoader.exists("res://assets/audio/sfx/spring_boing.wav"), "Spring hop needs a boing sound")
 	assert(walker.hop_lift() > 8.0, "Hop should lift the freak off the ground")
 	assert(walker.spring_is_airborne(), "Spring base should leave the ground with the freak")
 	assert(not walker.is_spring_pressed(), "Airborne hop should use the loose spring")
