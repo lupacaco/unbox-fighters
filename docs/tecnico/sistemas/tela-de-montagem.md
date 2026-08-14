@@ -23,7 +23,7 @@ A cena principal do jogo hoje: preparação + loja + luta no mesmo palco.
 ## Layout
 
 - Cartas em X = 380, 960, 1540; Y = 400 — etiquetas 3º, 2º, 1º (1º à direita)
-- Prateleira / palco em torno de Y = 920. Na luta os Freaks ficam um pouco mais baixos nessa madeira
+- Prateleira / palco em torno de Y = 920. Na luta a base da mola encosta na madeira de cima da prateleira
 - 5 caixas, espaçadas 250 px
 - Área **VENDER +1** à **direita** da prateleira
 - HUD: PREP à esquerda, relógio no centro do topo, PRONTO à direita; NÍVEL / PANCADAS / ATUALIZAR / TRAVAR embaixo
