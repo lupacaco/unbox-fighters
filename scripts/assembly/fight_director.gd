@@ -75,6 +75,7 @@ func play(
 
 	_stage = Node2D.new()
 	_stage.name = "FightStage"
+	_stage.y_sort_enabled = false
 	_fx.add_child(_stage)
 
 	_left = _build_line(result.left if result != null else BoardLoadout.new(), false, slots)
@@ -221,17 +222,26 @@ func _intro_pair(player: StageFighter, enemy: StageFighter, rank: int, heavy: bo
 	var need := 0
 	if player != null:
 		need += 1
-		_jump_walk_in(player, _land_pos(false), _stand_pos(false, rank), heavy, rank, func() -> void: done[0] += 1)
+		_jump_walk_in(player, false, LAND_X, STAND_X[clampi(rank, 0, 2)], heavy, rank, func() -> void: done[0] += 1)
 	if enemy != null:
 		need += 1
-		_jump_walk_in(enemy, _land_pos(true), _stand_pos(true, rank), heavy and player == null, rank, func() -> void: done[0] += 1)
+		_jump_walk_in(enemy, true, LAND_X, STAND_X[clampi(rank, 0, 2)], heavy and player == null, rank, func() -> void: done[0] += 1)
 	while done[0] < need:
 		await get_tree().process_frame
 
-func _jump_walk_in(fighter: StageFighter, land: Vector2, stand: Vector2, heavy: bool, rank: int, done: Callable = Callable()) -> void:
+func _jump_walk_in(
+	fighter: StageFighter,
+	opponent: bool,
+	land_x: float,
+	stand_x: float,
+	heavy: bool,
+	rank: int,
+	done: Callable = Callable()
+) -> void:
 	_lift_card(fighter.source_slot)
 	fighter.visual.scale = Vector2(1.12, 0.78)
 	GameAudio.whoosh()
+	var land := _shelf_pos(opponent, land_x, fighter)
 	await _jump_arc(fighter.root, land, JUMP_HEIGHT, JUMP_SEC)
 	if heavy:
 		await _land_impact(fighter)
@@ -243,6 +253,7 @@ func _jump_walk_in(fighter: StageFighter, land: Vector2, stand: Vector2, heavy: 
 	await _squash(fighter.visual, Vector2(1.06, 0.94), 0.14)
 	await _squash(fighter.visual, Vector2.ONE, 0.1)
 	await get_tree().create_timer(0.2).timeout
+	var stand := _shelf_pos(opponent, stand_x, fighter)
 	await _walk_to(fighter, land, stand)
 	fighter.puppet.set_pose(FighterPuppet.Pose.PROFILE)
 	_set_queue_look(fighter, rank)
@@ -263,13 +274,14 @@ func _walk_to(fighter: StageFighter, from: Vector2, to: Vector2) -> void:
 	fighter.root.global_position = to
 	fighter.visual.rotation_degrees = 0.0
 	fighter.puppet.set_pose(FighterPuppet.Pose.PROFILE)
+	_snap_to_floor(fighter, to.x)
 
 func _advance_line(line: Array[StageFighter], new_front: int, opponent: bool) -> void:
 	var rank := 0
 	for fighter in line:
 		if fighter.down or fighter.queue_index < new_front:
 			continue
-		var dest := _stand_pos(opponent, rank)
+		var dest := _shelf_pos(opponent, STAND_X[clampi(rank, 0, 2)], fighter)
 		await _walk_to(fighter, fighter.root.global_position, dest)
 		_set_queue_look(fighter, rank)
 		rank += 1
@@ -277,7 +289,12 @@ func _advance_line(line: Array[StageFighter], new_front: int, opponent: bool) ->
 func _set_queue_look(fighter: StageFighter, rank: int) -> void:
 	var face := -1.0 if fighter.face_left else 1.0
 	fighter.root.scale = Vector2(face, 1.0)
+	fighter.visual.scale = Vector2.ONE
+	fighter.visual.rotation_degrees = 0.0
+	# Draw order only: the one in front paints over the one behind.
+	# Position stays on the same floor line for every rank.
 	fighter.root.z_index = 12 - clampi(rank, 0, 2)
+	_snap_to_floor(fighter, fighter.root.global_position.x)
 
 func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, clash_l: FightPlaque, clash_r: FightPlaque) -> void:
 	if left == null or right == null:
@@ -454,14 +471,23 @@ func _lift_card(slot: CharacterSlot) -> void:
 	_lifted[slot] = true
 	slot.play_leave_for_fight()
 
-func _land_pos(opponent: bool) -> Vector2:
+func _shelf_pos(opponent: bool, x: float, fighter: StageFighter) -> Vector2:
 	var side := 1.0 if opponent else -1.0
-	return _tray.global_position + Vector2(side * LAND_X, SHELF_Y)
+	var world_x := _tray.global_position.x + side * x
+	return _snapped_floor_pos(fighter, world_x)
 
-func _stand_pos(opponent: bool, rank: int) -> Vector2:
-	var x := STAND_X[clampi(rank, 0, 2)]
-	var side := 1.0 if opponent else -1.0
-	return _tray.global_position + Vector2(side * x, SHELF_Y)
+func _floor_y() -> float:
+	return _tray.global_position.y + SHELF_Y + CompositeResolver.FEET_DROP_PX
+
+func _snapped_floor_pos(fighter: StageFighter, world_x: float) -> Vector2:
+	var saved := fighter.root.global_position
+	fighter.root.global_position = Vector2(world_x, _tray.global_position.y + SHELF_Y)
+	var pos := Vector2(world_x, fighter.root.global_position.y + (_floor_y() - fighter.puppet.visual_bottom_y()))
+	fighter.root.global_position = saved
+	return pos
+
+func _snap_to_floor(fighter: StageFighter, world_x: float) -> void:
+	fighter.root.global_position = _snapped_floor_pos(fighter, world_x)
 
 func _first_index(line: Array[StageFighter]) -> int:
 	for fighter in line:

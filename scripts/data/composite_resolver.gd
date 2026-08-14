@@ -3,9 +3,22 @@ extends RefCounted
 
 ## Builds a layered display plan. Parts snap together by magnet points
 ## (magnet_down of the upper part sticks to magnet_up of the lower part).
+## PNG files stay 300×200. PART_SIZE_PX is how big they appear in the game.
+## Every part uses the same scale so they all grow equally.
 
-const BODY_ORIGIN := Vector2(0, -8)
+const PART_WIDTH_PX := 300.0
+const PART_HEIGHT_PX := 200.0
 const PART_SIZE_PX := 250.0
+const FEET_DROP_PX := 90.0 * PART_SIZE_PX / 150.0
+const BODY_ORIGIN := Vector2(0, -22)
+
+const DEFAULT_BODY_UP := Vector2(0, -70)
+const DEFAULT_BODY_DOWN := Vector2(0, 64)
+const DEFAULT_HEAD_DOWN := Vector2(0, 74)
+const DEFAULT_LEGS_UP := Vector2(0, -68)
+
+static func display_scale(_texture: Texture2D = null) -> float:
+	return PART_SIZE_PX / PART_WIDTH_PX
 
 static func resolve(character: CharacterDef, has_head: bool, has_body: bool, has_legs: bool) -> Dictionary:
 	if character == null:
@@ -35,38 +48,40 @@ static func resolve_parts(head: PartDef, body: PartDef, legs: PartDef) -> Dictio
 	if head_tex == null and body_tex == null and legs_tex == null:
 		return empty
 
+	var scale := display_scale()
 	var body_pos := BODY_ORIGIN
-	var head_pos := Vector2(0, -138)
-	var legs_pos := Vector2(0, 118)
-
-	if body_tex != null and body != null:
-		var body_scale := _scale_for(body_tex, PART_SIZE_PX)
-		if head_tex != null and head != null:
-			var head_scale := _scale_for(head_tex, PART_SIZE_PX)
-			var body_up := body.magnet_up * body_scale
-			var head_down := head.magnet_down * head_scale
-			head_pos = body_pos + body_up - head_down
-		if legs_tex != null and legs != null:
-			var legs_scale := _scale_for(legs_tex, PART_SIZE_PX)
-			var body_down := body.magnet_down * body_scale
-			var legs_up := legs.magnet_up * legs_scale
-			legs_pos = body_pos + body_down - legs_up
-	elif head_tex != null and legs_tex == null:
-		head_pos = Vector2(0, -80)
-	elif legs_tex != null and head_tex == null:
-		legs_pos = Vector2(0, 80)
+	var body_up := _magnet_up(body) * scale
+	var body_down := _magnet_down(body) * scale
+	var head_down := _head_magnet_down(head) * scale
+	var legs_up := _legs_magnet_up(legs) * scale
 
 	return {
 		"mode": "layered",
 		"head": head_tex,
 		"body": body_tex,
 		"legs": legs_tex,
-		"head_pos": head_pos,
+		"head_pos": body_pos + body_up - head_down,
 		"body_pos": body_pos,
-		"legs_pos": legs_pos,
+		"legs_pos": body_pos + body_down - legs_up,
 		"part_size_px": PART_SIZE_PX,
 	}
 
-static func _scale_for(texture: Texture2D, target_px: float) -> float:
-	var tex_size := texture.get_size()
-	return target_px / maxf(maxf(tex_size.x, tex_size.y), 1.0)
+static func _magnet_up(body: PartDef) -> Vector2:
+	if body != null:
+		return body.magnet_up
+	return DEFAULT_BODY_UP
+
+static func _magnet_down(body: PartDef) -> Vector2:
+	if body != null:
+		return body.magnet_down
+	return DEFAULT_BODY_DOWN
+
+static func _head_magnet_down(head: PartDef) -> Vector2:
+	if head != null:
+		return head.magnet_down
+	return DEFAULT_HEAD_DOWN
+
+static func _legs_magnet_up(legs: PartDef) -> Vector2:
+	if legs != null:
+		return legs.magnet_up
+	return DEFAULT_LEGS_UP

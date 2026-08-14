@@ -6,8 +6,6 @@ signal part_detached(slot: CharacterSlot, part: PartDef)
 signal card_drag_requested(slot: CharacterSlot)
 signal assembly_changed(slot: CharacterSlot)
 
-const BODY_ORIGIN := Vector2(0, -8)
-const PART_SIZE_PX := 250.0
 const TAG_OFFSETS := {
 	PartSlotType.Value.HEAD: Vector2(108, -150),
 	PartSlotType.Value.BODY: Vector2(108, -20),
@@ -388,13 +386,12 @@ func _apply_plan(plan: Dictionary) -> void:
 	_sprite_body.visible = false
 	_sprite_legs.visible = false
 
-	var size_px: float = float(plan.get("part_size_px", PART_SIZE_PX))
 	if plan["mode"] == "layered":
-		_place_sprite(_sprite_legs, plan["legs"], plan["legs_pos"], size_px)
-		_place_sprite(_sprite_body, plan["body"], plan["body_pos"], size_px)
-		_place_sprite(_sprite_head, plan["head"], plan["head_pos"], size_px)
+		_place_sprite(_sprite_legs, plan["legs"], plan["legs_pos"])
+		_place_sprite(_sprite_body, plan["body"], plan["body_pos"])
+		_place_sprite(_sprite_head, plan["head"], plan["head_pos"])
 
-func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2, target_px: float) -> void:
+func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2) -> void:
 	if texture == null:
 		sprite.texture = null
 		sprite.visible = false
@@ -403,9 +400,7 @@ func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2, target_px
 	sprite.visible = true
 	sprite.centered = true
 	sprite.position = pos
-	var tex_size := texture.get_size()
-	var s := target_px / maxf(maxf(tex_size.x, tex_size.y), 1.0)
-	sprite.scale = Vector2.ONE * s
+	sprite.scale = Vector2.ONE * CompositeResolver.display_scale()
 
 func _update_stats() -> void:
 	var loadout := to_loadout()

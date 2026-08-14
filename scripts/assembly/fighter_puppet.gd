@@ -5,7 +5,6 @@ extends Node2D
 
 enum Pose { FRONT, PROFILE, STRIDE }
 
-const PART_SIZE_PX := 250.0
 const TAG_OFFSETS := {
 	PartSlotType.Value.HEAD: Vector2(70, -90),
 	PartSlotType.Value.BODY: Vector2(70, -10),
@@ -97,7 +96,18 @@ func has_living_part() -> bool:
 	return false
 
 func feet_position() -> Vector2:
-	return global_position + Vector2(0, 90.0 * PART_SIZE_PX / 150.0)
+	return Vector2(global_position.x, visual_bottom_y())
+
+func visual_bottom_y() -> float:
+	var lowest := -INF
+	for sprite in [_head, _body, _legs]:
+		if sprite == null or not sprite.visible or sprite.texture == null:
+			continue
+		var half_h := float(sprite.texture.get_height()) * absf(sprite.global_scale.y) * 0.5
+		lowest = maxf(lowest, sprite.global_position.y + half_h)
+	if lowest == -INF:
+		return global_position.y + CompositeResolver.FEET_DROP_PX
+	return lowest
 
 func get_part_node(slot: PartSlotType.Value) -> Sprite2D:
 	match slot:
@@ -148,6 +158,4 @@ func _place(sprite: Sprite2D, texture: Texture2D, pos: Vector2, slot: PartSlotTy
 	sprite.visible = not _dead.get(slot, false)
 	sprite.texture = texture
 	sprite.position = pos
-	var tex_size := texture.get_size()
-	var s := PART_SIZE_PX / maxf(maxf(tex_size.x, tex_size.y), 1.0)
-	sprite.scale = Vector2.ONE * s
+	sprite.scale = Vector2.ONE * CompositeResolver.display_scale()

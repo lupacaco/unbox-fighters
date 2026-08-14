@@ -16,5 +16,5 @@ sprite_attack = ExtResource("4")
 set_id = &"policial"
 combat_value = 6
 tier = 2
-magnet_up = Vector2(2, -103)
-magnet_down = Vector2(3, 86)
+magnet_up = Vector2(1, -69)
+magnet_down = Vector2(2, 57)

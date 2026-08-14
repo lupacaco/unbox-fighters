@@ -33,6 +33,8 @@ Pasta `assets/ui/`:
 - `frame_premium.png` — moldura da carta
 - `shelf_premium.png` — prateleira (vira palco na luta)
 
+As peças dos Freaks são arquivos **300×200**. No jogo todas aumentam iguais.
+
 ## Arte das caixas
 
 Pasta `assets/boxes/`:

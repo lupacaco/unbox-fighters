@@ -3,7 +3,8 @@ from collections import deque
 import os
 
 ROOT = r"C:\dev\unbox-fighters\assets\characters\vampiro"
-SIZE = 300
+WIDTH = 300
+HEIGHT = 200
 
 SOURCES = {
     "head.png": "_src_head.webp",
@@ -72,30 +73,33 @@ def soft_fringe(im, thr=10):
     return len(to_clear)
 
 
-def fit_square(im, size=SIZE):
+def fit_canvas(im, width=WIDTH, height=HEIGHT):
     im = im.convert("RGBA")
     n1 = flood_clear_black(im, thr=12)
     n2 = soft_fringe(im, thr=10)
     bbox = im.getbbox()
     if not bbox:
-        return Image.new("RGBA", (size, size), (0, 0, 0, 0)), n1, n2
+        return Image.new("RGBA", (width, height), (0, 0, 0, 0)), n1, n2
     cropped = im.crop(bbox)
     cw, ch = cropped.size
-    if cw >= ch:
-        nw, nh = size, max(1, int(round(ch * (size / cw))))
-    else:
-        nh, nw = size, max(1, int(round(cw * (size / ch))))
+    scale = min(width / cw, height / ch)
+    nw = max(1, int(round(cw * scale)))
+    nh = max(1, int(round(ch * scale)))
     resized = cropped.resize((nw, nh), Image.Resampling.LANCZOS)
-    canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    canvas.paste(resized, ((size - nw) // 2, (size - nh) // 2), resized)
+    canvas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    canvas.paste(resized, ((width - nw) // 2, (height - nh) // 2), resized)
     return canvas, n1, n2
+
+
+def fit_square(im, size=WIDTH):
+    return fit_canvas(im, size, size)
 
 
 def main():
     for out_name, src_name in SOURCES.items():
         src_path = os.path.join(ROOT, src_name)
         out_path = os.path.join(ROOT, out_name)
-        result, n1, n2 = fit_square(Image.open(src_path), SIZE)
+        result, n1, n2 = fit_canvas(Image.open(src_path), WIDTH, HEIGHT)
         result.save(out_path, "PNG")
         alpha = result.getchannel("A")
         opaque = sum(1 for v in alpha.getdata() if v > 16)

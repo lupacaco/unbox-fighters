@@ -16,5 +16,5 @@ sprite_attack = ExtResource("4")
 set_id = &"vampiro"
 combat_value = 9
 tier = 5
-magnet_up = Vector2(3, -98)
-magnet_down = Vector2(4, 83)
+magnet_up = Vector2(2, -65)
+magnet_down = Vector2(3, 55)

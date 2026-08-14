@@ -17,4 +17,4 @@ set_id = &"cachorro"
 combat_value = 5
 tier = 1
 magnet_up = Vector2(0, -72)
-magnet_down = Vector2(0, 55)
+magnet_down = Vector2(1, 64)

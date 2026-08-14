@@ -16,5 +16,5 @@ sprite_attack = ExtResource("4")
 set_id = &"bruxa"
 combat_value = 4
 tier = 1
-magnet_up = Vector2(6, -104)
-magnet_down = Vector2(8, 108)
+magnet_up = Vector2(4, -69)
+magnet_down = Vector2(5, 72)

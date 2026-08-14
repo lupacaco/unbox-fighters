@@ -109,20 +109,22 @@ func _input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 		get_viewport().set_input_as_handled()
 
 func _fit_visuals() -> void:
-	# Assets are normalized to 300x300 transparent squares.
-	var target := 168.0
-	var s := target / 300.0
+	var target := CompositeResolver.PART_SIZE_PX
+	var s := CompositeResolver.display_scale()
 	_sprite.scale = Vector2.ONE * s
 	_shadow.scale = Vector2.ONE * s
 	var shape := RectangleShape2D.new()
-	shape.size = Vector2(target, target) * 0.82
+	shape.size = Vector2(target, CompositeResolver.PART_HEIGHT_PX * s) * 0.82
 	_collision.shape = shape
+	var hw := target * 0.5
+	var hh := CompositeResolver.PART_HEIGHT_PX * s * 0.5
 	_plate.polygon = PackedVector2Array([
-		Vector2(-58, 48), Vector2(58, 48), Vector2(48, 68), Vector2(-48, 68)
+		Vector2(-hw * 0.7, hh * 0.58), Vector2(hw * 0.7, hh * 0.58),
+		Vector2(hw * 0.58, hh * 0.82), Vector2(-hw * 0.58, hh * 0.82)
 	])
 	_plate.color = Color(0, 0, 0, 0.3)
 	_glow.polygon = PackedVector2Array([
-		Vector2(-70, -70), Vector2(70, -70), Vector2(70, 70), Vector2(-70, 70)
+		Vector2(-hw, -hh), Vector2(hw, -hh), Vector2(hw, hh), Vector2(-hw, hh)
 	])
 	_glow.color = Color(0.77, 0.12, 0.23, 0.0)
 

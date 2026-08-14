@@ -43,7 +43,7 @@ unbox-fighters/
 | Mudar regras de composição visual | `scripts/data/composite_resolver.gd` |
 | Mudar regras de luta / loja / bots | `scripts/match/` |
 | Mudar HUD / fundo / tags | `scripts/ui/` |
-| Preparar imagens 300×300 | `tools/` |
+| Preparar imagens 300×200 | `tools/` |
 | Documentação | `docs/` |
 
 ## Pastas que o Godot gera

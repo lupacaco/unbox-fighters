@@ -1,7 +1,8 @@
 @tool
 extends VBoxContainer
 
-const PREVIEW_SIZE := 300.0
+const PREVIEW_WIDTH := 300.0
+const PREVIEW_HEIGHT := 200.0
 const MARKER_RADIUS := 10.0
 
 enum EditTarget { UP, DOWN }
@@ -49,7 +50,7 @@ func _build_ui() -> void:
 	row.add_child(_btn_down)
 
 	_canvas = Control.new()
-	_canvas.custom_minimum_size = Vector2(PREVIEW_SIZE, PREVIEW_SIZE)
+	_canvas.custom_minimum_size = Vector2(PREVIEW_WIDTH, PREVIEW_HEIGHT)
 	_canvas.mouse_filter = Control.MOUSE_FILTER_STOP
 	_canvas.draw.connect(_on_canvas_draw)
 	_canvas.gui_input.connect(_on_canvas_gui_input)
@@ -90,7 +91,7 @@ func _refresh_coords() -> void:
 	_label_coords.text = "   |   ".join(parts)
 
 func _texture_draw_rect() -> Rect2:
-	return Rect2(Vector2.ZERO, Vector2(PREVIEW_SIZE, PREVIEW_SIZE))
+	return Rect2(Vector2.ZERO, Vector2(PREVIEW_WIDTH, PREVIEW_HEIGHT))
 
 func _on_canvas_draw() -> void:
 	var rect := _texture_draw_rect()

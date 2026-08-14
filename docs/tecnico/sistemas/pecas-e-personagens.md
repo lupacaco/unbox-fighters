@@ -80,7 +80,7 @@ Padrão de arquivos por personagem em `assets/characters/<nome>/`:
 - `<nome>_head-2.png` / `_body-2` / `_legs-2` — perfil
 - `<nome>_head-3.png` / `_body-3` / `_legs-3` — ataque
 
-Todos em **300×300**.
+Todos em **300×200**. No jogo todas crescem iguais (ficam com 250 px de largura).
 
 ## Arquivos de dados atuais
 
