@@ -10,8 +10,8 @@
 | Preparação | Até 60 s (relógio `1:00`) ou botão PRONTO |
 | Loja | 5 caixas, pancadas douradas, atualizar, travar (caixas azuis), vender à direita, subir nível |
 | Montagem | 3 cartas (3º / 2º / 1º), misturar peças, carta incompleta vale |
-| Luta em fila | Choque parte contra parte, cópia das cartas, teto de 12 de dano por Freak |
-| Tela de luta | Um contra um no palco: pulo, andar afastados, arremesso do kit, colisão no centro, KO. Peça destruída voa para fora da tela. Ordem de frente: cabeça, braço D, tronco, perna D, perna E, braço E |
+| Luta em fila | Choque de kits sorteados (pode misturar cabeça vs pernas), só o vencedor ataca, cópia das cartas, teto de 12 de dano por Freak |
+| Tela de luta | Um contra um no palco: pulo, andar afastados, o kit vencedor voa até a peça do outro, KO. Peça destruída voa para fora da tela. Ordem de frente: cabeça, braço D, tronco, perna D, perna E, braço E |
 | Fim de partida | **Você venceu!** / **Você saiu** e botão **NOVA PARTIDA** |
 | Abrir caixas | 1 clique, custa 1 pancada |
 | Arrastar e soltar | Peças nas cartas (troca no lugar ocupado); botão direito vende; Freak inteiro troca de carta ou vai para VENDER. Sem retângulo vermelho: a carta acende ouro |

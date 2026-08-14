@@ -2,7 +2,7 @@
 
 A luta de verdade é calculada **antes** de aparecer (`CombatSim`). O `FightDirector` só **mostra** o resultado no palco (a prateleira).
 
-Há 3 choques: cabeça, tronco, pernas. O desenho no palco tem 6 membros presos nos ímãs (esferas de metal).
+Cada choque sorteia um kit vivo de cada Freak (cabeça, tronco+braços ou pernas). Pode misturar, por exemplo cabeça contra pernas. O desenho no palco tem 6 membros presos nos ímãs (esferas de metal).
 
 ## Sequência
 
@@ -22,7 +22,7 @@ Na luta, quem cobre quem é fixo (não usa o Z da ferramenta de ímãs). Da fren
 Depois:
 
 4. Placas no topo: nomes, HP e **VS**.
-5. Cada choque: os dois **se preparam** e **arremessam o kit** (cabeça, ou tronco com os braços, ou as duas pernas). As peças voam, batem no centro com física (o jogo calcula o tombo de verdade: elas quicam e giram sozinhas), a tela trava um instante, a câmera treme, faísca e anel de impacto. A peça que perde é **arremessada para fora da tela e some**. A que ganha **volta no corpo como um bumerangue**. Placas com os números; o vencedor mostra o **resto**.
+5. Cada choque: **só o kit vencedor** se prepara e **sai do corpo**. A peça perdedora **fica colada** no Freak. O kit voa até o ponto da peça alvo, a tela trava um instante, a câmera treme, faísca e anel de impacto. Aí a peça atingida é **arrancada e arremessada para fora da tela e some**. A que ganha **volta no corpo como um bumerangue**. Se empatar, nenhuma das duas ataca: as duas saem juntas. Placas com os números; o vencedor mostra o **resto**.
 6. Freak inteiro cai → placa **KO**, inclina e sai. **Aí** o próximo daquele lado pula no palco e se aproxima. O que ganhou fica esperando.
 7. Fim: EMPATE ou nome + dano. Cartas voltam. Quem ainda está de pé pula de volta. Aí a prateleira é limpa.
 
@@ -48,4 +48,4 @@ Em `assets/characters/<nome>/`:
 - Frente: `<nome>_head-1.png`, `_body-1`, `_arm_l-1`, `_arm_r-1`, `_leg_l-1`, `_leg_r-1`
 - Perfil: os mesmos com `-2` (usado no palco e na caminhada)
 
-Não precisa de pose de golpe (`-3`). O ataque é o kit inteiro saindo do corpo e voando até o centro.
+Não precisa de pose de golpe (`-3`). O ataque é o kit vencedor saindo do corpo e voando até a peça do adversário.

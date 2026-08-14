@@ -10,7 +10,7 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 | Script | O que verifica |
 |--------|----------------|
 | `verify_synergy.gd` | 100/75/50 no modelo de 3 kits, números do leão, curva de pancadas |
-| `verify_combat_sim.gd` | Choque, empate, teto de 12 de dano no HP |
+| `verify_combat_sim.gd` | Choque, empate, teto de 12 de dano no HP, pares sorteados (pode misturar kits) |
 | `verify_shop_pool.gd` | Loja vende todo Freak com ficha; tronco do médico só no nível 2; 5 ofertas |
 | `verify_character_importer.gd` | Id `Leão` → `leao`; cada Freak com 12 desenhos; folha do médico vira 6+6 |
 | `verify_match_state.gd` | 4 vivos, HP 40, nomes dos bots, oponente-fantasma |

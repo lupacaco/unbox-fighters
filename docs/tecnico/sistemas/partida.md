@@ -9,7 +9,7 @@ Regras da partida contra bots. Ficam em `scripts/match/` para poder testar os n�
 | `match_rules.gd` | Números fechados: HP 40, pancadas, custos, teto 12 |
 | `synergy.gd` | 100% / 75% / 50% na mesma carta |
 | `fighter_loadout.gd` / `board_loadout.gd` | Uma carta e as 3 cartas em fila |
-| `combat_sim.gd` | Choques e dano de HP; devolve eventos |
+| `combat_sim.gd` | Choques (kit sorteado de cada lado) e dano de HP; devolve eventos |
 | `combat_event.gd` / `combat_result.gd` | Cada choque e o placar final |
 | `shop_pool.gd` | Sorteia 5 peças do nível da loja |
 | `contestant.gd` | Um “jogador”: HP, ouro, loja, tabuleiro |

@@ -17,6 +17,12 @@ func _run() -> void:
 	if not _test_empty_vs_full(leao):
 		quit(1)
 		return
+	if not _test_leftover_stable_when_random(leao):
+		quit(1)
+		return
+	if not _test_random_slots_can_mix(leao):
+		quit(1)
+		return
 	print("VERIFY_COMBAT_SIM_PASS")
 	quit(0)
 
@@ -78,5 +84,44 @@ func _test_empty_vs_full(leao: CharacterDef) -> bool:
 	var result := CombatSim.simulate(left, right)
 	if result.winning_side != CombatEvent.Side.RIGHT or result.damage_to_left != 12:
 		push_error("VERIFY_FAIL empty board should take 12 from one lion")
+		return false
+	return true
+
+func _test_leftover_stable_when_random(leao: CharacterDef) -> bool:
+	for seed in 8:
+		var rng := RandomNumberGenerator.new()
+		rng.seed = seed
+		var left := BoardLoadout.new()
+		left.fighters[0] = FighterLoadout.from_character(leao)
+		var right := BoardLoadout.new()
+		right.fighters[0] = FighterLoadout.from_parts(null, leao.body, null)
+		var result := CombatSim.simulate(left, right, rng)
+		if result.damage_to_right != 10:
+			push_error("VERIFY_FAIL random pairing should still deal 10 vs solo body, seed %d got %d" % [seed, result.damage_to_right])
+			return false
+	return true
+
+func _test_random_slots_can_mix(leao: CharacterDef) -> bool:
+	var medico: CharacterDef = load("res://data/parts/medico_character.tres")
+	if medico == null:
+		push_error("VERIFY_FAIL missing medico")
+		return false
+	var mixed := false
+	for seed in 40:
+		var rng := RandomNumberGenerator.new()
+		rng.seed = seed
+		var left := BoardLoadout.new()
+		left.fighters[0] = FighterLoadout.from_character(leao)
+		var right := BoardLoadout.new()
+		right.fighters[0] = FighterLoadout.from_character(medico)
+		var result := CombatSim.simulate(left, right, rng)
+		for event in result.events:
+			if event.kind == CombatEvent.Kind.CLASH and event.left_slot != event.right_slot:
+				mixed = true
+				break
+		if mixed:
+			break
+	if not mixed:
+		push_error("VERIFY_FAIL expected some clashes to mix slots (head vs legs, etc)")
 		return false
 	return true

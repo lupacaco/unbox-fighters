@@ -1,7 +1,8 @@
 class_name CombatSim
 extends RefCounted
 
-## Resolves a 3-card queue fight. Presentation reads the event list; it does not
+## Resolves a 3-card queue fight. Each clash picks a living kit at random on each
+## side (head may hit legs). Presentation reads the event list; it does not
 ## recompute the rules.
 
 class LivePart:
@@ -20,11 +21,14 @@ class LiveFighter:
 				return true
 		return false
 
-	func top() -> LivePart:
+	func pick_living(rng: RandomNumberGenerator) -> LivePart:
+		var living: Array[LivePart] = []
 		for live_part in parts:
 			if live_part.value > 0:
-				return live_part
-		return null
+				living.append(live_part)
+		if living.is_empty():
+			return null
+		return living[rng.randi_range(0, living.size() - 1)]
 
 	func remaining_power() -> int:
 		var total := 0
@@ -33,7 +37,14 @@ class LiveFighter:
 		return total
 
 
-static func simulate(left: BoardLoadout, right: BoardLoadout) -> CombatResult:
+static func simulate(
+	left: BoardLoadout,
+	right: BoardLoadout,
+	rng: RandomNumberGenerator = null
+) -> CombatResult:
+	if rng == null:
+		rng = RandomNumberGenerator.new()
+		rng.randomize()
 	var result := CombatResult.new()
 	result.left = left
 	result.right = right
@@ -61,8 +72,10 @@ static func simulate(left: BoardLoadout, right: BoardLoadout) -> CombatResult:
 		var left_fighter: LiveFighter = left_queue[left_i]
 		var right_fighter: LiveFighter = right_queue[right_i]
 		while left_fighter.is_alive() and right_fighter.is_alive():
-			var a: LivePart = left_fighter.top()
-			var b: LivePart = right_fighter.top()
+			var a: LivePart = left_fighter.pick_living(rng)
+			var b: LivePart = right_fighter.pick_living(rng)
+			if a == null or b == null:
+				break
 			clash_n += 1
 			var left_v := a.value
 			var right_v := b.value
