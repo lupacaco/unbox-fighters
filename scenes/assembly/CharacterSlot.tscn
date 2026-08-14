@@ -93,36 +93,36 @@ monitorable = false
 [node name="StatReadout" type="Control" parent="." unique_id=676885028]
 layout_mode = 3
 anchors_preset = 0
-offset_left = -180.0
-offset_top = 200.0
-offset_right = 180.0
-offset_bottom = 290.0
+offset_left = -148.0
+offset_top = 176.0
+offset_right = 148.0
+offset_bottom = 258.0
 script = ExtResource("2")
 
 [node name="Panel" type="ColorRect" parent="StatReadout" unique_id=1826146353]
 layout_mode = 0
-offset_right = 360.0
-offset_bottom = 90.0
+offset_right = 296.0
+offset_bottom = 82.0
 color = Color(0.07, 0.08, 0.1, 0.92)
 
 [node name="Edge" type="ColorRect" parent="StatReadout" unique_id=489433634]
 layout_mode = 0
-offset_right = 360.0
+offset_right = 296.0
 offset_bottom = 1.0
 color = Color(0.55, 0.61, 0.71, 0.35)
 
 [node name="CompleteGlow" type="ColorRect" parent="StatReadout" unique_id=199920262]
 visible = false
 layout_mode = 0
-offset_right = 360.0
-offset_bottom = 90.0
+offset_right = 296.0
+offset_bottom = 82.0
 color = Color(0.79, 0.7, 0.49, 0.12)
 
 [node name="NameLabel" type="Label" parent="StatReadout" unique_id=1515451651]
 layout_mode = 0
 offset_left = 8.0
-offset_top = 8.0
-offset_right = 352.0
+offset_top = 6.0
+offset_right = 288.0
 offset_bottom = 34.0
 theme_override_colors/font_color = Color(0.9, 0.92, 0.94, 1)
 theme_override_font_sizes/font_size = 18
@@ -132,9 +132,9 @@ horizontal_alignment = 1
 [node name="TotalLabel" type="Label" parent="StatReadout" unique_id=1643431402]
 layout_mode = 0
 offset_left = 8.0
-offset_top = 36.0
-offset_right = 352.0
-offset_bottom = 82.0
+offset_top = 34.0
+offset_right = 288.0
+offset_bottom = 76.0
 theme_override_colors/font_color = Color(0.96, 0.93, 0.86, 1)
 theme_override_font_sizes/font_size = 13
 text = "Ameaça 0   Força 0   Agilidade 0   ·  0"

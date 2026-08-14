@@ -59,6 +59,8 @@ func setup(def: CharacterDef = null, roster: Array[CharacterDef] = []) -> void:
 	_highlight.visible = false
 	_drop_hot = false
 	_card_frame.modulate = Color.WHITE
+	if _empty_hint != null:
+		GameTheme.apply_display(_empty_hint, 40, Color(0.62, 0.56, 0.46, 0.4), 0)
 	_build_visuals()
 	_setup_zones()
 	_hide_fight_button()
@@ -545,11 +547,11 @@ func _ensure_rank_label() -> void:
 	if _rank_label != null:
 		return
 	_rank_label = Label.new()
-	_rank_label.position = Vector2(-40, -248)
-	_rank_label.size = Vector2(80, 40)
+	_rank_label.position = Vector2(-48, -252)
+	_rank_label.size = Vector2(96, 44)
 	_rank_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_rank_label.add_theme_font_size_override("font_size", 28)
-	_rank_label.add_theme_color_override("font_color", Color.WHITE)
+	_rank_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	GameTheme.apply_display(_rank_label, 36, ThemeTokens.GOLD, 5)
 	add_child(_rank_label)
 
 func _ensure_tags() -> void:

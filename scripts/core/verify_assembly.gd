@@ -38,6 +38,22 @@ func _run() -> void:
 		push_error("VERIFY_FAIL belt should span the full screen width")
 		quit(1)
 		return
+	if AssemblyLayout.REFRESH.y + 40.0 >= AssemblyLayout.belt_world_top():
+		push_error("VERIFY_FAIL shop buttons should sit above the conveyor")
+		quit(1)
+		return
+	if AssemblyLayout.FREEZE.y + 40.0 >= AssemblyLayout.belt_world_top():
+		push_error("VERIFY_FAIL freeze should sit above the conveyor")
+		quit(1)
+		return
+	if not FileAccess.file_exists("res://assets/fonts/BebasNeue-Regular.ttf"):
+		push_error("VERIFY_FAIL missing display font")
+		quit(1)
+		return
+	if not FileAccess.file_exists("res://assets/fonts/Oswald-Variable.ttf"):
+		push_error("VERIFY_FAIL missing body font")
+		quit(1)
+		return
 	var crate_y := AssemblyLayout.crate_y()
 	var sit := crate_y + AssemblyLayout.CRATE_SIT_OFFSET
 	var roller_local := AssemblyLayout.belt_roller_y() - AssemblyLayout.TRAY.y

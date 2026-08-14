@@ -105,12 +105,12 @@ func play(
 		_lift_card(slot)
 	_aim_camera(true)
 
-	var name_l := _hud_plaque(AssemblyLayout.FIGHT_NAME_LEFT, Vector2(280, 54), 22, ThemeTokens.INK)
+	var name_l := _hud_plaque(AssemblyLayout.FIGHT_NAME_LEFT, Vector2(280, 54), 22, ThemeTokens.INK, false)
 	name_l.set_text(left_name)
 	name_l.set_label_color(ThemeTokens.GOLD)
 	var hp_l := _hud_plaque(AssemblyLayout.FIGHT_HP_LEFT, Vector2(132, 78), 40, ThemeTokens.GOLD_DEEP)
 	hp_l.set_text(str(left_hp))
-	var name_r := _hud_plaque(AssemblyLayout.FIGHT_NAME_RIGHT, Vector2(280, 54), 22, ThemeTokens.INK)
+	var name_r := _hud_plaque(AssemblyLayout.FIGHT_NAME_RIGHT, Vector2(280, 54), 22, ThemeTokens.INK, false)
 	name_r.set_text(right_name)
 	name_r.set_label_color(ThemeTokens.GOLD)
 	var hp_r := _hud_plaque(AssemblyLayout.FIGHT_HP_RIGHT, Vector2(132, 78), 40, ThemeTokens.GOLD_DEEP)
@@ -600,17 +600,17 @@ func _fighter_by_queue(line: Array[StageFighter], queue_index: int) -> StageFigh
 			return fighter
 	return null
 
-func _hud_plaque(pos: Vector2, size: Vector2, font_px: int, fill: Color) -> FightPlaque:
-	return _make_plaque(_hud_layer, pos, size, font_px, fill)
+func _hud_plaque(pos: Vector2, size: Vector2, font_px: int, fill: Color, display: bool = true) -> FightPlaque:
+	return _make_plaque(_hud_layer, pos, size, font_px, fill, display)
 
 func _plaque(pos: Vector2, size: Vector2, font_px: int, fill: Color) -> FightPlaque:
 	return _make_plaque(_stage, pos, size, font_px, fill)
 
-func _make_plaque(host: Node, pos: Vector2, size: Vector2, font_px: int, fill: Color) -> FightPlaque:
+func _make_plaque(host: Node, pos: Vector2, size: Vector2, font_px: int, fill: Color, display: bool = true) -> FightPlaque:
 	var plaque := FightPlaque.new()
 	host.add_child(plaque)
 	plaque.position = pos
-	plaque.setup(size, font_px, fill)
+	plaque.setup(size, font_px, fill, display)
 	return plaque
 
 func _jump_arc(node: Node2D, to: Vector2, height: float, duration: float) -> void:

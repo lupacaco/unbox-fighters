@@ -90,7 +90,7 @@ Na tela: entra **um contra um**. O 1º de cada lado **pula** na esteira e **dá 
 ## Controles
 
 - Mouse: martelo nas caixas; arrastar peças; arrastar carta pelo rótulo 3º/2º/1º; PRONTO; ATUALIZAR; TRAVAR; clicar em NÍVEL para subir a loja.
-- Soltar em **VENDER** (direita da esteira) vende. **Botão direito** no mouse também vende a peça embaixo do cursor.
+- Soltar em **VENDER** (à direita, ao lado das caixas) vende. **Botão direito** no mouse também vende a peça embaixo do cursor.
 - Se o encaixe já tem peça, a nova entra e a antiga volta para a esteira.
 - No fim da partida, **NOVA PARTIDA** recomeça.
 - Sem gamepad por enquanto.

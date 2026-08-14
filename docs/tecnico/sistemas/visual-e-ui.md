@@ -7,8 +7,9 @@ Interface da preparação e da luta. As posições da tela seguem o mesmo mapa d
 | Arquivo | Papel |
 |---------|--------|
 | `scripts/assembly/assembly_layout.gd` | Onde cada coisa fica na tela (PREP, relógio, loja, vender, cartas) |
+| `scripts/ui/game_theme.gd` | Fontes, placas douradas e o visual dos botões |
 | `scripts/ui/prep_hud.gd` | **PREP** no topo, relógio no centro, vs / HP, PRONTO vermelho / NOVA PARTIDA |
-| `scripts/ui/shop_bar.gd` | NÍVEL (com custo), 10 bolinhas douradas, ATUALIZAR, TRAVAR |
+| `scripts/ui/shop_bar.gd` | NÍVEL e ATUALIZAR à esquerda; TRAVAR à direita; 10 bolinhas douradas no topo |
 | `scripts/ui/stat_tag.gd` | Pílula colorida com o número da peça |
 | `scripts/ui/fight_plaque.gd` | Placa dourada: nomes, HP, números do choque, KO |
 | `scripts/ui/stat_readout.gd` | Nome + números da cabeça, tronco e braços · total |
@@ -37,6 +38,13 @@ Pasta `assets/ui/`:
 - `frame_premium.png` — moldura da carta
 - `esteira-01.png` — esteira no rodapé (palco da luta, 1920 de largura). Caixas e peças ficam coladas nos rolos
 - `shelf_premium.png` — prateleira antiga (não usada na tela)
+
+Pasta `assets/fonts/`:
+
+- `BebasNeue-Regular.ttf` — títulos e botões (PREP, PRONTO, NÍVEL…)
+- `Oswald-Variable.ttf` — nomes e frases (vs, HP, “Você venceu!”)
+
+Os botões são placas escuras com borda ouro, sombra e texto com contorno. Ao passar o mouse eles crescem um pouco; ao clicar, esmagam. As pancadas são bolinhas douradas, não quadradinhos.
 
 As peças dos Freaks são arquivos **200×200**. No jogo todas ficam no mesmo tamanho.
 

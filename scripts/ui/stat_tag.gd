@@ -13,8 +13,7 @@ func _ready() -> void:
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_label.position = Vector2(-SIZE.x * 0.5, -SIZE.y * 0.5)
 	_label.size = SIZE
-	_label.add_theme_font_size_override("font_size", 18)
-	_label.add_theme_color_override("font_color", Color.WHITE)
+	GameTheme.apply_display(_label, 20, Color.WHITE, 3)
 	add_child(_label)
 	z_index = 8
 

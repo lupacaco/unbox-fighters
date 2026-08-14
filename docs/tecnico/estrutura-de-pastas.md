@@ -12,6 +12,7 @@ unbox-fighters/
 │   ├── boxes/             # Sprites da caixa (fechada / quebrada)
 │   ├── objects/           # Martelo do cursor e base-mola
 │   ├── audio/sfx/         # Efeitos sonoros (.wav)
+│   ├── fonts/             # Letras da interface (Bebas Neue, Oswald)
 │   ├── characters/leao/
 │   ├── characters/medico/
 │   ├── characters/vampiro/

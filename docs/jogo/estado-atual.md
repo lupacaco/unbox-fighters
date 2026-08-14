@@ -8,7 +8,7 @@
 |------|----------|
 | Partida contra 3 bots | 4 vivos, HP 40, último de pé ganha. Bots: Sombra, Ferrugem, Névoa |
 | Preparação | Até 60 s (relógio `1:00`) ou botão PRONTO |
-| Loja | 5 caixas coladas nos rolos da esteira, pancadas douradas, atualizar, travar (caixas azuis), vender à direita, subir nível |
+| Loja | 5 caixas coladas nos rolos; NÍVEL/ATUALIZAR à esquerda, TRAVAR/VENDER à direita, pancadas douradas no topo |
 | Montagem | 3 cartas (3º / 2º / 1º), misturar peças, carta incompleta vale |
 | Luta em fila | Choque de kits sorteados (pode misturar cabeça vs braço), só o vencedor ataca, empate os dois atacam no centro, cópia das cartas, teto de 12 de dano por Freak |
 | Tela de luta | Um contra um na esteira: pulo na mola, dois pulos até o ataque (base sai do chão junto, sombra + recorte nos rolos), o kit vencedor voa até a peça do outro (empate: os dois batem no centro), KO. Nomes/HP/VS ficam inteiros no topo. Peça destruída voa para fora da tela. Cobertura: frente (cabeça, braço E, braço D, tronco, mola) e perfil (braço D, tronco, cabeça, braço E, mola) |
@@ -16,6 +16,7 @@
 | Abrir caixas | 1 clique, custa 1 pancada |
 | Arrastar e soltar | Peças nas cartas (troca no lugar ocupado); botão direito vende; Freak inteiro troca de carta ou vai para VENDER. Sem retângulo vermelho: a carta acende ouro |
 | Visual composto | Base-mola em toda carta (menor que as peças e um pouco mais baixa; solta vazia, pressionada com peça). Ímãs unem cabeça e tronco pelas esferas; cada braço cola no ombro. Na frente os braços abrem um pouco |
+| Interface | Fontes de jogo, botões com borda ouro, loja nas laterais (não em cima da esteira) |
 | Incluir Freak | Folha 6+6 vira 12 PNG 200×200 + 4 kits na loja; ímãs em janela compacta (Ampliar para precisão). A mola já está na carta |
 | Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |
 | Áudio | Efeitos gravados (martelo, caixa, ímã). Na luta: boing de mola de desenho no impulso, passo no pouso e poom do golpe |

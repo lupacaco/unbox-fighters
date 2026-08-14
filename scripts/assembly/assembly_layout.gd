@@ -7,17 +7,18 @@ extends Object
 const WIDTH := 1920.0
 const HEIGHT := 1080.0
 
-const PREP_LABEL := Vector2(220, 36)
-const TIMER := Vector2(960, 36)
-const VS := Vector2(960, 78)
-const READY := Vector2(1700, 40)
-const FIELD := Vector2(960, 100)
-const REFRESH := Vector2(168, 912)
-const FREEZE := Vector2(1752, 912)
-const LEVEL := Vector2(400, 802)
-const SMASH_BAR := Vector2(960, 802)
-const SMASH_LABEL := Vector2(960, 774)
-const SELL_TRAY := Vector2(792, -150)
+const PREP_LABEL := Vector2(148, 40)
+const TIMER := Vector2(960, 34)
+const VS := Vector2(960, 108)
+const READY := Vector2(1768, 42)
+const READY_GAME_OVER := Vector2(960, 580)
+const FIELD := Vector2(960, 136)
+const REFRESH := Vector2(118, 704)
+const FREEZE := Vector2(1802, 628)
+const LEVEL := Vector2(118, 628)
+const SMASH_BAR := Vector2(1024, 74)
+const SMASH_LABEL := Vector2(824, 74)
+const SELL_TRAY := Vector2(842, -108)
 const TRAY := Vector2(960, 920)
 const SLOT_X: Array[float] = [380.0, 960.0, 1540.0]
 const SLOT_Y := 400.0
@@ -52,7 +53,7 @@ static func crate_x(index: int, count: int) -> float:
 
 
 static func smash_dot_center(index: int) -> Vector2:
-	return Vector2(SMASH_BAR.x + (float(index) - 4.5) * 28.0, SMASH_BAR.y)
+	return Vector2(SMASH_BAR.x + (float(index) - 4.5) * 26.0, SMASH_BAR.y)
 
 
 static func belt_world_top() -> float:

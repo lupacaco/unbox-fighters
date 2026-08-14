@@ -9,17 +9,17 @@ var _box: StyleBoxFlat
 var _label: Label
 var _shown: bool = true
 
-func setup(size_px: Vector2, font_px: int, fill: Color) -> void:
+func setup(size_px: Vector2, font_px: int, fill: Color, display: bool = true) -> void:
 	_size = size_px
 	_fill = fill
 	z_index = 90
 	_box = StyleBoxFlat.new()
 	_box.bg_color = _fill
-	_box.set_corner_radius_all(10)
-	_box.border_width_left = 3
-	_box.border_width_top = 3
-	_box.border_width_right = 3
-	_box.border_width_bottom = 3
+	_box.set_corner_radius_all(8)
+	_box.border_width_left = 2
+	_box.border_width_top = 2
+	_box.border_width_right = 2
+	_box.border_width_bottom = 2
 	_box.border_color = ThemeTokens.GOLD
 	_box.shadow_color = Color(0, 0, 0, 0.4)
 	_box.shadow_size = 6
@@ -29,8 +29,10 @@ func setup(size_px: Vector2, font_px: int, fill: Color) -> void:
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_label.position = -_size * 0.5
 	_label.size = _size
-	_label.add_theme_font_size_override("font_size", font_px)
-	_label.add_theme_color_override("font_color", Color("F4EFE6"))
+	if display:
+		GameTheme.apply_display(_label, font_px, Color("F4EFE6"), 4)
+	else:
+		GameTheme.apply_body(_label, font_px, Color("F4EFE6"), 3)
 	add_child(_label)
 	queue_redraw()
 
