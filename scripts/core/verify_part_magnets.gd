@@ -35,5 +35,36 @@ func _run() -> void:
 		push_error("VERIFY_FAIL torso magnets were not marked")
 		quit(1)
 		return
+
+	var probe: PartDef = head.duplicate()
+	probe.flip_h = false
+	probe.rotation_degrees = 0
+	if not probe.magnet_to_visual(Vector2(12, 8), 0).is_equal_approx(Vector2(12, 8)):
+		push_error("VERIFY_FAIL magnet without flip/rotate should stay put")
+		quit(1)
+		return
+	probe.flip_h = true
+	if not probe.magnet_to_visual(Vector2(12, 8), 0).is_equal_approx(Vector2(-12, 8)):
+		push_error("VERIFY_FAIL flip should mirror magnet X")
+		quit(1)
+		return
+	if not probe.visual_to_magnet(Vector2(-12, 8), 0).is_equal_approx(Vector2(12, 8)):
+		push_error("VERIFY_FAIL unflip should restore magnet")
+		quit(1)
+		return
+	if PartSlotType.default_draw_z(PartSlotType.Value.HEAD) != 1:
+		push_error("VERIFY_FAIL head should default to Z 1 (in front)")
+		quit(1)
+		return
+	if PartSlotType.default_draw_z(PartSlotType.Value.BODY) != 2:
+		push_error("VERIFY_FAIL torso should default to Z 2")
+		quit(1)
+		return
+	var order := PartSlotType.draw_order()
+	if order.is_empty() or order[order.size() - 1] != PartSlotType.Value.HEAD:
+		push_error("VERIFY_FAIL head should draw last (on top)")
+		quit(1)
+		return
+
 	print("VERIFY_PART_MAGNETS_PASS")
 	quit(0)

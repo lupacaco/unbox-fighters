@@ -79,12 +79,12 @@ Os ímãs dizem onde cada esfera de metal cola na vizinha.
 
 1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**).
 2. No alto da janela, escolha o **Freak** (ex.: Leão).
-3. A tela grande mostra as **12 partes** juntas: 6 de frente em cima, 6 de lado embaixo.
-4. Arraste cada bolinha até o **centro da esfera de metal**. Não precisa ir peça por peça.
-5. Embaixo aparece o Freak montado, para conferir se pescoço, ombros e quadris batem.
-6. Clique **Salvar ímãs**. Cada bolinha que você solta também já grava aquela peça.
+3. Use a aba **Frente** e a aba **Perfil**. À esquerda: as 6 partes. À direita: a prévia grande.
+4. Se um desenho estiver no tipo errado, escolha o certo na caixa (ex.: Perna E). **Virar** e **Girar 90°** corrigem a imagem. **Z** 1 fica na frente.
+5. Arraste cada bolinha até o **centro da esfera de metal**.
+6. Clique **Salvar**. Cada bolinha que você solta também já grava aquela peça.
 
-Se os 12 quadros vierem pretos com **sem peça**, feche a janela e abra de novo. Se continuar, feche o Godot por completo e abra o projeto outra vez.
+Se os quadros vierem pretos com **sem peça**, feche a janela e abra de novo. Se continuar, feche o Godot por completo e abra o projeto outra vez.
 
 Espaço da imagem: o centro do PNG é `(0, 0)`. **Y cresce para baixo.**
 
@@ -94,9 +94,9 @@ Espaço da imagem: o centro do PNG é `(0, 0)`. **Y cresce para baixo.**
 | Tronco | 5: PESCOÇO, OE (ombro esquerdo), OD, QE (quadril esquerdo), QD |
 | Braço / perna | 1: CIMA (topo da peça) |
 
-Marque **frente e perfil** na mesma tela. A carta usa a frente; a luta usa o lado. Se só a frente estiver marcada, o pescoço de lado fica torto.
+Marque **frente e perfil** nas duas abas. A carta usa a frente; a luta usa o lado. Se só a frente estiver marcada, o pescoço de lado fica torto.
 
-Se você estiver com uma peça aberta no Inspetor, o botão **Abrir as 12 partes deste Freak** abre a mesma janela já no Freak certo.
+Se você estiver com uma peça aberta no Inspetor, o botão **Abrir Frente / Perfil deste Freak** abre a mesma janela já no Freak certo.
 
 ## 3. Números de combate
 

@@ -44,6 +44,12 @@ func setup(def: PartDef, drag_service: DragDropService) -> void:
 		_shadow.texture = _sprite.texture
 		_shadow.modulate = Color(0, 0, 0, 0.45)
 		_shadow.position = Vector2(8, 14)
+		_sprite.flip_h = false
+		_sprite.rotation = 0.0
+		if def != null:
+			def.apply_to_sprite(_sprite, def.sprite)
+			_shadow.flip_h = _sprite.flip_h
+			_shadow.rotation = _sprite.rotation
 		_fit_single()
 	_start_idle_float()
 
@@ -175,7 +181,7 @@ func _apply_kit(expanded: Dictionary) -> void:
 	var textures: Dictionary = plan.get("textures", {})
 	var positions: Dictionary = plan.get("positions", {})
 	var s := CompositeResolver.display_scale() * KIT_PREVIEW_SCALE
-	for slot in PartSlotType.draw_order():
+	for slot in PartSlotType.draw_order_for(expanded):
 		var sprite: Sprite2D = _kit_sprites.get(slot)
 		if sprite == null:
 			continue
@@ -188,6 +194,11 @@ func _apply_kit(expanded: Dictionary) -> void:
 		sprite.visible = true
 		sprite.scale = Vector2.ONE * s
 		sprite.position = positions.get(slot, Vector2.ZERO) * KIT_PREVIEW_SCALE
+		sprite.flip_h = false
+		sprite.rotation = 0.0
+		var part := expanded.get(slot) as PartDef
+		if part != null:
+			part.apply_to_sprite(sprite, texture)
 	_center_kit()
 	_fit_kit_hitbox()
 

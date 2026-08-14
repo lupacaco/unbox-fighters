@@ -5,7 +5,7 @@ extends Control
 
 signal magnets_changed
 
-const TITLE_H := 22.0
+const TITLE_H := 0.0
 const DISC_RADIUS := 7.0
 const HIT_RADIUS := 16.0
 const SOCKET_COLORS := {
@@ -39,7 +39,7 @@ var _undo_old := Vector2.ZERO
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_MOVE
-	custom_minimum_size = Vector2(168, 196)
+	custom_minimum_size = Vector2(160, 160)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	resized.connect(queue_redraw)
@@ -51,16 +51,6 @@ func set_target(next_part: PartDef, next_pose: int) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	var title := _title_text()
-	draw_string(
-		ThemeDB.fallback_font,
-		Vector2(4, 16),
-		title,
-		HORIZONTAL_ALIGNMENT_LEFT,
-		size.x - 8,
-		13,
-		Color(0.86, 0.88, 0.92, 1)
-	)
 	var rect := _image_rect()
 	draw_rect(rect, Color(0.04, 0.04, 0.05, 1), true)
 	var tex := _texture()
@@ -86,7 +76,7 @@ func _draw() -> void:
 			Color(0.95, 0.7, 0.3)
 		)
 		return
-	draw_texture_rect(tex, rect, false)
+	part.draw_transformed(self, tex, rect, pose)
 	for socket in part.socket_names():
 		_draw_marker(part.socket_for(socket, tex), _socket_label(socket), _socket_color(socket), _drag_socket == socket)
 
@@ -111,7 +101,7 @@ func _begin_drag(mouse: Vector2) -> void:
 	var best := HIT_RADIUS * HIT_RADIUS
 	var tex := _texture()
 	for socket in part.socket_names():
-		var screen := _magnet_to_canvas(part.socket_for(socket, tex))
+		var screen := _visual_to_canvas(part.magnet_to_visual(part.socket_for(socket, tex), pose))
 		var d := mouse.distance_squared_to(screen)
 		if d <= best:
 			best = d
@@ -127,7 +117,7 @@ func _begin_drag(mouse: Vector2) -> void:
 	queue_redraw()
 
 func _update_drag(mouse: Vector2) -> void:
-	var magnet := _canvas_to_magnet(mouse - _grab_offset)
+	var magnet := part.visual_to_magnet(_canvas_to_visual(mouse - _grab_offset), pose)
 	part.set_socket(_drag_socket, pose, magnet)
 	part.emit_changed()
 	queue_redraw()
@@ -188,11 +178,6 @@ func _property_for(socket: String) -> String:
 		_:
 			return "magnet_up"
 
-func _title_text() -> String:
-	if part == null:
-		return "—"
-	return PartSlotType.display_label(part.slot_type)
-
 func _texture() -> Texture2D:
 	if part == null:
 		return null
@@ -205,23 +190,23 @@ func _image_rect() -> Rect2:
 	return Rect2(origin, Vector2(side, side))
 
 func _draw_marker(magnet: Vector2, label: String, color: Color, active: bool) -> void:
-	var p := _magnet_to_canvas(magnet)
+	var p := _visual_to_canvas(part.magnet_to_visual(magnet, pose))
 	var radius := DISC_RADIUS + 3.0 if active else DISC_RADIUS
 	draw_circle(p, radius + 2.0, Color(0, 0, 0, 0.65))
 	draw_circle(p, radius, color)
 	draw_arc(p, radius, 0.0, TAU, 24, Color.WHITE, 1.2, true)
 	draw_string(ThemeDB.fallback_font, p + Vector2(8, 4), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, color)
 
-func _magnet_to_canvas(magnet: Vector2) -> Vector2:
+func _visual_to_canvas(visual: Vector2) -> Vector2:
 	var tex := _texture()
 	var tex_size := tex.get_size() if tex != null else Vector2(200, 200)
 	var rect := _image_rect()
-	var pixel := magnet + tex_size * 0.5
+	var pixel := visual + tex_size * 0.5
 	var nx := pixel.x / maxf(tex_size.x, 1.0)
 	var ny := pixel.y / maxf(tex_size.y, 1.0)
 	return rect.position + Vector2(nx * rect.size.x, ny * rect.size.y)
 
-func _canvas_to_magnet(canvas_pos: Vector2) -> Vector2:
+func _canvas_to_visual(canvas_pos: Vector2) -> Vector2:
 	var tex := _texture()
 	var tex_size := tex.get_size() if tex != null else Vector2(200, 200)
 	var rect := _image_rect()

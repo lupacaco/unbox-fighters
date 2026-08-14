@@ -13,6 +13,12 @@ extends Resource
 @export var sprite_attack: Texture2D
 @export var combat_value: int = 0
 @export var tier: int = 1
+## 1 = in front. Lower number draws on top of a higher number.
+@export var draw_z: int = 0
+@export var flip_h: bool = false
+@export var flip_h_profile: bool = false
+@export var rotation_degrees: int = 0
+@export var rotation_degrees_profile: int = 0
 
 ## Magnet points in texture pixels, from the sprite CENTER.
 ## Y negative = up on the image. Y positive = down on the image.
@@ -164,12 +170,84 @@ func texture_for_pose(pose: int) -> Texture2D:
 		return sprite_attack
 	return sprite
 
+func pose_for_texture(shown: Texture2D) -> int:
+	if shown != null and shown == sprite_profile:
+		return 1
+	return 0
+
+func flip_h_for(pose: int) -> bool:
+	return flip_h_profile if pose == 1 else flip_h
+
+func set_flip_h_for(pose: int, on: bool) -> void:
+	if pose == 1:
+		flip_h_profile = on
+	else:
+		flip_h = on
+
+func rotation_for(pose: int) -> int:
+	var raw := rotation_degrees_profile if pose == 1 else rotation_degrees
+	return posmod(raw, 360)
+
+func rotate_cw_90(pose: int) -> void:
+	if pose == 1:
+		rotation_degrees_profile = posmod(rotation_degrees_profile + 90, 360)
+	else:
+		rotation_degrees = posmod(rotation_degrees + 90, 360)
+
+func effective_draw_z() -> int:
+	if draw_z >= 1:
+		return clampi(draw_z, 1, 9)
+	return PartSlotType.default_draw_z(slot_type)
+
+func godot_z() -> int:
+	return 16 - effective_draw_z()
+
+func magnet_to_visual(magnet: Vector2, pose: int) -> Vector2:
+	var visual := magnet
+	if flip_h_for(pose):
+		visual.x = -visual.x
+	var deg := rotation_for(pose)
+	if deg != 0:
+		visual = visual.rotated(deg_to_rad(float(deg)))
+	return visual
+
+func visual_to_magnet(visual: Vector2, pose: int) -> Vector2:
+	var magnet := visual
+	var deg := rotation_for(pose)
+	if deg != 0:
+		magnet = magnet.rotated(-deg_to_rad(float(deg)))
+	if flip_h_for(pose):
+		magnet.x = -magnet.x
+	return magnet
+
+func apply_to_sprite(sprite: Sprite2D, shown: Texture2D) -> void:
+	if sprite == null:
+		return
+	var pose := pose_for_texture(shown)
+	sprite.flip_h = flip_h_for(pose)
+	sprite.rotation_degrees = float(rotation_for(pose))
+	sprite.z_index = godot_z()
+
+func draw_transformed(ci: CanvasItem, tex: Texture2D, dest: Rect2, pose: int) -> void:
+	if ci == null or tex == null:
+		return
+	var xf := Transform2D(0.0, dest.get_center())
+	xf *= Transform2D(deg_to_rad(float(rotation_for(pose))), Vector2.ZERO)
+	if flip_h_for(pose):
+		xf *= Transform2D(Vector2(-1, 0), Vector2(0, 1), Vector2.ZERO)
+	ci.draw_set_transform_matrix(xf)
+	ci.draw_texture_rect(tex, Rect2(-dest.size * 0.5, dest.size), false)
+	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
 func _validate_property(property: Dictionary) -> void:
 	var name := String(property.name)
 	if is_legs_kit() and (name.begins_with("magnet_") or name.begins_with("sprite")):
 		property.usage = PROPERTY_USAGE_NO_EDITOR
 		return
 	if name.begins_with("magnet_") and name.contains("profile"):
+		property.usage = PROPERTY_USAGE_NO_EDITOR
+		return
+	if name in ["flip_h_profile", "rotation_degrees_profile"]:
 		property.usage = PROPERTY_USAGE_NO_EDITOR
 		return
 	if name in ["magnet_neck", "magnet_shoulder_l", "magnet_shoulder_r", "magnet_hip_l", "magnet_hip_r"]:

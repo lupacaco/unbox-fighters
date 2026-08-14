@@ -8,7 +8,7 @@ var pose: int = 0
 var caption: String = ""
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(280, 260)
+	custom_minimum_size = Vector2(380, 420)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -44,11 +44,12 @@ func _draw() -> void:
 	if not any:
 		return
 	var plan := CompositeResolver.resolve_slots(parts, textures)
-	var s := 0.55
-	var origin := box.get_center() + Vector2(0, 16)
+	var side := minf(box.size.x - 24.0, box.size.y - 36.0)
+	var s := clampf(side / 420.0, 0.7, 1.45)
+	var origin := box.get_center() + Vector2(0, 10)
 	var positions: Dictionary = plan.get("positions", {})
-	for slot in PartSlotType.draw_order():
-		_draw_part(textures.get(slot), positions.get(slot, Vector2.ZERO), s, origin, box)
+	for slot in PartSlotType.draw_order_for(parts):
+		_draw_part(parts.get(slot) as PartDef, textures.get(slot), positions.get(slot, Vector2.ZERO), s, origin)
 
 func _tex_for(part: PartDef) -> Texture2D:
 	if part == null:
@@ -56,11 +57,12 @@ func _tex_for(part: PartDef) -> Texture2D:
 	var tex := part.texture_for_pose(pose)
 	return tex if tex != null else part.sprite
 
-func _draw_part(tex: Texture2D, image_pos: Vector2, scale: float, origin: Vector2, box: Rect2) -> void:
+func _draw_part(part: PartDef, tex: Texture2D, image_pos: Vector2, scale: float, origin: Vector2) -> void:
 	if tex == null:
 		return
 	var size := tex.get_size() * scale
 	var r := Rect2(origin + image_pos * scale - size * 0.5, size)
-	if not box.intersects(r):
-		return
-	draw_texture_rect(tex, r, false)
+	if part != null:
+		part.draw_transformed(self, tex, r, pose)
+	else:
+		draw_texture_rect(tex, r, false)

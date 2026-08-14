@@ -33,14 +33,40 @@ static func fight_order() -> Array[Value]:
 	return shop_slots()
 
 static func draw_order() -> Array[Value]:
-	return [
-		Value.LEG_L,
-		Value.LEG_R,
-		Value.BODY,
-		Value.ARM_L,
-		Value.ARM_R,
-		Value.HEAD,
-	]
+	return draw_order_for({})
+
+static func default_draw_z(slot: Value) -> int:
+	match slot:
+		Value.HEAD:
+			return 1
+		Value.ARM_L, Value.ARM_R:
+			return 2
+		Value.BODY:
+			return 2
+		Value.LEG_L, Value.LEG_R:
+			return 3
+		_:
+			return 4
+
+static func draw_order_for(parts: Dictionary) -> Array[Value]:
+	var slots := visual_slots()
+	var ordered: Array[Value] = []
+	for slot in slots:
+		ordered.append(slot)
+	ordered.sort_custom(func(a: Value, b: Value) -> bool:
+		var za := _draw_z_of(parts, a)
+		var zb := _draw_z_of(parts, b)
+		if za != zb:
+			return za > zb
+		return int(a) < int(b)
+	)
+	return ordered
+
+static func _draw_z_of(parts: Dictionary, slot: Value) -> int:
+	var part: PartDef = parts.get(slot) as PartDef
+	if part != null:
+		return part.effective_draw_z()
+	return default_draw_z(slot)
 
 static func is_shop_slot(value: Value) -> bool:
 	return value == Value.HEAD or value == Value.BODY or value == Value.LEGS

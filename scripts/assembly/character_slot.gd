@@ -413,13 +413,14 @@ func _apply_plan(plan: Dictionary) -> void:
 	_sprite_composite.visible = false
 	var textures: Dictionary = plan.get("textures", {})
 	var positions: Dictionary = plan.get("positions", {})
-	for slot in PartSlotType.draw_order():
+	var expanded := PartKit.expand_shop_parts(_shop_parts_map())
+	for slot in PartSlotType.draw_order_for(expanded):
 		var sprite: Sprite2D = _layer_sprites.get(slot)
 		if sprite == null:
 			continue
-		_place_sprite(sprite, textures.get(slot), positions.get(slot, Vector2.ZERO))
+		_place_sprite(sprite, textures.get(slot), positions.get(slot, Vector2.ZERO), expanded.get(slot) as PartDef)
 
-func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2) -> void:
+func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2, part: PartDef = null) -> void:
 	if texture == null:
 		sprite.texture = null
 		sprite.visible = false
@@ -429,6 +430,10 @@ func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2) -> void:
 	sprite.centered = true
 	sprite.position = pos
 	sprite.scale = Vector2.ONE * CompositeResolver.display_scale()
+	sprite.flip_h = false
+	sprite.rotation = 0.0
+	if part != null:
+		part.apply_to_sprite(sprite, texture)
 
 func _update_stats() -> void:
 	var loadout := to_loadout()

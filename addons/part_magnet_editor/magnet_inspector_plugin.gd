@@ -16,7 +16,7 @@ func _parse_begin(object: Object) -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 6)
 	var open_btn := Button.new()
-	open_btn.text = "Abrir as 12 partes deste Freak"
+	open_btn.text = "Abrir Frente / Perfil deste Freak"
 	open_btn.custom_minimum_size.y = 28
 	open_btn.pressed.connect(func() -> void:
 		if _open_window.is_valid():
@@ -26,6 +26,6 @@ func _parse_begin(object: Object) -> void:
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.modulate = Color(0.78, 0.8, 0.84, 1)
-	hint.text = "A ferramenta mostra as 12 imagens (frente e de lado) na mesma tela. Arraste as bolinhas até as esferas de metal."
+	hint.text = "Abre Frente e Perfil em abas: 6 partes à esquerda, prévia grande à direita. Dá para virar, girar e escolher o tipo de cada desenho."
 	box.add_child(hint)
 	add_custom_control(box)

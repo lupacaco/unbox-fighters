@@ -43,12 +43,18 @@ func _open_magnet_window() -> void:
 	_ensure_window()
 	var part := EditorInterface.get_inspector().get_edited_object() as PartDef
 	_window.present(part)
-	_window.popup_centered_ratio(0.92)
+	_popup_magnet()
 
 func _open_magnet_window_for_set(set_id: String) -> void:
 	_ensure_window()
 	_window.present_character_id(set_id)
-	_window.popup_centered_ratio(0.92)
+	_popup_magnet()
+
+func _popup_magnet() -> void:
+	var host := EditorInterface.get_base_control().size
+	var w := clampi(int(host.x * 0.72), 880, 1100)
+	var h := clampi(int(host.y * 0.78), 560, 720)
+	_window.popup_centered(Vector2i(w, h))
 
 func _begin_import() -> void:
 	if _file_dialog == null or not is_instance_valid(_file_dialog):
@@ -85,7 +91,7 @@ func _build_form() -> void:
 		box.add_child(_labeled_spin(labels[i]))
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.text = "A folha precisa ter 12 recortes: 6 de frente e 6 de perfil (esquerda/direita ou frente em cima e perfil embaixo). Na loja entram só 3 kits: cabeça, tronco com os dois braços, e as duas pernas juntas. Depois marque os ímãs nas 12 imagens, todas na mesma tela: Projeto → Ferramentas → Ímãs das Peças."
+	hint.text = "A folha precisa ter 12 recortes: 6 de frente e 6 de perfil. Na loja entram só 3 kits. Depois marque os ímãs em Projeto → Ferramentas → Ímãs das Peças (abas Frente e Perfil)."
 	box.add_child(hint)
 	EditorInterface.get_base_control().add_child(_form)
 

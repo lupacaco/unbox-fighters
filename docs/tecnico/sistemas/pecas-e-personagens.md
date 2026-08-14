@@ -66,20 +66,26 @@ A loja lê sozinha as fichas `*_character.tres` em `data/parts/`, e depois filtr
 ## Como marcar os ímãs
 
 1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**).
-2. No alto, escolha o **Freak**. A janela mostra as **12 partes** (frente em cima, de lado embaixo).
-3. Arraste as bolinhas até o **centro das esferas de metal**:
+2. No alto, escolha o **Freak**. A janela tem duas abas: **Frente** e **Perfil**.
+3. À esquerda ficam as **6 partes**. À direita, a prévia grande do Freak montado.
+4. Em cada parte:
+   - a caixa escolhe o que ela é (cabeça, tronco, braço E/D, perna E/D)
+   - **Virar** espelha a imagem
+   - **Girar 90°** gira o desenho
+   - **Z** é a ordem da frente/trás: **1 fica na frente**. Exemplo: cabeça 1, tronco 2 → a cabeça cobre o tronco
+5. Arraste as bolinhas até o **centro das esferas de metal**:
    - Cabeça: **BAIXO**
    - Braço / perna: **CIMA**
    - Tronco: **PESCOÇO**, **OE**, **OD**, **QE**, **QD**
-4. Olhe a prévia embaixo (Freak montado). Clique **Salvar ímãs**.
+6. Clique **Salvar**.
 
-Se os quadros vierem pretos com **sem peça**, feche a janela e abra de novo. Se continuar, feche o Godot e abra o projeto outra vez — a ferramenta precisa reler as fichas no editor.
+Se os quadros vierem pretos com **sem peça**, feche a janela e abra de novo. Se continuar, feche o Godot e abra o projeto outra vez.
 
-Não use o kit `*_legs.tres` (não tem desenho). A ferramenta lê as 6 imagens de desenho × 2 poses.
+Não use o kit `*_legs.tres` (não tem desenho). A ferramenta lê as 6 imagens de desenho × 2 poses (uma aba cada).
 
 Marque **frente e perfil**. A carta usa a frente; a luta usa o perfil.
 
-Se uma peça estiver aberta no Inspetor, o botão **Abrir as 12 partes deste Freak** abre a mesma tela já nesse Freak.
+Se uma peça estiver aberta no Inspetor, o botão **Abrir Frente / Perfil deste Freak** abre a mesma tela já nesse Freak.
 
 ### Sistema de coordenadas
 

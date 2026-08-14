@@ -283,9 +283,9 @@ func _layout_rig() -> void:
 	_body_root.position = _body_rest
 	if not _walking and not _striking:
 		_body_root.rotation = 0.0
-	_place_sprite(_sprites[PartSlotType.Value.BODY], textures.get(PartSlotType.Value.BODY), Vector2.ZERO)
 	var body: PartDef = _parts.get(PartSlotType.Value.BODY)
 	var body_tex: Texture2D = textures.get(PartSlotType.Value.BODY)
+	_place_sprite(_sprites[PartSlotType.Value.BODY], body_tex, Vector2.ZERO, body)
 	_place_joint(
 		PartSlotType.Value.HEAD,
 		_socket(body, "neck", body_tex) * part_scale,
@@ -322,11 +322,14 @@ func _place_joint(slot: PartSlotType.Value, joint_pos: Vector2, texture: Texture
 	var sprite: Sprite2D = _sprites.get(slot)
 	if joint == null or sprite == null:
 		return
+	var part := _part_def(slot)
 	joint.position = joint_pos
-	_place_sprite(sprite, texture, -magnet)
+	if part != null:
+		joint.z_index = part.godot_z()
+	_place_sprite(sprite, texture, -magnet, part)
 	joint.visible = texture != null
 
-func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2) -> void:
+func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2, part: PartDef = null) -> void:
 	if sprite == null:
 		return
 	if texture == null:
@@ -339,6 +342,9 @@ func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2) -> void:
 	sprite.scale = Vector2.ONE * CompositeResolver.display_scale()
 	sprite.modulate = Color.WHITE
 	sprite.rotation = 0.0
+	sprite.flip_h = false
+	if part != null:
+		part.apply_to_sprite(sprite, texture)
 
 func _socket(part: PartDef, socket: String, shown: Texture2D) -> Vector2:
 	return CompositeResolver.socket_of(part, socket, shown)

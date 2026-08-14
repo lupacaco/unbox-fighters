@@ -86,22 +86,29 @@ static func socket_of(part: PartDef, socket: String, shown: Texture2D) -> Vector
 	return _socket(part, socket, shown)
 
 static func _socket(part: PartDef, socket: String, shown: Texture2D) -> Vector2:
+	var raw := Vector2.ZERO
+	var marked := false
 	if part != null:
 		var magnet := part.socket_for(socket, shown)
 		if magnet.length_squared() > 0.01:
-			return magnet
-	match socket:
-		"neck":
-			return DEFAULT_NECK
-		"shoulder_l":
-			return DEFAULT_SHOULDER_L
-		"shoulder_r":
-			return DEFAULT_SHOULDER_R
-		"hip_l":
-			return DEFAULT_HIP_L
-		"hip_r":
-			return DEFAULT_HIP_R
-		"down":
-			return DEFAULT_HEAD_DOWN
-		_:
-			return DEFAULT_LIMB_UP
+			raw = magnet
+			marked = true
+	if not marked:
+		match socket:
+			"neck":
+				raw = DEFAULT_NECK
+			"shoulder_l":
+				raw = DEFAULT_SHOULDER_L
+			"shoulder_r":
+				raw = DEFAULT_SHOULDER_R
+			"hip_l":
+				raw = DEFAULT_HIP_L
+			"hip_r":
+				raw = DEFAULT_HIP_R
+			"down":
+				raw = DEFAULT_HEAD_DOWN
+			_:
+				raw = DEFAULT_LIMB_UP
+	if part != null:
+		return part.magnet_to_visual(raw, part.pose_for_texture(shown))
+	return raw

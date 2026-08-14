@@ -34,6 +34,23 @@ func get_part(slot: PartSlotType.Value) -> PartDef:
 		_:
 			return null
 
+func set_part(slot: PartSlotType.Value, part: PartDef) -> void:
+	match slot:
+		PartSlotType.Value.HEAD:
+			head = part
+		PartSlotType.Value.BODY:
+			body = part
+		PartSlotType.Value.ARM_L:
+			arm_l = part
+		PartSlotType.Value.ARM_R:
+			arm_r = part
+		PartSlotType.Value.LEG_L:
+			leg_l = part
+		PartSlotType.Value.LEG_R:
+			leg_r = part
+		PartSlotType.Value.LEGS:
+			legs = part
+
 func shop_parts() -> Array[PartDef]:
 	var list: Array[PartDef] = []
 	for slot in PartSlotType.shop_slots():
