@@ -14,4 +14,4 @@ sprite = ExtResource("2")
 sprite_profile = ExtResource("3")
 combat_value = 4
 magnet_up = Vector2(-2, -94)
-magnet_up_profile = Vector2(-14, -92)
+magnet_up_profile = Vector2(-1, -91)

@@ -1,26 +1,25 @@
-[gd_resource type="Resource" script_class="PartDef" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://cllb5yjsn8fav"]
 
-[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/characters/vampiro/vampiro_body-1.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/characters/vampiro/vampiro_body-2.png" id="3"]
+[ext_resource type="Script" uid="uid://71ffw17l5buf" path="res://scripts/data/part_def.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cpeswchrdhcvo" path="res://assets/characters/vampiro/vampiro_body-1.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://brd528tpyl5fk" path="res://assets/characters/vampiro/vampiro_body-2.png" id="3"]
 
 [resource]
 script = ExtResource("1")
 id = &"vampiro_body"
 display_name = "Vampiro Tronco"
 slot_type = 1
+set_id = &"vampiro"
 sprite = ExtResource("2")
 sprite_profile = ExtResource("3")
-set_id = &"vampiro"
 combat_value = 4
-tier = 1
 magnet_neck = Vector2(0, -85)
-magnet_shoulder_l = Vector2(0, -43)
+magnet_shoulder_l = Vector2(-44, -68)
 magnet_shoulder_r = Vector2(46, -67)
 magnet_hip_l = Vector2(-37, 76)
 magnet_hip_r = Vector2(36, 76)
-magnet_neck_profile = Vector2(9, -85)
-magnet_shoulder_l_profile = Vector2(-20, -45)
-magnet_shoulder_r_profile = Vector2(-8, -48)
-magnet_hip_l_profile = Vector2(-3, 70)
-magnet_hip_r_profile = Vector2(1, -41)
+magnet_neck_profile = Vector2(13, -91)
+magnet_shoulder_l_profile = Vector2(-11, -52)
+magnet_shoulder_r_profile = Vector2(-9, -52)
+magnet_hip_l_profile = Vector2(4, 67)
+magnet_hip_r_profile = Vector2(-10, 68)

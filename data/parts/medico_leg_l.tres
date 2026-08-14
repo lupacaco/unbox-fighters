@@ -1,18 +1,17 @@
-[gd_resource type="Resource" script_class="PartDef" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://bgem4mtb5keoc"]
 
-[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/characters/medico/medico_leg_l-1.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/characters/medico/medico_leg_l-2.png" id="3"]
+[ext_resource type="Script" uid="uid://71ffw17l5buf" path="res://scripts/data/part_def.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bjieuepckru4s" path="res://assets/characters/medico/medico_leg_l-1.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://c436n3cbxb07c" path="res://assets/characters/medico/medico_leg_l-2.png" id="3"]
 
 [resource]
 script = ExtResource("1")
 id = &"medico_leg_l"
 display_name = "Médico Perna E"
 slot_type = 4
+set_id = &"medico"
 sprite = ExtResource("2")
 sprite_profile = ExtResource("3")
-set_id = &"medico"
 combat_value = 4
-tier = 1
 magnet_up = Vector2(2, -82)
 magnet_up_profile = Vector2(8, -82)
