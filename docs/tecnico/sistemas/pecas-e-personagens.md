@@ -74,6 +74,7 @@ A loja lê sozinha as fichas `*_character.tres` em `data/parts/`, e depois filtr
    - **Girar 90°** gira o desenho
    - **Z** é a ordem da frente/trás: **1 fica na frente**. Exemplo: cabeça 1, tronco 2 → a cabeça cobre o tronco
    - **Trocar imagem** escolhe um PNG/WEBP no computador. O jogo grava em **200×200** no lugar da peça.
+   - **Ampliar** abre a peça grande. Roda do mouse amplia; botão direito arrasta a imagem; clique duas vezes na miniatura também abre.
 5. Arraste as bolinhas até o **centro das esferas de metal**:
    - Cabeça: **BAIXO**
    - Braço / perna: **CIMA**

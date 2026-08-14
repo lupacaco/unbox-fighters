@@ -81,7 +81,7 @@ func _build_ui() -> void:
 	_help = Label.new()
 	_help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_help.modulate = Color(0.78, 0.8, 0.84, 1)
-	_help.text = "Duas colunas de partes. Z 1 fica na frente. Trocar imagem escolhe um PNG do PC (o jogo grava em 200×200). Arraste as bolinhas até as esferas de metal."
+	_help.text = "Ampliar abre a peça grande. Roda do mouse amplia. Botão direito arrasta a imagem. Z 1 fica na frente. Trocar imagem escolhe um PNG do PC."
 	column.add_child(_help)
 
 	_tabs = TabContainer.new()

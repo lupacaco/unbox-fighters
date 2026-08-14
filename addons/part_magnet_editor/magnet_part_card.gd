@@ -18,8 +18,11 @@ var _z_spin: SpinBox
 var _flip_btn: Button
 var _rotate_btn: Button
 var _replace_btn: Button
+var _expand_btn: Button
 var _tile: Control
 var _syncing := false
+var _zoom_win: Window
+var _zoom_tile: Control
 
 func _ready() -> void:
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -32,6 +35,8 @@ func set_target(next_part: PartDef, next_pose: int) -> void:
 	_sync_controls()
 	if _tile != null:
 		(_tile as MagnetTile).set_target(part, pose)
+	if _zoom_tile != null and is_instance_valid(_zoom_tile):
+		(_zoom_tile as MagnetTile).set_target(part, pose)
 
 func _build() -> void:
 	var margin := MarginContainer.new()
@@ -102,11 +107,19 @@ func _build() -> void:
 	_replace_btn.pressed.connect(_on_replace_pressed)
 	controls.add_child(_replace_btn)
 
+	_expand_btn = Button.new()
+	_expand_btn.text = "Ampliar"
+	_expand_btn.tooltip_text = "Abre a imagem grande para marcar o ímã com precisão. Roda do mouse amplia. Botão direito arrasta."
+	_expand_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_expand_btn.pressed.connect(_on_expand_pressed)
+	controls.add_child(_expand_btn)
+
 	_tile = MagnetTile.new()
 	_tile.custom_minimum_size = Vector2(260, 260)
 	_tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_tile.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	(_tile as MagnetTile).magnets_changed.connect(func() -> void: magnets_changed.emit())
+	(_tile as MagnetTile).expand_requested.connect(_on_expand_pressed)
 	row.add_child(_tile)
 
 func _sync_controls() -> void:
@@ -117,6 +130,7 @@ func _sync_controls() -> void:
 		_flip_btn.disabled = true
 		_rotate_btn.disabled = true
 		_replace_btn.disabled = true
+		_expand_btn.disabled = true
 		_syncing = false
 		return
 	_slot_pick.disabled = false
@@ -124,6 +138,7 @@ func _sync_controls() -> void:
 	_flip_btn.disabled = false
 	_rotate_btn.disabled = false
 	_replace_btn.disabled = false
+	_expand_btn.disabled = false
 	_select_slot(part.slot_type)
 	_z_spin.value = part.effective_draw_z()
 	_flip_btn.button_pressed = part.flip_h_for(pose)
@@ -158,6 +173,8 @@ func _on_flip_toggled(on: bool) -> void:
 	_save_part()
 	if _tile != null:
 		_tile.queue_redraw()
+	if _zoom_tile != null and is_instance_valid(_zoom_tile):
+		_zoom_tile.queue_redraw()
 	transform_changed.emit()
 
 func _on_rotate_pressed() -> void:
@@ -169,12 +186,91 @@ func _on_rotate_pressed() -> void:
 	_sync_controls()
 	if _tile != null:
 		(_tile as MagnetTile).set_target(part, pose)
+	if _zoom_tile != null and is_instance_valid(_zoom_tile):
+		(_zoom_tile as MagnetTile).set_target(part, pose)
 	transform_changed.emit()
 
 func _on_replace_pressed() -> void:
 	if part == null:
 		return
 	replace_requested.emit(part, pose)
+
+func _on_expand_pressed() -> void:
+	if part == null:
+		return
+	_ensure_zoom_window()
+	var tile := _zoom_tile as MagnetTile
+	tile.start_zoom = 2.2
+	tile.set_target(part, pose)
+	_zoom_win.title = "Ímã — %s" % PartSlotType.display_label(part.slot_type)
+	_zoom_win.popup_centered(Vector2i(720, 780))
+	tile.call_deferred("reset_view")
+
+func _ensure_zoom_window() -> void:
+	if _zoom_win != null and is_instance_valid(_zoom_win):
+		return
+	_zoom_win = Window.new()
+	_zoom_win.min_size = Vector2i(560, 620)
+	_zoom_win.unresizable = false
+	_zoom_win.exclusive = false
+	_zoom_win.close_requested.connect(func() -> void: _zoom_win.hide())
+	var root := MarginContainer.new()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.add_theme_constant_override("margin_left", 12)
+	root.add_theme_constant_override("margin_top", 10)
+	root.add_theme_constant_override("margin_right", 12)
+	root.add_theme_constant_override("margin_bottom", 12)
+	_zoom_win.add_child(root)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 8)
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	root.add_child(column)
+	var help := Label.new()
+	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	help.modulate = Color(0.78, 0.8, 0.84, 1)
+	help.text = "Roda do mouse amplia. Botão direito (ou esquerdo no vazio) arrasta a imagem. Esquerdo na bolinha move o ímã. Clique duas vezes na miniatura também abre esta tela."
+	column.add_child(help)
+	var bar := HBoxContainer.new()
+	bar.add_theme_constant_override("separation", 8)
+	column.add_child(bar)
+	var minus := Button.new()
+	minus.text = "−"
+	minus.custom_minimum_size = Vector2(40, 28)
+	minus.pressed.connect(func() -> void: (_zoom_tile as MagnetTile).zoom_by(1.0 / 1.25))
+	bar.add_child(minus)
+	var plus := Button.new()
+	plus.text = "+"
+	plus.custom_minimum_size = Vector2(40, 28)
+	plus.pressed.connect(func() -> void: (_zoom_tile as MagnetTile).zoom_by(1.25))
+	bar.add_child(plus)
+	var reset := Button.new()
+	reset.text = "100%"
+	reset.pressed.connect(func() -> void:
+		(_zoom_tile as MagnetTile).start_zoom = 1.0
+		(_zoom_tile as MagnetTile).reset_view()
+	)
+	bar.add_child(reset)
+	_zoom_tile = MagnetTile.new()
+	_zoom_tile.custom_minimum_size = Vector2(520, 520)
+	_zoom_tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_zoom_tile.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	(_zoom_tile as MagnetTile).start_zoom = 2.2
+	(_zoom_tile as MagnetTile).can_expand = false
+	(_zoom_tile as MagnetTile).magnets_changed.connect(func() -> void:
+		if _tile != null:
+			_tile.queue_redraw()
+		magnets_changed.emit()
+	)
+	column.add_child(_zoom_tile)
+	var host := EditorInterface.get_base_control()
+	host.add_child(_zoom_win)
+
+func _exit_tree() -> void:
+	if _zoom_win != null and is_instance_valid(_zoom_win):
+		_zoom_win.queue_free()
+	_zoom_win = null
+	_zoom_tile = null
 
 func _save_part() -> void:
 	if part == null or part.resource_path.is_empty():
