@@ -13,8 +13,7 @@ const LAND_X := 470.0
 const DUEL_X := 305.0
 const THROW_SEC := 0.34
 const BOOMERANG_SEC := 0.52
-const WRECK_IMPULSE := 980.0
-const SHELF_HALF := 850.0
+const WRECK_IMPULSE := 1680.0
 const OPPONENT_ENTER := Vector2(2040, 400)
 const WALK_PX_PER_SEC := 280.0
 const JUMP_SEC := 0.5
@@ -87,7 +86,6 @@ func play(
 	_stage.name = "FightStage"
 	_stage.y_sort_enabled = false
 	_fx.add_child(_stage)
-	_ensure_physics_shelf()
 
 	_left = _build_line(result.left if result != null else BoardLoadout.new(), false, slots)
 	_right = _build_line(opponent_board, true, slots)
@@ -430,8 +428,9 @@ func _resolve_thrown_kit(
 	if dies:
 		var away := WRECK_IMPULSE if fighter.face_left else -WRECK_IMPULSE
 		kit.begin_wreck(away)
-		await kit.settle_as_wreck(1.15)
+		kit.fly_off_and_free()
 		fighter.puppet.set_part_dead(slot, true)
+		await get_tree().create_timer(0.28).timeout
 	else:
 		await kit.fly_boomerang_to(func() -> Vector2: return fighter.puppet.kit_anchor(slot), BOOMERANG_SEC)
 		if is_instance_valid(kit):
@@ -441,28 +440,6 @@ func _resolve_thrown_kit(
 		await fighter.puppet.play_catch_kit()
 	if done.is_valid():
 		done.call()
-
-func _ensure_physics_shelf() -> void:
-	if _stage == null or _tray == null:
-		return
-	var floor_y := _shelf_y() + 118.0
-	var cx := _tray.global_position.x
-	_add_static_box(Vector2(cx, floor_y + 28.0), Vector2(SHELF_HALF * 2.0 + 80.0, 56.0))
-	_add_static_box(Vector2(cx - SHELF_HALF, floor_y - 70.0), Vector2(52.0, 220.0))
-	_add_static_box(Vector2(cx + SHELF_HALF, floor_y - 70.0), Vector2(52.0, 220.0))
-
-func _add_static_box(world_pos: Vector2, size: Vector2) -> void:
-	var body := StaticBody2D.new()
-	body.collision_layer = KitThrow.LAYER_SHELF
-	body.collision_mask = KitThrow.LAYER_KIT
-	_stage.add_child(body)
-	body.global_position = world_pos
-	var shape := CollisionShape2D.new()
-	var rect := RectangleShape2D.new()
-	rect.size = size
-	shape.shape = rect
-	body.add_child(shape)
-	Feel.hide_collision_debug(shape)
 
 func _drop_out(fighter: StageFighter, ko: FightPlaque) -> void:
 	if fighter == null or fighter.down or not is_instance_valid(fighter.root):

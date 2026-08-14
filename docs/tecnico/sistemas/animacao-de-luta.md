@@ -22,8 +22,8 @@ Na luta, quem cobre quem é fixo (não usa o Z da ferramenta de ímãs). Da fren
 Depois:
 
 4. Placas no topo: nomes, HP e **VS**.
-5. Cada choque: os dois **se preparam** e **arremessam o kit** (cabeça, ou tronco com os braços, ou as duas pernas). As peças voam, batem no centro com física (o jogo calcula o tombo de verdade: elas quicam e giram sozinhas), a tela trava um instante, a câmera treme, faísca e anel de impacto. A peça que perde é **arremessada para o canto da prateleira** e fica lá até o fim de todas as lutas da rodada. A que ganha **volta no corpo como um bumerangue**. Placas com os números; o vencedor mostra o **resto**.
-6. Freak inteiro cai → placa **KO**, inclina e sai. **Aí** o próximo daquele lado pula no palco e se aproxima. O que ganhou fica esperando. Os kits destruídos continuam nos cantos.
+5. Cada choque: os dois **se preparam** e **arremessam o kit** (cabeça, ou tronco com os braços, ou as duas pernas). As peças voam, batem no centro com física (o jogo calcula o tombo de verdade: elas quicam e giram sozinhas), a tela trava um instante, a câmera treme, faísca e anel de impacto. A peça que perde é **arremessada para fora da tela e some**. A que ganha **volta no corpo como um bumerangue**. Placas com os números; o vencedor mostra o **resto**.
+6. Freak inteiro cai → placa **KO**, inclina e sai. **Aí** o próximo daquele lado pula no palco e se aproxima. O que ganhou fica esperando.
 7. Fim: EMPATE ou nome + dano. Cartas voltam. Quem ainda está de pé pula de volta. Aí a prateleira é limpa.
 
 A poeira dos passos é **um** efeito reaproveitado, não um novo a cada passo. Isso deixa a luta mais leve no computador.

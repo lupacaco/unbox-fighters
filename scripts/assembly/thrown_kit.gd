@@ -1,13 +1,13 @@
 class_name ThrownKit
 extends RigidBody2D
 
-## One shop kit flying on the shelf: collides with physics, then wrecks or returns.
+## One shop kit flying on the shelf: collides with physics, then flies off or returns.
 
 signal collided
 
 const LAYER_KIT := 8
-const LAYER_SHELF := 16
 const AFTERIMAGE_SEC := 0.032
+const OFFSCREEN := Rect2(-160.0, -160.0, 2240.0, 1400.0)
 
 var slot: PartSlotType.Value = PartSlotType.Value.HEAD
 var face_left: bool = false
@@ -110,36 +110,31 @@ func begin_wreck(away_x: float) -> void:
 	freeze = false
 	can_sleep = false
 	sleeping = false
-	gravity_scale = 1.45
-	linear_damp = 0.55
-	angular_damp = 0.35
-	collision_layer = LAYER_KIT
-	collision_mask = LAYER_KIT | LAYER_SHELF
+	gravity_scale = 1.55
+	linear_damp = 0.12
+	angular_damp = 0.08
+	collision_layer = 0
+	collision_mask = 0
 	linear_velocity = Vector2.ZERO
 	angular_velocity = 0.0
-	apply_central_impulse(Vector2(away_x, -680.0))
-	apply_torque_impulse(away_x * 18.0)
+	apply_central_impulse(Vector2(away_x, -920.0))
+	apply_torque_impulse(away_x * 28.0)
 	modulate = Color(0.62, 0.54, 0.5)
 	if _visual != null:
 		Feel.punch(_visual, Vector2(1.28, 0.68), Vector2.ONE)
 
-func settle_as_wreck(max_wait: float) -> void:
+func fly_off_and_free() -> void:
+	var fade := create_tween()
+	fade.tween_interval(0.16)
+	fade.tween_property(self, "modulate:a", 0.0, 0.32)
 	var waited := 0.0
-	while waited < max_wait and is_inside_tree():
+	while waited < 1.2 and is_inside_tree():
 		await get_tree().physics_frame
 		waited += get_physics_process_delta_time()
-		if waited > 0.28 and linear_velocity.length() < 48.0 and absf(angular_velocity) < 2.4:
+		if not OFFSCREEN.has_point(global_position):
 			break
-	freeze_static()
-
-func freeze_static() -> void:
-	linear_velocity = Vector2.ZERO
-	angular_velocity = 0.0
-	freeze_mode = RigidBody2D.FREEZE_MODE_STATIC
-	freeze = true
-	can_sleep = true
-	sleeping = true
-	z_index = 24
+	if is_instance_valid(self):
+		queue_free()
 
 func fly_boomerang_to(dest: Callable, duration: float) -> void:
 	_hit = true
