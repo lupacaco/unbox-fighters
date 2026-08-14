@@ -13,14 +13,6 @@ const TAG_OFFSETS := {
 	PartSlotType.Value.BODY: Vector2(78, -10),
 	PartSlotType.Value.LEGS: Vector2(78, 90),
 }
-const JOINT_Z := {
-	PartSlotType.Value.LEG_L: 0,
-	PartSlotType.Value.LEG_R: 1,
-	PartSlotType.Value.BODY: 2,
-	PartSlotType.Value.ARM_L: 3,
-	PartSlotType.Value.ARM_R: 4,
-	PartSlotType.Value.HEAD: 5,
-}
 const WALK_HZ := 2.15
 const LEG_SWING := 0.42
 const ARM_SWING := 0.28
@@ -48,7 +40,7 @@ func _ready() -> void:
 	add_child(_body_root)
 	var body_sprite := Sprite2D.new()
 	body_sprite.centered = true
-	body_sprite.z_index = JOINT_Z[PartSlotType.Value.BODY]
+	body_sprite.z_index = PartSlotType.fight_z_index(PartSlotType.Value.BODY)
 	_body_root.add_child(body_sprite)
 	_sprites[PartSlotType.Value.BODY] = body_sprite
 	for slot in [
@@ -59,7 +51,7 @@ func _ready() -> void:
 		PartSlotType.Value.HEAD,
 	]:
 		var joint := Node2D.new()
-		joint.z_index = JOINT_Z[slot]
+		joint.z_index = PartSlotType.fight_z_index(slot)
 		_body_root.add_child(joint)
 		_joints[slot] = joint
 		var sprite := Sprite2D.new()
@@ -286,6 +278,7 @@ func _layout_rig() -> void:
 	var body: PartDef = _parts.get(PartSlotType.Value.BODY)
 	var body_tex: Texture2D = textures.get(PartSlotType.Value.BODY)
 	_place_sprite(_sprites[PartSlotType.Value.BODY], body_tex, Vector2.ZERO, body)
+	_sprites[PartSlotType.Value.BODY].z_index = PartSlotType.fight_z_index(PartSlotType.Value.BODY)
 	_place_joint(
 		PartSlotType.Value.HEAD,
 		_socket(body, "neck", body_tex) * part_scale,
@@ -324,8 +317,7 @@ func _place_joint(slot: PartSlotType.Value, joint_pos: Vector2, texture: Texture
 		return
 	var part := _part_def(slot)
 	joint.position = joint_pos
-	if part != null:
-		joint.z_index = part.godot_z()
+	joint.z_index = PartSlotType.fight_z_index(slot)
 	_place_sprite(sprite, texture, -magnet, part)
 	joint.visible = texture != null
 
@@ -344,7 +336,7 @@ func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2, part: Par
 	sprite.rotation = 0.0
 	sprite.flip_h = false
 	if part != null:
-		part.apply_to_sprite(sprite, texture)
+		part.apply_to_sprite(sprite, texture, false)
 
 func _socket(part: PartDef, socket: String, shown: Texture2D) -> Vector2:
 	return CompositeResolver.socket_of(part, socket, shown)

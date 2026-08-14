@@ -72,7 +72,7 @@ A loja lê sozinha as fichas `*_character.tres` em `data/parts/`, e depois filtr
    - a caixa escolhe o que ela é (cabeça, tronco, braço E/D, perna E/D)
    - **Virar** espelha a imagem
    - **Girar 90°** gira o desenho
-   - **Z** é a ordem da frente/trás: **1 fica na frente**. Exemplo: cabeça 1, tronco 2 → a cabeça cobre o tronco
+   - **Z** é a ordem da frente/trás **na carta**: **1 fica na frente**. Exemplo: cabeça 1, tronco 2 → a cabeça cobre o tronco. **Na luta** a ordem é outra e fixa: cabeça, braço direito, tronco, perna direita, perna esquerda, braço esquerdo.
    - **Trocar imagem** escolhe um PNG/WEBP no computador. O jogo grava em **200×200** no lugar da peça.
    - **Ampliar** abre a peça grande. Roda do mouse amplia; botão direito arrasta a imagem; clique duas vezes na miniatura também abre.
 5. Arraste as bolinhas até o **centro das esferas de metal**:

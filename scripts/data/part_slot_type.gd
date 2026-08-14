@@ -48,6 +48,24 @@ static func default_draw_z(slot: Value) -> int:
 		_:
 			return 4
 
+## Palco: número maior fica na frente. Ordem pedida: cabeça, braço D, tronco, perna D, perna E, braço E.
+static func fight_z_index(slot: Value) -> int:
+	match slot:
+		Value.HEAD:
+			return 5
+		Value.ARM_R:
+			return 4
+		Value.BODY:
+			return 3
+		Value.LEG_R:
+			return 2
+		Value.LEG_L:
+			return 1
+		Value.ARM_L:
+			return 0
+		_:
+			return 0
+
 static func draw_order_for(parts: Dictionary) -> Array[Value]:
 	var slots := visual_slots()
 	var ordered: Array[Value] = []

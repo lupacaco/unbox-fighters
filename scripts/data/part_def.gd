@@ -220,13 +220,14 @@ func visual_to_magnet(visual: Vector2, pose: int) -> Vector2:
 		magnet.x = -magnet.x
 	return magnet
 
-func apply_to_sprite(sprite: Sprite2D, shown: Texture2D) -> void:
+func apply_to_sprite(sprite: Sprite2D, shown: Texture2D, apply_z: bool = true) -> void:
 	if sprite == null:
 		return
 	var pose := pose_for_texture(shown)
 	sprite.flip_h = flip_h_for(pose)
 	sprite.rotation_degrees = float(rotation_for(pose))
-	sprite.z_index = godot_z()
+	if apply_z:
+		sprite.z_index = godot_z()
 
 func draw_transformed(ci: CanvasItem, tex: Texture2D, dest: Rect2, pose: int) -> void:
 	if ci == null or tex == null:

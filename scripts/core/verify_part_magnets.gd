@@ -65,6 +65,21 @@ func _run() -> void:
 		push_error("VERIFY_FAIL head should draw last (on top)")
 		quit(1)
 		return
+	var fight_front := [
+		PartSlotType.Value.HEAD,
+		PartSlotType.Value.ARM_R,
+		PartSlotType.Value.BODY,
+		PartSlotType.Value.LEG_R,
+		PartSlotType.Value.LEG_L,
+		PartSlotType.Value.ARM_L,
+	]
+	for i in range(fight_front.size() - 1):
+		var front: PartSlotType.Value = fight_front[i]
+		var behind: PartSlotType.Value = fight_front[i + 1]
+		if PartSlotType.fight_z_index(front) <= PartSlotType.fight_z_index(behind):
+			push_error("VERIFY_FAIL fight Z should be head, right arm, torso, right leg, left leg, left arm")
+			quit(1)
+			return
 
 	var Importer := load("res://addons/part_magnet_editor/character_importer.gd")
 	var canvas := Image.create(400, 100, false, Image.FORMAT_RGBA8)
