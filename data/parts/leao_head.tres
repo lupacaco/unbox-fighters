@@ -12,5 +12,5 @@ set_id = &"leao"
 sprite = ExtResource("2")
 sprite_profile = ExtResource("3")
 combat_value = 4
-magnet_down = Vector2(0, 86)
+magnet_down = Vector2(0, 90)
 magnet_down_profile = Vector2(-12, 83)
