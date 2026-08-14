@@ -323,7 +323,7 @@ func visual_bottom_y() -> float:
 		var half_h := float(sprite.texture.get_height()) * absf(sprite.global_scale.y) * 0.5
 		lowest = maxf(lowest, sprite.global_position.y + half_h)
 	if lowest == -INF:
-		return global_position.y + _Spring.GROUND_Y
+		return global_position.y + _Spring.SIT_Y
 	return lowest
 
 func is_spring_pressed() -> bool:
@@ -368,7 +368,7 @@ func _apply_hop_transform() -> void:
 	var squash := _hop_squash
 	_hop_root.scale = Vector2(2.0 - squash, squash)
 	_hop_root.rotation = _hop_lean
-	_hop_root.position = Vector2(0.0, _Spring.GROUND_Y * (1.0 - squash) + _hop_y)
+	_hop_root.position = Vector2(0.0, _Spring.SIT_Y * (1.0 - squash) + _hop_y)
 	_update_shadow()
 	if _body_root != null and not _walking:
 		_body_root.position.x = _body_rest.x

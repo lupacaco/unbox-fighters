@@ -68,8 +68,9 @@ static func crate_y() -> float:
 	return belt_roller_y() - TRAY.y - CRATE_SIT_OFFSET
 
 
+## Fighter origin so the visible spring disc sits on the roller crowns.
 static func fight_shelf_y() -> float:
-	return belt_roller_y() - TRAY.y - SpringBase.GROUND_Y
+	return belt_roller_y() - TRAY.y - SpringBase.SIT_Y
 
 
 static func top_left(center: Vector2, size: Vector2) -> Vector2:

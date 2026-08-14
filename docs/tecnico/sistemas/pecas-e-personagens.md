@@ -121,7 +121,7 @@ Padrão de arquivos em `assets/characters/<nome>/`:
 - `<nome>_head-1.png` / `_body-1` / `_arm_l-1` / `_arm_r-1` / `_leg_l-1` / `_leg_r-1` — frente
 - Os mesmos com `-2` — perfil
 
-Todos em **200×200**. No jogo o tamanho fica 1:1 (não estica). A mola fica em `assets/objects/base-mola-solta.png` e `base-mola-pressionada.png` (300×300), **menor** que as peças, com uma sombra oval no chão. Na luta, embaixo da sombra, um recorte mais escuro nos rolos da esteira.
+Todos em **200×200**. No jogo o tamanho fica 1:1 (não estica). A mola fica em `assets/objects/base-mola-solta.png` e `base-mola-pressionada.png` (300×300), **menor** que as peças, com uma sombra oval no chão. Na luta o disco branco senta nos rolos; embaixo da sombra, um recorte mais escuro nos cilindros.
 
 Para colocar um Freak **novo**, veja [Incluir personagem](../incluir-personagem.md).
 

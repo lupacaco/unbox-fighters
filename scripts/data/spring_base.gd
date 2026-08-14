@@ -14,7 +14,11 @@ const MAGNET_LOOSE := Vector2(0, -112)
 const MAGNET_PRESSED := Vector2(0, -48)
 const BOTTOM_LOOSE := 143.0
 const BOTTOM_PRESSED := 145.0
+## Front lip of the disc (lowest opaque pixels), from the puppet origin.
 const GROUND_Y := 128.0
+## Visible 3/4 sit of the white disc — the ellipse you actually see.
+## The front lip (GROUND_Y) tucks a little into the floor below this.
+const SIT_Y := 100.0
 ## Draw with the other parts (first in the tree, so it stays behind them).
 ## Negative Z hid the stand behind the dark card back.
 const Z_INDEX := 0
@@ -40,10 +44,10 @@ static func magnet_world(pressed: bool) -> Vector2:
 	return center_on_ground(pressed) + magnet_px(pressed) * SCALE
 
 static func shadow_position() -> Vector2:
-	return Vector2(0.0, GROUND_Y + 6.0)
+	return Vector2(0.0, SIT_Y + 6.0)
 
 static func dent_position() -> Vector2:
-	return Vector2(0.0, GROUND_Y + 11.0)
+	return Vector2(0.0, SIT_Y + 11.0)
 
 static func make_shadow(node_name: String = "SpringShadow") -> Polygon2D:
 	return _make_oval(node_name, Vector2(150.0, 26.0) * SCALE, SHADOW_COLOR, SHADOW_Z, shadow_position())

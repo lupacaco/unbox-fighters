@@ -14,8 +14,8 @@ func _run() -> void:
 	root.add_child(tray)
 	var floor_y := tray.global_position.y + AssemblyLayout.fight_shelf_y()
 	assert(
-		is_equal_approx(floor_y + Spring.GROUND_Y, AssemblyLayout.belt_roller_y()),
-		"Fight floor should land on the conveyor rollers"
+		is_equal_approx(floor_y + Spring.SIT_Y, AssemblyLayout.belt_roller_y()),
+		"Fight disc should sit on the conveyor rollers"
 	)
 
 	var leao: CharacterDef = load("res://data/parts/leao_character.tres")
