@@ -76,7 +76,7 @@ Ordem do choque: **cabeça → tronco → pernas**. Pula o que estiver vazio.
 
 Dano no HP do perdedor = soma do que sobrou em cada Freak vivo do vencedor, **no máximo 12 por Freak**.
 
-Na tela: os Freaks **pulam** da carta para a prateleira e **andam** com o corpo inteiro se mexendo (pernas em tempos opostos, braços e cabeça acompanhando, presos nos ímãs). No choque eles **avançam** um passo e dão soco, chute ou cabeçada no próprio corpo. As placas mostram os números. Quem perde some o kit no lugar (cabeça, ou tronco+braços, ou as duas pernas), com um **X**. Freak inteiro cai → **KO**. As cartas **sobem e somem** durante a batalha e voltam depois.
+Na tela: entra **um contra um**. O 1º de cada lado **pula** na prateleira e **anda até perto** do outro. Só quando um cai inteiro (**KO**) o próximo daquele lado pula e se aproxima. No choque eles pulam para frente: soco, chute ou cabeçada, com faísca e um tranco na câmera. As placas mostram os números. Quem perde some o kit no lugar (cabeça, ou tronco+braços, ou as duas pernas), com um **X**. As cartas **sobem e somem** durante a batalha e voltam depois.
 
 ## Controles
 

@@ -1,19 +1,20 @@
 class_name FightDirector
 extends Node
 
-## Plays a simulated queue fight on the shelf: jump in, walk, collide, KO.
+## Plays a simulated queue fight on the shelf: one pair at a time, walk in, clash, KO.
 
 signal finished
 
 ## All fighters share this one floor line (same Y). Never shift it per freak.
 const SHELF_Y := -148.0
-const LAND_X := 640.0
-const STAND_X: Array[float] = [250.0, 430.0, 610.0]
+const LAND_X := 420.0
+const DUEL_X := 125.0
 const OPPONENT_ENTER := Vector2(2040, 400)
-const WALK_PX_PER_SEC := 250.0
-const LUNGE_PX := 42.0
-const JUMP_SEC := 0.48
-const JUMP_HEIGHT := 240.0
+const WALK_PX_PER_SEC := 280.0
+const LUNGE_PX := 82.0
+const JUMP_SEC := 0.5
+const JUMP_HEIGHT := 260.0
+const CAMERA_FIGHT_ZOOM := Vector2(1.12, 1.12)
 
 class StageFighter:
 	var root: Node2D
@@ -34,6 +35,8 @@ var _stage: Node2D
 var _dust_fx: CPUParticles2D
 var _spark_fx: CPUParticles2D
 var _flash_poly: Polygon2D
+var _burst_poly: Polygon2D
+var _slash: Line2D
 var _left: Array[StageFighter] = []
 var _right: Array[StageFighter] = []
 var _lifted: Dictionary = {}
@@ -81,9 +84,15 @@ func play(
 
 	_left = _build_line(result.left if result != null else BoardLoadout.new(), false, slots)
 	_right = _build_line(opponent_board, true, slots)
+	for fighter in _left:
+		fighter.root.visible = false
+	for fighter in _right:
+		fighter.root.visible = false
 	for slot in slots:
 		slot.set_fight_locked(true)
 		slot.set_fighter_visible(false)
+		_lift_card(slot)
+	_aim_camera(true)
 
 	var name_l := _plaque(AssemblyLayout.FIGHT_NAME_LEFT, Vector2(280, 54), 22, ThemeTokens.INK)
 	name_l.set_text(left_name)
@@ -106,13 +115,7 @@ func play(
 	ko.set_text("KO")
 	ko.show_plaque(false)
 
-	var intro_n := maxi(_left.size(), _right.size())
-	for i in intro_n:
-		var a: StageFighter = _left[i] if i < _left.size() else null
-		var b: StageFighter = _right[i] if i < _right.size() else null
-		await _intro_pair(a, b, i, i == 0)
-	for slot in slots:
-		_lift_card(slot)
+	await _enter_duelists(_front(_left), _front(_right), true)
 	await get_tree().create_timer(0.28).timeout
 
 	var live_l := _first_index(_left)
@@ -121,22 +124,13 @@ func play(
 		for event in result.events:
 			match event.kind:
 				CombatEvent.Kind.QUEUE_ADVANCE:
-					if event.left_queue != live_l:
-						await _drop_out(_fighter_by_queue(_left, live_l), ko)
-						await _advance_line(_left, event.left_queue, false)
-						live_l = event.left_queue
-					if event.right_queue != live_r:
-						await _drop_out(_fighter_by_queue(_right, live_r), ko)
-						await _advance_line(_right, event.right_queue, true)
-						live_r = event.right_queue
+					await _advance_to(event, ko, live_l, live_r)
+					live_l = event.left_queue
+					live_r = event.right_queue
 				CombatEvent.Kind.CLASH:
-					if event.left_queue != live_l:
-						await _drop_out(_fighter_by_queue(_left, live_l), ko)
-						await _advance_line(_left, event.left_queue, false)
+					if event.left_queue != live_l or event.right_queue != live_r:
+						await _advance_to(event, ko, live_l, live_r)
 						live_l = event.left_queue
-					if event.right_queue != live_r:
-						await _drop_out(_fighter_by_queue(_right, live_r), ko)
-						await _advance_line(_right, event.right_queue, true)
 						live_r = event.right_queue
 					await _play_clash(
 						_fighter_by_queue(_left, event.left_queue),
@@ -218,46 +212,67 @@ func _slot_for_queue(queue_index: int, slots: Array[CharacterSlot]) -> Character
 		return null
 	return slots[visual]
 
-func _intro_pair(player: StageFighter, enemy: StageFighter, rank: int, heavy: bool) -> void:
+func _front(line: Array[StageFighter]) -> StageFighter:
+	for fighter in line:
+		if fighter != null and not fighter.down:
+			return fighter
+	return null
+
+func _enter_duelists(player: StageFighter, enemy: StageFighter, heavy: bool) -> void:
 	var done := [0]
 	var need := 0
-	if player != null:
+	if player != null and not player.down:
 		need += 1
-		_jump_walk_in(player, false, LAND_X, _queue_x(rank), heavy, rank, func() -> void: done[0] += 1)
-	if enemy != null:
+		_jump_walk_in(player, false, heavy, func() -> void: done[0] += 1)
+	if enemy != null and not enemy.down:
 		need += 1
-		_jump_walk_in(enemy, true, LAND_X, _queue_x(rank), heavy and player == null, rank, func() -> void: done[0] += 1)
+		_jump_walk_in(enemy, true, heavy and player == null, func() -> void: done[0] += 1)
+	if need == 0:
+		return
 	while done[0] < need:
 		await get_tree().process_frame
 
-func _jump_walk_in(
-	fighter: StageFighter,
-	opponent: bool,
-	land_x: float,
-	stand_x: float,
-	heavy: bool,
-	rank: int,
-	done: Callable = Callable()
-) -> void:
+func _advance_to(event: CombatEvent, ko: FightPlaque, live_l: int, live_r: int) -> void:
+	var next_l: StageFighter = null
+	var next_r: StageFighter = null
+	if event.left_queue != live_l:
+		await _drop_out(_fighter_by_queue(_left, live_l), ko)
+		next_l = _fighter_by_queue(_left, event.left_queue)
+	if event.right_queue != live_r:
+		await _drop_out(_fighter_by_queue(_right, live_r), ko)
+		next_r = _fighter_by_queue(_right, event.right_queue)
+	if next_l == null and next_r == null:
+		return
+	await _enter_duelists(next_l, next_r, false)
+	await get_tree().create_timer(0.2).timeout
+
+func _jump_walk_in(fighter: StageFighter, opponent: bool, heavy: bool, done: Callable = Callable()) -> void:
+	if fighter == null or fighter.root == null or not is_instance_valid(fighter.root):
+		if done.is_valid():
+			done.call()
+		return
+	fighter.root.visible = true
 	_lift_card(fighter.source_slot)
 	fighter.visual.scale = Vector2(1.12, 0.78)
 	fighter.puppet.freeze_motion(true)
 	GameAudio.whoosh()
-	var land := _shelf_pos(opponent, land_x)
+	var land := _shelf_pos(opponent, LAND_X)
 	await _jump_arc(fighter.root, land, JUMP_HEIGHT, JUMP_SEC)
 	fighter.puppet.freeze_motion(false)
 	if heavy:
 		await _land_impact(fighter)
 	else:
-		await _squash(fighter.visual, Vector2(1.1, 0.88), 0.08)
-		await _squash(fighter.visual, Vector2.ONE, 0.08)
-	await get_tree().create_timer(0.12).timeout
+		GameAudio.land()
+		_dust(fighter.puppet.feet_position())
+		await _squash(fighter.visual, Vector2(1.16, 0.82), 0.07)
+		await _squash(fighter.visual, Vector2.ONE, 0.1)
+	await get_tree().create_timer(0.1).timeout
 	fighter.puppet.set_pose(FighterPuppet.Pose.PROFILE)
 	await _squash(fighter.visual, Vector2(1.04, 0.96), 0.1)
 	await _squash(fighter.visual, Vector2.ONE, 0.1)
-	var stand := _shelf_pos(opponent, stand_x)
+	var stand := _shelf_pos(opponent, DUEL_X)
 	await _walk_to(fighter, land, stand)
-	_set_queue_look(fighter, rank)
+	_face_on_stage(fighter)
 	if done.is_valid():
 		done.call()
 
@@ -283,29 +298,23 @@ func _walk_to(fighter: StageFighter, from: Vector2, to: Vector2) -> void:
 	fighter.root.global_position = Vector2(to.x, _shelf_y())
 	fighter.visual.rotation_degrees = 0.0
 
-func _advance_line(line: Array[StageFighter], new_front: int, opponent: bool) -> void:
-	var rank := 0
-	for fighter in line:
-		if fighter.down or fighter.queue_index < new_front:
-			continue
-		var dest := _shelf_pos(opponent, _queue_x(rank))
-		await _walk_to(fighter, fighter.root.global_position, dest)
-		_set_queue_look(fighter, rank)
-		rank += 1
-
-func _set_queue_look(fighter: StageFighter, rank: int) -> void:
+func _face_on_stage(fighter: StageFighter) -> void:
+	if fighter == null or not is_instance_valid(fighter.root):
+		return
 	var face := -1.0 if fighter.face_left else 1.0
 	fighter.root.scale = Vector2(face, 1.0)
 	fighter.visual.scale = Vector2.ONE
 	fighter.visual.rotation_degrees = 0.0
-	fighter.root.z_index = 12 - clampi(rank, 0, 2)
+	fighter.root.z_index = 12
 	fighter.root.global_position.y = _shelf_y()
 
 func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, clash_l: FightPlaque, clash_r: FightPlaque) -> void:
 	if left == null or right == null:
 		return
-	var stand_l := left.root.global_position
-	var stand_r := right.root.global_position
+	var stand_l := _shelf_pos(false, DUEL_X)
+	var stand_r := _shelf_pos(true, DUEL_X)
+	left.root.global_position.y = _shelf_y()
+	right.root.global_position.y = _shelf_y()
 	var mid := (stand_l + stand_r) * 0.5
 	clash_l.global_position = AssemblyLayout.FIGHT_CLASH + Vector2(-120, 0)
 	clash_r.global_position = AssemblyLayout.FIGHT_CLASH + Vector2(120, 0)
@@ -319,17 +328,24 @@ func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, cl
 	clash_r.show_plaque(true)
 	clash_l.punch()
 	clash_r.punch()
-	GameAudio.whoosh()
+	var hit := [false]
+	var on_hit := func() -> void:
+		hit[0] = true
+	_clear_struck(left)
+	_clear_struck(right)
+	left.puppet.struck.connect(on_hit)
+	right.puppet.struck.connect(on_hit)
 	var done := [0]
 	_lunge_and_strike(left, stand_l.move_toward(mid, LUNGE_PX), event.left_slot, func() -> void: done[0] += 1)
 	_lunge_and_strike(right, stand_r.move_toward(mid, LUNGE_PX), event.right_slot, func() -> void: done[0] += 1)
+	while not hit[0] and done[0] < 2:
+		await get_tree().process_frame
+	if hit[0]:
+		await _clash_impact(left, right, event, mid)
 	while done[0] < 2:
 		await get_tree().process_frame
-	_flash(Color(1, 0.88, 0.55, 0.18), 0.08)
-	_camera_punch(10.0, 0.18)
-	_hit_spark(mid)
-	GameAudio.impact()
-	await get_tree().create_timer(0.16).timeout
+	_clear_struck(left)
+	_clear_struck(right)
 	var left_dies := event.winning_side != CombatEvent.Side.LEFT
 	var right_dies := event.winning_side != CombatEvent.Side.RIGHT
 	if left_dies:
@@ -352,26 +368,42 @@ func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, cl
 		GameAudio.impact()
 	await get_tree().create_timer(0.12).timeout
 	var recover := [0]
-	_recover_stand(left, stand_l, func() -> void: recover[0] += 1)
-	_recover_stand(right, stand_r, func() -> void: recover[0] += 1)
+	if left.puppet.has_living_part():
+		_recover_stand(left, stand_l, func() -> void: recover[0] += 1)
+	else:
+		recover[0] += 1
+	if right.puppet.has_living_part():
+		_recover_stand(right, stand_r, func() -> void: recover[0] += 1)
+	else:
+		recover[0] += 1
 	while recover[0] < 2:
 		await get_tree().process_frame
 	clash_l.show_plaque(false)
 	clash_r.show_plaque(false)
 	GameAudio.part_place()
 
+func _clear_struck(fighter: StageFighter) -> void:
+	if fighter == null or fighter.puppet == null or not is_instance_valid(fighter.puppet):
+		return
+	for conn in fighter.puppet.struck.get_connections():
+		fighter.puppet.struck.disconnect(conn["callable"])
+
 func _lunge_and_strike(fighter: StageFighter, lunge: Vector2, slot: PartSlotType.Value, done: Callable) -> void:
 	lunge.y = _shelf_y()
 	var flags := {"move": false, "strike": false}
-	_finish_move(fighter, lunge, flags)
+	_finish_lunge(fighter, lunge, flags)
 	_finish_strike(fighter, slot, flags)
 	while not flags.move or not flags.strike:
 		await get_tree().process_frame
 	if done.is_valid():
 		done.call()
 
+func _finish_lunge(fighter: StageFighter, lunge: Vector2, flags: Dictionary) -> void:
+	await _lunge_to(fighter.root, lunge, 0.28)
+	flags.move = true
+
 func _finish_move(fighter: StageFighter, lunge: Vector2, flags: Dictionary) -> void:
-	await _move_to(fighter.root, lunge, 0.24)
+	await _move_to(fighter.root, lunge, 0.22)
 	flags.move = true
 
 func _finish_strike(fighter: StageFighter, slot: PartSlotType.Value, flags: Dictionary) -> void:
@@ -427,11 +459,12 @@ func _drop_out(fighter: StageFighter, ko: FightPlaque) -> void:
 	ko.punch()
 	var side := 1.0 if fighter.face_left else -1.0
 	var tilt := create_tween()
-	tilt.tween_property(fighter.visual, "rotation_degrees", side * 70.0, 0.18)
+	tilt.tween_property(fighter.visual, "rotation_degrees", side * 78.0, 0.2).set_trans(Tween.TRANS_BACK)
 	await tilt.finished
 	var slide := create_tween()
-	slide.tween_property(fighter.root, "global_position", fighter.root.global_position + Vector2(side * 80.0, 40.0), 0.28)
-	slide.parallel().tween_property(fighter.root, "modulate:a", 0.0, 0.28)
+	slide.tween_property(fighter.root, "global_position", fighter.root.global_position + Vector2(side * 110.0, 48.0), 0.32).set_trans(Tween.TRANS_QUAD)
+	slide.parallel().tween_property(fighter.root, "modulate:a", 0.0, 0.32)
+	slide.parallel().tween_property(fighter.visual, "scale", Vector2(0.7, 0.7), 0.32)
 	await slide.finished
 	ko.show_plaque(false)
 	fighter.root.visible = false
@@ -482,9 +515,6 @@ func _lift_card(slot: CharacterSlot) -> void:
 	_lifted[slot] = true
 	slot.play_leave_for_fight()
 
-func _queue_x(rank: int) -> float:
-	return STAND_X[clampi(rank, 0, 2)]
-
 func _shelf_y() -> float:
 	return _tray.global_position.y + SHELF_Y
 
@@ -529,6 +559,102 @@ func _move_to(node: Node2D, to: Vector2, duration: float) -> void:
 	tween.tween_property(node, "global_position", to, duration).set_trans(Tween.TRANS_SINE)
 	await tween.finished
 
+func _lunge_to(node: Node2D, to: Vector2, duration: float) -> void:
+	var from := node.global_position
+	to.y = _shelf_y()
+	var tween := create_tween()
+	tween.tween_method(
+		func(t: float) -> void:
+			var p := from.lerp(to, t)
+			p.y = _shelf_y() - sin(t * PI) * 26.0
+			node.global_position = p,
+		0.0,
+		1.0,
+		duration
+	).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	await tween.finished
+	node.global_position = to
+
+func _clash_impact(left: StageFighter, right: StageFighter, event: CombatEvent, mid: Vector2) -> void:
+	var tint := ThemeTokens.color_for_slot(event.left_slot).lerp(ThemeTokens.color_for_slot(event.right_slot), 0.5)
+	_flash(Color(tint.r, tint.g, tint.b, 0.22), 0.1)
+	_camera_punch(18.0, 0.22)
+	_hit_spark(mid, tint)
+	_impact_burst(mid, tint)
+	GameAudio.impact()
+	Feel.punch(left.visual, Vector2(1.22, 0.78), Vector2.ONE)
+	Feel.punch(right.visual, Vector2(1.22, 0.78), Vector2.ONE)
+	_hit_flash(left)
+	_hit_flash(right)
+	if event.winning_side == CombatEvent.Side.LEFT:
+		_knock(right, 1.0, 58.0)
+		_knock(left, -1.0, 12.0)
+	elif event.winning_side == CombatEvent.Side.RIGHT:
+		_knock(left, -1.0, 58.0)
+		_knock(right, 1.0, 12.0)
+	else:
+		_knock(left, -1.0, 38.0)
+		_knock(right, 1.0, 38.0)
+	await _hit_stop(0.07)
+
+func _knock(fighter: StageFighter, dir: float, pixels: float) -> void:
+	if fighter == null or fighter.down or not is_instance_valid(fighter.root):
+		return
+	fighter.root.global_position.x += dir * pixels
+	fighter.root.global_position.y = _shelf_y()
+
+func _hit_flash(fighter: StageFighter) -> void:
+	if fighter == null or not is_instance_valid(fighter.visual):
+		return
+	fighter.visual.modulate = Color(1.45, 1.35, 1.15)
+	var tween := create_tween()
+	tween.tween_property(fighter.visual, "modulate", Color.WHITE, 0.18)
+
+func _hit_stop(real_sec: float) -> void:
+	Engine.time_scale = 0.07
+	await get_tree().create_timer(real_sec, true, false, true).timeout
+	Engine.time_scale = 1.0
+
+func _impact_burst(pos: Vector2, tint: Color) -> void:
+	_ensure_fx_pool()
+	if _burst_poly != null and is_instance_valid(_burst_poly):
+		_burst_poly.global_position = pos
+		_burst_poly.color = Color(tint.r, tint.g, tint.b, 0.95)
+		_burst_poly.scale = Vector2(0.2, 0.2)
+		_burst_poly.rotation = randf() * TAU
+		_burst_poly.modulate.a = 1.0
+		_burst_poly.visible = true
+		var burst := create_tween()
+		burst.tween_property(_burst_poly, "scale", Vector2(2.6, 2.6), 0.2).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		burst.parallel().tween_property(_burst_poly, "modulate:a", 0.0, 0.2)
+		burst.tween_callback(func() -> void:
+			if is_instance_valid(_burst_poly):
+				_burst_poly.visible = false
+		)
+	if _slash == null or not is_instance_valid(_slash):
+		return
+	_slash.global_position = pos
+	_slash.rotation = deg_to_rad(-40.0 + randf() * 80.0)
+	_slash.default_color = Color(1.0, 0.96, 0.82, 1.0)
+	_slash.width = 16.0
+	_slash.modulate.a = 1.0
+	_slash.visible = true
+	var slash := create_tween()
+	slash.tween_property(_slash, "width", 0.0, 0.16)
+	slash.parallel().tween_property(_slash, "modulate:a", 0.0, 0.16)
+	slash.tween_callback(func() -> void:
+		if is_instance_valid(_slash):
+			_slash.visible = false
+	)
+
+func _star_points(count: int, outer: float, inner: float) -> PackedVector2Array:
+	var verts := PackedVector2Array()
+	for i in count * 2:
+		var ang := float(i) * PI / float(count) - PI * 0.5
+		var radius := outer if i % 2 == 0 else inner
+		verts.append(Vector2(cos(ang), sin(ang)) * radius)
+	return verts
+
 func _squash(node: Node2D, to: Vector2, duration: float) -> void:
 	var tween := create_tween()
 	tween.tween_property(node, "scale", to, duration)
@@ -553,8 +679,18 @@ func _camera_punch(amount: float, duration: float) -> void:
 		return
 	var origin := _camera.offset
 	var tween := create_tween()
-	tween.tween_property(_camera, "offset", origin + Vector2(0, amount), duration * 0.35)
-	tween.tween_property(_camera, "offset", origin, duration * 0.65)
+	tween.tween_property(_camera, "offset", origin + Vector2(amount * 0.45, amount), duration * 0.3)
+	tween.tween_property(_camera, "offset", origin + Vector2(-amount * 0.25, amount * 0.2), duration * 0.25)
+	tween.tween_property(_camera, "offset", origin, duration * 0.45)
+
+func _aim_camera(on: bool) -> void:
+	if _camera == null:
+		return
+	var zoom := CAMERA_FIGHT_ZOOM if on else _camera_rest_zoom
+	var offset := _camera_rest_offset + (Vector2(0, 26) if on else Vector2.ZERO)
+	var tween := create_tween()
+	tween.tween_property(_camera, "zoom", zoom, 0.38).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(_camera, "offset", offset, 0.38)
 
 func _dust(pos: Vector2) -> void:
 	_ensure_fx_pool()
@@ -564,11 +700,12 @@ func _dust(pos: Vector2) -> void:
 	_dust_fx.restart()
 	_dust_fx.emitting = true
 
-func _hit_spark(pos: Vector2) -> void:
+func _hit_spark(pos: Vector2, tint: Color = Color(1.0, 0.86, 0.45, 0.95)) -> void:
 	_dust(pos)
 	_ensure_fx_pool()
 	if _spark_fx == null:
 		return
+	_spark_fx.color = tint
 	_spark_fx.global_position = pos
 	_spark_fx.restart()
 	_spark_fx.emitting = true
@@ -581,8 +718,8 @@ func _ensure_fx_pool() -> void:
 		_dust_fx.emitting = false
 		_dust_fx.one_shot = true
 		_dust_fx.explosiveness = 1.0
-		_dust_fx.amount = 10
-		_dust_fx.lifetime = 0.35
+		_dust_fx.amount = 14
+		_dust_fx.lifetime = 0.4
 		_dust_fx.direction = Vector2(0, -1)
 		_dust_fx.spread = 80.0
 		_dust_fx.initial_velocity_min = 40.0
@@ -598,12 +735,12 @@ func _ensure_fx_pool() -> void:
 		_spark_fx.emitting = false
 		_spark_fx.one_shot = true
 		_spark_fx.explosiveness = 1.0
-		_spark_fx.amount = 14
-		_spark_fx.lifetime = 0.28
+		_spark_fx.amount = 22
+		_spark_fx.lifetime = 0.32
 		_spark_fx.direction = Vector2(0, -1)
 		_spark_fx.spread = 180.0
-		_spark_fx.initial_velocity_min = 70.0
-		_spark_fx.initial_velocity_max = 160.0
+		_spark_fx.initial_velocity_min = 90.0
+		_spark_fx.initial_velocity_max = 210.0
 		_spark_fx.gravity = Vector2(0, 240)
 		_spark_fx.scale_amount_min = 0.5
 		_spark_fx.scale_amount_max = 1.4
@@ -618,6 +755,21 @@ func _ensure_fx_pool() -> void:
 		_flash_poly.z_index = 200
 		_flash_poly.visible = false
 		_fx.add_child(_flash_poly)
+	if _burst_poly == null or not is_instance_valid(_burst_poly):
+		_burst_poly = Polygon2D.new()
+		_burst_poly.polygon = _star_points(8, 42.0, 16.0)
+		_burst_poly.z_index = 70
+		_burst_poly.visible = false
+		_fx.add_child(_burst_poly)
+	if _slash == null or not is_instance_valid(_slash):
+		_slash = Line2D.new()
+		_slash.points = PackedVector2Array([Vector2(-78, 0), Vector2(78, 0)])
+		_slash.width = 16.0
+		_slash.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		_slash.end_cap_mode = Line2D.LINE_CAP_ROUND
+		_slash.z_index = 71
+		_slash.visible = false
+		_fx.add_child(_slash)
 
 func _restore_camera() -> void:
 	if _camera == null:

@@ -4,6 +4,7 @@ extends Node2D
 ## Jointed on-stage fighter. Limbs rotate around magnet sockets.
 
 signal stepped
+signal struck
 
 enum Pose { FRONT, PROFILE, STRIDE }
 
@@ -171,10 +172,11 @@ func drop_kit(slot: PartSlotType.Value) -> void:
 			continue
 		var tw := create_tween()
 		tw.set_parallel(true)
-		tw.tween_property(sprite, "modulate:a", 0.0, 0.32).set_trans(Tween.TRANS_SINE)
-		tw.tween_property(sprite, "position:y", sprite.position.y + 36.0, 0.32).set_trans(Tween.TRANS_QUAD)
-		tw.tween_property(sprite, "rotation", sprite.rotation + deg_to_rad(28.0), 0.32)
-	await get_tree().create_timer(0.32).timeout
+		tw.tween_property(sprite, "modulate:a", 0.0, 0.42).set_trans(Tween.TRANS_SINE)
+		tw.tween_property(sprite, "position:y", sprite.position.y + 58.0, 0.42).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tw.tween_property(sprite, "rotation", sprite.rotation + deg_to_rad(48.0), 0.42)
+		tw.tween_property(sprite, "scale", sprite.scale * 0.72, 0.42)
+	await get_tree().create_timer(0.42).timeout
 	set_part_dead(slot, true)
 	_striking = false
 
@@ -388,63 +390,81 @@ func _strike_punch() -> void:
 	var arm: Node2D = _joints.get(PartSlotType.Value.ARM_R)
 	var other: Node2D = _joints.get(PartSlotType.Value.ARM_L)
 	if arm == null:
+		struck.emit()
 		await get_tree().create_timer(0.28).timeout
 		return
+	GameAudio.whoosh()
 	var tw := create_tween()
 	tw.set_parallel(true)
-	tw.tween_property(arm, "rotation", 0.55, 0.16).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(arm, "rotation", 0.92, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	if other != null:
-		tw.tween_property(other, "rotation", -0.22, 0.16)
-	tw.tween_property(_body_root, "rotation", 0.12, 0.16)
+		tw.tween_property(other, "rotation", -0.28, 0.18)
+	tw.tween_property(_body_root, "rotation", 0.2, 0.18)
+	tw.tween_property(_body_root, "position", _body_rest + Vector2(-10.0, 8.0), 0.18)
+	_set_joint(PartSlotType.Value.HEAD, 0.12)
 	await tw.finished
 	tw = create_tween()
 	tw.set_parallel(true)
-	tw.tween_property(arm, "rotation", -1.12, 0.11).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	tw.tween_property(arm, "rotation", -1.48, 0.09).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 	if other != null:
-		tw.tween_property(other, "rotation", 0.38, 0.11)
-	tw.tween_property(_body_root, "rotation", -0.16, 0.11)
-	tw.tween_property(_body_root, "position:x", _body_rest.x + 14.0, 0.11)
-	_set_joint(PartSlotType.Value.HEAD, -0.1)
+		tw.tween_property(other, "rotation", 0.48, 0.09)
+	tw.tween_property(_body_root, "rotation", -0.24, 0.09)
+	tw.tween_property(_body_root, "position", _body_rest + Vector2(26.0, -4.0), 0.09)
+	_set_joint(PartSlotType.Value.HEAD, -0.16)
 	await tw.finished
+	struck.emit()
+	await get_tree().create_timer(0.08).timeout
 
 func _strike_kick() -> void:
 	var kick: Node2D = _joints.get(PartSlotType.Value.LEG_R)
 	var plant: Node2D = _joints.get(PartSlotType.Value.LEG_L)
 	if kick == null:
+		struck.emit()
 		await get_tree().create_timer(0.28).timeout
 		return
+	GameAudio.whoosh()
 	var tw := create_tween()
 	tw.set_parallel(true)
-	tw.tween_property(kick, "rotation", 0.4, 0.14).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(kick, "rotation", 0.62, 0.16).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	if plant != null:
-		tw.tween_property(plant, "rotation", 0.12, 0.14)
-	tw.tween_property(_body_root, "rotation", 0.1, 0.14)
+		tw.tween_property(plant, "rotation", 0.18, 0.16)
+	tw.tween_property(_body_root, "rotation", 0.16, 0.16)
+	tw.tween_property(_body_root, "position", _body_rest + Vector2(-6.0, -22.0), 0.16)
+	_set_joint(PartSlotType.Value.ARM_L, 0.28)
+	_set_joint(PartSlotType.Value.ARM_R, -0.22)
 	await tw.finished
 	tw = create_tween()
 	tw.set_parallel(true)
-	tw.tween_property(kick, "rotation", -0.95, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	tw.tween_property(kick, "rotation", -1.22, 0.1).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 	if plant != null:
-		tw.tween_property(plant, "rotation", 0.2, 0.12)
-	tw.tween_property(_body_root, "position:x", _body_rest.x + 10.0, 0.12)
-	tw.tween_property(_body_root, "rotation", -0.12, 0.12)
+		tw.tween_property(plant, "rotation", 0.28, 0.1)
+	tw.tween_property(_body_root, "position", _body_rest + Vector2(18.0, 6.0), 0.1)
+	tw.tween_property(_body_root, "rotation", -0.2, 0.1)
 	await tw.finished
+	struck.emit()
+	await get_tree().create_timer(0.08).timeout
 
 func _strike_head() -> void:
 	var head: Node2D = _joints.get(PartSlotType.Value.HEAD)
+	GameAudio.whoosh()
 	var tw := create_tween()
 	tw.set_parallel(true)
-	tw.tween_property(_body_root, "position:x", _body_rest.x - 8.0, 0.12).set_trans(Tween.TRANS_CUBIC)
-	tw.tween_property(_body_root, "rotation", 0.08, 0.12)
+	tw.tween_property(_body_root, "position", _body_rest + Vector2(-16.0, 6.0), 0.16).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(_body_root, "rotation", 0.2, 0.16)
 	if head != null:
-		tw.tween_property(head, "rotation", 0.18, 0.12)
+		tw.tween_property(head, "rotation", 0.32, 0.16)
+	_set_joint(PartSlotType.Value.ARM_L, -0.18)
+	_set_joint(PartSlotType.Value.ARM_R, 0.18)
 	await tw.finished
 	tw = create_tween()
 	tw.set_parallel(true)
-	tw.tween_property(_body_root, "position:x", _body_rest.x + 18.0, 0.1).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
-	tw.tween_property(_body_root, "rotation", -0.14, 0.1)
+	tw.tween_property(_body_root, "position", _body_rest + Vector2(28.0, -2.0), 0.09).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	tw.tween_property(_body_root, "rotation", -0.22, 0.09)
 	if head != null:
-		tw.tween_property(head, "rotation", -0.22, 0.1)
+		tw.tween_property(head, "rotation", -0.38, 0.09)
 	await tw.finished
+	struck.emit()
+	await get_tree().create_timer(0.08).timeout
 
 func _tween_rest(duration: float) -> void:
 	_kill_motion()

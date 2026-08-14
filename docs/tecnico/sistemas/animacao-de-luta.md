@@ -6,13 +6,13 @@ Há 3 choques: cabeça, tronco, pernas. O desenho no palco tem 6 membros presos 
 
 ## Sequência
 
-1. Flash na tela. As cartas **sobem ~460 px e somem**. A loja e o HUD de cima somem.
-2. Cada par (você e o oponente) **pula ao mesmo tempo** até a prateleira, com um impacto no pouso.
-3. **Anda** de perfil até o lugar da fila, em movimento contínuo. Pernas em tempos opostos, braços e cabeça acompanhando, tudo girando no ímã. Leve balanço do tronco. Os três ficam **na mesma altura do chão**. O da frente só é desenhado por cima do de trás. Todos do **mesmo tamanho**.
+1. Flash na tela. As cartas **sobem ~460 px e somem**. A loja e o HUD de cima somem. A câmera se aproxima um pouco.
+2. Só **um de cada lado** entra: pulam ao mesmo tempo na prateleira (impacto no pouso) e **andam até ficarem perto** no centro. Os outros esperam fora do palco.
+3. **Anda** de perfil, em movimento contínuo. Pernas em tempos opostos, braços e cabeça acompanhando, tudo girando no ímã. Leve balanço do tronco. Os dois do duelo ficam **na mesma altura do chão** e do **mesmo tamanho**.
 4. Placas no topo: nomes, HP e **VS**.
-5. Cada choque: os dois **avançam** um pouco e atacam no próprio corpo (tronco = soco, pernas = chute, cabeça = cabeçada). No impacto: faísca, a câmera treme um pouco, placas com os números. O vencedor mostra o **resto**. O perdedor leva **X** e o kit cai no lugar. Depois voltam à fila.
-6. Freak inteiro cai → placa **KO**, inclina e sai. O próximo anda para frente.
-7. Fim: EMPATE ou nome + dano. Cartas voltam. Freaks pulam de volta (os que restam, juntos).
+5. Cada choque: os dois **pulam para frente** e atacam (tronco = soco, pernas = chute com pulo, cabeça = cabeçada). No impacto: estrela, corte de luz, faísca, a tela trava um instante, a câmera treme, quem leva o golpe recua. Placas com os números. O vencedor mostra o **resto**. O perdedor leva **X** e o kit cai. Quem ainda tem peça volta ao lugar; quem ficou sem peça inteira espera o **KO**.
+6. Freak inteiro cai → placa **KO**, inclina e sai. **Aí** o próximo daquele lado pula no palco e se aproxima. O que ganhou fica esperando.
+7. Fim: EMPATE ou nome + dano. Cartas voltam. Quem ainda está de pé pula de volta.
 
 A poeira dos passos é **um** efeito reaproveitado, não um novo a cada passo. Isso deixa a luta mais leve no computador.
 

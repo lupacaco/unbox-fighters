@@ -25,7 +25,7 @@ O jogo ainda **não está pronto**. Estes docs descrevem o que **já existe** ho
 | [Peças e personagens](tecnico/sistemas/pecas-e-personagens.md) | Dados dos personagens, sinergia e composição visual |
 | [Incluir personagem](tecnico/incluir-personagem.md) | Folha 6+6 → 12 PNG 200×200, 3 kits na loja, ímãs |
 | [Arrastar e soltar](tecnico/sistemas/arrastar-e-soltar.md) | Peças, troca de fila e vender |
-| [Animação de luta](tecnico/sistemas/animacao-de-luta.md) | Palco: pulo, caminhada, placas, resto, KO |
+| [Animação de luta](tecnico/sistemas/animacao-de-luta.md) | Palco: um contra um, pulo, caminhada, golpes, KO |
 | [Visual e UI](tecnico/sistemas/visual-e-ui.md) | PREP, tags, pancadas, fundo |
 | [Áudio](tecnico/sistemas/audio.md) | Efeitos gravados: caixa, ímã, luta |
 | [Pipeline de arte](tecnico/pipeline-de-arte.md) | Scripts que preparam imagens dos personagens |
