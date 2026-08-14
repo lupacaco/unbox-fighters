@@ -1,23 +1,33 @@
 class_name FighterLoadout
 extends RefCounted
 
-## One card: head + torso kits on a spring base. Missing kits are allowed.
+## One card: head, torso, and both arms on a spring base. Missing kits are allowed.
 
 var head: PartDef
 var body: PartDef
-var legs: PartDef
+var arm_l: PartDef
+var arm_r: PartDef
 
-static func from_parts(head_part: PartDef, body_part: PartDef, legs_part: PartDef) -> FighterLoadout:
+static func from_parts(
+	head_part: PartDef,
+	body_part: PartDef,
+	arm_l_part: PartDef = null,
+	arm_r_part: PartDef = null
+) -> FighterLoadout:
 	var loadout := FighterLoadout.new()
 	loadout.head = head_part
 	loadout.body = body_part
-	loadout.legs = legs_part
+	loadout.arm_l = arm_l_part
+	loadout.arm_r = arm_r_part
 	return loadout
 
 static func from_character(character: CharacterDef) -> FighterLoadout:
+	var loadout := FighterLoadout.new()
 	if character == null:
-		return FighterLoadout.new()
-	return from_parts(character.head, character.body, character.legs)
+		return loadout
+	for slot in PartSlotType.shop_slots():
+		loadout.set_part(slot, character.get_part(slot))
+	return loadout
 
 func is_empty() -> bool:
 	for slot in PartSlotType.shop_slots():
@@ -37,8 +47,10 @@ func get_part(slot: PartSlotType.Value) -> PartDef:
 			return head
 		PartSlotType.Value.BODY:
 			return body
-		PartSlotType.Value.LEGS:
-			return legs
+		PartSlotType.Value.ARM_L:
+			return arm_l
+		PartSlotType.Value.ARM_R:
+			return arm_r
 		_:
 			return null
 
@@ -48,8 +60,10 @@ func set_part(slot: PartSlotType.Value, part: PartDef) -> void:
 			head = part
 		PartSlotType.Value.BODY:
 			body = part
-		PartSlotType.Value.LEGS:
-			legs = part
+		PartSlotType.Value.ARM_L:
+			arm_l = part
+		PartSlotType.Value.ARM_R:
+			arm_r = part
 
 func combat_value_of(slot: PartSlotType.Value) -> int:
 	return Synergy.value_for_part(get_part(slot), parts_array())
@@ -61,4 +75,4 @@ func total_power() -> int:
 	return total
 
 func duplicate_loadout() -> FighterLoadout:
-	return from_parts(head, body, legs)
+	return from_parts(head, body, arm_l, arm_r)

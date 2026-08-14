@@ -104,6 +104,8 @@ static func _score_placement(card: FighterLoadout, part: PartDef) -> int:
 			same += 1
 	if card.get_part(part.slot_type) != null:
 		same -= 1
+	if same >= 3:
+		return 40 + part.combat_value
 	if same >= 2:
 		return 30 + part.combat_value
 	if same >= 1:

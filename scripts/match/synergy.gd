@@ -2,7 +2,7 @@ class_name Synergy
 extends RefCounted
 
 ## Combat value on a card: 2 matching kits = full, 1 = 50%.
-## Always rounds up. The spring base has no number.
+## Always rounds up. The spring base has no number. Arms count as their own kits.
 
 static func scaled_value(base: int, same_set_count: int) -> int:
 	if base <= 0 or same_set_count <= 0:

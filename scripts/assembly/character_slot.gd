@@ -9,6 +9,8 @@ signal assembly_changed(slot: CharacterSlot)
 const TAG_OFFSETS := {
 	PartSlotType.Value.HEAD: Vector2(108, -150),
 	PartSlotType.Value.BODY: Vector2(108, -20),
+	PartSlotType.Value.ARM_L: Vector2(-120, 8),
+	PartSlotType.Value.ARM_R: Vector2(108, 70),
 }
 const _Spring := preload("res://scripts/data/spring_base.gd")
 
@@ -346,7 +348,9 @@ func _setup_zones() -> void:
 		leftover.visible = false
 	var rects := {
 		PartSlotType.Value.HEAD: Rect2(-95, -190, 190, 110),
-		PartSlotType.Value.BODY: Rect2(-105, -85, 210, 250),
+		PartSlotType.Value.BODY: Rect2(-55, -80, 110, 170),
+		PartSlotType.Value.ARM_L: Rect2(-130, -70, 75, 190),
+		PartSlotType.Value.ARM_R: Rect2(55, -70, 75, 190),
 	}
 	for slot in PartSlotType.shop_slots():
 		var node_name := _layer_name(slot)

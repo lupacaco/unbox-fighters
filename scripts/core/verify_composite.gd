@@ -52,8 +52,13 @@ func _run() -> void:
 		quit(1)
 		return
 	var body_kit := PartKit.expand_shop_part(leao.body)
-	if body_kit.size() != 3:
-		push_error("VERIFY_FAIL torso kit should draw torso + 2 arms")
+	if body_kit.size() != 1 or not body_kit.has(PartSlotType.Value.BODY):
+		push_error("VERIFY_FAIL torso kit should draw only the torso")
+		quit(1)
+		return
+	var arm_kit := PartKit.expand_shop_part(leao.arm_l)
+	if arm_kit.size() != 1 or not arm_kit.has(PartSlotType.Value.ARM_L):
+		push_error("VERIFY_FAIL left arm kit should draw only that arm")
 		quit(1)
 		return
 	if not (positions[PartSlotType.Value.HEAD].y < positions[PartSlotType.Value.BODY].y):

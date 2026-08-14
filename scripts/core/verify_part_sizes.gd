@@ -14,13 +14,13 @@ func _run() -> void:
 	for part in leao.visual_parts():
 		_assert_part_art(part)
 	assert(leao.can_fight(), "Lion needs a side view on every drawing")
-	assert(leao.shop_parts().size() == 2)
+	assert(leao.shop_parts().size() == 4)
 	var medico: CharacterDef = load("res://data/parts/medico_character.tres")
 	assert(medico != null, "Missing doctor")
 	for part in medico.visual_parts():
 		_assert_part_art(part)
 	assert(medico.can_fight(), "Doctor needs a side view on every drawing")
-	assert(medico.shop_parts().size() == 2)
+	assert(medico.shop_parts().size() == 4)
 	assert(medico.head.combat_value == 5)
 	assert(medico.body.combat_value == 6)
 	assert(medico.legs.combat_value == 4)
@@ -29,7 +29,7 @@ func _run() -> void:
 	for part in vampiro.visual_parts():
 		_assert_part_art(part)
 	assert(vampiro.can_fight(), "Vampire needs a side view on every drawing")
-	assert(vampiro.shop_parts().size() == 2)
+	assert(vampiro.shop_parts().size() == 4)
 	assert(vampiro.head.combat_value == 3)
 	assert(vampiro.body.combat_value == 4)
 	assert(vampiro.legs.combat_value == 3)
@@ -38,7 +38,7 @@ func _run() -> void:
 	for part in bruxa.visual_parts():
 		_assert_part_art(part)
 	assert(bruxa.can_fight(), "Witch needs a side view on every drawing")
-	assert(bruxa.shop_parts().size() == 2)
+	assert(bruxa.shop_parts().size() == 4)
 	var full := CompositeResolver.resolve(leao)
 	assert(full["mode"] == "layered")
 	var textures: Dictionary = full["textures"]

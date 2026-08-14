@@ -2,7 +2,7 @@
 
 A luta de verdade é calculada **antes** de aparecer (`CombatSim`). O `FightDirector` só **mostra** o resultado no palco (a prateleira).
 
-Cada choque sorteia um kit vivo de cada Freak (cabeça ou tronco+braços). Pode misturar, por exemplo cabeça contra tronco. No palco o Freak senta numa **base-mola**. Não tem pernas.
+Cada choque sorteia um kit vivo de cada Freak (cabeça, tronco, braço E ou braço D). Pode misturar, por exemplo cabeça contra braço. No palco o Freak senta numa **base-mola**. Não tem pernas.
 
 ## Sequência
 

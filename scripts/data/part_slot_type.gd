@@ -2,7 +2,7 @@
 class_name PartSlotType
 extends Object
 
-## Shop / fight use two kits (head + torso). Drawing uses four limbs plus the spring base.
+## Shop and fight use four kits. Legs stay in the files for the magnet editor.
 enum Value {
 	HEAD,
 	BODY,
@@ -14,7 +14,7 @@ enum Value {
 }
 
 static func shop_slots() -> Array[Value]:
-	return [Value.HEAD, Value.BODY]
+	return [Value.HEAD, Value.BODY, Value.ARM_L, Value.ARM_R]
 
 static func visual_slots() -> Array[Value]:
 	return [
@@ -87,18 +87,10 @@ static func _draw_z_of(parts: Dictionary, slot: Value) -> int:
 	return default_draw_z(slot)
 
 static func is_shop_slot(value: Value) -> bool:
-	return value == Value.HEAD or value == Value.BODY
+	return value == Value.HEAD or value == Value.BODY or value == Value.ARM_L or value == Value.ARM_R
 
 static func visual_slots_for(shop_slot: Value) -> Array[Value]:
-	match shop_slot:
-		Value.HEAD:
-			return [Value.HEAD]
-		Value.BODY:
-			return [Value.BODY, Value.ARM_L, Value.ARM_R]
-		Value.LEGS:
-			return [Value.LEG_L, Value.LEG_R]
-		_:
-			return [shop_slot]
+	return [shop_slot]
 
 static func to_string_name(value: Value) -> StringName:
 	match value:

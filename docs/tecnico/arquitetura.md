@@ -33,7 +33,7 @@ Arte e recursos (assets/, data/)
 | `PrepHud` / `ShopBar` / `StatTag` | PREP, pancadas, tags coloridas |
 | `DragDropService` | Arraste de peça, troca de carta, vender |
 | `Crate` / `PartView` / `CharacterSlot` | Caixa, peça, carta |
-| `CompositeResolver` / `PartKit` / `SpringBase` | Cola cabeça e tronco na esfera da mola; o kit da loja vira esses desenhos |
+| `CompositeResolver` / `PartKit` / `SpringBase` | Cola cabeça, tronco e cada braço na mola ou no ombro |
 
 ## Organização dos scripts
 

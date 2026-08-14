@@ -10,13 +10,13 @@
 | Preparação | Até 60 s (relógio `1:00`) ou botão PRONTO |
 | Loja | 5 caixas, pancadas douradas, atualizar, travar (caixas azuis), vender à direita, subir nível |
 | Montagem | 3 cartas (3º / 2º / 1º), misturar peças, carta incompleta vale |
-| Luta em fila | Choque de kits sorteados (pode misturar cabeça vs tronco), só o vencedor ataca, empate os dois atacam no centro, cópia das cartas, teto de 12 de dano por Freak |
+| Luta em fila | Choque de kits sorteados (pode misturar cabeça vs braço), só o vencedor ataca, empate os dois atacam no centro, cópia das cartas, teto de 12 de dano por Freak |
 | Tela de luta | Um contra um no palco: pulo na mola, dois pulos até o ataque (base sai do chão junto, sombra no chão), o kit vencedor voa até a peça do outro (empate: os dois batem no centro), KO. Nomes/HP/VS ficam inteiros no topo. Peça destruída voa para fora da tela. Ordem de frente: cabeça, braço D, tronco, braço E |
 | Fim de partida | **Você venceu!** / **Você saiu** e botão **NOVA PARTIDA** |
 | Abrir caixas | 1 clique, custa 1 pancada |
 | Arrastar e soltar | Peças nas cartas (troca no lugar ocupado); botão direito vende; Freak inteiro troca de carta ou vai para VENDER. Sem retângulo vermelho: a carta acende ouro |
-| Visual composto | Base-mola em toda carta (solta vazia, pressionada com peça). Ímãs unem cabeça e tronco pelas esferas de metal (frente e perfil; tronco tem 5 ímãs). Na frente os braços abrem um pouco no ombro |
-| Incluir Freak | Folha 6+6 vira 12 PNG 200×200 + 2 fichas na loja; ímãs em janela compacta (Ampliar para precisão). A mola já está na carta |
+| Visual composto | Base-mola em toda carta (solta vazia, pressionada com peça). Ímãs unem cabeça e tronco pelas esferas; cada braço cola no ombro. Na frente os braços abrem um pouco |
+| Incluir Freak | Folha 6+6 vira 12 PNG 200×200 + 4 kits na loja; ímãs em janela compacta (Ampliar para precisão). A mola já está na carta |
 | Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |
 | Áudio | Efeitos gravados (martelo, caixa, ímã). Na luta: boing no impulso da mola, passo no pouso e poom do golpe |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |

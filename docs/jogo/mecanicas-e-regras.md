@@ -36,12 +36,14 @@ Há **1 jogador + 3 bots** (Sombra, Ferrugem, Névoa). HP inicial **40**. Não e
 
 ## Peças
 
-Nas caixas existem só **2 kits**. Cada um ocupa um encaixe da carta:
+Nas caixas existem **4 kits**. Cada um ocupa um encaixe da carta:
 
 | Tipo | O que o jogador recebe | Tag |
 |------|------------------------|-----|
 | HEAD | Cabeça | Azul |
-| BODY | Tronco **com os dois braços já grudados** (não se separam) | Roxo |
+| BODY | Tronco (sem os braços) | Roxo |
+| ARM_L | Braço esquerdo (de quem olha) | Laranja |
+| ARM_R | Braço direito (de quem olha) | Vermelho-claro |
 
 Toda carta já tem uma **base-mola**. Ela não sai da carta, não vem na caixa e **não tem número** de luta. Em cima da mola tem uma esfera de metal: é o ímã onde a peça senta.
 
@@ -49,19 +51,18 @@ Toda carta já tem uma **base-mola**. Ela não sai da carta, não vem na caixa e
 - Qualquer peça encaixada: mola **pressionada** (baixa).
 - Só a cabeça: a cabeça cola na esfera da mola.
 - Cabeça + tronco: o tronco cola na esfera; a cabeça cola no pescoço do tronco (como já era).
+- Braço com tronco: cola no ombro. Sem tronco: senta na mola, um pouco para o lado.
 
-Não dá para tirar a mola. Não dá para encaixar pernas — o jogo não vende mais pernas.
-
-Por baixo, o desenho ainda tem recortes 200×200 (cabeça, tronco, 2 braços). Os arquivos de pernas existem só para a ferramenta de ímãs; **não aparecem no jogo**.
+Não dá para tirar a mola. Não dá para encaixar pernas — o jogo não vende pernas.
 
 Cada kit da loja tem **um** número de combate e um **nível** de loja.
 
 | Set | Kits | Total |
 |-----|------|-------|
-| Leão | Cabeça 4, tronco 4 (nível 1) | 8 |
-| Médico | Cabeça 5 (nível 1), tronco 6 (nível 2) | 11 |
-| Vampiro | Cabeça 3, tronco 4 (nível 1) | 7 |
-| Bruxa | Cabeça 4, tronco 3 (nível 1) | 7 |
+| Leão | Cabeça 4, tronco 4, braço E 4, braço D 4 (nível 1) | 16 |
+| Médico | Cabeça 5 (nível 1); tronco 6 e os dois braços 6 (nível 2) | 23 |
+| Vampiro | Cabeça 3, tronco 4, braço E 4, braço D 4 (nível 1) | 15 |
+| Bruxa | Cabeça 4, tronco 3, braço E 3, braço D 3 (nível 1) | 13 |
 
 Nível da loja pela força do kit: 3–5 → 1; 6 → 2; 7 → 3; 8 → 4; 9 → 5.
 
@@ -72,11 +73,11 @@ Conta quantos kits do **mesmo set** estão na carta. Arredonda para cima.
 - 2 iguais: 100%
 - 1: 50%
 
-Exemplo: cabeça 4 sozinha vira **2**. Cabeça + tronco do mesmo set vale o número cheio (8 no leão).
+Exemplo: cabeça 4 sozinha vira **2**. Cabeça + tronco do mesmo set já vale o número cheio (8 no leão). Os dois braços iguais somam mais (set completo do leão = **16**).
 
 ## Luta
 
-Cada choque sorteia **um kit vivo de cada lado**. Pode ser cabeça contra tronco. Não segue ordem fixa. Pula o que estiver vazio.
+Cada choque sorteia **um kit vivo de cada lado**. Pode ser cabeça contra braço, tronco contra cabeça, etc. Não segue ordem fixa. Pula o que estiver vazio.
 
 - Se A > B: só A ataca. B fica no corpo até levar o golpe e voar para fora. A fica A−B e pode ser sorteada de novo.
 - Se empatar: os dois kits morrem. Na tela os dois atacam juntos, batem no centro e voam para fora.

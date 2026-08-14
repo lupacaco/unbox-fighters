@@ -12,6 +12,8 @@ enum Pose { FRONT, PROFILE, STRIDE }
 const TAG_OFFSETS := {
 	PartSlotType.Value.HEAD: Vector2(78, -110),
 	PartSlotType.Value.BODY: Vector2(78, -10),
+	PartSlotType.Value.ARM_L: Vector2(-78, 8),
+	PartSlotType.Value.ARM_R: Vector2(78, 48),
 }
 const _Spring := preload("res://scripts/data/spring_base.gd")
 const HOP_HZ := 1.2
@@ -116,8 +118,8 @@ func setup_loadout(loadout: FighterLoadout, face_left: bool) -> void:
 	_layout_rig()
 	refresh_tags(loadout)
 
-func setup_parts(head: PartDef, body: PartDef, legs: PartDef) -> void:
-	setup_loadout(FighterLoadout.from_parts(head, body, legs), scale.x < 0)
+func setup_parts(head: PartDef, body: PartDef, arm_l: PartDef = null, arm_r: PartDef = null) -> void:
+	setup_loadout(FighterLoadout.from_parts(head, body, arm_l, arm_r), scale.x < 0)
 
 func set_pose(pose: Pose) -> void:
 	_pose = pose
@@ -223,11 +225,12 @@ func play_throw_windup(shop_slot: PartSlotType.Value) -> void:
 			_tween_joint(tw, PartSlotType.Value.HEAD, 0.42, 0.2)
 			_tween_joint(tw, PartSlotType.Value.ARM_L, -0.28, 0.2)
 			_tween_joint(tw, PartSlotType.Value.ARM_R, 0.28, 0.2)
-		int(PartSlotType.Value.LEGS):
-			_tween_joint(tw, PartSlotType.Value.LEG_R, 0.55, 0.2)
-			_tween_joint(tw, PartSlotType.Value.LEG_L, -0.22, 0.2)
-			_tween_joint(tw, PartSlotType.Value.ARM_L, 0.2, 0.2)
-			_tween_joint(tw, PartSlotType.Value.ARM_R, -0.2, 0.2)
+		int(PartSlotType.Value.ARM_L):
+			_tween_joint(tw, PartSlotType.Value.ARM_L, -0.95, 0.2)
+			_tween_joint(tw, PartSlotType.Value.HEAD, 0.08, 0.2)
+		int(PartSlotType.Value.ARM_R):
+			_tween_joint(tw, PartSlotType.Value.ARM_R, 0.95, 0.2)
+			_tween_joint(tw, PartSlotType.Value.HEAD, 0.08, 0.2)
 		_:
 			_tween_joint(tw, PartSlotType.Value.ARM_R, 0.85, 0.2)
 			_tween_joint(tw, PartSlotType.Value.ARM_L, -0.55, 0.2)
@@ -526,8 +529,18 @@ func _layout_rig() -> void:
 			head_tex,
 			_socket(_part_def(PartSlotType.Value.HEAD), "down", head_tex) * part_scale
 		)
-		_place_joint(PartSlotType.Value.ARM_L, Vector2.ZERO, null, Vector2.ZERO)
-		_place_joint(PartSlotType.Value.ARM_R, Vector2.ZERO, null, Vector2.ZERO)
+		_place_joint(
+			PartSlotType.Value.ARM_L,
+			magnet + Vector2(-40.0, 8.0),
+			textures.get(PartSlotType.Value.ARM_L),
+			_socket(_part_def(PartSlotType.Value.ARM_L), "up", textures.get(PartSlotType.Value.ARM_L)) * part_scale
+		)
+		_place_joint(
+			PartSlotType.Value.ARM_R,
+			magnet + Vector2(40.0, 8.0),
+			textures.get(PartSlotType.Value.ARM_R),
+			_socket(_part_def(PartSlotType.Value.ARM_R), "up", textures.get(PartSlotType.Value.ARM_R)) * part_scale
+		)
 	_place_joint(PartSlotType.Value.LEG_L, Vector2.ZERO, null, Vector2.ZERO)
 	_place_joint(PartSlotType.Value.LEG_R, Vector2.ZERO, null, Vector2.ZERO)
 

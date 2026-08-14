@@ -2,7 +2,7 @@ class_name CombatSim
 extends RefCounted
 
 ## Resolves a 3-card queue fight. Each clash picks a living kit at random on each
-## side (head may hit legs). Presentation reads the event list; it does not
+## side (head may hit an arm). Presentation reads the event list; it does not
 ## recompute the rules.
 
 class LivePart:

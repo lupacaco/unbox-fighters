@@ -4,7 +4,7 @@ Este é o jeito certo de colocar um Freak novo no jogo. Siga **todos** os passos
 
 As regras da loja, sinergia e luta (o que o jogador vê) estão em [Mecânicas e regras](../jogo/mecanicas-e-regras.md).
 
-O jogador manda uma folha de desenho. O jogo precisa de **12 recortes** (6 de frente + 6 de perfil) para a ferramenta de ímãs e os braços, **2 fichas na loja** (cabeça, tronco com braços), e uma ficha do personagem. A **base-mola já vem na carta** — não cria ficha de pernas para vender. A loja **acha sozinha** qualquer ficha nova em `data/parts/`.
+O jogador manda uma folha de desenho. O jogo precisa de **12 recortes** (6 de frente + 6 de perfil) para a ferramenta de ímãs, **4 kits na loja** (cabeça, tronco, braço E, braço D), e uma ficha do personagem. A **base-mola já vem na carta** — não cria ficha de pernas para vender. A loja **acha sozinha** qualquer ficha nova em `data/parts/`.
 
 ## O que a folha precisa ter
 
@@ -116,13 +116,13 @@ Grave os dois: `combat_value` e `tier`.
 
 ## 4. Fichas das peças e do personagem
 
-Doze recortes viram **6 fichas de desenho** + a ficha do personagem. A loja só vende cabeça e tronco:
+Doze recortes viram **6 fichas de desenho** + a ficha do personagem. A loja vende cabeça, tronco e os dois braços:
 
 - Desenho: `{id}_head.tres` `{id}_body.tres` `{id}_arm_l.tres` `{id}_arm_r.tres` `{id}_leg_l.tres` `{id}_leg_r.tres`
-- Loja: `{id}_head.tres` `{id}_body.tres`
+- Loja: `{id}_head.tres` `{id}_body.tres` `{id}_arm_l.tres` `{id}_arm_r.tres`
 - Personagem: `{id}_character.tres`
 
-A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 2 kits de cada Freak. Braços e pernas soltos não entram nas caixas. A base-mola já está na carta. Freak novo entra no Play seguinte, sem lista na mão.
+A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 4 kits de cada Freak. Os dois números que você preenche (cabeça, tronco) também valem para os braços (o tronco copia o número para os dois braços). Pernas não entram nas caixas. A base-mola já está na carta. Freak novo entra no Play seguinte, sem lista na mão.
 
 ## 5. Documentação
 
@@ -137,14 +137,14 @@ Atualize:
 
 - Os 12 PNG são 200 × 200 e têm transparência de verdade
 - Preto de dentro do desenho não sumiu
-- Play: kit na caixa (tronco já com braços), encaixa na carta em cima da mola, set completo (cabeça + tronco) mostra o nome certo
+- Play: kit na caixa (braço E e braço D separados), encaixa na carta em cima da mola, set completo (cabeça + tronco + 2 braços) mostra o nome certo
 - Tronco tem 5 ímãs visíveis na ferramenta
 
 ## Sets que já passaram por este fluxo
 
 | id | Nome | Números |
 |----|------|---------|
-| `leao` | Leão | Cabeça 4, tronco 4 (nível 1, total 8) |
-| `medico` | Médico | Cabeça 5 (nível 1), tronco 6 (nível 2). Total 11 |
-| `vampiro` | Vampiro | Cabeça 3, tronco 4 (nível 1). Total 7 |
-| `bruxa` | Bruxa | Cabeça 4, tronco 3 (nível 1). Total 7 |
+| `leao` | Leão | Cabeça 4, tronco 4, braços 4 (nível 1, total 16) |
+| `medico` | Médico | Cabeça 5 (nível 1); tronco e braços 6 (nível 2). Total 23 |
+| `vampiro` | Vampiro | Cabeça 3, tronco 4, braços 4 (nível 1). Total 15 |
+| `bruxa` | Bruxa | Cabeça 4, tronco 3, braços 3 (nível 1). Total 13 |

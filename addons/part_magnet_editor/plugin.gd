@@ -98,7 +98,7 @@ func _build_form() -> void:
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.custom_minimum_size.x = 380
-	hint.text = "Folha com 6 desenhos de frente e 6 de perfil. A loja ganha 2 kits (cabeça e tronco). A base-mola já vem na carta. Depois marque os ímãs em Ampliar."
+	hint.text = "Folha com 6 desenhos de frente e 6 de perfil. A loja ganha 4 kits (cabeça, tronco, braço E, braço D). A base-mola já vem na carta. Depois marque os ímãs em Ampliar."
 	box.add_child(hint)
 	_form_status = Label.new()
 	_form_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

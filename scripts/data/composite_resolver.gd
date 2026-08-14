@@ -81,8 +81,13 @@ static func resolve_slots(
 		positions[PartSlotType.Value.HEAD] = body_pos + (_socket(body, "neck", body_tex) - _socket(head, "down", head_tex)) * scale
 		positions[PartSlotType.Value.ARM_L] = body_pos + (_socket(body, "shoulder_l", body_tex) - _socket(parts.get(PartSlotType.Value.ARM_L), "up", tex.get(PartSlotType.Value.ARM_L))) * scale
 		positions[PartSlotType.Value.ARM_R] = body_pos + (_socket(body, "shoulder_r", body_tex) - _socket(parts.get(PartSlotType.Value.ARM_R), "up", tex.get(PartSlotType.Value.ARM_R))) * scale
-	elif head_tex != null:
-		positions[PartSlotType.Value.HEAD] = magnet - _socket(head, "down", head_tex) * scale
+	else:
+		if head_tex != null:
+			positions[PartSlotType.Value.HEAD] = magnet - _socket(head, "down", head_tex) * scale
+		if tex.get(PartSlotType.Value.ARM_L) != null:
+			positions[PartSlotType.Value.ARM_L] = magnet + Vector2(-40.0, 8.0) - _socket(parts.get(PartSlotType.Value.ARM_L), "up", tex.get(PartSlotType.Value.ARM_L)) * scale
+		if tex.get(PartSlotType.Value.ARM_R) != null:
+			positions[PartSlotType.Value.ARM_R] = magnet + Vector2(40.0, 8.0) - _socket(parts.get(PartSlotType.Value.ARM_R), "up", tex.get(PartSlotType.Value.ARM_R)) * scale
 
 	return {
 		"mode": "layered",

@@ -11,7 +11,7 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 |--------|----------------|
 | `verify_synergy.gd` | 2 iguais = 100% / 1 = 50%, números do leão, curva de pancadas |
 | `verify_combat_sim.gd` | Choque, empate, teto de 12 de dano no HP, pares sorteados (pode misturar kits) |
-| `verify_shop_pool.gd` | Loja vende todo Freak com ficha; tronco do médico só no nível 2; 5 ofertas |
+| `verify_shop_pool.gd` | Loja vende todo Freak com ficha; tronco e braços do médico só no nível 2; 5 ofertas |
 | `verify_character_importer.gd` | Id `Leão` → `leao`; cada Freak com 12 desenhos; folha do médico vira 6+6 |
 | `verify_match_state.gd` | 4 vivos, HP 40, nomes dos bots, oponente-fantasma |
 | `verify_assembly.gd` | 3 cartas, 5 caixas e VENDER à direita |
@@ -21,7 +21,7 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 | `verify_part_sizes.gd` | Sprites 200×200 e perfil nos desenhos visíveis |
 | `verify_fight_line.gd` | Fila no mesmo chão; pulo da mola inteira; dois pulos até o ataque; sombra no chão; um boing ao sair do chão; duelistas afastados; placas de HP cabem no topo |
 | `verify_thrown_kit.gd` | Kit copiado do boneco some do corpo e pode voltar |
-| `verify_fight_poses.gd` | Personagem tem perfil; carta mostra a mola e a sombra; aceita cabeça e tronco, recusa pernas |
+| `verify_fight_poses.gd` | Personagem tem perfil; carta mostra a mola e a sombra; aceita cabeça, tronco e braços, recusa pernas |
 | `verify_fight_lock.gd` | Travamento da carta; soltar kit em lugar ocupado devolve o antigo |
 | `debug_parts.gd` | Carrega peça e checa visibilidade do sprite |
 | `debug_reveal.gd` | Força revelar peça da caixa e checa transparência |

@@ -6,7 +6,7 @@
 
 ## Ideia em uma frase
 
-Você abre caixas, monta Freaks com **2 kits** (cabeça e tronco com os braços) em cima de uma **base-mola** que já vem na carta, e eles lutam sozinhos em fila contra bots. Eles andam pulando na mola.
+Você abre caixas, monta Freaks com **4 kits** (cabeça, tronco, braço esquerdo e braço direito) em cima de uma **base-mola** que já vem na carta, e eles lutam sozinhos em fila contra bots. Eles andam pulando na mola.
 
 ## Loop principal
 

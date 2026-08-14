@@ -4,26 +4,30 @@ Como o jogo descreve personagens e decide o que desenhar na carta.
 
 ## O que o jogador vê vs o desenho
 
-Na **loja** e na **carta** existem 2 kits:
+Na **loja** e na **carta** existem **4 kits**:
 
 - **Cabeça**
-- **Tronco** = tronco + os dois braços (já vêm juntos)
+- **Tronco** (só o peito; os braços não vêm grudados)
+- **Braço E** (esquerda de quem olha)
+- **Braço D** (direita de quem olha)
 
 Toda carta já tem uma **base-mola** (`scripts/data/spring_base.gd`). Não vem na caixa, não tem número, não dá para remover.
 
 - Vazia: mola solta (`assets/objects/base-mola-solta.png`)
 - Com qualquer peça: mola pressionada (`assets/objects/base-mola-pressionada.png`)
-- Só cabeça: a esfera de baixo da cabeça cola na esfera da mola
-- Cabeça + tronco: o meio dos quadris do tronco cola na esfera da mola; a cabeça cola no pescoço
+- Só a cabeça: a esfera de baixo da cabeça cola na esfera da mola
+- Cabeça + tronco: o meio dos quadris do tronco cola nessa esfera; a cabeça cola no pescoço
+- Braço com tronco: a esfera de cima do braço cola no ombro
+- Braço sem tronco: o braço senta na esfera da mola, um pouco para o lado
 
-O **desenho** ainda tem recortes 200×200 da cabeça, tronco e braços, para o Freak mexer os braços. Os arquivos de perna continuam no set para a ferramenta de ímãs, mas **não são desenhados nem vendidos**. `PartKit` (`scripts/data/part_kit.gd`) transforma o kit da loja nesses desenhos.
+Os arquivos de perna continuam no set para a ferramenta de ímãs, mas **não são desenhados nem vendidos**.
 
 ## Tipos de dados
 
 ### `PartSlotType` (`scripts/data/part_slot_type.gd`)
 
-- Loja / luta: `HEAD`, `BODY`
-- Desenho: `HEAD`, `BODY`, `ARM_L`, `ARM_R` (e `LEG_L` / `LEG_R` só nos arquivos, ocultos no jogo)
+- Loja / luta: `HEAD`, `BODY`, `ARM_L`, `ARM_R`
+- Desenho: os mesmos, mais `LEG_L` / `LEG_R` só nos arquivos (ocultos no jogo)
 
 Esquerda/direita no desenho = lado **de quem olha** a frente.
 
@@ -52,9 +56,9 @@ Recurso de **um personagem**:
 
 - `id`, `display_name`
 - Desenho: `head`, `body`, `arm_l`, `arm_r` (e `leg_l` / `leg_r` nos arquivos)
-- Loja: `head`, `body`
+- Loja: `head`, `body`, `arm_l`, `arm_r`
 
-A loja lê `shop_parts()` (2 kits). Braços soltos **não** entram nas caixas. Pernas também não.
+A loja lê `shop_parts()` (4 kits). Pernas **não** entram nas caixas.
 
 ## Números atuais (teste)
 
@@ -62,14 +66,14 @@ Na loja entram **todos** os Freaks que tiverem ficha `*_character.tres`. Hoje:
 
 | Set | Kits | Total do set completo |
 |-----|------|------------------------|
-| Leão | 4, 4 (nível 1) | 8 |
-| Médico | Cabeça 5 (nível 1), tronco 6 (nível 2) | 11 |
-| Vampiro | Cabeça 3, tronco 4 (nível 1) | 7 |
-| Bruxa | Cabeça 4, tronco 3 (nível 1) | 7 |
+| Leão | Cabeça 4, tronco 4, braço E 4, braço D 4 (nível 1) | 16 |
+| Médico | Cabeça 5 (nível 1); tronco 6, braço E 6, braço D 6 (nível 2) | 23 |
+| Vampiro | Cabeça 3, tronco 4, braço E 4, braço D 4 (nível 1) | 15 |
+| Bruxa | Cabeça 4, tronco 3, braço E 3, braço D 3 (nível 1) | 13 |
 
-A sinergia (2 iguais = 100%, 1 = 50%) está em `scripts/match/synergy.gd`.
+A sinergia (2 iguais = 100%, 1 = 50%) está em `scripts/match/synergy.gd`. Dois kits do mesmo set já valem o número cheio; os outros dois iguais somam mais.
 
-A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 2 kits de cada uma.
+A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 4 kits de cada uma.
 
 ## Como marcar os ímãs
 
@@ -127,11 +131,11 @@ Pasta: `data/parts/`
 
 | Arquivo | Conteúdo |
 |---------|----------|
-| `leao_character.tres` + `leao_head/body.tres` | Kits da loja (Leão) |
-| `leao_arm_*.tres`, `leao_leg_l/r.tres` | Só desenho (não vendidos; pernas ocultas no jogo) |
-| `medico_character.tres` + `medico_head/body.tres` | Kits da loja (Médico) |
-| `medico_arm_*.tres`, `medico_leg_l/r.tres` | Só desenho (não vendidos; pernas ocultas no jogo) |
-| `vampiro_character.tres` + `vampiro_head/body.tres` | Kits da loja (Vampiro) |
-| `vampiro_arm_*.tres`, `vampiro_leg_l/r.tres` | Só desenho (não vendidos; pernas ocultas no jogo) |
-| `bruxa_character.tres` + `bruxa_head/body.tres` | Kits da loja (Bruxa) |
-| `bruxa_arm_*.tres`, `bruxa_leg_l/r.tres` | Só desenho (não vendidos; pernas ocultas no jogo) |
+| `leao_character.tres` + `leao_head/body/arm_*.tres` | Kits da loja (Leão) |
+| `leao_leg_l/r.tres` | Só desenho (pernas ocultas no jogo) |
+| `medico_character.tres` + `medico_head/body/arm_*.tres` | Kits da loja (Médico) |
+| `medico_leg_l/r.tres` | Só desenho (pernas ocultas no jogo) |
+| `vampiro_character.tres` + `vampiro_head/body/arm_*.tres` | Kits da loja (Vampiro) |
+| `vampiro_leg_l/r.tres` | Só desenho (pernas ocultas no jogo) |
+| `bruxa_character.tres` + `bruxa_head/body/arm_*.tres` | Kits da loja (Bruxa) |
+| `bruxa_leg_l/r.tres` | Só desenho (pernas ocultas no jogo) |

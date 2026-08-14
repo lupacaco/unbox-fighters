@@ -39,16 +39,16 @@ func _check_part_numbers() -> bool:
 	if leao == null:
 		push_error("VERIFY_FAIL missing leao")
 		return false
-	if leao.shop_parts().size() != 2:
-		push_error("VERIFY_FAIL lion should sell 2 kits")
+	if leao.shop_parts().size() != 4:
+		push_error("VERIFY_FAIL lion should sell 4 kits")
 		return false
 	for part in leao.shop_parts():
 		if part == null or part.combat_value != 4 or part.tier != 1:
 			push_error("VERIFY_FAIL lion kits should all be 4 / shop level 1")
 			return false
 	var full := FighterLoadout.from_character(leao)
-	if full.total_power() != 8:
-		push_error("VERIFY_FAIL lion full should be 8, got %d" % full.total_power())
+	if full.total_power() != 16:
+		push_error("VERIFY_FAIL lion full should be 16, got %d" % full.total_power())
 		return false
 	var solo := FighterLoadout.from_parts(leao.head, null, null)
 	if solo.combat_value_of(PartSlotType.Value.HEAD) != 2:
@@ -57,5 +57,8 @@ func _check_part_numbers() -> bool:
 	var pair := FighterLoadout.from_parts(leao.head, leao.body, null)
 	if pair.combat_value_of(PartSlotType.Value.HEAD) != 4:
 		push_error("VERIFY_FAIL two matching lion kits should be 100%")
+		return false
+	if pair.total_power() != 8:
+		push_error("VERIFY_FAIL head+torso lion should be 8, got %d" % pair.total_power())
 		return false
 	return true
