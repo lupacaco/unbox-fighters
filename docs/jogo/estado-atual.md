@@ -16,7 +16,7 @@
 | Abrir caixas | 1 clique, custa 1 pancada |
 | Arrastar e soltar | Peças nas cartas (troca no lugar ocupado); botão direito vende; Freak inteiro troca de carta ou vai para VENDER |
 | Visual composto | Ímãs unem os 6 desenhos pelas esferas de metal (frente e perfil; tronco tem 5 ímãs) |
-| Incluir Freak | Folha 6+6 vira 12 PNG 200×200 + 3 fichas na loja (menu Tools ou script); ímãs se marcam arrastando bolinhas |
+| Incluir Freak | Folha 6+6 vira 12 PNG 200×200 + 3 fichas na loja (menu Tools ou script); ímãs se marcam nas 12 partes juntas, na mesma tela |
 | Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |
 | Áudio | Efeitos: martelo, caixa, peças, impacto da luta |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |

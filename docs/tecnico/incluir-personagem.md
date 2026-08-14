@@ -75,23 +75,24 @@ Os ímãs dizem onde cada esfera de metal cola na vizinha.
 
 **Não chute os números.** Marque na imagem:
 
-1. No Godot, menu **Project → Tools → Ímãs das Peças**.
-2. Na pasta **FileSystem**, clique na peça (`data/parts/leao_body.tres`…).
-3. Escolha **Frente** ou **De lado**.
-4. Arraste cada bolinha até o **centro da esfera de metal**. Não precisa de botão “marcar”.
-5. Salve a ficha (`Ctrl+S`).
+1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**).
+2. No alto da janela, escolha o **Freak** (ex.: Leão).
+3. A tela grande mostra as **12 partes** juntas: 6 de frente em cima, 6 de lado embaixo.
+4. Arraste cada bolinha até o **centro da esfera de metal**. Não precisa ir peça por peça.
+5. Embaixo aparece o Freak montado, para conferir se pescoço, ombros e quadris batem.
+6. Clique **Salvar ímãs**. Cada bolinha que você solta também já grava aquela peça.
 
 Espaço da imagem: o centro do PNG é `(0, 0)`. **Y cresce para baixo.**
 
 | Peça | Ímãs |
 |------|------|
 | Cabeça | 1: BAIXO (base do pescoço) |
-| Tronco | 5: PESCOÇO, OMBRO E, OMBRO D, QUADRIL E, QUADRIL D |
+| Tronco | 5: PESCOÇO, OE (ombro esquerdo), OD, QE (quadril esquerdo), QD |
 | Braço / perna | 1: CIMA (topo da peça) |
 
-Marque **frente e perfil**. A carta usa a frente; a luta usa o lado. Se só a frente estiver marcada, o pescoço de lado fica torto.
+Marque **frente e perfil** na mesma tela. A carta usa a frente; a luta usa o lado. Se só a frente estiver marcada, o pescoço de lado fica torto.
 
-O mesmo desenho de ímãs também aparece no Inspetor quando você abre uma peça, com o botão **Abrir ferramenta de ímãs (imagem grande)**.
+Se você estiver com uma peça aberta no Inspetor, o botão **Abrir as 12 partes deste Freak** abre a mesma janela já no Freak certo.
 
 ## 3. Números de combate
 

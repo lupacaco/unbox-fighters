@@ -6,8 +6,7 @@ const MagnetWindowScene := preload("res://addons/part_magnet_editor/magnet_windo
 const CharacterImporter := preload("res://addons/part_magnet_editor/character_importer.gd")
 
 var _inspector_plugin: EditorInspectorPlugin
-var _window: Window
-var _window_part: PartDef
+var _window
 var _file_dialog: EditorFileDialog
 var _form: AcceptDialog
 var _id_edit: LineEdit
@@ -21,7 +20,6 @@ func _enter_tree() -> void:
 	add_inspector_plugin(_inspector_plugin)
 	add_tool_menu_item("Ímãs das Peças", _open_magnet_window)
 	add_tool_menu_item("Incluir personagem", _begin_import)
-	set_process(false)
 
 func _exit_tree() -> void:
 	remove_tool_menu_item("Ímãs das Peças")
@@ -36,23 +34,21 @@ func _exit_tree() -> void:
 	_free_node(_form)
 	_form = null
 
-func _process(_delta: float) -> void:
-	if _window == null or not is_instance_valid(_window) or not _window.visible:
-		set_process(false)
-		return
-	var edited := EditorInterface.get_inspector().get_edited_object() as PartDef
-	if edited != _window_part:
-		_window_part = edited
-		_window.set_part(edited)
-
-func _open_magnet_window() -> void:
+func _ensure_window() -> void:
 	if _window == null or not is_instance_valid(_window):
 		_window = MagnetWindowScene.new()
 		EditorInterface.get_base_control().add_child(_window)
-	_window.popup_centered(Vector2i(520, 760))
-	_window_part = EditorInterface.get_inspector().get_edited_object() as PartDef
-	_window.set_part(_window_part)
-	set_process(true)
+
+func _open_magnet_window() -> void:
+	_ensure_window()
+	var part := EditorInterface.get_inspector().get_edited_object() as PartDef
+	_window.present(part)
+	_window.popup_centered_ratio(0.92)
+
+func _open_magnet_window_for_set(set_id: String) -> void:
+	_ensure_window()
+	_window.present_character_id(set_id)
+	_window.popup_centered_ratio(0.92)
 
 func _begin_import() -> void:
 	if _file_dialog == null or not is_instance_valid(_file_dialog):
@@ -89,7 +85,7 @@ func _build_form() -> void:
 		box.add_child(_labeled_spin(labels[i]))
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.text = "A folha precisa ter 6 partes de frente à esquerda e 6 de perfil à direita (12 recortes). Na loja entram só 3 kits: cabeça, tronco com os dois braços, e as duas pernas juntas. Depois marque os ímãs nas 6 imagens: Projeto → Ferramentas → Ímãs das Peças."
+	hint.text = "A folha precisa ter 6 partes de frente à esquerda e 6 de perfil à direita (12 recortes). Na loja entram só 3 kits: cabeça, tronco com os dois braços, e as duas pernas juntas. Depois marque os ímãs nas 12 imagens, todas na mesma tela: Projeto → Ferramentas → Ímãs das Peças."
 	box.add_child(hint)
 	EditorInterface.get_base_control().add_child(_form)
 
@@ -149,7 +145,7 @@ func _run_import() -> void:
 	if part != null:
 		EditorInterface.inspect_object(part)
 	EditorInterface.select_file(part_path)
-	_open_magnet_window()
+	_open_magnet_window_for_set(set_id)
 
 func _wait_filesystem(fs: EditorFileSystem) -> void:
 	fs.scan()

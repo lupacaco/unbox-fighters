@@ -65,17 +65,18 @@ A loja lê sozinha as fichas `*_character.tres` em `data/parts/`, e depois filtr
 ## Como marcar os ímãs
 
 1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**).
-2. Clique no **desenho** em `data/parts/`, ex.: `leao_body.tres` (não no kit `leao_legs.tres`).
-3. Escolha **Frente** ou **De lado**.
-4. Arraste as bolinhas até o **centro das esferas de metal**:
+2. No alto, escolha o **Freak**. A janela mostra as **12 partes** (frente em cima, de lado embaixo).
+3. Arraste as bolinhas até o **centro das esferas de metal**:
    - Cabeça: **BAIXO**
    - Braço / perna: **CIMA**
-   - Tronco: **PESCOÇO**, **OMBRO E**, **OMBRO D**, **QUADRIL E**, **QUADRIL D**
-5. Salve (`Ctrl+S`).
+   - Tronco: **PESCOÇO**, **OE**, **OD**, **QE**, **QD**
+4. Olhe a prévia embaixo (Freak montado). Clique **Salvar ímãs**.
 
-A mesma ferramenta aparece no Inspetor, com o botão **Abrir ferramenta de ímãs (imagem grande)**. Na janela grande dá para misturar os 6 desenhos e ver se os encaixes batem.
+Não use o kit `*_legs.tres` (não tem desenho). A ferramenta lê as 6 imagens de desenho × 2 poses.
 
 Marque **frente e perfil**. A carta usa a frente; a luta usa o perfil.
+
+Se uma peça estiver aberta no Inspetor, o botão **Abrir as 12 partes deste Freak** abre a mesma tela já nesse Freak.
 
 ### Sistema de coordenadas
 
