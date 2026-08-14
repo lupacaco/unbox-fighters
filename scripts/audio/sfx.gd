@@ -15,8 +15,6 @@ const PATHS := {
 	"part_reject": "res://assets/audio/sfx/part_reject.wav",
 	"fighter_complete": "res://assets/audio/sfx/fighter_complete.wav",
 	"impact": "res://assets/audio/sfx/impact.wav",
-	"whoosh": "res://assets/audio/sfx/whoosh.wav",
-	"land": "res://assets/audio/sfx/land.wav",
 	"step": "res://assets/audio/sfx/step.wav",
 }
 
@@ -114,14 +112,8 @@ func fighter_complete() -> void:
 func impact() -> void:
 	play(&"impact", -1.5, randf_range(0.93, 1.06))
 
-func land() -> void:
-	play(&"land", -4.0, randf_range(0.94, 1.04))
-
 func step() -> void:
 	play(&"step", -11.0, randf_range(0.92, 1.1))
 
 func ui_click() -> void:
 	play(&"part_pickup", -11.0, randf_range(1.1, 1.22))
-
-func whoosh() -> void:
-	play(&"whoosh", -8.0, randf_range(0.9, 1.12))

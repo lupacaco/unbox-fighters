@@ -14,6 +14,4 @@ Gerar de novo: `python tools/fetch_sfx.py`
 | `part_reject.wav` | 2569 | Negative tone interface tap |
 | `fighter_complete.wav` | 2865 | Success software tone |
 | `impact.wav` | 2143 | Hard and quick punch |
-| `whoosh.wav` | 1492 | Cinematic whoosh fast transition |
-| `land.wav` | 2655 | Fast impact blow |
 | `step.wav` | 542 | Footsteps on heels on the pavement (um passo recortado) |

@@ -54,11 +54,6 @@ static func impact() -> void:
 	if s:
 		s.call("impact")
 
-static func land() -> void:
-	var s := _sfx()
-	if s:
-		s.call("land")
-
 static func step() -> void:
 	var s := _sfx()
 	if s:
@@ -68,8 +63,3 @@ static func ui_click() -> void:
 	var s := _sfx()
 	if s:
 		s.call("ui_click")
-
-static func whoosh() -> void:
-	var s := _sfx()
-	if s:
-		s.call("whoosh")

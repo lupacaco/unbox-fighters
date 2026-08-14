@@ -391,7 +391,6 @@ func _strike_punch() -> void:
 		struck.emit()
 		await get_tree().create_timer(0.28).timeout
 		return
-	GameAudio.whoosh()
 	var tw := create_tween()
 	tw.set_parallel(true)
 	tw.tween_property(arm, "rotation", 0.92, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
@@ -420,7 +419,6 @@ func _strike_kick() -> void:
 		struck.emit()
 		await get_tree().create_timer(0.28).timeout
 		return
-	GameAudio.whoosh()
 	var tw := create_tween()
 	tw.set_parallel(true)
 	tw.tween_property(kick, "rotation", 0.62, 0.16).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
@@ -444,7 +442,6 @@ func _strike_kick() -> void:
 
 func _strike_head() -> void:
 	var head: Node2D = _joints.get(PartSlotType.Value.HEAD)
-	GameAudio.whoosh()
 	var tw := create_tween()
 	tw.set_parallel(true)
 	tw.tween_property(_body_root, "position", _body_rest + Vector2(-16.0, 6.0), 0.16).set_trans(Tween.TRANS_CUBIC)

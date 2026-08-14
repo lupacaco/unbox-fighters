@@ -18,7 +18,7 @@
 | Visual composto | Ímãs unem os 6 desenhos pelas esferas de metal (frente e perfil; tronco tem 5 ímãs) |
 | Incluir Freak | Folha 6+6 vira 12 PNG 200×200 + 3 fichas na loja; ímãs em janela compacta (Ampliar para precisão) |
 | Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |
-| Áudio | Efeitos gravados (martelo, caixa, ímã, soco, passo, whoosh). Sem bipes de script |
+| Áudio | Efeitos gravados (martelo, caixa, ímã). Na luta: só passo e poom do golpe |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |
 | Dados | Loja lê sozinha todo `*_character.tres` (Leão, Médico, Vampiro, Bruxa) |
 | Scripts de verificação | Rodam checagens sem abrir a interface completa |

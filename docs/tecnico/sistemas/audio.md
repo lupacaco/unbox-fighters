@@ -27,11 +27,11 @@ Os efeitos passam por um canal **SFX** com compressão leve (segura o volume qua
 | `part_pickup` | `part_pickup.wav` | Começa a arrastar uma peça |
 | `part_place` | `part_place.wav` | Peça encaixa na carta |
 | `part_reject` | `part_reject.wav` | Soltou no lugar errado / voltou / sem pancada |
-| `fighter_complete` | `fighter_complete.wav` | Carta completa (3 kits) e vitória no palco |
-| `impact` | `impact.wav` | Soco / chute / cabeçada no choque |
-| `whoosh` | `whoosh.wav` | Pulo e avanço no palco |
-| `land` | `land.wav` | Pouso no chão da prateleira |
+| `fighter_complete` | `fighter_complete.wav` | Carta completa (3 kits) — só na montagem |
+| `impact` | `impact.wav` | Poom do choque / KO na luta |
 | `step` | `step.wav` | Passo ao andar na luta |
+
+Na luta tocam **só** passo e o poom do golpe. Pulo, vento, clique de ímã e tom de vitória **não** entram no palco.
 
 Abrir a caixa toca martelo e, um instante depois, a madeira quebrando — os dois juntos, sem o mesmo arquivo servindo para tudo.
 

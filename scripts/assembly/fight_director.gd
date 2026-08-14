@@ -255,14 +255,12 @@ func _jump_walk_in(fighter: StageFighter, opponent: bool, heavy: bool, done: Cal
 	_lift_card(fighter.source_slot)
 	fighter.visual.scale = Vector2(1.12, 0.78)
 	fighter.puppet.freeze_motion(true)
-	GameAudio.whoosh()
 	var land := _shelf_pos(opponent, LAND_X)
 	await _jump_arc(fighter.root, land, JUMP_HEIGHT, JUMP_SEC)
 	fighter.puppet.freeze_motion(false)
 	if heavy:
 		await _land_impact(fighter)
 	else:
-		GameAudio.land()
 		_dust(fighter.puppet.feet_position())
 		await _squash(fighter.visual, Vector2(1.16, 0.82), 0.07)
 		await _squash(fighter.visual, Vector2.ONE, 0.1)
@@ -380,7 +378,6 @@ func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, cl
 		await get_tree().process_frame
 	clash_l.show_plaque(false)
 	clash_r.show_plaque(false)
-	GameAudio.part_place()
 
 func _clear_struck(fighter: StageFighter) -> void:
 	if fighter == null or fighter.puppet == null or not is_instance_valid(fighter.puppet):
@@ -484,7 +481,6 @@ func _jump_home_one(fighter: StageFighter, opponent: bool, done: Callable) -> vo
 	var home := OPPONENT_ENTER if opponent else (
 		fighter.source_slot.get_fighter_global_position() if fighter.source_slot != null else fighter.root.global_position + Vector2(0, -200)
 	)
-	GameAudio.whoosh()
 	fighter.puppet.set_pose(FighterPuppet.Pose.FRONT)
 	await _jump_arc(fighter.root, home, 200.0, 0.42)
 	fighter.root.visible = false
@@ -492,8 +488,6 @@ func _jump_home_one(fighter: StageFighter, opponent: bool, done: Callable) -> vo
 		done.call()
 
 func _land_impact(fighter: StageFighter) -> void:
-	GameAudio.land()
-	GameAudio.fighter_complete()
 	_dust(fighter.puppet.feet_position())
 	_flash(Color(1, 0.95, 0.8, 0.16), 0.08)
 	_camera_punch(12.0, 0.22)

@@ -32,8 +32,6 @@ JOBS: dict[str, dict] = {
 	"part_reject": {"id": 2569, "end": 0.55, "fade_out": 0.08},
 	"fighter_complete": {"id": 2865, "fade_out": 0.1},
 	"impact": {"id": 2143, "fade_out": 0.08},
-	"whoosh": {"id": 1492, "fade_out": 0.1},
-	"land": {"id": 2655, "end": 0.95, "fade_out": 0.1},
 	"step": {"id": 542, "start": 0.15, "end": 0.40, "fade_in": 0.008, "fade_out": 0.07},
 }
 
