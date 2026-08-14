@@ -9,10 +9,9 @@ signal finished
 const SHELF_Y := -148.0
 const LAND_X := 640.0
 const STAND_X: Array[float] = [250.0, 430.0, 610.0]
-const CLASH_CENTER := Vector2(960, 440)
 const OPPONENT_ENTER := Vector2(2040, 400)
-const WALK_STEPS := 6
-const WALK_STEP_SEC := 0.16
+const WALK_PX_PER_SEC := 250.0
+const LUNGE_PX := 42.0
 const JUMP_SEC := 0.48
 const JUMP_HEIGHT := 240.0
 
@@ -33,6 +32,7 @@ var _camera_rest_zoom := Vector2.ONE
 var _camera_rest_offset := Vector2.ZERO
 var _stage: Node2D
 var _dust_fx: CPUParticles2D
+var _spark_fx: CPUParticles2D
 var _flash_poly: Polygon2D
 var _left: Array[StageFighter] = []
 var _right: Array[StageFighter] = []
@@ -241,22 +241,22 @@ func _jump_walk_in(
 ) -> void:
 	_lift_card(fighter.source_slot)
 	fighter.visual.scale = Vector2(1.12, 0.78)
+	fighter.puppet.freeze_motion(true)
 	GameAudio.whoosh()
 	var land := _shelf_pos(opponent, land_x)
 	await _jump_arc(fighter.root, land, JUMP_HEIGHT, JUMP_SEC)
+	fighter.puppet.freeze_motion(false)
 	if heavy:
 		await _land_impact(fighter)
 	else:
 		await _squash(fighter.visual, Vector2(1.1, 0.88), 0.08)
 		await _squash(fighter.visual, Vector2.ONE, 0.08)
-	await get_tree().create_timer(0.18).timeout
+	await get_tree().create_timer(0.12).timeout
 	fighter.puppet.set_pose(FighterPuppet.Pose.PROFILE)
-	await _squash(fighter.visual, Vector2(1.06, 0.94), 0.14)
+	await _squash(fighter.visual, Vector2(1.04, 0.96), 0.1)
 	await _squash(fighter.visual, Vector2.ONE, 0.1)
-	await get_tree().create_timer(0.2).timeout
 	var stand := _shelf_pos(opponent, stand_x)
 	await _walk_to(fighter, land, stand)
-	fighter.puppet.set_pose(FighterPuppet.Pose.PROFILE)
 	_set_queue_look(fighter, rank)
 	if done.is_valid():
 		done.call()
@@ -264,19 +264,24 @@ func _jump_walk_in(
 func _walk_to(fighter: StageFighter, from: Vector2, to: Vector2) -> void:
 	from.y = _shelf_y()
 	to.y = _shelf_y()
-	for i in WALK_STEPS:
-		var t := float(i + 1) / float(WALK_STEPS)
-		var next := from.lerp(to, t)
-		fighter.puppet.set_stride_frame((i % 2) == 0)
-		GameAudio.step()
-		_dust(fighter.puppet.feet_position())
-		var bob := next + Vector2(0, -16.0 if (i % 2) == 0 else 0.0)
-		fighter.visual.rotation_degrees = 6.0 if (i % 2) == 0 else -4.0
-		await _move_to(fighter.root, bob, WALK_STEP_SEC * 0.5)
-		await _move_to(fighter.root, next, WALK_STEP_SEC * 0.5)
+	var dist := from.distance_to(to)
+	if dist < 10.0:
+		fighter.root.global_position = to
+		return
+	var on_step := func() -> void:
+		if fighter.puppet != null and is_instance_valid(fighter.puppet):
+			GameAudio.step()
+			_dust(fighter.puppet.feet_position())
+	fighter.puppet.stepped.connect(on_step)
+	fighter.puppet.start_walk()
+	fighter.root.global_position = from
+	await _move_to(fighter.root, to, dist / WALK_PX_PER_SEC)
+	fighter.puppet.stop_walk()
+	if fighter.puppet.stepped.is_connected(on_step):
+		fighter.puppet.stepped.disconnect(on_step)
+	await fighter.puppet.settle_idle()
 	fighter.root.global_position = Vector2(to.x, _shelf_y())
 	fighter.visual.rotation_degrees = 0.0
-	fighter.puppet.set_pose(FighterPuppet.Pose.PROFILE)
 
 func _advance_line(line: Array[StageFighter], new_front: int, opponent: bool) -> void:
 	var rank := 0
@@ -299,12 +304,9 @@ func _set_queue_look(fighter: StageFighter, rank: int) -> void:
 func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, clash_l: FightPlaque, clash_r: FightPlaque) -> void:
 	if left == null or right == null:
 		return
-	left.puppet.set_attacking(event.left_slot)
-	right.puppet.set_attacking(event.right_slot)
-	var left_ghost := _make_ghost(left, event.left_slot)
-	var right_ghost := _make_ghost(right, event.right_slot)
-	var left_hit := CLASH_CENTER + Vector2(-78, 0)
-	var right_hit := CLASH_CENTER + Vector2(78, 0)
+	var stand_l := left.root.global_position
+	var stand_r := right.root.global_position
+	var mid := (stand_l + stand_r) * 0.5
 	clash_l.global_position = AssemblyLayout.FIGHT_CLASH + Vector2(-120, 0)
 	clash_r.global_position = AssemblyLayout.FIGHT_CLASH + Vector2(120, 0)
 	clash_l.set_fill(ThemeTokens.color_for_slot(event.left_slot))
@@ -318,93 +320,95 @@ func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, cl
 	clash_l.punch()
 	clash_r.punch()
 	GameAudio.whoosh()
-	var spin_l := create_tween()
-	spin_l.tween_property(left_ghost, "rotation_degrees", 220.0, 0.55)
-	var spin_r := create_tween()
-	spin_r.tween_property(right_ghost, "rotation_degrees", -220.0, 0.55)
-	await _jump_arc_scale_pair(left_ghost, left_hit, left_ghost.scale * 2.15, right_ghost, right_hit, right_ghost.scale * 2.15, 160.0, 0.55)
-	await get_tree().create_timer(0.18).timeout
-	_flash(Color(1, 0.85, 0.45, 0.22), 0.1)
-	_camera_punch(14.0, 0.22)
-	_hit_zoom(CLASH_CENTER, 0.32)
+	var done := [0]
+	_lunge_and_strike(left, stand_l.move_toward(mid, LUNGE_PX), event.left_slot, func() -> void: done[0] += 1)
+	_lunge_and_strike(right, stand_r.move_toward(mid, LUNGE_PX), event.right_slot, func() -> void: done[0] += 1)
+	while done[0] < 2:
+		await get_tree().process_frame
+	_flash(Color(1, 0.88, 0.55, 0.18), 0.08)
+	_camera_punch(10.0, 0.18)
+	_hit_spark(mid)
 	GameAudio.impact()
-	await _impact_freeze(0.12)
-	await get_tree().create_timer(0.42).timeout
+	await get_tree().create_timer(0.16).timeout
 	var left_dies := event.winning_side != CombatEvent.Side.LEFT
 	var right_dies := event.winning_side != CombatEvent.Side.RIGHT
 	if left_dies:
-		_kill_ghost(left, event.left_slot, left_ghost)
+		await _break_kit(left, event.left_slot)
 		clash_l.set_fill(Color(0.28, 0.08, 0.1, 0.95))
 		clash_l.set_label_color(ThemeTokens.X_RED)
 	else:
 		clash_l.set_text(str(event.left_leftover))
 		clash_l.punch()
+		left.puppet.set_tag_value(event.left_slot, event.left_leftover)
 	if right_dies:
-		_kill_ghost(right, event.right_slot, right_ghost)
+		await _break_kit(right, event.right_slot)
 		clash_r.set_fill(Color(0.28, 0.08, 0.1, 0.95))
 		clash_r.set_label_color(ThemeTokens.X_RED)
 	else:
 		clash_r.set_text(str(event.right_leftover))
 		clash_r.punch()
+		right.puppet.set_tag_value(event.right_slot, event.right_leftover)
 	if left_dies or right_dies:
 		GameAudio.impact()
-	await get_tree().create_timer(0.38).timeout
-	if not left_dies:
-		left.puppet.set_tag_value(event.left_slot, event.left_leftover)
-		await _return_ghost(left_ghost, left, event.left_slot)
-	if not right_dies:
-		right.puppet.set_tag_value(event.right_slot, event.right_leftover)
-		await _return_ghost(right_ghost, right, event.right_slot)
-	left.puppet.set_attacking(null)
-	right.puppet.set_attacking(null)
+	await get_tree().create_timer(0.12).timeout
+	var recover := [0]
+	_recover_stand(left, stand_l, func() -> void: recover[0] += 1)
+	_recover_stand(right, stand_r, func() -> void: recover[0] += 1)
+	while recover[0] < 2:
+		await get_tree().process_frame
 	clash_l.show_plaque(false)
 	clash_r.show_plaque(false)
 	GameAudio.part_place()
 
-func _make_ghost(fighter: StageFighter, slot: PartSlotType.Value) -> Node2D:
-	var ghost := Node2D.new()
-	ghost.z_index = 80
-	_stage.add_child(ghost)
-	ghost.global_position = fighter.puppet.kit_anchor(slot)
-	for visual in PartSlotType.visual_slots_for(slot):
-		var src := fighter.puppet.get_part_node(visual)
-		if src == null or src.texture == null:
-			continue
-		var copy := Sprite2D.new()
-		copy.texture = src.texture
-		copy.centered = true
-		ghost.add_child(copy)
-		copy.global_transform = src.global_transform
-		src.visible = false
-	return ghost
+func _lunge_and_strike(fighter: StageFighter, lunge: Vector2, slot: PartSlotType.Value, done: Callable) -> void:
+	lunge.y = _shelf_y()
+	var flags := {"move": false, "strike": false}
+	_finish_move(fighter, lunge, flags)
+	_finish_strike(fighter, slot, flags)
+	while not flags.move or not flags.strike:
+		await get_tree().process_frame
+	if done.is_valid():
+		done.call()
 
-func _return_ghost(ghost: Node2D, fighter: StageFighter, slot: PartSlotType.Value) -> void:
-	var dest := fighter.puppet.kit_anchor(slot)
-	await _jump_arc_scale(ghost, dest, Vector2.ONE, 110.0, 0.48)
-	for visual in PartSlotType.visual_slots_for(slot):
-		var src := fighter.puppet.get_part_node(visual)
-		if src != null and not fighter.puppet.is_visual_dead(visual):
-			src.visible = true
-	if is_instance_valid(ghost):
-		ghost.queue_free()
+func _finish_move(fighter: StageFighter, lunge: Vector2, flags: Dictionary) -> void:
+	await _move_to(fighter.root, lunge, 0.24)
+	flags.move = true
 
-func _kill_ghost(fighter: StageFighter, slot: PartSlotType.Value, ghost: Node2D) -> void:
-	fighter.puppet.set_part_dead(slot, true)
+func _finish_strike(fighter: StageFighter, slot: PartSlotType.Value, flags: Dictionary) -> void:
+	await fighter.puppet.play_strike(slot)
+	flags.strike = true
+
+func _recover_stand(fighter: StageFighter, stand: Vector2, done: Callable) -> void:
+	if fighter == null or fighter.down or not is_instance_valid(fighter.root):
+		if done.is_valid():
+			done.call()
+		return
+	stand.y = _shelf_y()
+	var flags := {"move": false, "settle": false}
+	_finish_move(fighter, stand, flags)
+	_finish_settle(fighter, flags)
+	while not flags.move or not flags.settle:
+		await get_tree().process_frame
+	if done.is_valid():
+		done.call()
+
+func _finish_settle(fighter: StageFighter, flags: Dictionary) -> void:
+	await fighter.puppet.settle_idle()
+	flags.settle = true
+
+func _break_kit(fighter: StageFighter, slot: PartSlotType.Value) -> void:
 	var mark := Label.new()
 	mark.text = "X"
-	mark.add_theme_font_size_override("font_size", 72)
+	mark.add_theme_font_size_override("font_size", 64)
 	mark.add_theme_color_override("font_color", ThemeTokens.X_RED)
 	mark.size = Vector2(80, 80)
 	mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_stage.add_child(mark)
-	mark.global_position = ghost.global_position - Vector2(40, 40)
-	var tween := create_tween()
-	tween.tween_property(ghost, "modulate:a", 0.0, 0.45)
-	tween.parallel().tween_property(ghost, "scale", ghost.scale * 0.4, 0.45)
-	tween.parallel().tween_property(mark, "modulate:a", 0.0, 0.45)
-	tween.tween_callback(func() -> void:
-		if is_instance_valid(ghost):
-			ghost.queue_free()
+	mark.global_position = fighter.puppet.kit_anchor(slot) - Vector2(40, 40)
+	await fighter.puppet.drop_kit(slot)
+	var fade := create_tween()
+	fade.tween_property(mark, "modulate:a", 0.0, 0.28)
+	fade.tween_callback(func() -> void:
 		if is_instance_valid(mark):
 			mark.queue_free()
 	)
@@ -520,41 +524,6 @@ func _jump_arc(node: Node2D, to: Vector2, height: float, duration: float) -> voi
 	).set_trans(Tween.TRANS_SINE)
 	await tween.finished
 
-func _jump_arc_scale(node: Node2D, to: Vector2, to_scale: Vector2, height: float, duration: float) -> void:
-	await _jump_arc_scale_pair(node, to, to_scale, null, Vector2.ZERO, Vector2.ONE, height, duration)
-
-func _jump_arc_scale_pair(
-	a: Node2D,
-	a_to: Vector2,
-	a_scale: Vector2,
-	b: Node2D,
-	b_to: Vector2,
-	b_scale: Vector2,
-	height: float,
-	duration: float
-) -> void:
-	var a_from := a.global_position
-	var b_from := b.global_position if b != null else Vector2.ZERO
-	var tween := create_tween()
-	tween.set_parallel(true)
-	tween.tween_method(
-		func(t: float) -> void:
-			var pa := a_from.lerp(a_to, t)
-			pa.y -= sin(t * PI) * height
-			a.global_position = pa
-			if b != null:
-				var pb := b_from.lerp(b_to, t)
-				pb.y -= sin(t * PI) * height
-				b.global_position = pb,
-		0.0,
-		1.0,
-		duration
-	).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(a, "scale", a_scale, duration)
-	if b != null:
-		tween.tween_property(b, "scale", b_scale, duration)
-	await tween.finished
-
 func _move_to(node: Node2D, to: Vector2, duration: float) -> void:
 	var tween := create_tween()
 	tween.tween_property(node, "global_position", to, duration).set_trans(Tween.TRANS_SINE)
@@ -595,6 +564,15 @@ func _dust(pos: Vector2) -> void:
 	_dust_fx.restart()
 	_dust_fx.emitting = true
 
+func _hit_spark(pos: Vector2) -> void:
+	_dust(pos)
+	_ensure_fx_pool()
+	if _spark_fx == null:
+		return
+	_spark_fx.global_position = pos
+	_spark_fx.restart()
+	_spark_fx.emitting = true
+
 func _ensure_fx_pool() -> void:
 	if _fx == null:
 		return
@@ -615,6 +593,23 @@ func _ensure_fx_pool() -> void:
 		_dust_fx.color = Color(0.85, 0.82, 0.74, 0.7)
 		_dust_fx.z_index = 50
 		_fx.add_child(_dust_fx)
+	if _spark_fx == null or not is_instance_valid(_spark_fx):
+		_spark_fx = CPUParticles2D.new()
+		_spark_fx.emitting = false
+		_spark_fx.one_shot = true
+		_spark_fx.explosiveness = 1.0
+		_spark_fx.amount = 14
+		_spark_fx.lifetime = 0.28
+		_spark_fx.direction = Vector2(0, -1)
+		_spark_fx.spread = 180.0
+		_spark_fx.initial_velocity_min = 70.0
+		_spark_fx.initial_velocity_max = 160.0
+		_spark_fx.gravity = Vector2(0, 240)
+		_spark_fx.scale_amount_min = 0.5
+		_spark_fx.scale_amount_max = 1.4
+		_spark_fx.color = Color(1.0, 0.86, 0.45, 0.9)
+		_spark_fx.z_index = 60
+		_fx.add_child(_spark_fx)
 	if _flash_poly == null or not is_instance_valid(_flash_poly):
 		_flash_poly = Polygon2D.new()
 		_flash_poly.polygon = PackedVector2Array([
@@ -623,22 +618,6 @@ func _ensure_fx_pool() -> void:
 		_flash_poly.z_index = 200
 		_flash_poly.visible = false
 		_fx.add_child(_flash_poly)
-
-func _hit_zoom(world: Vector2, duration: float) -> void:
-	if _camera == null:
-		return
-	var pull := (world - _camera.global_position) * 0.38
-	var tween := create_tween()
-	tween.set_ignore_time_scale(true)
-	tween.tween_property(_camera, "zoom", _camera_rest_zoom * 1.08, duration * 0.35)
-	tween.parallel().tween_property(_camera, "offset", _camera_rest_offset + pull, duration * 0.35)
-	tween.tween_property(_camera, "zoom", _camera_rest_zoom, duration * 0.65)
-	tween.parallel().tween_property(_camera, "offset", _camera_rest_offset, duration * 0.65)
-
-func _impact_freeze(seconds: float) -> void:
-	Engine.time_scale = 0.07
-	await get_tree().create_timer(seconds, true, false, true).timeout
-	Engine.time_scale = 1.0
 
 func _restore_camera() -> void:
 	if _camera == null:

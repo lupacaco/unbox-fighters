@@ -11,7 +11,7 @@
 | Loja | 5 caixas, pancadas douradas, atualizar, travar (caixas azuis), vender à direita, subir nível |
 | Montagem | 3 cartas (3º / 2º / 1º), misturar peças, carta incompleta vale |
 | Luta em fila | Choque parte contra parte, cópia das cartas, teto de 12 de dano por Freak |
-| Tela de luta | Os dois Freaks entram juntos; pulo, passos de marionete, placas, resto do choque, KO |
+| Tela de luta | Pulo, andar contínuo nos ímãs, choque no palco (soco/chute/cabeçada), placas, KO |
 | Fim de partida | **Você venceu!** / **Você saiu** e botão **NOVA PARTIDA** |
 | Abrir caixas | 1 clique, custa 1 pancada |
 | Arrastar e soltar | Peças nas cartas (troca no lugar ocupado); botão direito vende; Freak inteiro troca de carta ou vai para VENDER |

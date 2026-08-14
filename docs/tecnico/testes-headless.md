@@ -18,7 +18,7 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 | `verify_composite.gd` | Layout por ímãs (6 desenhos) e expansor 3→6 |
 | `verify_part_magnets.gd` | Cabeça só embaixo; tronco com 5 ímãs |
 | `verify_part_sizes.gd` | Sprites 200×200 e perfil nos 6 desenhos |
-| `verify_fight_line.gd` | Fila no mesmo chão; passos e soco de marionete |
+| `verify_fight_line.gd` | Fila no mesmo chão; perna e braço giram nos ímãs |
 | `verify_fight_poses.gd` | Personagem tem perfil; carta aceita os 3 kits |
 | `verify_fight_lock.gd` | Travamento da carta; soltar kit em lugar ocupado devolve o antigo |
 | `debug_parts.gd` | Carrega peça e checa visibilidade do sprite |

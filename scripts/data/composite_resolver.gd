@@ -81,6 +81,9 @@ static func resolve_slots(parts: Dictionary, textures: Dictionary = {}) -> Dicti
 		"legs_pos": positions[PartSlotType.Value.LEG_L],
 	}
 
+static func socket_of(part: PartDef, socket: String, shown: Texture2D) -> Vector2:
+	return _socket(part, socket, shown)
+
 static func _socket(part: PartDef, socket: String, shown: Texture2D) -> Vector2:
 	if part != null:
 		var magnet := part.socket_for(socket, shown)
