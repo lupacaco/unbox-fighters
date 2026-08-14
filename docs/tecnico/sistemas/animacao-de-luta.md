@@ -22,7 +22,7 @@ Na luta, quem cobre quem é fixo (não usa o Z da ferramenta de ímãs). Da fren
 Depois:
 
 4. Placas no topo: nomes, HP e **VS**.
-5. Cada choque: **só o kit vencedor** se prepara e **sai do corpo**. A peça perdedora **fica colada** no Freak. O kit voa até o ponto da peça alvo, a tela trava um instante, a câmera treme, faísca e anel de impacto. Aí a peça atingida é **arrancada e arremessada para fora da tela e some**. A que ganha **volta no corpo como um bumerangue**. Se empatar, nenhuma das duas ataca: as duas saem juntas. Placas com os números; o vencedor mostra o **resto**.
+5. Cada choque: **só o kit vencedor** se prepara e **sai do corpo**. A peça perdedora **fica colada** no Freak. O kit voa até o ponto da peça alvo, a tela trava um instante, a câmera treme, faísca e anel de impacto. Aí a peça atingida é **arrancada e arremessada para fora da tela e some**. A que ganha **volta no corpo como um bumerangue**. Se empatar, **os dois atacam juntos**, batem no centro com física (o jogo calcula o tombo de verdade) e **os dois voam para fora da tela**. Placas com os números; o vencedor mostra o **resto**.
 6. Freak inteiro cai → placa **KO**, inclina e sai. **Aí** o próximo daquele lado pula no palco e se aproxima. O que ganhou fica esperando.
 7. Fim: EMPATE ou nome + dano. Cartas voltam. Quem ainda está de pé pula de volta. Aí a prateleira é limpa.
 
@@ -48,4 +48,4 @@ Em `assets/characters/<nome>/`:
 - Frente: `<nome>_head-1.png`, `_body-1`, `_arm_l-1`, `_arm_r-1`, `_leg_l-1`, `_leg_r-1`
 - Perfil: os mesmos com `-2` (usado no palco e na caminhada)
 
-Não precisa de pose de golpe (`-3`). O ataque é o kit vencedor saindo do corpo e voando até a peça do adversário.
+Não precisa de pose de golpe (`-3`). O ataque é o kit vencedor saindo do corpo e voando até a peça do adversário. No empate os dois kits voam até o centro.

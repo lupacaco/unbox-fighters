@@ -72,12 +72,12 @@ Exemplo: cabeça 4 sozinha vira **2**. Completar as 3 ainda vale o número cheio
 Cada choque sorteia **um kit vivo de cada lado**. Pode ser cabeça contra pernas, tronco contra cabeça, etc. Não segue ordem fixa. Pula o que estiver vazio.
 
 - Se A > B: só A ataca. B fica no corpo até levar o golpe e voar para fora. A fica A−B e pode ser sorteada de novo.
-- Se empatar: os dois kits morrem (os dois saem do corpo juntos).
+- Se empatar: os dois kits morrem. Na tela os dois atacam juntos, batem no centro e voam para fora.
 - Quando o Freak inteiro cai, entra o próximo da fila.
 
 Dano no HP do perdedor = soma do que sobrou em cada Freak vivo do vencedor, **no máximo 12 por Freak**.
 
-Na tela: entra **um contra um**. O 1º de cada lado **pula** na prateleira e **anda até ficar afastado** do outro. Só quando um cai inteiro (**KO**) o próximo daquele lado pula e se aproxima. No choque, **só o kit que vai ganhar** sai do corpo e voa até a peça do outro. A que perde **fica colada** até o impacto; aí **voa para fora da tela e some**. A que ganha volta no corpo como bumerangue. As placas mostram os números. As cartas **sobem e somem** durante a batalha e voltam depois.
+Na tela: entra **um contra um**. O 1º de cada lado **pula** na prateleira e **anda até ficar afastado** do outro. Só quando um cai inteiro (**KO**) o próximo daquele lado pula e se aproxima. No choque, **só o kit que vai ganhar** sai do corpo e voa até a peça do outro. A que perde **fica colada** até o impacto; aí **voa para fora da tela e some**. A que ganha volta no corpo como bumerangue. Se os números forem iguais, **os dois atacam**, batem no centro e os dois voam para fora. As placas mostram os números. As cartas **sobem e somem** durante a batalha e voltam depois.
 
 ## Controles
 

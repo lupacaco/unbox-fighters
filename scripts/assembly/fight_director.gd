@@ -369,26 +369,93 @@ func _play_winning_throw(
 		return defender.puppet.kit_anchor(def_slot)
 	bolt.launch_toward(dest.call(), THROW_SEC)
 	await _wait_kit_reaches(bolt, dest, 78.0)
-	bolt.linear_velocity = Vector2.ZERO
-	bolt.angular_velocity = 0.0
-	bolt.freeze = true
-	bolt.flash_hit()
+	_freeze_hit(bolt)
 	await _clash_impact(attacker, defender, event, bolt.global_position)
 	var leftover := event.left_leftover if not attacker.face_left else event.right_leftover
 	_fling_victim(defender, def_slot)
 	await _return_winner(bolt, attacker, atk_slot, leftover)
 
 func _play_tie_clash(left: StageFighter, right: StageFighter, event: CombatEvent) -> void:
-	Feel.punch(left.visual, Vector2(1.1, 0.88), Vector2.ONE)
-	Feel.punch(right.visual, Vector2(1.1, 0.88), Vector2.ONE)
-	await get_tree().create_timer(0.18).timeout
-	var mid := (left.puppet.kit_anchor(event.left_slot) + right.puppet.kit_anchor(event.right_slot)) * 0.5
-	await _clash_impact(left, right, event, mid)
-	var finished := [0]
-	_fling_victim(left, event.left_slot, func() -> void: finished[0] += 1)
-	_fling_victim(right, event.right_slot, func() -> void: finished[0] += 1)
-	while finished[0] < 2:
+	Feel.punch(left.visual, Vector2(0.9, 1.1), Vector2.ONE)
+	Feel.punch(right.visual, Vector2(0.9, 1.1), Vector2.ONE)
+	await _windup_pair(left, event.left_slot, right, event.right_slot)
+	left.puppet.snap_rest()
+	right.puppet.snap_rest()
+	var meet := _clash_meet(left, event.left_slot, right, event.right_slot)
+	var kit_l := _spawn_thrown_kit(left, event.left_slot)
+	var kit_r := _spawn_thrown_kit(right, event.right_slot)
+	left.puppet.play_throw_recoil(event.left_slot)
+	right.puppet.play_throw_recoil(event.right_slot)
+	kit_l.launch_toward(meet, THROW_SEC)
+	kit_r.launch_toward(meet, THROW_SEC)
+	await _wait_kits_collide(kit_l, kit_r, meet)
+	_freeze_hit(kit_l)
+	_freeze_hit(kit_r)
+	var impact := meet
+	if is_instance_valid(kit_l) and is_instance_valid(kit_r):
+		impact = (kit_l.global_position + kit_r.global_position) * 0.5
+	await _clash_impact(left, right, event, impact)
+	_wreck_kit(kit_l, left, event.left_slot)
+	_wreck_kit(kit_r, right, event.right_slot)
+	await get_tree().create_timer(0.28).timeout
+
+func _windup_pair(
+	left: StageFighter,
+	left_slot: PartSlotType.Value,
+	right: StageFighter,
+	right_slot: PartSlotType.Value
+) -> void:
+	var done := [0]
+	_windup_one(left, left_slot, func() -> void: done[0] += 1)
+	_windup_one(right, right_slot, func() -> void: done[0] += 1)
+	while done[0] < 2:
 		await get_tree().process_frame
+
+func _windup_one(fighter: StageFighter, slot: PartSlotType.Value, done: Callable) -> void:
+	await fighter.puppet.play_throw_windup(slot)
+	if done.is_valid():
+		done.call()
+
+func _clash_meet(
+	left: StageFighter,
+	left_slot: PartSlotType.Value,
+	right: StageFighter,
+	right_slot: PartSlotType.Value
+) -> Vector2:
+	var left_at := left.puppet.kit_anchor(left_slot)
+	var right_at := right.puppet.kit_anchor(right_slot)
+	return Vector2(_tray.global_position.x, (left_at.y + right_at.y) * 0.5)
+
+func _wait_kits_collide(kit_l: KitThrow, kit_r: KitThrow, meet: Vector2) -> void:
+	var hit := [false]
+	var on_hit := func() -> void:
+		hit[0] = true
+	if is_instance_valid(kit_l):
+		kit_l.collided.connect(on_hit)
+	if is_instance_valid(kit_r):
+		kit_r.collided.connect(on_hit)
+	var waited := 0.0
+	while not hit[0] and waited < THROW_SEC + 0.4:
+		if not is_instance_valid(kit_l) or not is_instance_valid(kit_r):
+			break
+		if kit_l.global_position.distance_to(kit_r.global_position) <= 118.0:
+			break
+		if kit_l.global_position.distance_to(meet) < 40.0 and kit_r.global_position.distance_to(meet) < 40.0:
+			break
+		await get_tree().physics_frame
+		waited += get_physics_process_delta_time()
+	if is_instance_valid(kit_l) and kit_l.collided.is_connected(on_hit):
+		kit_l.collided.disconnect(on_hit)
+	if is_instance_valid(kit_r) and kit_r.collided.is_connected(on_hit):
+		kit_r.collided.disconnect(on_hit)
+
+func _freeze_hit(kit: KitThrow) -> void:
+	if not is_instance_valid(kit):
+		return
+	kit.linear_velocity = Vector2.ZERO
+	kit.angular_velocity = 0.0
+	kit.freeze = true
+	kit.flash_hit()
 
 func _wait_kit_reaches(kit: KitThrow, dest: Callable, radius: float) -> void:
 	var waited := 0.0
@@ -408,18 +475,16 @@ func _spawn_thrown_kit(fighter: StageFighter, slot: PartSlotType.Value) -> KitTh
 	fighter.puppet.detach_kit(slot)
 	return kit
 
-func _fling_victim(fighter: StageFighter, slot: PartSlotType.Value, done: Callable = Callable()) -> void:
+func _fling_victim(fighter: StageFighter, slot: PartSlotType.Value) -> void:
 	var kit := _spawn_thrown_kit(fighter, slot)
-	var away := WRECK_IMPULSE if fighter.face_left else -WRECK_IMPULSE
-	kit.begin_wreck(away)
-	kit.fly_off_and_free()
+	_wreck_kit(kit, fighter, slot)
+
+func _wreck_kit(kit: KitThrow, fighter: StageFighter, slot: PartSlotType.Value) -> void:
+	if is_instance_valid(kit):
+		var away := WRECK_IMPULSE if fighter.face_left else -WRECK_IMPULSE
+		kit.begin_wreck(away)
+		kit.fly_off_and_free()
 	fighter.puppet.set_part_dead(slot, true)
-	get_tree().create_timer(0.28).timeout.connect(
-		func() -> void:
-			if done.is_valid():
-				done.call(),
-		CONNECT_ONE_SHOT
-	)
 
 func _return_winner(
 	kit: KitThrow,
