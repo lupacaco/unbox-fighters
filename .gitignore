@@ -44,3 +44,5 @@ credentials.json
 # Python
 __pycache__/
 *.pyc
+tools/_sfx_cache/
+tools/_sfx_probe/

@@ -11,6 +11,7 @@ Scripts fora do Godot que preparam imagens dos personagens.
 | `slice_character_sheet.py` | Corta uma folha 6+6 em 12 PNG 200×200 e, se pedido, cria as fichas |
 | `normalize_parts_300.py` | Script antigo (canvas 300×200). Não usar nos sets novos |
 | `remove_backgrounds.py` | Remove fundo xadrez / preto de artes de personagem |
+| `fetch_sfx.py` | Baixa e recorta os efeitos sonoros gravados (Mixkit) |
 
 ## Convenção de arquivos
 

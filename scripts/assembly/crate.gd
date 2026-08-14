@@ -77,8 +77,7 @@ func _on_clicked() -> void:
 		GameAudio.part_reject()
 		return
 	HammerCursor.strike()
-	GameAudio.hammer_hit()
-	GameAudio.crate_break()
+	GameAudio.open_crate()
 	_finish_open()
 
 func _clear_hover_cursor() -> void:

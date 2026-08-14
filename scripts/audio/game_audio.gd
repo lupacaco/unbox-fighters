@@ -24,6 +24,11 @@ static func crate_break() -> void:
 	if s:
 		s.call("crate_break")
 
+static func open_crate() -> void:
+	var s := _sfx()
+	if s:
+		s.call("open_crate")
+
 static func part_pickup() -> void:
 	var s := _sfx()
 	if s:
