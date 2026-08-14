@@ -64,13 +64,17 @@ func _build_hud() -> void:
 
 func _setup_tray_visual() -> void:
 	_tray.position = AssemblyLayout.TRAY
-	var shelf_tex: Texture2D = load("res://assets/ui/shelf_premium.png")
-	_shelf.texture = shelf_tex
+	var belt: Texture2D = load(AssemblyLayout.BELT_TEX)
+	_shelf.texture = belt
 	_shelf.centered = true
-	_shelf.position = Vector2(0, 58)
-	var tex_size := shelf_tex.get_size()
-	_shelf.scale = Vector2(1700.0 / tex_size.x, 170.0 / tex_size.y)
-	_shelf.modulate = Color(0.9, 0.92, 0.95, 1)
+	_shelf.modulate = Color.WHITE
+	_shelf.z_index = -1
+	var tex_size := belt.get_size()
+	var fit := AssemblyLayout.WIDTH / maxf(tex_size.x, 1.0)
+	_shelf.scale = Vector2(fit, fit)
+	var display_h := tex_size.y * fit
+	var world_center_y := AssemblyLayout.HEIGHT - display_h * 0.5
+	_shelf.position = Vector2(0.0, world_center_y - _tray.position.y)
 
 func _spawn_slots() -> void:
 	var ranks := [3, 2, 1]

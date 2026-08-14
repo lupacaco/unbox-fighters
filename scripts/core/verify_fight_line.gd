@@ -3,6 +3,7 @@ extends SceneTree
 ## Every fighter in the queue uses the same floor Y and the same scale.
 
 const FightDir := preload("res://scripts/assembly/fight_director.gd")
+const Spring := preload("res://scripts/data/spring_base.gd")
 
 func _init() -> void:
 	call_deferred("_run")
@@ -12,6 +13,10 @@ func _run() -> void:
 	tray.position = AssemblyLayout.TRAY
 	root.add_child(tray)
 	var floor_y := tray.global_position.y + FightDir.SHELF_Y
+	assert(
+		is_equal_approx(floor_y + Spring.GROUND_Y, AssemblyLayout.belt_roller_y()),
+		"Fight floor should land on the conveyor rollers"
+	)
 
 	var leao: CharacterDef = load("res://data/parts/leao_character.tres")
 	var ys: Array[float] = []

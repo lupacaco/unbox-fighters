@@ -35,7 +35,8 @@ Pasta `assets/ui/`:
 
 - `bg_premium.png` — fundo
 - `frame_premium.png` — moldura da carta
-- `shelf_premium.png` — prateleira (vira palco na luta)
+- `esteira-01.png` — esteira no rodapé (palco da luta, 1920 de largura)
+- `shelf_premium.png` — prateleira antiga (não usada na tela)
 
 As peças dos Freaks são arquivos **200×200**. No jogo todas ficam no mesmo tamanho.
 

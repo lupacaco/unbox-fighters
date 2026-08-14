@@ -17,11 +17,11 @@ Como o jogador move peças (e Freaks inteiros) até as cartas ou para vender.
 2. Enquanto o mouse se move, a peça segue o cursor
 3. O serviço procura uma carta **compatível** sob o cursor. A **carta inteira** acende ouro e cresce um pouco (sem retângulo vermelho).
 4. A peça inclinada segue o mouse, fica maior, e a sombra alonga. Em cima da carta ela puxa um pouco mais.
-5. Passar por **VENDER** (direita da prateleira) deixa a área dourada e maior
+5. Passar por **VENDER** (direita da esteira) deixa a área dourada e maior
 6. Ao soltar:
    - Na carta que aceita → encaixa
    - Em **VENDER** → some e você ganha 1 pancada
-   - Senão → volta para a prateleira
+   - Senão → volta para a esteira
 
 ## Fluxo do Freak inteiro
 
@@ -34,7 +34,7 @@ Arrastar pelo rótulo **3º / 2º / 1º**:
 
 - A peça não pode ser nula
 - Qualquer peça do tipo certo serve em qualquer carta
-- Se o encaixe **já tem** peça, a nova entra e a antiga volta para a prateleira
+   - Se o encaixe **já tem** peça, a nova entra e a antiga volta para a esteira
 - Durante a luta a carta fica travada
 
 ## Sinais úteis
@@ -46,4 +46,4 @@ Arrastar pelo rótulo **3º / 2º / 1º**:
 
 Ação configurada no projeto: `pointer_press` (botão esquerdo do mouse).  
 O término do arraste também observa soltar o botão esquerdo.  
-O **botão direito** vende a peça embaixo do cursor (na prateleira ou na carta).
+O **botão direito** vende a peça embaixo do cursor (na esteira ou na carta).

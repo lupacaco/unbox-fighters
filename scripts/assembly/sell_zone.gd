@@ -1,7 +1,7 @@
 class_name SellZone
 extends Area2D
 
-## Drop target on the right of the shelf. Gold flash when a piece is over it.
+## Drop target on the right of the conveyor. Gold flash when a piece is over it.
 
 const REST := Color(0.18, 0.12, 0.14, 0.92)
 const HOT := Color(0.96, 0.78, 0.36, 0.55)

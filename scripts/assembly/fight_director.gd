@@ -1,15 +1,15 @@
 class_name FightDirector
 extends Node
 
-## Plays a simulated queue fight on the shelf: one pair at a time, walk in, clash, KO.
+## Plays a simulated queue fight on the conveyor: one pair at a time, walk in, clash, KO.
 
 const KitThrow := preload("res://scripts/assembly/thrown_kit.gd")
 
 signal finished
 
 ## All fighters share this one floor line (same Y). Never shift it per freak.
-## Chosen so the white disc of the spring sits on the shelf's top edge, not above it.
-const SHELF_Y := -66.0
+## Spring origin so the disc sits on the conveyor rollers, not the red panel.
+const SHELF_Y := -130.0
 const LAND_X := 470.0
 const DUEL_X := 305.0
 const ENTRY_HOPS := 2

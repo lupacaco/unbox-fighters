@@ -16,7 +16,7 @@ Você abre caixas, monta Freaks com **4 kits** (cabeça, tronco, braço esquerdo
 
 ## Tom visual
 
-Arena escura, prateleira como palco, tags coloridas com os números, spotlight no choque do centro.
+Arena escura, esteira no rodapé como palco, tags coloridas com os números, spotlight no choque do centro.
 
 ## Conteúdo atual
 

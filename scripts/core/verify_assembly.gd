@@ -25,9 +25,22 @@ func _run() -> void:
 		push_error("VERIFY_FAIL expected 5 shop crates, got %d" % crates)
 		quit(1)
 		return
+	var belt := scene.get_node_or_null("Tray/Shelf") as Sprite2D
+	if belt == null or belt.texture == null or not String(belt.texture.resource_path).ends_with("esteira-01.png"):
+		push_error("VERIFY_FAIL tray should show the conveyor belt")
+		quit(1)
+		return
+	if belt.global_position.y + belt.texture.get_size().y * belt.scale.y * 0.5 < AssemblyLayout.HEIGHT - 2.0:
+		push_error("VERIFY_FAIL belt should sit on the bottom of the screen")
+		quit(1)
+		return
+	if absf(belt.texture.get_size().x * belt.scale.x - AssemblyLayout.WIDTH) > 2.0:
+		push_error("VERIFY_FAIL belt should span the full screen width")
+		quit(1)
+		return
 	var sell := scene.get_node_or_null("Tray/SellZone")
 	if sell == null or sell.position.x < 0.0:
-		push_error("VERIFY_FAIL sell zone should sit on the right of the shelf")
+		push_error("VERIFY_FAIL sell zone should sit on the right of the belt")
 		quit(1)
 		return
 	print("VERIFY_OK slots=", slots, " crates=", crates)

@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://b7sgdo30ttuoq" path="res://scenes/assembly/CharacterSlot.tscn" id="4"]
 [ext_resource type="PackedScene" uid="uid://bybfdwqe4xpfp" path="res://scenes/assembly/Crate.tscn" id="5"]
 [ext_resource type="Texture2D" uid="uid://dggow7pil84dp" path="res://assets/ui/bg_premium.png" id="6"]
-[ext_resource type="Texture2D" uid="uid://cluxunvn3e03k" path="res://assets/ui/shelf_premium.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://b7wpdxqumblk1" path="res://assets/ui/esteira-01.png" id="7"]
 
 [node name="Assembly" type="Node2D" unique_id=1114481662]
 script = ExtResource("1")
@@ -50,26 +50,24 @@ position = Vector2(1540, 400)
 position = Vector2(960, 920)
 
 [node name="Shelf" type="Sprite2D" parent="Tray" unique_id=315548021]
-modulate = Color(0.9, 0.92, 0.95, 1)
 z_index = -1
-position = Vector2(0, 58)
-scale = Vector2(1.1525424, 0.7391304)
+position = Vector2(0, 68)
 texture = ExtResource("7")
 
 [node name="Crate0" parent="Tray" unique_id=271263522 instance=ExtResource("5")]
-position = Vector2(-660, -58)
+position = Vector2(-660, -110)
 
 [node name="Crate1" parent="Tray" unique_id=1055760682 instance=ExtResource("5")]
-position = Vector2(-495, -58)
+position = Vector2(-495, -110)
 
 [node name="Crate2" parent="Tray" unique_id=408890494 instance=ExtResource("5")]
-position = Vector2(-330, -58)
+position = Vector2(-330, -110)
 
 [node name="Crate3" parent="Tray" unique_id=897639340 instance=ExtResource("5")]
-position = Vector2(-165, -58)
+position = Vector2(-165, -110)
 
 [node name="Crate4" parent="Tray" unique_id=1334653743 instance=ExtResource("5")]
-position = Vector2(0, -58)
+position = Vector2(0, -110)
 
 [node name="FxLayer" type="Node2D" parent="." unique_id=1892017742]
 z_index = 50
