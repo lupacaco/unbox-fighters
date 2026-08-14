@@ -1,7 +1,8 @@
 class_name PartKit
 extends RefCounted
 
-## Turns a shop kit (head / torso / legs) into the 6 drawings used on screen.
+## Turns a shop kit (head / torso) into the drawings used on screen.
+## Legs stay in the files for the magnet editor; the game draws a spring instead.
 
 static func character_for(part: PartDef) -> CharacterDef:
 	if part == null:

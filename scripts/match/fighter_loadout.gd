@@ -1,7 +1,7 @@
 class_name FighterLoadout
 extends RefCounted
 
-## One card: up to three shop kits. Missing kits are allowed.
+## One card: head + torso kits on a spring base. Missing kits are allowed.
 
 var head: PartDef
 var body: PartDef

@@ -39,11 +39,11 @@ static func write_defs(set_id: String, display_name: String, values: Array) -> S
 		return "O id interno precisa ser minúsculo, sem acento. Exemplo: leao."
 	if display_name.strip_edges().is_empty():
 		display_name = set_id.capitalize()
-	if values.size() < 3:
-		return "Faltam os 3 números da loja (cabeça, tronco, pernas)."
+	if values.size() < 2:
+		return "Faltam os 2 números da loja (cabeça, tronco)."
 
 	var visual_values: Array = _visual_values(values)
-	var legs_value := int(values[2]) if values.size() == 3 else int(values[4])
+	var legs_value := 0
 	var parts: Array[PartDef] = []
 	for i in SLOT_NAMES.size():
 		var slot_name: String = SLOT_NAMES[i]
@@ -84,7 +84,9 @@ static func write_defs(set_id: String, display_name: String, values: Array) -> S
 static func _visual_values(values: Array) -> Array:
 	if values.size() >= 6:
 		return values
-	return [int(values[0]), int(values[1]), int(values[1]), int(values[1]), int(values[2]), int(values[2])]
+	if values.size() >= 3:
+		return [int(values[0]), int(values[1]), int(values[1]), int(values[1]), int(values[2]), int(values[2])]
+	return [int(values[0]), int(values[1]), int(values[1]), int(values[1]), 0, 0]
 
 static func _make_legs_kit(set_id: String, display_name: String, combat_value: int) -> PartDef:
 	var part := PartDef.new()

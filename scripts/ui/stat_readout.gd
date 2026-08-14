@@ -12,23 +12,19 @@ func _ready() -> void:
 func set_display_name(value: String) -> void:
 	_name_label.text = value
 
-func set_stats(brain: int, power: int, speed: int) -> void:
-	set_breakdown(brain, power, speed, brain + power + speed)
-
 func set_total(total: int) -> void:
-	set_breakdown(0, 0, 0, total)
+	set_breakdown(0, 0, total)
 
-func set_breakdown(threat: int, might: int, agility: int, power: int) -> void:
-	_total_label.text = "Cabeça %d   Tronco %d   Pernas %d   ·  %d" % [threat, might, agility, power]
+func set_breakdown(threat: int, might: int, power: int) -> void:
+	_total_label.text = "Cabeça %d   Tronco %d   ·  %d" % [threat, might, power]
 
 func set_from_loadout(loadout: FighterLoadout) -> void:
 	if loadout == null:
-		set_breakdown(0, 0, 0, 0)
+		set_breakdown(0, 0, 0)
 		return
 	set_breakdown(
 		loadout.combat_value_of(PartSlotType.Value.HEAD),
 		loadout.combat_value_of(PartSlotType.Value.BODY),
-		loadout.combat_value_of(PartSlotType.Value.LEGS),
 		loadout.total_power()
 	)
 

@@ -10,7 +10,7 @@ unbox-fighters/
 ├── docs/                  # Esta documentação
 ├── assets/                # Arte (imagens)
 │   ├── boxes/             # Sprites da caixa (fechada / quebrada)
-│   ├── objects/           # Objetos de UI (martelo do cursor)
+│   ├── objects/           # Martelo do cursor e base-mola
 │   ├── audio/sfx/         # Efeitos sonoros (.wav)
 │   ├── characters/leao/
 │   ├── characters/medico/

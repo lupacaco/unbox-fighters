@@ -11,10 +11,10 @@ enum Pose { FRONT, PROFILE, STRIDE }
 const TAG_OFFSETS := {
 	PartSlotType.Value.HEAD: Vector2(78, -110),
 	PartSlotType.Value.BODY: Vector2(78, -10),
-	PartSlotType.Value.LEGS: Vector2(78, 90),
 }
-const WALK_HZ := 2.15
-const LEG_SWING := 0.42
+const _Spring := preload("res://scripts/data/spring_base.gd")
+const HOP_HZ := 1.45
+const HOP_HEIGHT := 54.0
 const ARM_SWING := 0.28
 const IDLE_HZ := 1.35
 
@@ -26,13 +26,17 @@ var _tags: Dictionary = {}
 var _sprites: Dictionary = {}
 var _joints: Dictionary = {}
 var _body_root: Node2D
+var _spring: Sprite2D
 var _body_rest := CompositeResolver.BODY_ORIGIN
+var _spring_rest := Vector2.ZERO
 var _walking: bool = false
 var _striking: bool = false
 var _frozen: bool = false
 var _gait: float = 0.0
 var _life: float = 0.0
-var _prev_gait_sin: float = 0.0
+var _hop_y: float = 0.0
+var _spring_pressed: bool = true
+var _was_airborne: bool = false
 var _motion: Tween
 
 func _ready() -> void:
@@ -64,6 +68,11 @@ func _ready() -> void:
 		tag.position = TAG_OFFSETS[slot]
 		add_child(tag)
 		_tags[slot] = tag
+	_spring = Sprite2D.new()
+	_spring.name = "Spring"
+	_spring.centered = true
+	_spring.z_index = _Spring.Z_INDEX
+	add_child(_spring)
 	set_process(true)
 
 func _process(delta: float) -> void:
@@ -71,12 +80,8 @@ func _process(delta: float) -> void:
 	if _striking or _frozen:
 		return
 	if _walking:
-		_gait += delta * WALK_HZ * TAU
-		var s := sin(_gait)
-		_apply_gait(_gait)
-		if (_prev_gait_sin <= 0.0 and s > 0.0) or (_prev_gait_sin >= 0.0 and s < 0.0):
-			stepped.emit()
-		_prev_gait_sin = s
+		_gait += delta * HOP_HZ * TAU
+		_apply_hop(_gait)
 	else:
 		_apply_idle()
 
@@ -87,6 +92,9 @@ func setup_loadout(loadout: FighterLoadout, face_left: bool) -> void:
 	_striking = false
 	_frozen = false
 	_gait = 0.0
+	_hop_y = 0.0
+	_spring_pressed = true
+	_was_airborne = false
 	_dead.clear()
 	_detached.clear()
 	scale.x = -absf(scale.x) if face_left else absf(scale.x)
@@ -103,7 +111,7 @@ func set_pose(pose: Pose) -> void:
 		_walking = false
 	_layout_rig()
 	if pose == Pose.STRIDE:
-		_apply_gait(_gait)
+		_apply_hop(_gait)
 
 func start_walk() -> void:
 	_pose = Pose.PROFILE
@@ -128,12 +136,13 @@ func settle_idle() -> void:
 	await _tween_rest(0.22)
 	_striking = false
 
-func set_stride_frame(left_forward: bool) -> void:
+func set_stride_frame(_left_forward: bool) -> void:
 	_pose = Pose.PROFILE
 	_walking = false
 	_striking = true
+	_gait = 0.5 * TAU
 	_layout_rig()
-	_apply_gait(0.25 * TAU if left_forward else 0.75 * TAU)
+	_apply_hop(_gait)
 
 func set_attacking(slot: Variant) -> void:
 	_striking = slot != null
@@ -271,6 +280,9 @@ func feet_position() -> Vector2:
 
 func visual_bottom_y() -> float:
 	var lowest := -INF
+	if _spring != null and _spring.visible and _spring.texture != null:
+		var half_h := float(_spring.texture.get_height()) * absf(_spring.global_scale.y) * 0.5
+		lowest = maxf(lowest, _spring.global_position.y + half_h)
 	for slot in _sprites.keys():
 		var sprite: Sprite2D = _sprites[slot]
 		if sprite == null or not sprite.visible or sprite.texture == null:
@@ -281,11 +293,13 @@ func visual_bottom_y() -> float:
 		return global_position.y + CompositeResolver.FEET_DROP_PX
 	return lowest
 
+func is_spring_pressed() -> bool:
+	return _spring_pressed
+
+func hop_lift() -> float:
+	return -_hop_y
+
 func get_part_node(slot: PartSlotType.Value) -> Sprite2D:
-	if PartSlotType.is_shop_slot(slot) and slot != PartSlotType.Value.HEAD and slot != PartSlotType.Value.BODY:
-		var visuals := PartSlotType.visual_slots_for(slot)
-		if not visuals.is_empty():
-			return _sprites.get(visuals[0]) as Sprite2D
 	return _sprites.get(slot) as Sprite2D
 
 func joint_rotation(slot: PartSlotType.Value) -> float:
@@ -332,47 +346,60 @@ func _layout_rig() -> void:
 	var textures := {}
 	for slot in PartSlotType.visual_slots():
 		textures[slot] = _texture_for(slot)
-	var plan := CompositeResolver.resolve_slots(_parts, textures)
+	# Hop uses the pressed sit height so the body launches off the sphere.
+	# The spring texture still follows _spring_pressed (loose in the air).
+	var pose_pressed := true
+	if not _walking and not _striking:
+		pose_pressed = _has_visible_part()
+		_spring_pressed = pose_pressed
+	var plan := CompositeResolver.resolve_slots(_parts, textures, pose_pressed)
 	var positions: Dictionary = plan.get("positions", {})
 	var part_scale := CompositeResolver.display_scale()
-	_body_rest = positions.get(PartSlotType.Value.BODY, CompositeResolver.BODY_ORIGIN)
-	_body_root.position = _body_rest
-	if not _walking and not _striking:
-		_body_root.rotation = 0.0
 	var body: PartDef = _parts.get(PartSlotType.Value.BODY)
 	var body_tex: Texture2D = textures.get(PartSlotType.Value.BODY)
+	var head_tex: Texture2D = textures.get(PartSlotType.Value.HEAD)
+	if body_tex != null:
+		_body_rest = positions.get(PartSlotType.Value.BODY, CompositeResolver.BODY_ORIGIN)
+	else:
+		_body_rest = Vector2.ZERO
+	_spring_rest = _Spring.center_on_ground(_spring_pressed)
+	_place_spring()
+	_apply_hop_offset()
+	if not _walking and not _striking:
+		_body_root.rotation = 0.0
 	_place_sprite(PartSlotType.Value.BODY, _sprites[PartSlotType.Value.BODY], body_tex, Vector2.ZERO, body)
 	_sprites[PartSlotType.Value.BODY].z_index = PartSlotType.fight_z_index(PartSlotType.Value.BODY)
-	_place_joint(
-		PartSlotType.Value.HEAD,
-		_socket(body, "neck", body_tex) * part_scale,
-		textures.get(PartSlotType.Value.HEAD),
-		_socket(_part_def(PartSlotType.Value.HEAD), "down", textures.get(PartSlotType.Value.HEAD)) * part_scale
-	)
-	_place_joint(
-		PartSlotType.Value.ARM_L,
-		_socket(body, "shoulder_l", body_tex) * part_scale,
-		textures.get(PartSlotType.Value.ARM_L),
-		_socket(_part_def(PartSlotType.Value.ARM_L), "up", textures.get(PartSlotType.Value.ARM_L)) * part_scale
-	)
-	_place_joint(
-		PartSlotType.Value.ARM_R,
-		_socket(body, "shoulder_r", body_tex) * part_scale,
-		textures.get(PartSlotType.Value.ARM_R),
-		_socket(_part_def(PartSlotType.Value.ARM_R), "up", textures.get(PartSlotType.Value.ARM_R)) * part_scale
-	)
-	_place_joint(
-		PartSlotType.Value.LEG_L,
-		_socket(body, "hip_l", body_tex) * part_scale,
-		textures.get(PartSlotType.Value.LEG_L),
-		_socket(_part_def(PartSlotType.Value.LEG_L), "up", textures.get(PartSlotType.Value.LEG_L)) * part_scale
-	)
-	_place_joint(
-		PartSlotType.Value.LEG_R,
-		_socket(body, "hip_r", body_tex) * part_scale,
-		textures.get(PartSlotType.Value.LEG_R),
-		_socket(_part_def(PartSlotType.Value.LEG_R), "up", textures.get(PartSlotType.Value.LEG_R)) * part_scale
-	)
+	if body_tex != null:
+		_place_joint(
+			PartSlotType.Value.HEAD,
+			_socket(body, "neck", body_tex) * part_scale,
+			head_tex,
+			_socket(_part_def(PartSlotType.Value.HEAD), "down", head_tex) * part_scale
+		)
+		_place_joint(
+			PartSlotType.Value.ARM_L,
+			_socket(body, "shoulder_l", body_tex) * part_scale,
+			textures.get(PartSlotType.Value.ARM_L),
+			_socket(_part_def(PartSlotType.Value.ARM_L), "up", textures.get(PartSlotType.Value.ARM_L)) * part_scale
+		)
+		_place_joint(
+			PartSlotType.Value.ARM_R,
+			_socket(body, "shoulder_r", body_tex) * part_scale,
+			textures.get(PartSlotType.Value.ARM_R),
+			_socket(_part_def(PartSlotType.Value.ARM_R), "up", textures.get(PartSlotType.Value.ARM_R)) * part_scale
+		)
+	else:
+		var magnet := _Spring.magnet_world(pose_pressed)
+		_place_joint(
+			PartSlotType.Value.HEAD,
+			magnet,
+			head_tex,
+			_socket(_part_def(PartSlotType.Value.HEAD), "down", head_tex) * part_scale
+		)
+		_place_joint(PartSlotType.Value.ARM_L, Vector2.ZERO, null, Vector2.ZERO)
+		_place_joint(PartSlotType.Value.ARM_R, Vector2.ZERO, null, Vector2.ZERO)
+	_place_joint(PartSlotType.Value.LEG_L, Vector2.ZERO, null, Vector2.ZERO)
+	_place_joint(PartSlotType.Value.LEG_R, Vector2.ZERO, null, Vector2.ZERO)
 
 func _place_joint(slot: PartSlotType.Value, joint_pos: Vector2, texture: Texture2D, magnet: Vector2) -> void:
 	var joint: Node2D = _joints.get(slot)
@@ -405,19 +432,59 @@ func _place_sprite(slot: PartSlotType.Value, sprite: Sprite2D, texture: Texture2
 func _socket(part: PartDef, socket: String, shown: Texture2D) -> Vector2:
 	return CompositeResolver.socket_of(part, socket, shown)
 
-func _apply_gait(phase: float) -> void:
+func _has_visible_part() -> bool:
+	for slot in PartSlotType.visual_slots():
+		if slot == PartSlotType.Value.LEG_L or slot == PartSlotType.Value.LEG_R:
+			continue
+		if _texture_for(slot) != null:
+			return true
+	return false
+
+func _place_spring() -> void:
+	if _spring == null:
+		return
+	_spring.texture = _Spring.texture(_spring_pressed)
+	_spring.visible = _spring.texture != null
+	_spring.scale = Vector2.ONE * _Spring.SCALE
+	_spring.z_index = _Spring.Z_INDEX
+	_spring.position = _spring_rest
+
+func _apply_hop_offset() -> void:
+	if _spring != null:
+		_spring.position = _spring_rest
+	if _body_root != null:
+		_body_root.position = Vector2(_body_rest.x, _body_rest.y + _hop_y)
+
+func _apply_hop(phase: float) -> void:
+	var cycle := fposmod(phase, TAU) / TAU
+	var airborne := cycle > 0.12 and cycle < 0.82
+	var hop := 0.0
+	if airborne:
+		var u := (cycle - 0.12) / 0.70
+		hop = sin(u * PI) * HOP_HEIGHT
+	_hop_y = -hop
+	if airborne != (not _spring_pressed):
+		_spring_pressed = not airborne
+		_layout_rig()
+	else:
+		_apply_hop_offset()
 	var s := sin(phase)
-	var opp := sin(phase + PI)
-	_set_joint(PartSlotType.Value.LEG_L, s * -LEG_SWING)
-	_set_joint(PartSlotType.Value.LEG_R, opp * -LEG_SWING)
 	_set_joint(PartSlotType.Value.ARM_L, s * ARM_SWING)
-	_set_joint(PartSlotType.Value.ARM_R, opp * ARM_SWING)
+	_set_joint(PartSlotType.Value.ARM_R, sin(phase + PI) * ARM_SWING)
 	_set_joint(PartSlotType.Value.HEAD, s * -0.12)
 	if _body_root != null:
-		_body_root.rotation = s * 0.08
-		_body_root.position.y = _body_rest.y - absf(s) * 5.5
+		_body_root.rotation = s * 0.06
+	if _was_airborne and not airborne:
+		stepped.emit()
+	_was_airborne = airborne
 
 func _apply_idle() -> void:
+	_hop_y = 0.0
+	if _spring_pressed != _has_visible_part():
+		_spring_pressed = _has_visible_part()
+		_layout_rig()
+	else:
+		_apply_hop_offset()
 	var b := sin(_life * IDLE_HZ * TAU)
 	var arm_l := CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_L) if _pose == Pose.FRONT else 0.0
 	var arm_r := CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_R) if _pose == Pose.FRONT else 0.0

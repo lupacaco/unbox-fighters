@@ -23,7 +23,7 @@ O jogo ainda **não está pronto**. Estes docs descrevem o que **já existe** ho
 | [Partida (auto-battle)](tecnico/sistemas/partida.md) | Rodada, loja, bots, simulador de luta |
 | [Tela de montagem](tecnico/sistemas/tela-de-montagem.md) | Prep, loja e cartas |
 | [Peças e personagens](tecnico/sistemas/pecas-e-personagens.md) | Dados dos personagens, sinergia e composição visual |
-| [Incluir personagem](tecnico/incluir-personagem.md) | Folha 6+6 → 12 PNG 200×200, 3 kits na loja, ímãs |
+| [Incluir personagem](tecnico/incluir-personagem.md) | Folha 6+6 → 12 PNG 200×200, 2 kits na loja, ímãs, base-mola na carta |
 | [Arrastar e soltar](tecnico/sistemas/arrastar-e-soltar.md) | Peças, troca de fila e vender |
 | [Animação de luta](tecnico/sistemas/animacao-de-luta.md) | Palco: um contra um, só o vencedor arremessa, KO |
 | [Visual e UI](tecnico/sistemas/visual-e-ui.md) | PREP, tags, pancadas, fundo |

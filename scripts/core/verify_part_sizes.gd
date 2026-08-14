@@ -14,13 +14,13 @@ func _run() -> void:
 	for part in leao.visual_parts():
 		_assert_part_art(part)
 	assert(leao.can_fight(), "Lion needs a side view on every drawing")
-	assert(leao.shop_parts().size() == 3)
+	assert(leao.shop_parts().size() == 2)
 	var medico: CharacterDef = load("res://data/parts/medico_character.tres")
 	assert(medico != null, "Missing doctor")
 	for part in medico.visual_parts():
 		_assert_part_art(part)
 	assert(medico.can_fight(), "Doctor needs a side view on every drawing")
-	assert(medico.shop_parts().size() == 3)
+	assert(medico.shop_parts().size() == 2)
 	assert(medico.head.combat_value == 5)
 	assert(medico.body.combat_value == 6)
 	assert(medico.legs.combat_value == 4)
@@ -29,7 +29,7 @@ func _run() -> void:
 	for part in vampiro.visual_parts():
 		_assert_part_art(part)
 	assert(vampiro.can_fight(), "Vampire needs a side view on every drawing")
-	assert(vampiro.shop_parts().size() == 3)
+	assert(vampiro.shop_parts().size() == 2)
 	assert(vampiro.head.combat_value == 3)
 	assert(vampiro.body.combat_value == 4)
 	assert(vampiro.legs.combat_value == 3)
@@ -38,21 +38,22 @@ func _run() -> void:
 	for part in bruxa.visual_parts():
 		_assert_part_art(part)
 	assert(bruxa.can_fight(), "Witch needs a side view on every drawing")
-	assert(bruxa.shop_parts().size() == 3)
+	assert(bruxa.shop_parts().size() == 2)
 	var full := CompositeResolver.resolve(leao)
 	assert(full["mode"] == "layered")
 	var textures: Dictionary = full["textures"]
 	var positions: Dictionary = full["positions"]
 	for slot in PartSlotType.visual_slots():
+		if slot == PartSlotType.Value.LEG_L or slot == PartSlotType.Value.LEG_R:
+			continue
 		assert(textures.get(slot) != null, "Missing texture %s" % slot)
 		assert(positions.has(slot), "Missing position %s" % slot)
+	assert(full.get("spring_texture") != null)
 	assert(positions[PartSlotType.Value.HEAD].y < positions[PartSlotType.Value.BODY].y)
-	assert(positions[PartSlotType.Value.LEG_L].y > positions[PartSlotType.Value.BODY].y)
-	assert(positions[PartSlotType.Value.LEG_R].y > positions[PartSlotType.Value.BODY].y)
+	assert(float(full["spring_pos"].y) > positions[PartSlotType.Value.BODY].y)
 	var med := CompositeResolver.resolve(medico)
 	var med_pos: Dictionary = med["positions"]
 	assert(med_pos[PartSlotType.Value.HEAD].y < med_pos[PartSlotType.Value.BODY].y)
-	assert(med_pos[PartSlotType.Value.LEG_L].y > med_pos[PartSlotType.Value.BODY].y)
 	print("SIZE_AND_LAYOUT_OK")
 	quit(0)
 

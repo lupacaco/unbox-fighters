@@ -27,7 +27,7 @@ Os efeitos passam por um canal **SFX** com compressão leve (segura o volume qua
 | `part_pickup` | `part_pickup.wav` | Começa a arrastar uma peça |
 | `part_place` | `part_place.wav` | Peça encaixa na carta |
 | `part_reject` | `part_reject.wav` | Soltou no lugar errado / voltou / sem pancada |
-| `fighter_complete` | `fighter_complete.wav` | Carta completa (3 kits) — só na montagem |
+| `fighter_complete` | `fighter_complete.wav` | Carta completa (cabeça + tronco) — só na montagem |
 | `impact` | `impact.wav` | Poom do choque / KO na luta |
 | `step` | `step.wav` | Passo ao andar na luta |
 

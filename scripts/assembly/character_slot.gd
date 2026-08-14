@@ -9,8 +9,8 @@ signal assembly_changed(slot: CharacterSlot)
 const TAG_OFFSETS := {
 	PartSlotType.Value.HEAD: Vector2(108, -150),
 	PartSlotType.Value.BODY: Vector2(108, -20),
-	PartSlotType.Value.LEGS: Vector2(108, 110),
 }
+const _Spring := preload("res://scripts/data/spring_base.gd")
 
 @onready var _card_shadow: Sprite2D = $CardShadow
 @onready var _card_frame: Sprite2D = $CardFrame
@@ -37,6 +37,7 @@ var _tags: Dictionary = {}
 var _grip: Area2D
 var _card_motion: Tween
 var _drop_hot: bool = false
+var _spring: Sprite2D
 
 func setup(def: CharacterDef = null, roster: Array[CharacterDef] = []) -> void:
 	character = def
@@ -311,13 +312,31 @@ func _ensure_layers() -> void:
 			sprite.centered = true
 			_display_root.add_child(sprite)
 		_layer_sprites[slot] = sprite
+	_spring = _display_root.get_node_or_null("Spring") as Sprite2D
+	if _spring == null:
+		_spring = Sprite2D.new()
+		_spring.name = "Spring"
+		_spring.centered = true
+		_display_root.add_child(_spring)
+	_display_root.move_child(_spring, 0)
+	_spring.z_index = _Spring.Z_INDEX
+	for leg_name in ["LegL", "LegR"]:
+		var leftover_sprite := _display_root.get_node_or_null(leg_name) as Sprite2D
+		if leftover_sprite != null:
+			leftover_sprite.visible = false
+			leftover_sprite.texture = null
 
 func _setup_zones() -> void:
 	var zones_root: Node2D = $Zones
+	var leftover := zones_root.get_node_or_null("Legs") as Area2D
+	if leftover != null:
+		leftover.input_pickable = false
+		leftover.monitoring = false
+		leftover.monitorable = false
+		leftover.visible = false
 	var rects := {
 		PartSlotType.Value.HEAD: Rect2(-95, -190, 190, 110),
-		PartSlotType.Value.BODY: Rect2(-105, -85, 210, 130),
-		PartSlotType.Value.LEGS: Rect2(-95, 45, 190, 120),
+		PartSlotType.Value.BODY: Rect2(-105, -85, 210, 250),
 	}
 	for slot in PartSlotType.shop_slots():
 		var node_name := _layer_name(slot)
@@ -396,7 +415,7 @@ func _refresh_display(animate: bool) -> void:
 	var complete := is_complete()
 	_glow.visible = complete
 	_readout.set_complete(complete)
-	_empty_hint.visible = plan["mode"] == "empty"
+	_empty_hint.visible = false
 
 	if not animate or _crossfade_busy:
 		_apply_plan(plan)
@@ -418,7 +437,24 @@ func _apply_plan(plan: Dictionary) -> void:
 		var sprite: Sprite2D = _layer_sprites.get(slot)
 		if sprite == null:
 			continue
+		if slot == PartSlotType.Value.LEG_L or slot == PartSlotType.Value.LEG_R:
+			sprite.visible = false
+			sprite.texture = null
+			continue
 		_place_sprite(sprite, textures.get(slot), positions.get(slot, Vector2.ZERO), expanded.get(slot) as PartDef, slot)
+	_place_spring(plan)
+
+func _place_spring(plan: Dictionary) -> void:
+	if _spring == null:
+		return
+	var tex: Texture2D = plan.get("spring_texture")
+	_spring.texture = tex
+	_spring.visible = tex != null
+	_spring.centered = true
+	_spring.position = plan.get("spring_pos", Vector2.ZERO)
+	var spring_scale := float(plan.get("spring_scale", _Spring.SCALE))
+	_spring.scale = Vector2.ONE * spring_scale
+	_spring.z_index = _Spring.Z_INDEX
 
 func _place_sprite(
 	sprite: Sprite2D,

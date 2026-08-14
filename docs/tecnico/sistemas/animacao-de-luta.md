@@ -2,22 +2,21 @@
 
 A luta de verdade é calculada **antes** de aparecer (`CombatSim`). O `FightDirector` só **mostra** o resultado no palco (a prateleira).
 
-Cada choque sorteia um kit vivo de cada Freak (cabeça, tronco+braços ou pernas). Pode misturar, por exemplo cabeça contra pernas. O desenho no palco tem 6 membros presos nos ímãs (esferas de metal).
+Cada choque sorteia um kit vivo de cada Freak (cabeça ou tronco+braços). Pode misturar, por exemplo cabeça contra tronco. No palco o Freak senta numa **base-mola**. Não tem pernas.
 
 ## Sequência
 
 1. Flash na tela. As cartas **sobem ~460 px e somem**. A loja e o HUD de cima somem. A câmera se aproxima um pouco. Os nomes, o HP e o VS ficam **fixos na tela** (não entram no zoom), para não cortar em cima.
-2. Só **um de cada lado** entra: pulam ao mesmo tempo na prateleira (impacto no pouso) e **andam até ficarem afastados**, um de cada lado do centro. Os outros esperam fora do palco.
-3. **Anda** de perfil, em movimento contínuo. Pernas em tempos opostos, braços e cabeça acompanhando, tudo girando no ímã. Leve balanço do tronco. Os dois do duelo ficam **na mesma altura do chão** e do **mesmo tamanho**.
+2. Só **um de cada lado** entra: pulam ao mesmo tempo na prateleira (impacto no pouso) e **andam pulando até ficarem afastados**, um de cada lado do centro. Os outros esperam fora do palco.
+3. **Anda** de perfil, pulando. No chão a mola fica **pressionada**; no ar ela fica **solta**; ao pousar, pressiona de novo. Parado, a mola fica pressionada. Braços e cabeça acompanham, girando no ímã. Leve balanço do tronco. Os dois do duelo ficam **na mesma altura do chão** e do **mesmo tamanho**.
 
 Na luta, quem cobre quem é fixo (não usa o Z da ferramenta de ímãs). Da frente para trás:
 
 1. Cabeça
 2. Braço direito
 3. Tronco
-4. Perna direita
-5. Perna esquerda
-6. Braço esquerdo
+4. Base-mola (atrás / embaixo)
+5. Braço esquerdo
 
 Depois:
 

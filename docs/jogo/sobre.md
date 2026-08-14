@@ -6,7 +6,7 @@
 
 ## Ideia em uma frase
 
-Você abre caixas, monta Freaks com **3 kits** (cabeça, tronco com os braços, pernas juntas) e eles lutam sozinhos em fila contra bots. Por baixo, o desenho ainda tem 6 membros, para andar e atacar como marionete.
+Você abre caixas, monta Freaks com **2 kits** (cabeça e tronco com os braços) em cima de uma **base-mola** que já vem na carta, e eles lutam sozinhos em fila contra bots. Eles andam pulando na mola.
 
 ## Loop principal
 

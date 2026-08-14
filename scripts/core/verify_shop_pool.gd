@@ -36,8 +36,8 @@ func _run() -> void:
 			return
 
 	var high := ShopPool.parts_up_to_tier(5)
-	if high.size() != roster.size() * 3:
-		push_error("VERIFY_FAIL shop should sell 3 kits per Freak, got %d" % high.size())
+	if high.size() != roster.size() * 2:
+		push_error("VERIFY_FAIL shop should sell 2 kits per Freak, got %d" % high.size())
 		quit(1)
 		return
 	var body: PartDef = load("res://data/parts/medico_body.tres")

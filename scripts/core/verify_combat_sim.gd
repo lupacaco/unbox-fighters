@@ -42,8 +42,8 @@ func _test_clash_leftover(leao: CharacterDef) -> bool:
 	if first.winning_side != CombatEvent.Side.LEFT or first.left_leftover != 2:
 		push_error("VERIFY_FAIL leftover should be 2")
 		return false
-	if result.damage_to_right != 10:
-		push_error("VERIFY_FAIL leftover should be 10, got %d" % result.damage_to_right)
+	if result.damage_to_right != 6:
+		push_error("VERIFY_FAIL leftover should be 6, got %d" % result.damage_to_right)
 		return false
 	return true
 
@@ -72,8 +72,8 @@ func _test_damage_cap(leao: CharacterDef) -> bool:
 	left.fighters[2] = FighterLoadout.from_character(leao)
 	var right := BoardLoadout.new()
 	var result := CombatSim.simulate(left, right)
-	if result.damage_to_right != 36:
-		push_error("VERIFY_FAIL three lions vs empty should deal 36, got %d" % result.damage_to_right)
+	if result.damage_to_right != 24:
+		push_error("VERIFY_FAIL three lions vs empty should deal 24, got %d" % result.damage_to_right)
 		return false
 	return true
 
@@ -82,8 +82,8 @@ func _test_empty_vs_full(leao: CharacterDef) -> bool:
 	var right := BoardLoadout.new()
 	right.fighters[0] = FighterLoadout.from_character(leao)
 	var result := CombatSim.simulate(left, right)
-	if result.winning_side != CombatEvent.Side.RIGHT or result.damage_to_left != 12:
-		push_error("VERIFY_FAIL empty board should take 12 from one lion")
+	if result.winning_side != CombatEvent.Side.RIGHT or result.damage_to_left != 8:
+		push_error("VERIFY_FAIL empty board should take 8 from one lion")
 		return false
 	return true
 
@@ -96,8 +96,8 @@ func _test_leftover_stable_when_random(leao: CharacterDef) -> bool:
 		var right := BoardLoadout.new()
 		right.fighters[0] = FighterLoadout.from_parts(null, leao.body, null)
 		var result := CombatSim.simulate(left, right, rng)
-		if result.damage_to_right != 10:
-			push_error("VERIFY_FAIL random pairing should still deal 10 vs solo body, seed %d got %d" % [seed, result.damage_to_right])
+		if result.damage_to_right != 6:
+			push_error("VERIFY_FAIL random pairing should still deal 6 vs solo body, seed %d got %d" % [seed, result.damage_to_right])
 			return false
 	return true
 
@@ -122,6 +122,6 @@ func _test_random_slots_can_mix(leao: CharacterDef) -> bool:
 		if mixed:
 			break
 	if not mixed:
-		push_error("VERIFY_FAIL expected some clashes to mix slots (head vs legs, etc)")
+		push_error("VERIFY_FAIL expected some clashes to mix slots (head vs torso)")
 		return false
 	return true

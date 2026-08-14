@@ -8,8 +8,9 @@ extends RefCounted
 const PART_WIDTH_PX := 200.0
 const PART_HEIGHT_PX := 200.0
 const PART_SIZE_PX := 200.0
-const FEET_DROP_PX := 90.0 * PART_SIZE_PX / 150.0
+const FEET_DROP_PX := 118.0
 const BODY_ORIGIN := Vector2(0, -8)
+const _Spring := preload("res://scripts/data/spring_base.gd")
 
 const DEFAULT_NECK := Vector2(0, -70)
 const DEFAULT_SHOULDER_L := Vector2(-70, -40)
@@ -37,53 +38,73 @@ static func resolve(character: CharacterDef, attached: Dictionary = {}) -> Dicti
 			parts[slot] = character.get_part(slot)
 	return resolve_slots(parts)
 
-static func resolve_slots(parts: Dictionary, textures: Dictionary = {}) -> Dictionary:
-	var empty := {
-		"mode": "empty",
-		"textures": {},
-		"positions": {},
-		"part_size_px": PART_SIZE_PX,
-	}
+static func resolve_slots(
+	parts: Dictionary,
+	textures: Dictionary = {},
+	spring_pressed: Variant = null
+) -> Dictionary:
 	var tex := {}
 	for slot in PartSlotType.visual_slots():
+		if slot == PartSlotType.Value.LEG_L or slot == PartSlotType.Value.LEG_R:
+			tex[slot] = null
+			continue
 		var part: PartDef = parts.get(slot)
 		var shown: Texture2D = textures.get(slot)
 		if shown == null and part != null:
 			shown = part.sprite
 		tex[slot] = shown
 
-	var any := false
+	var has_part := false
 	for slot in tex.keys():
 		if tex[slot] != null:
-			any = true
+			has_part = true
 			break
-	if not any:
-		return empty
-
+	var pressed := has_part if spring_pressed == null else bool(spring_pressed)
 	var scale := display_scale()
+	var spring_pos := _Spring.center_on_ground(pressed)
+	var magnet := _Spring.magnet_world(pressed)
 	var body: PartDef = parts.get(PartSlotType.Value.BODY)
 	var body_tex: Texture2D = tex.get(PartSlotType.Value.BODY)
+	var head: PartDef = parts.get(PartSlotType.Value.HEAD)
+	var head_tex: Texture2D = tex.get(PartSlotType.Value.HEAD)
 	var body_pos := BODY_ORIGIN
-	var positions := {PartSlotType.Value.BODY: body_pos}
-
-	positions[PartSlotType.Value.HEAD] = body_pos + (_socket(body, "neck", body_tex) - _socket(parts.get(PartSlotType.Value.HEAD), "down", tex.get(PartSlotType.Value.HEAD))) * scale
-	positions[PartSlotType.Value.ARM_L] = body_pos + (_socket(body, "shoulder_l", body_tex) - _socket(parts.get(PartSlotType.Value.ARM_L), "up", tex.get(PartSlotType.Value.ARM_L))) * scale
-	positions[PartSlotType.Value.ARM_R] = body_pos + (_socket(body, "shoulder_r", body_tex) - _socket(parts.get(PartSlotType.Value.ARM_R), "up", tex.get(PartSlotType.Value.ARM_R))) * scale
-	positions[PartSlotType.Value.LEG_L] = body_pos + (_socket(body, "hip_l", body_tex) - _socket(parts.get(PartSlotType.Value.LEG_L), "up", tex.get(PartSlotType.Value.LEG_L))) * scale
-	positions[PartSlotType.Value.LEG_R] = body_pos + (_socket(body, "hip_r", body_tex) - _socket(parts.get(PartSlotType.Value.LEG_R), "up", tex.get(PartSlotType.Value.LEG_R))) * scale
+	var positions := {
+		PartSlotType.Value.BODY: body_pos,
+		PartSlotType.Value.HEAD: body_pos,
+		PartSlotType.Value.ARM_L: body_pos,
+		PartSlotType.Value.ARM_R: body_pos,
+		PartSlotType.Value.LEG_L: body_pos,
+		PartSlotType.Value.LEG_R: body_pos,
+	}
+	if body_tex != null:
+		body_pos = magnet - _body_sit_offset(body, body_tex) * scale
+		positions[PartSlotType.Value.BODY] = body_pos
+		positions[PartSlotType.Value.HEAD] = body_pos + (_socket(body, "neck", body_tex) - _socket(head, "down", head_tex)) * scale
+		positions[PartSlotType.Value.ARM_L] = body_pos + (_socket(body, "shoulder_l", body_tex) - _socket(parts.get(PartSlotType.Value.ARM_L), "up", tex.get(PartSlotType.Value.ARM_L))) * scale
+		positions[PartSlotType.Value.ARM_R] = body_pos + (_socket(body, "shoulder_r", body_tex) - _socket(parts.get(PartSlotType.Value.ARM_R), "up", tex.get(PartSlotType.Value.ARM_R))) * scale
+	elif head_tex != null:
+		positions[PartSlotType.Value.HEAD] = magnet - _socket(head, "down", head_tex) * scale
 
 	return {
 		"mode": "layered",
 		"textures": tex,
 		"positions": positions,
 		"part_size_px": PART_SIZE_PX,
-		"head": tex.get(PartSlotType.Value.HEAD),
-		"body": tex.get(PartSlotType.Value.BODY),
-		"legs": tex.get(PartSlotType.Value.LEG_L),
+		"head": head_tex,
+		"body": body_tex,
+		"legs": null,
 		"head_pos": positions[PartSlotType.Value.HEAD],
-		"body_pos": body_pos,
-		"legs_pos": positions[PartSlotType.Value.LEG_L],
+		"body_pos": positions[PartSlotType.Value.BODY],
+		"legs_pos": spring_pos,
+		"spring_pressed": pressed,
+		"spring_pos": spring_pos,
+		"spring_scale": _Spring.SCALE,
+		"spring_texture": _Spring.texture(pressed),
 	}
+
+
+static func _body_sit_offset(body: PartDef, body_tex: Texture2D) -> Vector2:
+	return (_socket(body, "hip_l", body_tex) + _socket(body, "hip_r", body_tex)) * 0.5
 
 static func socket_of(part: PartDef, socket: String, shown: Texture2D) -> Vector2:
 	return _socket(part, socket, shown)

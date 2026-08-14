@@ -91,14 +91,14 @@ func _build_form() -> void:
 	_form.add_child(box)
 	box.add_child(_labeled_edit("Id interno (ex: leao)", true))
 	box.add_child(_labeled_edit("Nome na carta (ex: Leão)", false))
-	var labels: PackedStringArray = ["Cabeça", "Tronco", "Pernas"]
+	var labels: PackedStringArray = ["Cabeça", "Tronco"]
 	_value_spins.clear()
 	for i in labels.size():
 		box.add_child(_labeled_spin(labels[i]))
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.custom_minimum_size.x = 380
-	hint.text = "Folha com 6 desenhos de frente e 6 de perfil. A loja ganha 3 kits. Depois marque os ímãs em Ampliar."
+	hint.text = "Folha com 6 desenhos de frente e 6 de perfil. A loja ganha 2 kits (cabeça e tronco). A base-mola já vem na carta. Depois marque os ímãs em Ampliar."
 	box.add_child(hint)
 	_form_status = Label.new()
 	_form_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

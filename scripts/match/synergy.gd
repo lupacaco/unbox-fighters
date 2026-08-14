@@ -1,16 +1,14 @@
 class_name Synergy
 extends RefCounted
 
-## Combat value on a card: 3 matching kits = full, 2 = 75%, 1 = 50%.
-## Always rounds up.
+## Combat value on a card: 2 matching kits = full, 1 = 50%.
+## Always rounds up. The spring base has no number.
 
 static func scaled_value(base: int, same_set_count: int) -> int:
 	if base <= 0 or same_set_count <= 0:
 		return 0
-	if same_set_count >= 3:
-		return base
 	if same_set_count >= 2:
-		return ceili(float(base) * 0.75)
+		return base
 	return ceili(float(base) * 0.5)
 
 static func set_count(parts: Array, set_id: StringName) -> int:

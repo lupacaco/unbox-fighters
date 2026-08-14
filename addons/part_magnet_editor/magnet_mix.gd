@@ -1,6 +1,8 @@
 @tool
 extends Control
 
+const _Spring := preload("res://scripts/data/spring_base.gd")
+
 ## Assembled preview of the six drawings snapped at the magnets.
 
 var parts: Dictionary = {}
@@ -36,20 +38,25 @@ func _draw() -> void:
 	var textures := {}
 	for slot in PartSlotType.visual_slots():
 		textures[slot] = _tex_for(parts.get(slot) as PartDef)
-	var any := false
-	for slot in textures.keys():
-		if textures[slot] != null:
-			any = true
-			break
-	if not any:
-		return
 	var plan := CompositeResolver.resolve_slots(parts, textures)
 	var side := minf(box.size.x - 24.0, box.size.y - 36.0)
 	var s := clampf(side / 420.0, 0.32, 1.05)
 	var origin := box.get_center() + Vector2(0, 10)
+	_draw_spring(plan, s, origin)
 	var positions: Dictionary = plan.get("positions", {})
 	for slot in PartSlotType.draw_order_for(parts):
+		if slot == PartSlotType.Value.LEG_L or slot == PartSlotType.Value.LEG_R:
+			continue
 		_draw_part(slot, parts.get(slot) as PartDef, textures.get(slot), positions.get(slot, Vector2.ZERO), s, origin)
+
+func _draw_spring(plan: Dictionary, scale: float, origin: Vector2) -> void:
+	var tex: Texture2D = plan.get("spring_texture")
+	if tex == null:
+		return
+	var spring_scale := float(plan.get("spring_scale", _Spring.SCALE)) * scale
+	var pos: Vector2 = plan.get("spring_pos", Vector2.ZERO)
+	var size := tex.get_size() * spring_scale
+	draw_texture_rect(tex, Rect2(origin + pos * scale - size * 0.5, size), false)
 
 func _tex_for(part: PartDef) -> Texture2D:
 	if part == null:

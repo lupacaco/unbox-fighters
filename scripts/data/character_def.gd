@@ -12,7 +12,7 @@ extends Resource
 @export var arm_r: PartDef
 @export var leg_l: PartDef
 @export var leg_r: PartDef
-## Shop kit: both legs together. Old 3-part sets used this as the only legs drawing.
+## Shop kit: unused. The game stands every Freak on a spring base.
 @export var legs: PartDef
 
 func get_part(slot: PartSlotType.Value) -> PartDef:

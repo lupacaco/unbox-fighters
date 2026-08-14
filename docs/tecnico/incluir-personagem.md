@@ -4,7 +4,7 @@ Este é o jeito certo de colocar um Freak novo no jogo. Siga **todos** os passos
 
 As regras da loja, sinergia e luta (o que o jogador vê) estão em [Mecânicas e regras](../jogo/mecanicas-e-regras.md).
 
-O jogador manda uma folha de desenho. O jogo precisa de **12 recortes** (6 de frente + 6 de perfil) para animar, **3 fichas na loja** (cabeça, tronco com braços, pernas juntas), e uma ficha do personagem. A loja **acha sozinha** qualquer ficha nova em `data/parts/` (depois filtra pelos sets ativos).
+O jogador manda uma folha de desenho. O jogo precisa de **12 recortes** (6 de frente + 6 de perfil) para a ferramenta de ímãs e os braços, **2 fichas na loja** (cabeça, tronco com braços), e uma ficha do personagem. A **base-mola já vem na carta** — não cria ficha de pernas para vender. A loja **acha sozinha** qualquer ficha nova em `data/parts/`.
 
 ## O que a folha precisa ter
 
@@ -33,7 +33,7 @@ Nome na carta: com acento se precisar (`Leão`).
 
 1. Menu **Project → Tools → Incluir personagem** (se o Godot estiver em português: **Projeto → Ferramentas**).
 2. Escolha a folha PNG ou WEBP.
-3. Preencha o id, o nome na carta e os **3 números** da loja (Cabeça, Tronco, Pernas).
+3. Preencha o id, o nome na carta e os **2 números** da loja (Cabeça, Tronco).
 4. Clique **Cortar e criar**. A janela **fica aberta** e mostra o que está acontecendo (costuma levar poucos segundos). Se a folha estiver errada, o texto fica vermelho na mesma janela. Se der certo, abre a ferramenta de ímãs.
 
 ### B) Quando a folha chega no chat (assistente)
@@ -116,13 +116,13 @@ Grave os dois: `combat_value` e `tier`.
 
 ## 4. Fichas das peças e do personagem
 
-Doze recortes viram **6 fichas de desenho** + **1 kit de pernas da loja** + a ficha do personagem:
+Doze recortes viram **6 fichas de desenho** + a ficha do personagem. A loja só vende cabeça e tronco:
 
 - Desenho: `{id}_head.tres` `{id}_body.tres` `{id}_arm_l.tres` `{id}_arm_r.tres` `{id}_leg_l.tres` `{id}_leg_r.tres`
-- Loja: `{id}_head.tres` `{id}_body.tres` `{id}_legs.tres` (as duas pernas juntas; sem PNG próprio)
+- Loja: `{id}_head.tres` `{id}_body.tres`
 - Personagem: `{id}_character.tres`
 
-A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 3 kits de cada Freak. Braços e pernas soltos não entram nas caixas. Freak novo entra no Play seguinte, sem lista na mão.
+A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 2 kits de cada Freak. Braços e pernas soltos não entram nas caixas. A base-mola já está na carta. Freak novo entra no Play seguinte, sem lista na mão.
 
 ## 5. Documentação
 
@@ -137,14 +137,14 @@ Atualize:
 
 - Os 12 PNG são 200 × 200 e têm transparência de verdade
 - Preto de dentro do desenho não sumiu
-- Play: kit na caixa (tronco já com braços, pernas juntas), encaixa na carta, set completo (3 kits) mostra o nome certo
+- Play: kit na caixa (tronco já com braços), encaixa na carta em cima da mola, set completo (cabeça + tronco) mostra o nome certo
 - Tronco tem 5 ímãs visíveis na ferramenta
 
 ## Sets que já passaram por este fluxo
 
 | id | Nome | Números |
 |----|------|---------|
-| `leao` | Leão | 4 nos 3 kits da loja (nível 1, total 12) |
-| `medico` | Médico | Cabeça 5 (nível 1), tronco 6 (nível 2), pernas 4 (nível 1). Total 15 |
-| `vampiro` | Vampiro | Cabeça 3, tronco 4, pernas 3 (nível 1). Total 10 |
-| `bruxa` | Bruxa | Cabeça 4, tronco 3, pernas 3 (nível 1). Total 10 |
+| `leao` | Leão | Cabeça 4, tronco 4 (nível 1, total 8) |
+| `medico` | Médico | Cabeça 5 (nível 1), tronco 6 (nível 2). Total 11 |
+| `vampiro` | Vampiro | Cabeça 3, tronco 4 (nível 1). Total 7 |
+| `bruxa` | Bruxa | Cabeça 4, tronco 3 (nível 1). Total 7 |

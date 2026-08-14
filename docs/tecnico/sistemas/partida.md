@@ -7,7 +7,7 @@ Regras da partida contra bots. Ficam em `scripts/match/` para poder testar os n√
 | Arquivo | Papel |
 |---------|--------|
 | `match_rules.gd` | N√∫meros fechados: HP 40, pancadas, custos, teto 12 |
-| `synergy.gd` | 100% / 75% / 50% na mesma carta |
+| `synergy.gd` | 2 iguais = 100%, 1 = 50% na mesma carta |
 | `fighter_loadout.gd` / `board_loadout.gd` | Uma carta e as 3 cartas em fila |
 | `combat_sim.gd` | Choques (kit sorteado de cada lado) e dano de HP; devolve eventos |
 | `combat_event.gd` / `combat_result.gd` | Cada choque e o placar final |

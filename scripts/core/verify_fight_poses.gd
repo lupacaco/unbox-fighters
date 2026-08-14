@@ -15,7 +15,7 @@ func _run() -> void:
 	assert(slot.get_node("FightButton") != null)
 	assert(slot.can_accept(leao.head))
 	assert(slot.can_accept(leao.body))
-	assert(slot.can_accept(leao.legs))
+	assert(not slot.can_accept(leao.legs))
 	assert(not slot.can_accept(leao.arm_l))
 	assert(not slot.can_accept(leao.leg_r))
 	assert(not slot.can_fight())

@@ -36,24 +36,32 @@ Há **1 jogador + 3 bots** (Sombra, Ferrugem, Névoa). HP inicial **40**. Não e
 
 ## Peças
 
-Na caixa e na carta existem só **3 kits**. Cada um ocupa um encaixe:
+Nas caixas existem só **2 kits**. Cada um ocupa um encaixe da carta:
 
 | Tipo | O que o jogador recebe | Tag |
 |------|------------------------|-----|
 | HEAD | Cabeça | Azul |
 | BODY | Tronco **com os dois braços já grudados** (não se separam) | Roxo |
-| LEGS | As **duas pernas juntas** (não se separam) | Verde |
 
-Por baixo, o desenho ainda tem 6 recortes 200×200 (cabeça, tronco, 2 braços, 2 pernas), colados nas esferas de metal. Isso serve para o Freak **andar e atacar** mexendo os membros.
+Toda carta já tem uma **base-mola**. Ela não sai da carta, não vem na caixa e **não tem número** de luta. Em cima da mola tem uma esfera de metal: é o ímã onde a peça senta.
+
+- Carta vazia: mola **solta** (alta).
+- Qualquer peça encaixada: mola **pressionada** (baixa).
+- Só a cabeça: a cabeça cola na esfera da mola.
+- Cabeça + tronco: o tronco cola na esfera; a cabeça cola no pescoço do tronco (como já era).
+
+Não dá para tirar a mola. Não dá para encaixar pernas — o jogo não vende mais pernas.
+
+Por baixo, o desenho ainda tem recortes 200×200 (cabeça, tronco, 2 braços). Os arquivos de pernas existem só para a ferramenta de ímãs; **não aparecem no jogo**.
 
 Cada kit da loja tem **um** número de combate e um **nível** de loja.
 
 | Set | Kits | Total |
 |-----|------|-------|
-| Leão | 3 × 4 (nível 1) | 12 |
-| Médico | Cabeça 5 (nível 1), tronco 6 (nível 2), pernas 4 (nível 1) | 15 |
-| Vampiro | Cabeça 3, tronco 4, pernas 3 (nível 1) | 10 |
-| Bruxa | Cabeça 4, tronco 3, pernas 3 (nível 1) | 10 |
+| Leão | Cabeça 4, tronco 4 (nível 1) | 8 |
+| Médico | Cabeça 5 (nível 1), tronco 6 (nível 2) | 11 |
+| Vampiro | Cabeça 3, tronco 4 (nível 1) | 7 |
+| Bruxa | Cabeça 4, tronco 3 (nível 1) | 7 |
 
 Nível da loja pela força do kit: 3–5 → 1; 6 → 2; 7 → 3; 8 → 4; 9 → 5.
 
@@ -61,15 +69,14 @@ Nível da loja pela força do kit: 3–5 → 1; 6 → 2; 7 → 3; 8 → 4; 9 →
 
 Conta quantos kits do **mesmo set** estão na carta. Arredonda para cima.
 
-- 3 iguais: 100%
-- 2 iguais: 75%
+- 2 iguais: 100%
 - 1: 50%
 
-Exemplo: cabeça 4 sozinha vira **2**. Completar as 3 ainda vale o número cheio (12 no leão).
+Exemplo: cabeça 4 sozinha vira **2**. Cabeça + tronco do mesmo set vale o número cheio (8 no leão).
 
 ## Luta
 
-Cada choque sorteia **um kit vivo de cada lado**. Pode ser cabeça contra pernas, tronco contra cabeça, etc. Não segue ordem fixa. Pula o que estiver vazio.
+Cada choque sorteia **um kit vivo de cada lado**. Pode ser cabeça contra tronco. Não segue ordem fixa. Pula o que estiver vazio.
 
 - Se A > B: só A ataca. B fica no corpo até levar o golpe e voar para fora. A fica A−B e pode ser sorteada de novo.
 - Se empatar: os dois kits morrem. Na tela os dois atacam juntos, batem no centro e voam para fora.
@@ -77,7 +84,7 @@ Cada choque sorteia **um kit vivo de cada lado**. Pode ser cabeça contra pernas
 
 Dano no HP do perdedor = soma do que sobrou em cada Freak vivo do vencedor, **no máximo 12 por Freak**.
 
-Na tela: entra **um contra um**. O 1º de cada lado **pula** na prateleira e **anda até ficar afastado** do outro. Só quando um cai inteiro (**KO**) o próximo daquele lado pula e se aproxima. No choque, **só o kit que vai ganhar** sai do corpo e voa até a peça do outro. A que perde **fica colada** até o impacto; aí **voa para fora da tela e some**. A que ganha volta no corpo como bumerangue. Se os números forem iguais, **os dois atacam**, batem no centro e os dois voam para fora. As placas mostram os números. As cartas **sobem e somem** durante a batalha e voltam depois.
+Na tela: entra **um contra um**. O 1º de cada lado **pula** na prateleira e **anda pulando** até ficar afastado do outro. No chão a mola fica pressionada; no ar ela fica solta; ao pousar, pressiona de novo. Parado, a mola fica pressionada. Só quando um cai inteiro (**KO**) o próximo daquele lado pula e se aproxima. No choque, **só o kit que vai ganhar** sai do corpo e voa até a peça do outro. A que perde **fica colada** até o impacto; aí **voa para fora da tela e some**. A que ganha volta no corpo como bumerangue. Se os números forem iguais, **os dois atacam**, batem no centro e os dois voam para fora. As placas mostram os números. As cartas **sobem e somem** durante a batalha e voltam depois.
 
 ## Controles
 

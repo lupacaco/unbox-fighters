@@ -20,7 +20,7 @@ Em `assets/characters/<nome>/`:
 - Os mesmos com `-2` — perfil
 - Canvas **200×200**
 
-Para um set novo: [Incluir personagem](incluir-personagem.md). O Godot também tem **Project → Tools → Incluir personagem** (corta os 12 PNG e cria as 3 fichas da loja).
+Para um set novo: [Incluir personagem](incluir-personagem.md). O Godot também tem **Project → Tools → Incluir personagem** (corta os 12 PNG e cria as 2 fichas da loja).
 
 ## Por que 200×200
 

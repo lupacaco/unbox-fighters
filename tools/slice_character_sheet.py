@@ -428,7 +428,7 @@ def main() -> None:
 	parser.add_argument("--value", type=int, default=4, help="Combat number if --head/--body/--legs are omitted")
 	parser.add_argument("--head", type=int, default=0, help="Shop number for the head kit")
 	parser.add_argument("--body", type=int, default=0, help="Shop number for the torso kit")
-	parser.add_argument("--legs", type=int, default=0, help="Shop number for the legs kit")
+	parser.add_argument("--legs", type=int, default=0, help="Unused shop leftover; the game does not sell legs")
 	parser.add_argument("--write-defs", action="store_true", help="Also write data/parts/*.tres")
 	args = parser.parse_args()
 	set_id = args.id.strip().lower()
