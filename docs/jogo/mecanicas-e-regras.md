@@ -77,7 +77,7 @@ De cima para baixo: cabeça, senão tronco, senão pernas.
 
 Dano no HP do perdedor = soma do que sobrou em cada Freak vivo do vencedor, **no máximo 12 por Freak**.
 
-Na tela: os Freaks **pulam** da carta para a prateleira, **andam** até a fila (todos no **mesmo chão** e com o **mesmo tamanho**), e no choque a peça **gira, cresce e voa ao centro**. Placas douradas mostram os números; o vencedor fica com o **resto** (9 contra 5 → 4). Quem perde leva **X** vermelho. Freak inteiro cai → **KO**. As cartas **sobem e somem** durante a batalha e voltam depois.
+Na tela: os Freaks **pulam** da carta para a prateleira, **andam** até a fila (todos na **mesma altura**, ninguém mais à frente, **mesmo tamanho**), e no choque a peça **gira, cresce e voa ao centro**. Placas douradas mostram os números; o vencedor fica com o **resto** (9 contra 5 → 4). Quem perde leva **X** vermelho. Freak inteiro cai → **KO**. As cartas **sobem e somem** durante a batalha e voltam depois.
 
 ## Controles
 
