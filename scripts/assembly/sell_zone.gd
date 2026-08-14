@@ -20,6 +20,7 @@ func setup() -> void:
 	var box := RectangleShape2D.new()
 	box.size = SIZE
 	shape.shape = box
+	Feel.hide_collision_debug(shape)
 	add_child(shape)
 	_plate = Polygon2D.new()
 	_plate.polygon = PackedVector2Array([
@@ -43,5 +44,7 @@ func setup() -> void:
 
 
 func set_highlight(on: bool) -> void:
-	if _plate != null:
-		_plate.color = HOT if on else REST
+	if _plate == null:
+		return
+	_plate.color = HOT if on else REST
+	Feel.to_scale(self, Vector2.ONE * 1.08 if on else Vector2.ONE, 0.1)

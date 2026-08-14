@@ -14,6 +14,7 @@ var _tray: Node2D = null
 var _hover_slot: CharacterSlot = null
 var _locked: bool = false
 var _sell_zone: Area2D = null
+var _last_mouse := Vector2.ZERO
 
 func setup(slots: Array[CharacterSlot], tray: Node2D, sell_zone: Area2D = null) -> void:
 	_slots = slots
@@ -37,6 +38,7 @@ func begin_drag(part: PartView) -> void:
 	if _locked or _dragging != null or _dragging_card != null or part == null or not part.can_interact():
 		return
 	_dragging = part
+	_last_mouse = get_viewport().get_mouse_position()
 	set_process(true)
 	part.begin_drag()
 	GameAudio.part_pickup()
@@ -46,12 +48,17 @@ func begin_card_drag(slot: CharacterSlot) -> void:
 	if _locked or _dragging != null or _dragging_card != null or slot == null:
 		return
 	_dragging_card = slot
+	_last_mouse = get_viewport().get_mouse_position()
 	set_process(true)
+	Feel.to_scale(slot, Vector2.ONE * 1.05, 0.1)
 	GameAudio.part_pickup()
 
 func _process(_delta: float) -> void:
 	if _dragging != null:
-		_dragging.global_position = get_viewport().get_mouse_position()
+		var mouse := get_viewport().get_mouse_position()
+		_dragging.apply_drag_tilt(mouse.x - _last_mouse.x)
+		_last_mouse = mouse
+		_dragging.global_position = mouse
 		_update_hover()
 		_update_sell_highlight()
 	elif _dragging_card != null:
@@ -78,9 +85,11 @@ func _update_hover() -> void:
 		return
 	if _hover_slot != null:
 		_hover_slot.set_drop_highlight(false, _dragging.part_def.slot_type)
+		_dragging.set_over_target(false)
 	_hover_slot = next
 	if _hover_slot != null:
 		_hover_slot.set_drop_highlight(true, _dragging.part_def.slot_type)
+		_dragging.set_over_target(true)
 
 func _update_card_hover() -> void:
 	var next := _find_card_under_mouse()
@@ -98,6 +107,7 @@ func _finish_drag() -> void:
 	set_process(false)
 	if _hover_slot != null:
 		_hover_slot.set_drop_highlight(false, part.part_def.slot_type)
+	part.set_over_target(false)
 	var target := _hover_slot
 	_hover_slot = null
 	_set_sell_highlight(false)
@@ -126,11 +136,14 @@ func _finish_card_drag() -> void:
 	_hover_slot = null
 	_set_sell_highlight(false)
 	if _is_over_sell():
+		Feel.to_scale(card, Vector2.ONE, 0.08)
 		card_sold.emit(card)
 		return
 	if target != null and target != card:
+		Feel.to_scale(card, Vector2.ONE, 0.1)
 		cards_swapped.emit(card, target)
 		return
+	Feel.to_scale(card, Vector2.ONE, 0.12)
 	GameAudio.part_reject()
 
 func notify_drag_process_needed() -> void:

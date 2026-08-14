@@ -15,9 +15,10 @@ Como o jogador move peças (e Freaks inteiros) até as cartas ou para vender.
 
 1. `PartView` pede para começar o arraste no `DragDropService`
 2. Enquanto o mouse se move, a peça segue o cursor
-3. O serviço procura uma carta **compatível** sob o cursor e acende o destaque
-4. Passar por **VENDER** (direita da prateleira) deixa a área dourada
-5. Ao soltar:
+3. O serviço procura uma carta **compatível** sob o cursor. A **carta inteira** acende ouro e cresce um pouco (sem retângulo vermelho).
+4. A peça inclinada segue o mouse, fica maior, e a sombra alonga. Em cima da carta ela puxa um pouco mais.
+5. Passar por **VENDER** (direita da prateleira) deixa a área dourada e maior
+6. Ao soltar:
    - Na carta que aceita → encaixa
    - Em **VENDER** → some e você ganha 1 pancada
    - Senão → volta para a prateleira

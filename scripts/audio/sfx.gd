@@ -120,5 +120,8 @@ func land() -> void:
 func step() -> void:
 	play(&"step", -11.0, randf_range(0.92, 1.1))
 
+func ui_click() -> void:
+	play(&"part_pickup", -11.0, randf_range(1.1, 1.22))
+
 func whoosh() -> void:
 	play(&"whoosh", -8.0, randf_range(0.9, 1.12))

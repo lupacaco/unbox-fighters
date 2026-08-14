@@ -55,6 +55,7 @@ func _ready() -> void:
 	var shape := RectangleShape2D.new()
 	shape.size = Vector2(230, 220)
 	_collision.shape = shape
+	Feel.hide_collision_debug(_collision)
 	_label.visible = false
 	_label.text = ""
 
@@ -137,6 +138,7 @@ func _on_hover(entering: bool) -> void:
 		_motion = create_tween()
 		_motion.tween_property(self, "position:y", target_y, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		_motion.parallel().tween_property(_sprite, "modulate", target_mod, 0.18)
+		_motion.parallel().tween_property(_sprite, "scale", Vector2.ONE * _display_scale * 1.06, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		return
 
 	_clear_hover_cursor()
@@ -146,6 +148,7 @@ func _on_hover(entering: bool) -> void:
 	_motion = create_tween()
 	_motion.tween_property(self, "position:y", _base_y, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	_motion.parallel().tween_property(_sprite, "modulate", _rest_modulate(), 0.18)
+	_motion.parallel().tween_property(_sprite, "scale", Vector2.ONE * _display_scale, 0.18)
 
 func _finish_open() -> void:
 	_busy = true

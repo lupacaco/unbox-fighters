@@ -14,6 +14,7 @@ Interface da preparação e da luta. As posições da tela seguem o mesmo mapa d
 | `scripts/ui/stat_readout.gd` | Nome + números dos 3 kits · total |
 | `scripts/ui/background_fx.gd` | Fundo de arena, vinheta e poeira |
 | `scripts/ui/theme_tokens.gd` | Paleta: ouro, creme, vermelho do PRONTO, gelo do travar |
+| `scripts/ui/feel.gd` | Reação gostosa: hover, clique, squash. Esconde retângulo de colisão |
 | `scripts/ui/hammer_cursor.gd` | Cursor martelo ao passar / bater nas caixas |
 | `scripts/assembly/sell_zone.gd` | Área **VENDER +1** à direita; fica dourada quando a peça passa por cima |
 
@@ -37,6 +38,8 @@ Pasta `assets/ui/`:
 - `shelf_premium.png` — prateleira (vira palco na luta)
 
 As peças dos Freaks são arquivos **200×200**. No jogo todas ficam no mesmo tamanho.
+
+Ao passar o mouse, clicar ou arrastar, as coisas **crescem, esmagam e brilham** (ouro), sem caixas vermelhas de debug. Regra: `.cursor/rules/feedback-gostoso.mdc`.
 
 ## Arte das caixas
 

@@ -35,7 +35,7 @@ unbox-fighters/
 └── .cursor/               # Regras e skills do Cursor (assistente) — versão Godot, não Unity
 ```
 
-As regras em `.cursor/rules/` ensinam o assistente a falar simples, atualizar docs, marcar ímãs, incluir personagem, e **mostrar no Godot onde clicar**. Não há regras da Unity neste projeto.
+As regras em `.cursor/rules/` ensinam o assistente a falar simples, atualizar docs, marcar ímãs, incluir personagem, **fazer cada clique parecer gostoso**, e **mostrar no Godot onde clicar**. Não há regras da Unity neste projeto.
 
 ## Guia rápido
 

@@ -36,6 +36,7 @@ func _ready() -> void:
 	_ready_button.add_theme_stylebox_override("pressed", _ready_hover)
 	_ready_button.pressed.connect(func() -> void: ready_pressed.emit())
 	add_child(_ready_button)
+	Feel.wire_button(_ready_button)
 
 func show_prep() -> void:
 	_place(_phase, AssemblyLayout.PREP_LABEL, Vector2(280, 48))

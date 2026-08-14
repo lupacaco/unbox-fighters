@@ -22,6 +22,8 @@ var _kit_root: Node2D
 var _kit_sprites: Dictionary = {}
 var _kit_home := Vector2.ZERO
 var _shows_kit: bool = false
+var _over_target: bool = false
+var _shadow_rest := Vector2(8, 14)
 
 func setup(def: PartDef, drag_service: DragDropService) -> void:
 	part_def = def
@@ -57,21 +59,45 @@ func set_attached_slot(slot: CharacterSlot) -> void:
 
 func begin_drag() -> void:
 	_dragging = true
+	_over_target = false
 	_stop_idle_float()
 	z_index = 120
-	_glow.color = Color(0.77, 0.12, 0.23, 0.22)
-	var tween := create_tween()
-	tween.tween_property(self, "scale", Vector2.ONE * 1.05, 0.12).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_plate.visible = false
+	_glow.visible = false
+	rotation = 0.0
+	_shadow.position = Vector2(18, 28)
+	_shadow.modulate = Color(0, 0, 0, 0.55)
+	Feel.punch(self, Vector2(1.16, 0.88), Vector2.ONE * 1.12)
 	if _attached_slot != null:
 		_attached_slot.detach_part(part_def.slot_type, false)
 		_attached_slot = null
 		visible = true
 	_drag_service.notify_drag_process_needed()
 
-func cancel_drag_return() -> void:
+func apply_drag_tilt(mouse_dx: float) -> void:
+	if not _dragging:
+		return
+	var target := clampf(mouse_dx * 0.045, -0.18, 0.18)
+	rotation = lerp_angle(rotation, target, 0.28)
+
+func set_over_target(on: bool) -> void:
+	if _over_target == on:
+		return
+	_over_target = on
+	if not _dragging:
+		return
+	Feel.to_scale(self, Vector2.ONE * (1.2 if on else 1.12), 0.1)
+
+func _clear_drag_pose() -> void:
 	_dragging = false
+	_over_target = false
 	z_index = 0
-	scale = Vector2.ONE
+	rotation = 0.0
+	_shadow.position = _shadow_rest
+	_shadow.modulate = Color(0, 0, 0, 0.45)
+
+func cancel_drag_return() -> void:
+	_clear_drag_pose()
 	return_to_tray()
 
 func contains_point(global_point: Vector2) -> bool:
@@ -89,25 +115,23 @@ func unbind_from_card() -> void:
 	visible = true
 
 func return_to_tray() -> void:
-	_dragging = false
+	_clear_drag_pose()
 	_attached_slot = null
 	visible = true
-	z_index = 0
-	_glow.color = Color(0.77, 0.12, 0.23, 0.1)
+	Feel.kill_scale(self)
 	if not is_inside_tree():
 		global_position = tray_home
 		scale = Vector2.ONE
 		return
 	var tween := create_tween()
 	tween.tween_property(self, "global_position", tray_home, 0.24).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(self, "scale", Vector2.ONE, 0.24).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(self, "scale", Vector2.ONE, 0.24).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.finished.connect(_start_idle_float, CONNECT_ONE_SHOT)
 
 func snap_hide_for_slot() -> void:
-	_dragging = false
-	visible = false
-	z_index = 0
+	_clear_drag_pose()
 	scale = Vector2.ONE
+	visible = false
 	_stop_idle_float()
 
 func lock_interaction(locked: bool) -> void:
@@ -117,6 +141,9 @@ func _ready() -> void:
 	input_pickable = true
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
+	_plate.visible = false
+	_glow.visible = false
+	Feel.hide_collision_debug(_collision)
 	_ensure_kit()
 
 func _input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
@@ -195,7 +222,10 @@ func _fit_kit_hitbox() -> void:
 	_glow.polygon = PackedVector2Array([
 		Vector2(-hw, -hh), Vector2(hw, -hh), Vector2(hw, hh), Vector2(-hw, hh)
 	])
-	_glow.color = Color(0.77, 0.12, 0.23, 0.0)
+	_plate.visible = false
+	_glow.visible = false
+	_glow.color = Color(0, 0, 0, 0)
+	Feel.hide_collision_debug(_collision)
 
 func _fit_single() -> void:
 	var target := CompositeResolver.PART_SIZE_PX
@@ -215,7 +245,10 @@ func _fit_single() -> void:
 	_glow.polygon = PackedVector2Array([
 		Vector2(-hw, -hh), Vector2(hw, -hh), Vector2(hw, hh), Vector2(-hw, hh)
 	])
-	_glow.color = Color(0.77, 0.12, 0.23, 0.0)
+	_plate.visible = false
+	_glow.visible = false
+	_glow.color = Color(0, 0, 0, 0)
+	Feel.hide_collision_debug(_collision)
 
 func _start_idle_float() -> void:
 	_stop_idle_float()
@@ -238,10 +271,8 @@ func _stop_idle_float() -> void:
 
 func _on_mouse_entered() -> void:
 	if can_interact() and not _dragging:
-		var tween := create_tween()
-		tween.tween_property(self, "scale", Vector2.ONE * 1.03, 0.12).set_trans(Tween.TRANS_SINE)
+		Feel.to_scale(self, Vector2.ONE * 1.08, 0.1)
 
 func _on_mouse_exited() -> void:
 	if not _dragging:
-		var tween := create_tween()
-		tween.tween_property(self, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE)
+		Feel.to_scale(self, Vector2.ONE, 0.12)

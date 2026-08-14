@@ -63,7 +63,8 @@ text = "LUTAR"
 
 [node name="DropHighlight" type="Line2D" parent="." unique_id=1965586886]
 visible = false
-width = 2.0
+width = 3.0
+default_color = Color(0.96, 0.78, 0.36, 0)
 
 [node name="CompleteGlow" type="Polygon2D" parent="." unique_id=1867872172]
 visible = false

@@ -1,0 +1,30 @@
+---
+description: Toda interação do jogo deve ter reação gostosa (scale, squash, brilho). Sem retângulos de debug.
+alwaysApply: true
+---
+
+# Feedback gostoso
+
+Cada clique, arraste, hover e soltar precisa **parecer vivo**. Sem caixa vermelha, retângulo de colisão ou destaque de programador na tela do jogo.
+
+## Proibido
+
+- `ColorRect` / `Polygon2D` / `Line2D` vermelho para “estou segurando” ou “pode soltar aqui”
+- Deixar `CollisionShape2D` visível (use `Feel.hide_collision_debug`)
+- Troca seca de escala/cor, sem tween
+- Destacar zona de drop com retângulo feio; a **carta inteira** acende (ouro / creme)
+
+## Obrigatório em interação nova
+
+- **Hover:** cresce um pouco (1.04–1.08)
+- **Clique / pegar:** squash (largo e baixo) e volta com `TRANS_BACK`
+- **Arrastar:** peça maior, sombra mais longa, inclina com o movimento
+- **Em cima da carta / VENDER:** o alvo brilha ouro e cresce; a peça puxa um pouco
+- **Soltar certo:** pulso na carta; **errado:** volta com tween, não some
+- **Botão:** pivot no centro, hover cresce, apertar encolhe, som curto
+
+Use `scripts/ui/feel.gd` (`Feel`). Não invente outro jeito de tween.
+
+## Cor de “pode”
+
+Ouro / creme (`ThemeTokens.GOLD`). Vermelho só para perigo de verdade (PRONTO, sem pancada), nunca para drop válido.

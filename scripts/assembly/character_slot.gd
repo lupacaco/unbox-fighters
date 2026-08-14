@@ -36,6 +36,7 @@ var _rank_label: Label
 var _tags: Dictionary = {}
 var _grip: Area2D
 var _card_motion: Tween
+var _drop_hot: bool = false
 
 func setup(def: CharacterDef = null, roster: Array[CharacterDef] = []) -> void:
 	character = def
@@ -50,6 +51,8 @@ func setup(def: CharacterDef = null, roster: Array[CharacterDef] = []) -> void:
 	_readout.set_complete(false)
 	_glow.visible = false
 	_highlight.visible = false
+	_drop_hot = false
+	_card_frame.modulate = Color.WHITE
 	_build_visuals()
 	_setup_zones()
 	_hide_fight_button()
@@ -101,6 +104,8 @@ func find_part_at(global_point: Vector2) -> PartView:
 func play_leave_for_fight() -> void:
 	if _lifted:
 		return
+	set_drop_highlight(false, PartSlotType.Value.BODY)
+	Feel.kill_scale(self)
 	_lifted = true
 	set_fight_locked(true)
 	_kill_card_motion()
@@ -242,25 +247,18 @@ func detach_part(slot: PartSlotType.Value, refresh: bool = true) -> PartView:
 	assembly_changed.emit(self)
 	return part_view
 
-func set_drop_highlight(enabled: bool, slot: PartSlotType.Value) -> void:
-	_highlight.visible = enabled
-	if not enabled:
+func set_drop_highlight(enabled: bool, _slot: PartSlotType.Value) -> void:
+	_highlight.visible = false
+	if _lifted or _fight_locked:
+		enabled = false
+	if _drop_hot == enabled:
 		return
-	var zone := _zone_for(slot)
-	if zone == null or not zone.has_meta("rect"):
-		return
-	var rect: Rect2 = zone.get_meta("rect")
-	_highlight.points = PackedVector2Array([
-		rect.position,
-		rect.position + Vector2(rect.size.x, 0),
-		rect.position + rect.size,
-		rect.position + Vector2(0, rect.size.y),
-		rect.position
-	])
-	_highlight.default_color = Color(0.77, 0.12, 0.23, 0.85)
-	_highlight.modulate.a = 0.0
+	_drop_hot = enabled
+	var frame_color := Color(1.18, 1.12, 0.92, 1) if enabled else Color.WHITE
+	var card_scale := Vector2.ONE * 1.045 if enabled else Vector2.ONE
+	Feel.to_scale(self, card_scale, 0.12)
 	var tween := create_tween()
-	tween.tween_property(_highlight, "modulate:a", 1.0, 0.16).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(_card_frame, "modulate", frame_color, 0.12).set_trans(Tween.TRANS_SINE)
 
 func play_intro(delay: float) -> void:
 	modulate.a = 0.0
@@ -344,6 +342,7 @@ func _configure_zone(zone: Area2D, rect: Rect2) -> void:
 			if shape_node != null and shape_node.shape is RectangleShape2D:
 				(shape_node.shape as RectangleShape2D).size = rect.size
 				shape_node.position = rect.position + rect.size * 0.5
+				Feel.hide_collision_debug(shape_node)
 		return
 	zone.set_meta("wired", true)
 	var shape_owner := CollisionShape2D.new()
@@ -351,6 +350,7 @@ func _configure_zone(zone: Area2D, rect: Rect2) -> void:
 	shape.size = rect.size
 	shape_owner.shape = shape
 	shape_owner.position = rect.position + rect.size * 0.5
+	Feel.hide_collision_debug(shape_owner)
 	zone.add_child(shape_owner)
 	zone.input_event.connect(_on_zone_input.bind(zone))
 
@@ -456,8 +456,9 @@ func _resolve_display_name() -> String:
 	return "MIX"
 
 func _pulse_attach() -> void:
+	Feel.punch(_display_root, Vector2(1.08, 0.92), Vector2.ONE)
 	var tween := create_tween()
-	tween.tween_property(_card_frame, "modulate", Color(1.12, 1.1, 1.08, 1), 0.08)
+	tween.tween_property(_card_frame, "modulate", Color(1.2, 1.14, 0.95, 1), 0.08)
 	tween.tween_property(_card_frame, "modulate", Color.WHITE, 0.28).set_trans(Tween.TRANS_SINE)
 
 func _hide_fight_button() -> void:
@@ -505,6 +506,7 @@ func _ensure_grip() -> void:
 	rect.size = Vector2(220, 48)
 	shape.shape = rect
 	shape.position = Vector2(0, -226)
+	Feel.hide_collision_debug(shape)
 	_grip.add_child(shape)
 	_grip.input_pickable = true
 	_grip.input_event.connect(_on_grip_input)

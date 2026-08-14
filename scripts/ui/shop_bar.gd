@@ -93,6 +93,7 @@ func _make_fill_button(text: String, center: Vector2, size: Vector2, fill: Color
 	button.add_theme_font_size_override("font_size", 18)
 	button.add_theme_color_override("font_color", ThemeTokens.CREAM)
 	_paint_button(button, fill)
+	Feel.wire_button(button)
 	return button
 
 func _paint_button(button: Button, fill: Color) -> void:

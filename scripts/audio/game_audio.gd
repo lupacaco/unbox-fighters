@@ -64,6 +64,11 @@ static func step() -> void:
 	if s:
 		s.call("step")
 
+static func ui_click() -> void:
+	var s := _sfx()
+	if s:
+		s.call("ui_click")
+
 static func whoosh() -> void:
 	var s := _sfx()
 	if s:
