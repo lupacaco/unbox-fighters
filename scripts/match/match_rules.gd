@@ -16,7 +16,6 @@ const REFRESH_COST := 1
 const SELL_REWARD := 1
 const HUMAN_COUNT := 1
 const BOT_COUNT := 3
-const MAX_BOT_REFRESHES := 6
 
 ## Cost to go from tier 1→2, 2→3, 3→4, 4→5.
 const UPGRADE_COSTS: Array[int] = [4, 5, 6, 7]

@@ -13,7 +13,7 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 | `verify_combat_sim.gd` | Choque, empate, teto de 12 de dano no HP |
 | `verify_shop_pool.gd` | 6 personagens; loja nível 1 não vende 9 nem tronco da múmia; 5 ofertas |
 | `verify_match_state.gd` | 4 vivos, HP 40, nomes dos bots, oponente-fantasma |
-| `verify_assembly.gd` | 3 cartas e 5 caixas |
+| `verify_assembly.gd` | 3 cartas, 5 caixas e VENDER à direita |
 | `verify_crate_open.gd` | Fluxo de 2 cliques da caixa |
 | `verify_composite.gd` | Layout por ímãs |
 | `verify_part_sizes.gd` | Sprites 300×300 e poses |

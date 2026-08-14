@@ -27,6 +27,7 @@ func set_locked(locked: bool) -> void:
 			_dragging.cancel_drag_return()
 			_dragging = null
 		_dragging_card = null
+		_set_sell_highlight(false)
 		set_process(false)
 
 func is_locked() -> bool:
@@ -52,8 +53,10 @@ func _process(_delta: float) -> void:
 	if _dragging != null:
 		_dragging.global_position = get_viewport().get_mouse_position()
 		_update_hover()
+		_update_sell_highlight()
 	elif _dragging_card != null:
 		_update_card_hover()
+		_update_sell_highlight()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
@@ -97,6 +100,7 @@ func _finish_drag() -> void:
 		_hover_slot.set_drop_highlight(false, part.part_def.slot_type)
 	var target := _hover_slot
 	_hover_slot = null
+	_set_sell_highlight(false)
 	if _is_over_sell():
 		part_sold.emit(part)
 		drag_ended.emit(part, true)
@@ -120,6 +124,7 @@ func _finish_card_drag() -> void:
 		_hover_slot.set_drop_highlight(false, PartSlotType.Value.BODY)
 	var target := _hover_slot
 	_hover_slot = null
+	_set_sell_highlight(false)
 	if _is_over_sell():
 		card_sold.emit(card)
 		return
@@ -137,6 +142,13 @@ func _is_over_sell() -> bool:
 	var mouse := get_viewport().get_mouse_position()
 	var rect: Rect2 = _sell_zone.get_meta("rect", Rect2())
 	return rect.has_point(_sell_zone.to_local(mouse))
+
+func _update_sell_highlight() -> void:
+	_set_sell_highlight(_is_over_sell())
+
+func _set_sell_highlight(on: bool) -> void:
+	if _sell_zone != null and _sell_zone.has_method("set_highlight"):
+		_sell_zone.set_highlight(on)
 
 func _find_compatible_slot(part: PartView) -> CharacterSlot:
 	var mouse := get_viewport().get_mouse_position()
@@ -188,4 +200,5 @@ func _clear_drag_visuals() -> void:
 		_hover_slot = null
 	_dragging = null
 	_dragging_card = null
+	_set_sell_highlight(false)
 	set_process(false)

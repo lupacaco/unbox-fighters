@@ -20,8 +20,7 @@ var _fight_director: FightDirector
 var _match: MatchState
 var _prep_hud: PrepHud
 var _shop_bar: ShopBar
-var _fight_overlay: FightOverlay
-var _sell_zone: Area2D
+var _sell_zone: SellZone
 var _crates: Array[Crate] = []
 var _waiting_for_fight: bool = false
 
@@ -62,11 +61,9 @@ func _build_hud() -> void:
 	_shop_bar.refresh_pressed.connect(_on_refresh_pressed)
 	_shop_bar.freeze_pressed.connect(_on_freeze_pressed)
 	_shop_bar.upgrade_pressed.connect(_on_upgrade_pressed)
-	_fight_overlay = FightOverlay.new()
-	_hud.add_child(_fight_overlay)
 
 func _setup_tray_visual() -> void:
-	_tray.position = Vector2(960, 920)
+	_tray.position = AssemblyLayout.TRAY
 	var shelf_tex: Texture2D = load("res://assets/ui/shelf_premium.png")
 	_shelf.texture = shelf_tex
 	_shelf.centered = true
@@ -76,20 +73,19 @@ func _setup_tray_visual() -> void:
 	_shelf.modulate = Color(0.9, 0.92, 0.95, 1)
 
 func _spawn_slots() -> void:
-	var xs := [380.0, 960.0, 1540.0]
 	var ranks := [3, 2, 1]
 	var existing: Array[CharacterSlot] = []
 	for child in _slots_root.get_children():
 		if child is CharacterSlot:
 			existing.append(child as CharacterSlot)
-	for i in xs.size():
+	for i in AssemblyLayout.SLOT_X.size():
 		var slot: CharacterSlot
 		if i < existing.size():
 			slot = existing[i]
 		else:
 			slot = _slot_scene.instantiate() as CharacterSlot
 			_slots_root.add_child(slot)
-		slot.position = Vector2(xs[i], 400)
+		slot.position = Vector2(AssemblyLayout.SLOT_X[i], AssemblyLayout.SLOT_Y)
 		slot.setup(null, _roster)
 		slot.set_queue_rank(ranks[i])
 		slot.card_drag_requested.connect(_on_card_drag_requested)
@@ -97,32 +93,9 @@ func _spawn_slots() -> void:
 		_slots.append(slot)
 
 func _spawn_sell_zone() -> void:
-	_sell_zone = Area2D.new()
-	_sell_zone.name = "SellZone"
+	_sell_zone = SellZone.new()
 	_tray.add_child(_sell_zone)
-	_sell_zone.position = Vector2(-780, -58)
-	var rect := Rect2(Vector2(-70, -70), Vector2(140, 140))
-	_sell_zone.set_meta("rect", rect)
-	var shape := CollisionShape2D.new()
-	var box := RectangleShape2D.new()
-	box.size = rect.size
-	shape.shape = box
-	_sell_zone.add_child(shape)
-	var label := Label.new()
-	label.text = "VENDER"
-	label.position = Vector2(-54, 64)
-	label.size = Vector2(108, 24)
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 16)
-	label.add_theme_color_override("font_color", ThemeTokens.TEXT_DIM)
-	_sell_zone.add_child(label)
-	var plate := Polygon2D.new()
-	plate.polygon = PackedVector2Array([
-		Vector2(-60, -60), Vector2(60, -60), Vector2(60, 60), Vector2(-60, 60)
-	])
-	plate.color = Color(0.12, 0.08, 0.08, 0.55)
-	_sell_zone.add_child(plate)
-	plate.z_index = -1
+	_sell_zone.setup()
 
 func _refresh_shop_crates() -> void:
 	for crate in _crates:
@@ -134,21 +107,20 @@ func _refresh_shop_crates() -> void:
 			child.queue_free()
 	var human := _match.human()
 	var count := MatchRules.SHOP_SLOTS
-	var spacing := 165.0
-	var start_x := -spacing * float(count - 1) * 0.5
 	for i in count:
 		var part: PartDef = human.shop_offers[i] if i < human.shop_offers.size() else null
 		if part == null:
 			continue
 		var crate: Crate = _crate_scene.instantiate() as Crate
 		_tray.add_child(crate)
-		var rest := Vector2(start_x + spacing * float(i), -58)
+		var rest := Vector2(AssemblyLayout.crate_x(i, count), AssemblyLayout.CRATE_Y)
 		crate.position = rest
 		crate.shop_index = i
 		crate.can_afford = func() -> bool: return _match.human().gold >= MatchRules.OPEN_CRATE_COST
 		crate.on_paid_open = _pay_for_crate
 		crate.setup(part, _part_scene, _drag_service, _tray)
 		crate.set_rest_y(rest.y)
+		crate.set_frozen_look(human.frozen)
 		_crates.append(crate)
 
 func _pay_for_crate(crate: Crate) -> bool:
@@ -197,6 +169,9 @@ func _restart_match() -> void:
 func _clear_player_pieces() -> void:
 	for slot in _slots:
 		slot.set_fight_locked(false)
+		slot.visible = true
+		slot.modulate.a = 1.0
+		slot.scale = Vector2.ONE
 		var stolen := slot.steal_all_parts()
 		for key in stolen.keys():
 			var view: PartView = stolen[key]
@@ -217,6 +192,10 @@ func _on_freeze_pressed() -> void:
 	if _match.phase != MatchState.Phase.PREP:
 		return
 	_match.toggle_freeze(_match.human())
+	var frozen := _match.human().frozen
+	for crate in _crates:
+		if is_instance_valid(crate):
+			crate.set_frozen_look(frozen)
 	_refresh_hud()
 
 func _on_upgrade_pressed() -> void:
@@ -288,7 +267,6 @@ func _begin_fight() -> void:
 		_tray,
 		_fx_layer,
 		_drag_service,
-		_fight_overlay,
 		_shop_nodes(),
 		human.display_name,
 		opponent.display_name if opponent != null else "",
@@ -303,8 +281,8 @@ func _begin_fight() -> void:
 	_match.finish_round()
 	if _match.phase == MatchState.Phase.GAME_OVER:
 		_drag_service.set_locked(true)
+		_shop_bar.set_fight_style(true)
 		_prep_hud.show_game_over(_match.winner_id == human.id)
-		_prep_hud.refresh_players(_match)
 		return
 	_refresh_shop_crates()
 	_refresh_hud()

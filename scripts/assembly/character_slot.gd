@@ -40,16 +40,22 @@ var _bound_parts: Dictionary = {}
 var _crossfade_busy: bool = false
 var _rest_y: float = 0.0
 var _fight_locked: bool = false
+var _lifted: bool = false
 var _rank_label: Label
 var _tags: Dictionary = {}
 var _grip: Area2D
+var _card_motion: Tween
 
 func setup(def: CharacterDef = null, roster: Array[CharacterDef] = []) -> void:
 	character = def
 	_roster = roster
 	_rest_y = position.y
+	_lifted = false
+	visible = true
+	scale = Vector2.ONE
+	modulate.a = 1.0
 	_readout.set_display_name("???")
-	_readout.set_total(0)
+	_readout.set_breakdown(0, 0, 0, 0)
 	_readout.set_complete(false)
 	_glow.visible = false
 	_highlight.visible = false
@@ -103,17 +109,40 @@ func find_part_at(global_point: Vector2) -> PartView:
 	return null
 
 func play_leave_for_fight() -> void:
+	if _lifted:
+		return
+	_lifted = true
 	set_fight_locked(true)
-	var tween := create_tween()
-	tween.tween_property(self, "position:y", _rest_y - 360.0, 0.48).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tween.parallel().tween_property(self, "modulate:a", 0.0, 0.4).set_trans(Tween.TRANS_SINE)
+	_kill_card_motion()
+	_card_motion = create_tween()
+	_card_motion.tween_property(self, "position:y", _rest_y - AssemblyLayout.CARD_LIFT, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	_card_motion.parallel().tween_property(self, "scale", Vector2(0.78, 0.78), 0.4)
+	_card_motion.parallel().tween_property(self, "modulate:a", 0.0, 0.38).set_trans(Tween.TRANS_SINE)
+	_card_motion.tween_callback(func() -> void:
+		position.y = _rest_y
+		scale = Vector2.ONE
+		modulate.a = 1.0
+		visible = false
+	)
 
 func play_return_from_fight() -> void:
-	position.y = _rest_y - 360.0
-	var tween := create_tween()
-	tween.tween_property(self, "position:y", _rest_y, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(self, "modulate:a", 1.0, 0.38).set_trans(Tween.TRANS_SINE)
-	tween.tween_callback(func() -> void: set_fight_locked(false))
+	_kill_card_motion()
+	visible = true
+	position.y = _rest_y - AssemblyLayout.CARD_SETTLE
+	scale = Vector2(0.84, 0.84)
+	modulate.a = 1.0
+	_card_motion = create_tween()
+	_card_motion.tween_property(self, "position:y", _rest_y, 0.42).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_card_motion.parallel().tween_property(self, "scale", Vector2.ONE, 0.42)
+	_card_motion.tween_callback(func() -> void:
+		_lifted = false
+		set_fight_locked(false)
+	)
+
+func _kill_card_motion() -> void:
+	if _card_motion != null and _card_motion.is_valid():
+		_card_motion.kill()
+	_card_motion = null
 
 func contains_card_point(global_point: Vector2) -> bool:
 	return Rect2(Vector2(-135, -205), Vector2(270, 400)).has_point(to_local(global_point))
@@ -380,7 +409,12 @@ func _place_sprite(sprite: Sprite2D, texture: Texture2D, pos: Vector2, target_px
 
 func _update_stats() -> void:
 	var loadout := to_loadout()
-	_readout.set_total(loadout.total_power())
+	_readout.set_breakdown(
+		loadout.combat_value_of(PartSlotType.Value.HEAD),
+		loadout.combat_value_of(PartSlotType.Value.BODY),
+		loadout.combat_value_of(PartSlotType.Value.LEGS),
+		loadout.total_power()
+	)
 	_readout.set_display_name(_resolve_display_name())
 	_refresh_tags()
 

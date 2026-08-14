@@ -24,7 +24,7 @@ unbox-fighters/
 ├── scenes/                # Cenas Godot (.tscn)
 │   └── assembly/          # Tela 2D principal
 ├── scripts/               # Código GDScript (.gd)
-│   ├── assembly/          # Tela: cartas, caixas, luta visível
+│   ├── assembly/          # Tela: cartas, caixas, luta visível, posições
 │   ├── match/             # Regras da partida (loja, sinergia, luta)
 │   ├── core/
 │   ├── data/

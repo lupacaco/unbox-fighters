@@ -25,7 +25,7 @@ O jogo ainda **não está pronto**. Estes docs descrevem o que **já existe** ho
 | [Peças e personagens](tecnico/sistemas/pecas-e-personagens.md) | Dados dos personagens, sinergia e composição visual |
 | [Arrastar e soltar](tecnico/sistemas/arrastar-e-soltar.md) | Peças, troca de fila e vender |
 | [Animação de luta](tecnico/sistemas/animacao-de-luta.md) | Palco: pulo, caminhada, placas, resto, KO |
-| [Visual e UI](tecnico/sistemas/visual-e-ui.md) | PREP., tags, pancadas, fundo |
+| [Visual e UI](tecnico/sistemas/visual-e-ui.md) | PREP, tags, pancadas, fundo |
 | [Áudio](tecnico/sistemas/audio.md) | Efeitos sonoros (caixa, peças, conclusão) |
 | [Pipeline de arte](tecnico/pipeline-de-arte.md) | Scripts que preparam imagens dos personagens |
 | [Testes rápidos](tecnico/testes-headless.md) | Scripts que verificam o jogo sem abrir a tela |

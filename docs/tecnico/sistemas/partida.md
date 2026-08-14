@@ -15,7 +15,7 @@ Regras da partida contra bots. Ficam em `scripts/match/` para poder testar os n�
 | `contestant.gd` | Um “jogador”: HP, ouro, loja, tabuleiro |
 | `match_state.gd` | Rodada, pareamento (incluindo cópia-fantasma), gastar pancada |
 | `fight_pair.gd` | Um confronto da rodada; `right_is_ghost` se o da direita é cópia |
-| `bot_brain.gd` | Compras instantâneas dos bots |
+| `bot_brain.gd` | Compras dos bots: completa set, só troca se a carta ficar mais forte, recarrega a loja ao subir de nível |
 
 ## Fluxo
 

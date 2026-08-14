@@ -25,6 +25,11 @@ func _run() -> void:
 		push_error("VERIFY_FAIL expected 5 shop crates, got %d" % crates)
 		quit(1)
 		return
+	var sell := scene.get_node_or_null("Tray/SellZone")
+	if sell == null or sell.position.x < 0.0:
+		push_error("VERIFY_FAIL sell zone should sit on the right of the shelf")
+		quit(1)
+		return
 	print("VERIFY_OK slots=", slots, " crates=", crates)
 	print("VERIFY_PASS")
 	quit(0)

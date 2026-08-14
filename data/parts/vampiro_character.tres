@@ -8,7 +8,7 @@
 [resource]
 script = ExtResource("1")
 id = &"vampiro"
-display_name = "VAMPIRE"
+display_name = "Vampiro"
 head = ExtResource("2")
 body = ExtResource("3")
 legs = ExtResource("4")

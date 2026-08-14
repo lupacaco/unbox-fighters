@@ -30,7 +30,7 @@ Arte e recursos (assets/, data/)
 | `Synergy` | 100% / 75% / 50% na mesma carta |
 | `ShopPool` / `BotBrain` | Sorteio da loja e compras dos bots |
 | `FightDirector` / `FighterPuppet` / `FightPlaque` | Mostra o palco: pulo, caminhada, choque, KO |
-| `PrepHud` / `ShopBar` / `StatTag` | PREP., pancadas, tags coloridas |
+| `PrepHud` / `ShopBar` / `StatTag` | PREP, pancadas, tags coloridas |
 | `DragDropService` | Arraste de peça, troca de carta, vender |
 | `Crate` / `PartView` / `CharacterSlot` | Caixa, peça, carta |
 | `CompositeResolver` | Cola as peças pelos ímãs |

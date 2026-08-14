@@ -30,6 +30,7 @@ var _drag_service: DragDropService
 var _tray: Node2D
 var _idle: Tween
 var _motion: Tween
+var _frozen_look: bool = false
 
 func setup(part: PartDef, part_scene: PackedScene, drag_service: DragDropService, tray: Node2D) -> void:
 	reward_part = part
@@ -38,10 +39,19 @@ func setup(part: PartDef, part_scene: PackedScene, drag_service: DragDropService
 	_tray = tray
 	_base_y = position.y
 	_apply_stage_art(TEX_INTACT)
+	set_frozen_look(false)
 	_start_idle()
 
 func set_rest_y(value: float) -> void:
 	_base_y = value
+
+func set_frozen_look(frozen: bool) -> void:
+	_frozen_look = frozen
+	if _sprite != null:
+		_sprite.modulate = _rest_modulate()
+
+func _rest_modulate() -> Color:
+	return ThemeTokens.FREEZE_CRATE if _frozen_look else Color.WHITE
 
 func _ready() -> void:
 	input_pickable = true
@@ -50,6 +60,8 @@ func _ready() -> void:
 	var shape := RectangleShape2D.new()
 	shape.size = Vector2(190, 180)
 	_collision.shape = shape
+	_label.visible = false
+	_label.text = ""
 
 func _exit_tree() -> void:
 	_clear_hover_cursor()
@@ -133,7 +145,7 @@ func _on_hover(entering: bool) -> void:
 			_hovered = true
 			HammerCursor.enter_crate()
 		var target_y := _base_y - 10.0
-		var target_mod := Color(1.08, 1.06, 1.04, 1)
+		var target_mod := _rest_modulate() * Color(1.08, 1.06, 1.04, 1)
 		_kill_motion()
 		_motion = create_tween()
 		_motion.tween_property(self, "position:y", target_y, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
@@ -146,7 +158,7 @@ func _on_hover(entering: bool) -> void:
 	_kill_motion()
 	_motion = create_tween()
 	_motion.tween_property(self, "position:y", _base_y, 0.18).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	_motion.parallel().tween_property(_sprite, "modulate", Color.WHITE, 0.18)
+	_motion.parallel().tween_property(_sprite, "modulate", _rest_modulate(), 0.18)
 
 func _play_hit_feedback() -> void:
 	_stop_idle()

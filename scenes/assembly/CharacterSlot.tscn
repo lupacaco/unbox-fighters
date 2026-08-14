@@ -89,37 +89,37 @@ monitorable = false
 
 [node name="StatReadout" type="Control" parent="."]
 anchors_preset = 0
-offset_left = -120.0
+offset_left = -180.0
 offset_top = 200.0
-offset_right = 120.0
-offset_bottom = 300.0
+offset_right = 180.0
+offset_bottom = 290.0
 script = ExtResource("2")
 
 [node name="Panel" type="ColorRect" parent="StatReadout"]
 layout_mode = 0
-offset_right = 240.0
-offset_bottom = 96.0
+offset_right = 360.0
+offset_bottom = 90.0
 color = Color(0.07, 0.08, 0.1, 0.92)
 
 [node name="Edge" type="ColorRect" parent="StatReadout"]
 layout_mode = 0
-offset_right = 240.0
+offset_right = 360.0
 offset_bottom = 1.0
 color = Color(0.55, 0.61, 0.71, 0.35)
 
 [node name="CompleteGlow" type="ColorRect" parent="StatReadout"]
 visible = false
 layout_mode = 0
-offset_right = 240.0
-offset_bottom = 96.0
+offset_right = 360.0
+offset_bottom = 90.0
 color = Color(0.79, 0.7, 0.49, 0.12)
 
 [node name="NameLabel" type="Label" parent="StatReadout"]
 layout_mode = 0
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 230.0
-offset_bottom = 36.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 352.0
+offset_bottom = 34.0
 theme_override_colors/font_color = Color(0.9, 0.92, 0.94, 1)
 theme_override_font_sizes/font_size = 18
 text = "???"
@@ -127,16 +127,17 @@ horizontal_alignment = 1
 
 [node name="TotalLabel" type="Label" parent="StatReadout"]
 layout_mode = 0
-offset_left = 10.0
-offset_top = 34.0
-offset_right = 230.0
-offset_bottom = 60.0
-theme_override_colors/font_color = Color(0.79, 0.7, 0.49, 1)
-theme_override_font_sizes/font_size = 22
-text = "0"
+offset_left = 8.0
+offset_top = 36.0
+offset_right = 352.0
+offset_bottom = 82.0
+theme_override_colors/font_color = Color(0.96, 0.93, 0.86, 1)
+theme_override_font_sizes/font_size = 13
+text = "Ameaça 0   Força 0   Agilidade 0   ·  0"
 horizontal_alignment = 1
 
 [node name="Stats" type="HBoxContainer" parent="StatReadout"]
+visible = false
 layout_mode = 0
 offset_left = 10.0
 offset_top = 64.0

@@ -1,20 +1,23 @@
 # Sistema: visual e UI
 
-Interface da preparação e da luta.
+Interface da preparação e da luta. As posições da tela seguem o mesmo mapa da Unity (convertido para o Godot, onde Y cresce para baixo).
 
 ## Arquivos
 
 | Arquivo | Papel |
 |---------|--------|
-| `scripts/ui/prep_hud.gd` | **PREP.** / **LUTA**, relógio `1:00`, vs oponente, HP dos 4, PRONTO / NOVA PARTIDA |
-| `scripts/ui/shop_bar.gd` | NÍVEL, bolinhas de pancadas, ATUALIZAR, TRAVAR |
+| `scripts/assembly/assembly_layout.gd` | Onde cada coisa fica na tela (PREP, relógio, loja, vender, cartas) |
+| `scripts/ui/prep_hud.gd` | **PREP** no topo, relógio no centro, vs / HP, PRONTO vermelho / NOVA PARTIDA |
+| `scripts/ui/shop_bar.gd` | NÍVEL (com custo), 10 bolinhas douradas, ATUALIZAR, TRAVAR |
 | `scripts/ui/stat_tag.gd` | Pílula colorida com o número da peça |
-| `scripts/ui/fight_overlay.gd` | Overlay antigo da luta (a apresentação nova usa placas) |
 | `scripts/ui/fight_plaque.gd` | Placa dourada: nomes, HP, números do choque, KO |
-| `scripts/ui/stat_readout.gd` | Nome e total na carta |
+| `scripts/ui/stat_readout.gd` | Nome + linha **Ameaça / Força / Agilidade · total** |
 | `scripts/ui/background_fx.gd` | Fundo de arena, vinheta e poeira |
-| `scripts/ui/theme_tokens.gd` | Paleta: laranja PREP, azul / roxo / verde das tags, vermelho das pancadas |
+| `scripts/ui/theme_tokens.gd` | Paleta: ouro, creme, vermelho do PRONTO, gelo do travar |
 | `scripts/ui/hammer_cursor.gd` | Cursor martelo ao passar / bater nas caixas |
+| `scripts/assembly/sell_zone.gd` | Área **VENDER +1** à direita; fica dourada quando a peça passa por cima |
+
+Durante a luta, o HUD de cima e a loja somem. Só ficam as placas da luta. No fim: **Você venceu!** ou **Você saiu**.
 
 ## Cores das tags
 
@@ -37,6 +40,8 @@ Pasta `assets/boxes/`:
 - `box-01.png` — intacta
 - `box-02.png` — trincada
 - `box-03.png` — quebrada
+
+Com **TRAVAR** ligado, as caixas ficam com um tom gelado (azul-claro).
 
 ## Cursor martelo
 

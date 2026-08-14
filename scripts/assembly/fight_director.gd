@@ -29,7 +29,11 @@ var _busy: bool = false
 var _tray: Node2D
 var _fx: Node2D
 var _camera: Camera2D
+var _camera_rest_zoom := Vector2.ONE
+var _camera_rest_offset := Vector2.ZERO
 var _stage: Node2D
+var _dust_fx: CPUParticles2D
+var _flash_poly: Polygon2D
 var _left: Array[StageFighter] = []
 var _right: Array[StageFighter] = []
 var _lifted: Dictionary = {}
@@ -44,7 +48,6 @@ func play(
 	tray: Node2D,
 	fx_layer: Node2D,
 	drag_service: DragDropService,
-	overlay: FightOverlay,
 	shop_nodes: Array,
 	left_name: String = "Você",
 	right_name: String = "",
@@ -59,11 +62,13 @@ func play(
 	_lifted.clear()
 	_left.clear()
 	_right.clear()
+	Engine.time_scale = 1.0
 	if drag_service != null:
 		drag_service.set_locked(true)
-	if overlay != null:
-		overlay.reset()
 	_camera = _ensure_camera()
+	_camera_rest_zoom = _camera.zoom
+	_camera_rest_offset = _camera.offset
+	_ensure_fx_pool()
 	_set_arena(true)
 	_flash(Color(1, 0.92, 0.75, 0.22), 0.12)
 	_camera_punch(8.0, 0.16)
@@ -79,24 +84,24 @@ func play(
 		slot.set_fight_locked(true)
 		slot.set_fighter_visible(false)
 
-	var name_l := _plaque(Vector2(320, 64), Vector2(280, 54), 22, Color(0.1, 0.09, 0.08, 0.94))
+	var name_l := _plaque(AssemblyLayout.FIGHT_NAME_LEFT, Vector2(280, 54), 22, ThemeTokens.INK)
 	name_l.set_text(left_name)
-	name_l.set_label_color(ThemeTokens.COMPLETE)
-	var hp_l := _plaque(Vector2(320, 132), Vector2(132, 78), 40, Color(0.42, 0.32, 0.12, 0.95))
+	name_l.set_label_color(ThemeTokens.GOLD)
+	var hp_l := _plaque(AssemblyLayout.FIGHT_HP_LEFT, Vector2(132, 78), 40, ThemeTokens.GOLD_DEEP)
 	hp_l.set_text(str(left_hp))
-	var name_r := _plaque(Vector2(1600, 64), Vector2(280, 54), 22, Color(0.1, 0.09, 0.08, 0.94))
+	var name_r := _plaque(AssemblyLayout.FIGHT_NAME_RIGHT, Vector2(280, 54), 22, ThemeTokens.INK)
 	name_r.set_text(right_name)
-	name_r.set_label_color(ThemeTokens.COMPLETE)
-	var hp_r := _plaque(Vector2(1600, 132), Vector2(132, 78), 40, Color(0.42, 0.32, 0.12, 0.95))
+	name_r.set_label_color(ThemeTokens.GOLD)
+	var hp_r := _plaque(AssemblyLayout.FIGHT_HP_RIGHT, Vector2(132, 78), 40, ThemeTokens.GOLD_DEEP)
 	hp_r.set_text(str(right_hp))
-	var vs := _plaque(Vector2(960, 80), Vector2(220, 52), 22, Color(0.1, 0.09, 0.08, 0.94))
+	var vs := _plaque(AssemblyLayout.FIGHT_VS, Vector2(220, 52), 22, ThemeTokens.INK)
 	vs.set_text("VS")
-	vs.set_label_color(ThemeTokens.COMPLETE)
-	var clash_l := _plaque(CLASH_CENTER + Vector2(-150, -130), Vector2(168, 124), 56, ThemeTokens.THREAT)
-	var clash_r := _plaque(CLASH_CENTER + Vector2(150, -130), Vector2(168, 124), 56, ThemeTokens.THREAT)
+	vs.set_label_color(ThemeTokens.GOLD)
+	var clash_l := _plaque(AssemblyLayout.FIGHT_CLASH + Vector2(-120, 0), Vector2(168, 124), 56, ThemeTokens.THREAT)
+	var clash_r := _plaque(AssemblyLayout.FIGHT_CLASH + Vector2(120, 0), Vector2(168, 124), 56, ThemeTokens.THREAT)
 	clash_l.show_plaque(false)
 	clash_r.show_plaque(false)
-	var ko := _plaque(CLASH_CENTER, Vector2(240, 110), 48, ThemeTokens.X_RED)
+	var ko := _plaque(AssemblyLayout.FIGHT_CLASH, Vector2(240, 110), 48, ThemeTokens.BLOOD_HOT)
 	ko.set_text("KO")
 	ko.show_plaque(false)
 
@@ -154,13 +159,11 @@ func play(
 					elif event.winning_side == CombatEvent.Side.RIGHT:
 						end = "%s  +%d" % [right_name, event.damage_to_left]
 					vs.set_text(end)
-					vs.set_fill(Color(0.42, 0.32, 0.12, 0.95))
-					vs.set_label_color(Color("F4EFE6"))
+					vs.set_fill(ThemeTokens.GOLD_DEEP)
+					vs.set_label_color(ThemeTokens.CREAM)
 					vs.punch()
 					await get_tree().create_timer(1.15).timeout
 
-	if overlay != null:
-		overlay.reset()
 	for slot in slots:
 		slot.play_return_from_fight()
 	await get_tree().create_timer(0.45).timeout
@@ -173,6 +176,8 @@ func play(
 		_stage.queue_free()
 	_stage = null
 	_set_arena(false)
+	_restore_camera()
+	Engine.time_scale = 1.0
 	if drag_service != null:
 		drag_service.set_locked(false)
 	_busy = false
@@ -213,12 +218,18 @@ func _slot_for_queue(queue_index: int, slots: Array[CharacterSlot]) -> Character
 	return slots[visual]
 
 func _intro_pair(player: StageFighter, enemy: StageFighter, rank: int, heavy: bool) -> void:
+	var done := [0]
+	var need := 0
 	if player != null:
-		await _jump_walk_in(player, _land_pos(false), _stand_pos(false, rank), heavy, rank)
+		need += 1
+		_jump_walk_in(player, _land_pos(false), _stand_pos(false, rank), heavy, rank, func() -> void: done[0] += 1)
 	if enemy != null:
-		await _jump_walk_in(enemy, _land_pos(true), _stand_pos(true, rank), heavy and player == null, rank)
+		need += 1
+		_jump_walk_in(enemy, _land_pos(true), _stand_pos(true, rank), heavy and player == null, rank, func() -> void: done[0] += 1)
+	while done[0] < need:
+		await get_tree().process_frame
 
-func _jump_walk_in(fighter: StageFighter, land: Vector2, stand: Vector2, heavy: bool, rank: int) -> void:
+func _jump_walk_in(fighter: StageFighter, land: Vector2, stand: Vector2, heavy: bool, rank: int, done: Callable = Callable()) -> void:
 	_lift_card(fighter.source_slot)
 	var face := -1.0 if fighter.face_left else 1.0
 	fighter.visual.scale = Vector2(1.12, 0.78)
@@ -236,6 +247,8 @@ func _jump_walk_in(fighter: StageFighter, land: Vector2, stand: Vector2, heavy: 
 	fighter.puppet.set_pose(FighterPuppet.Pose.PROFILE)
 	var signed := QUEUE_SCALE[clampi(rank, 0, 2)]
 	fighter.root.scale = Vector2(face * signed, signed)
+	if done.is_valid():
+		done.call()
 
 func _walk_to(fighter: StageFighter, from: Vector2, to: Vector2) -> void:
 	for i in WALK_STEPS:
@@ -273,8 +286,8 @@ func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, cl
 	var right_ghost := _make_ghost(right, event.right_slot)
 	var left_hit := CLASH_CENTER + Vector2(-78, 0)
 	var right_hit := CLASH_CENTER + Vector2(78, 0)
-	clash_l.global_position = CLASH_CENTER + Vector2(-150, -130)
-	clash_r.global_position = CLASH_CENTER + Vector2(150, -130)
+	clash_l.global_position = AssemblyLayout.FIGHT_CLASH + Vector2(-120, 0)
+	clash_r.global_position = AssemblyLayout.FIGHT_CLASH + Vector2(120, 0)
 	clash_l.set_fill(ThemeTokens.color_for_slot(event.left_slot))
 	clash_r.set_fill(ThemeTokens.color_for_slot(event.right_slot))
 	clash_l.set_label_color(Color("F4EFE6"))
@@ -294,7 +307,9 @@ func _play_clash(left: StageFighter, right: StageFighter, event: CombatEvent, cl
 	await get_tree().create_timer(0.18).timeout
 	_flash(Color(1, 0.85, 0.45, 0.22), 0.1)
 	_camera_punch(14.0, 0.22)
+	_hit_zoom(CLASH_CENTER, 0.32)
 	GameAudio.impact()
+	await _impact_freeze(0.12)
 	await get_tree().create_timer(0.42).timeout
 	var left_dies := event.winning_side != CombatEvent.Side.LEFT
 	var right_dies := event.winning_side != CombatEvent.Side.RIGHT
@@ -392,16 +407,26 @@ func _drop_out(fighter: StageFighter, ko: FightPlaque) -> void:
 	fighter.root.visible = false
 
 func _jump_home(line: Array[StageFighter], opponent: bool) -> void:
+	var done := [0]
+	var need := 0
 	for fighter in line:
 		if fighter.down or fighter.root == null or not is_instance_valid(fighter.root) or not fighter.root.visible:
 			continue
-		var home := OPPONENT_ENTER if opponent else (
-			fighter.source_slot.get_fighter_global_position() if fighter.source_slot != null else fighter.root.global_position + Vector2(0, -200)
-		)
-		GameAudio.whoosh()
-		fighter.puppet.set_pose(FighterPuppet.Pose.FRONT)
-		await _jump_arc(fighter.root, home, 200.0, 0.42)
-		fighter.root.visible = false
+		need += 1
+		_jump_home_one(fighter, opponent, func() -> void: done[0] += 1)
+	while done[0] < need:
+		await get_tree().process_frame
+
+func _jump_home_one(fighter: StageFighter, opponent: bool, done: Callable) -> void:
+	var home := OPPONENT_ENTER if opponent else (
+		fighter.source_slot.get_fighter_global_position() if fighter.source_slot != null else fighter.root.global_position + Vector2(0, -200)
+	)
+	GameAudio.whoosh()
+	fighter.puppet.set_pose(FighterPuppet.Pose.FRONT)
+	await _jump_arc(fighter.root, home, 200.0, 0.42)
+	fighter.root.visible = false
+	if done.is_valid():
+		done.call()
 
 func _land_impact(fighter: StageFighter) -> void:
 	GameAudio.land()
@@ -514,16 +539,18 @@ func _squash(node: Node2D, to: Vector2, duration: float) -> void:
 	await tween.finished
 
 func _flash(color: Color, duration: float) -> void:
-	var flash := Polygon2D.new()
-	flash.polygon = PackedVector2Array([
-		Vector2(0, 0), Vector2(1920, 0), Vector2(1920, 1080), Vector2(0, 1080)
-	])
-	flash.color = color
-	flash.z_index = 200
-	_fx.add_child(flash)
+	_ensure_fx_pool()
+	if _flash_poly == null:
+		return
+	_flash_poly.color = color
+	_flash_poly.modulate.a = 1.0
+	_flash_poly.visible = true
 	var tween := create_tween()
-	tween.tween_property(flash, "modulate:a", 0.0, duration)
-	tween.tween_callback(flash.queue_free)
+	tween.tween_property(_flash_poly, "modulate:a", 0.0, duration)
+	tween.tween_callback(func() -> void:
+		if is_instance_valid(_flash_poly):
+			_flash_poly.visible = false
+	)
 
 func _camera_punch(amount: float, duration: float) -> void:
 	if _camera == null:
@@ -534,24 +561,63 @@ func _camera_punch(amount: float, duration: float) -> void:
 	tween.tween_property(_camera, "offset", origin, duration * 0.65)
 
 func _dust(pos: Vector2) -> void:
-	var dust := CPUParticles2D.new()
-	dust.emitting = false
-	dust.one_shot = true
-	dust.explosiveness = 1.0
-	dust.amount = 10
-	dust.lifetime = 0.35
-	dust.direction = Vector2(0, -1)
-	dust.spread = 80.0
-	dust.initial_velocity_min = 40.0
-	dust.initial_velocity_max = 90.0
-	dust.gravity = Vector2(0, 180)
-	dust.scale_amount_min = 0.4
-	dust.scale_amount_max = 1.1
-	dust.color = Color(0.85, 0.82, 0.74, 0.7)
-	_fx.add_child(dust)
-	dust.global_position = pos
-	dust.emitting = true
-	get_tree().create_timer(0.5).timeout.connect(dust.queue_free)
+	_ensure_fx_pool()
+	if _dust_fx == null:
+		return
+	_dust_fx.global_position = pos
+	_dust_fx.restart()
+	_dust_fx.emitting = true
+
+func _ensure_fx_pool() -> void:
+	if _fx == null:
+		return
+	if _dust_fx == null or not is_instance_valid(_dust_fx):
+		_dust_fx = CPUParticles2D.new()
+		_dust_fx.emitting = false
+		_dust_fx.one_shot = true
+		_dust_fx.explosiveness = 1.0
+		_dust_fx.amount = 10
+		_dust_fx.lifetime = 0.35
+		_dust_fx.direction = Vector2(0, -1)
+		_dust_fx.spread = 80.0
+		_dust_fx.initial_velocity_min = 40.0
+		_dust_fx.initial_velocity_max = 90.0
+		_dust_fx.gravity = Vector2(0, 180)
+		_dust_fx.scale_amount_min = 0.4
+		_dust_fx.scale_amount_max = 1.1
+		_dust_fx.color = Color(0.85, 0.82, 0.74, 0.7)
+		_dust_fx.z_index = 50
+		_fx.add_child(_dust_fx)
+	if _flash_poly == null or not is_instance_valid(_flash_poly):
+		_flash_poly = Polygon2D.new()
+		_flash_poly.polygon = PackedVector2Array([
+			Vector2(0, 0), Vector2(1920, 0), Vector2(1920, 1080), Vector2(0, 1080)
+		])
+		_flash_poly.z_index = 200
+		_flash_poly.visible = false
+		_fx.add_child(_flash_poly)
+
+func _hit_zoom(world: Vector2, duration: float) -> void:
+	if _camera == null:
+		return
+	var pull := (world - _camera.global_position) * 0.38
+	var tween := create_tween()
+	tween.set_ignore_time_scale(true)
+	tween.tween_property(_camera, "zoom", _camera_rest_zoom * 1.08, duration * 0.35)
+	tween.parallel().tween_property(_camera, "offset", _camera_rest_offset + pull, duration * 0.35)
+	tween.tween_property(_camera, "zoom", _camera_rest_zoom, duration * 0.65)
+	tween.parallel().tween_property(_camera, "offset", _camera_rest_offset, duration * 0.65)
+
+func _impact_freeze(seconds: float) -> void:
+	Engine.time_scale = 0.07
+	await get_tree().create_timer(seconds, true, false, true).timeout
+	Engine.time_scale = 1.0
+
+func _restore_camera() -> void:
+	if _camera == null:
+		return
+	_camera.zoom = _camera_rest_zoom
+	_camera.offset = _camera_rest_offset
 
 func _ensure_camera() -> Camera2D:
 	var cam := get_viewport().get_camera_2d()

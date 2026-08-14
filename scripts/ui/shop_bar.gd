@@ -5,12 +5,12 @@ signal refresh_pressed
 signal freeze_pressed
 signal upgrade_pressed
 
-var _level: Label
+var _level: Button
 var _pancada_word: Label
 var _dots: Array[ColorRect] = []
 var _refresh: Button
 var _freeze: Button
-var _upgrade_hint: Label
+var _freeze_fill: Color
 var _fight_style: bool = false
 
 func _ready() -> void:
@@ -19,90 +19,88 @@ func _ready() -> void:
 	_build()
 
 func _build() -> void:
-	_level = _make_label("NÍVEL 1", 22, Vector2(48, 1008), Vector2(220, 40))
-	_level.mouse_filter = Control.MOUSE_FILTER_STOP
-	_level.gui_input.connect(_on_level_input)
+	_level = _make_fill_button("NÍVEL 1", AssemblyLayout.LEVEL, Vector2(220, 56), ThemeTokens.GOLD_DEEP)
+	_level.pressed.connect(func() -> void: upgrade_pressed.emit())
 	add_child(_level)
 
-	_upgrade_hint = _make_label("", 14, Vector2(48, 1044), Vector2(280, 24))
-	_upgrade_hint.add_theme_color_override("font_color", ThemeTokens.TEXT_DIM)
-	add_child(_upgrade_hint)
-
-	_pancada_word = _make_label("PANCADAS", 18, Vector2(700, 1004), Vector2(160, 28))
+	_pancada_word = _make_label("PANCADAS", 16, AssemblyLayout.SMASH_LABEL, Vector2(220, 28), ThemeTokens.GOLD)
 	add_child(_pancada_word)
 
 	for i in MatchRules.MAX_GOLD:
 		var dot := ColorRect.new()
-		dot.size = Vector2(28, 28)
-		dot.position = Vector2(870 + i * 38, 1006)
-		dot.color = Color(0.12, 0.12, 0.14, 1)
+		dot.size = Vector2(18, 18)
+		dot.position = AssemblyLayout.smash_dot_center(i) - dot.size * 0.5
+		dot.color = ThemeTokens.DOT_EMPTY
 		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(dot)
 		_dots.append(dot)
 
-	_refresh = _make_button("ATUALIZAR", Vector2(1580, 968), Vector2(260, 36))
+	_refresh = _make_fill_button("ATUALIZAR", AssemblyLayout.REFRESH, Vector2(210, 56), ThemeTokens.WOOD)
 	_refresh.pressed.connect(func() -> void: refresh_pressed.emit())
 	add_child(_refresh)
 
-	_freeze = _make_button("TRAVAR", Vector2(1580, 1012), Vector2(260, 36))
+	_freeze_fill = Color(0.22, 0.42, 0.55, 1)
+	_freeze = _make_fill_button("TRAVAR", AssemblyLayout.FREEZE, Vector2(200, 56), _freeze_fill)
 	_freeze.pressed.connect(func() -> void: freeze_pressed.emit())
 	add_child(_freeze)
 
 func set_fight_style(enabled: bool) -> void:
 	_fight_style = enabled
-	_refresh.visible = not enabled
-	_freeze.visible = not enabled
-	_upgrade_hint.visible = not enabled
-	_level.mouse_filter = Control.MOUSE_FILTER_IGNORE if enabled else Control.MOUSE_FILTER_STOP
+	_set_chrome_visible(not enabled)
 
-func refresh(contestant: Contestant, round_index: int) -> void:
+func refresh(contestant: Contestant, _round_index: int) -> void:
 	if contestant == null:
 		return
-	_level.text = "NÍVEL %d" % contestant.shop_tier
-	var max_gold := MatchRules.gold_for_round(round_index)
-	var filled := contestant.gold
-	for i in _dots.size():
-		var dot := _dots[i]
-		dot.visible = i < max_gold
-		if i < filled:
-			dot.color = Color.WHITE if _fight_style else ThemeTokens.PANCADA_RED
-		else:
-			dot.color = Color(0.18, 0.18, 0.2, 0.9)
 	var cost := MatchRules.upgrade_cost(contestant.shop_tier)
 	if cost < 0:
-		_upgrade_hint.text = "Nível máximo"
+		_level.text = "NÍVEL %d" % contestant.shop_tier
 	else:
-		_upgrade_hint.text = "Clique para subir · %d pancadas" % cost
+		_level.text = "NÍVEL %d  (%d)" % [contestant.shop_tier, cost]
+	for i in _dots.size():
+		_dots[i].visible = not _fight_style
+		if i < contestant.gold:
+			_dots[i].color = ThemeTokens.GOLD
+		else:
+			_dots[i].color = ThemeTokens.DOT_EMPTY
 	_freeze.text = "TRAVADO" if contestant.frozen else "TRAVAR"
-	_freeze.modulate = ThemeTokens.PREP_ORANGE if contestant.frozen else Color.WHITE
+	_paint_button(_freeze, _freeze_fill.lerp(ThemeTokens.ICE, 0.45) if contestant.frozen else _freeze_fill)
 
-func _on_level_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		upgrade_pressed.emit()
+func _set_chrome_visible(on: bool) -> void:
+	_refresh.visible = on
+	_freeze.visible = on
+	_level.visible = on
+	_pancada_word.visible = on
+	for dot in _dots:
+		dot.visible = on
 
-func _make_label(text: String, size: int, pos: Vector2, rect: Vector2) -> Label:
+func _make_label(text: String, font_px: int, center: Vector2, size: Vector2, color: Color) -> Label:
 	var label := Label.new()
 	label.text = text
-	label.position = pos
-	label.size = rect
-	label.add_theme_font_size_override("font_size", size)
-	label.add_theme_color_override("font_color", ThemeTokens.TEXT)
+	label.size = size
+	label.position = AssemblyLayout.top_left(center, size)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", font_px)
+	label.add_theme_color_override("font_color", color)
 	return label
 
-func _make_button(text: String, pos: Vector2, rect: Vector2) -> Button:
+func _make_fill_button(text: String, center: Vector2, size: Vector2, fill: Color) -> Button:
 	var button := Button.new()
 	button.text = text
-	button.position = pos
-	button.size = rect
+	button.size = size
+	button.position = AssemblyLayout.top_left(center, size)
 	button.focus_mode = Control.FOCUS_NONE
 	button.add_theme_font_size_override("font_size", 18)
+	button.add_theme_color_override("font_color", ThemeTokens.CREAM)
+	_paint_button(button, fill)
+	return button
+
+func _paint_button(button: Button, fill: Color) -> void:
 	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color(0.08, 0.09, 0.11, 0.0)
-	normal.set_corner_radius_all(4)
+	normal.bg_color = fill
+	normal.set_corner_radius_all(8)
 	var hover := normal.duplicate() as StyleBoxFlat
-	hover.bg_color = Color(1, 1, 1, 0.08)
+	hover.bg_color = fill.lerp(ThemeTokens.GOLD, 0.18)
 	button.add_theme_stylebox_override("normal", normal)
 	button.add_theme_stylebox_override("hover", hover)
 	button.add_theme_stylebox_override("pressed", hover)
-	button.add_theme_color_override("font_color", ThemeTokens.TEXT)
-	return button
