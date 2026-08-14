@@ -1,11 +1,11 @@
 @tool
 extends RefCounted
 
-## Finds 6 front + 6 profile parts on a sheet and saves each in a 200×200 PNG.
+## Finds 4 front + 4 profile parts on a sheet and saves each in a 200×200 PNG.
 
 const OUT := 200
 const MIN_BLOB := 400
-const SLOT_NAMES: PackedStringArray = ["head", "body", "arm_l", "arm_r", "leg_l", "leg_r"]
+const SLOT_NAMES: PackedStringArray = ["head", "body", "arm_l", "arm_r"]
 
 static func slice_to_folder(sheet_path: String, set_id: String) -> Dictionary:
 	if set_id.is_empty():
@@ -30,7 +30,7 @@ static func slice_to_folder(sheet_path: String, set_id: String) -> Dictionary:
 	if not classify_err.is_empty():
 		return _fail(classify_err)
 	if not _group_complete(named.get("front", {})) or not _group_complete(named.get("profile", {})):
-		return _fail("Achei os recortes, mas não soube o que é cabeça, tronco, braço e perna. Separe bem as 6 peças de frente e as 6 de perfil.")
+		return _fail("Achei os recortes, mas não soube o que é cabeça, tronco e braço. Separe bem as 4 peças de frente e as 4 de perfil.")
 
 	var out_dir := "res://assets/characters/%s" % set_id
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(out_dir))
@@ -52,8 +52,8 @@ static func slice_to_folder(sheet_path: String, set_id: String) -> Dictionary:
 			var path := "%s/%s_%s-%s.png" % [out_dir, set_id, slot_name, suffix]
 			fitted.save_png(ProjectSettings.globalize_path(path))
 			saved.append(path)
-	if saved.size() != 12:
-		return _fail("O corte não gerou as 12 imagens.")
+	if saved.size() != 8:
+		return _fail("O corte não gerou as 8 imagens.")
 	return {"saved": saved, "error": ""}
 
 static func _fail(message: String) -> Dictionary:
@@ -163,6 +163,10 @@ static func _classify(blobs: Array, width: int, height: int) -> Dictionary:
 			top.append(blob)
 		else:
 			bottom.append(blob)
+	if left.size() == 4 and right.size() == 4:
+		return {"front": _name_group(left), "profile": _name_group(right), "error": ""}
+	if top.size() == 4 and bottom.size() == 4:
+		return {"front": _name_group(top), "profile": _name_group(bottom), "error": ""}
 	if left.size() == 6 and right.size() == 6:
 		return {"front": _name_group(left), "profile": _name_group(right), "error": ""}
 	if top.size() == 6 and bottom.size() == 6:
@@ -170,12 +174,40 @@ static func _classify(blobs: Array, width: int, height: int) -> Dictionary:
 	return {
 		"front": {},
 		"profile": {},
-		"error": "A folha precisa de 6 desenhos de frente e 6 de perfil, separados. Achei %d à esquerda, %d à direita, %d em cima e %d embaixo. Se o Freak tem roupa preta, use PNG com fundo transparente (não JPG)." % [left.size(), right.size(), top.size(), bottom.size()],
+		"error": "A folha precisa de 4 desenhos de frente e 4 de perfil, separados. Achei %d à esquerda, %d à direita, %d em cima e %d embaixo. Se o Freak tem roupa preta, use PNG com fundo transparente (não JPG)." % [left.size(), right.size(), top.size(), bottom.size()],
 	}
 
 static func _name_group(group: Array) -> Dictionary:
-	if group.size() != 6:
+	if group.size() == 4:
+		return _name_four(group)
+	if group.size() == 6:
+		return _name_six(group)
+	return {}
+
+static func _name_four(group: Array) -> Dictionary:
+	var ordered := group.duplicate()
+	ordered.sort_custom(func(a, b): return a["cy"] < b["cy"])
+	var head: Dictionary = ordered[0]
+	var rest: Array = ordered.slice(1)
+	var torso: Dictionary = rest[0]
+	for blob in rest:
+		if int(blob["n"]) > int(torso["n"]):
+			torso = blob
+	var arms: Array = []
+	for blob in rest:
+		if blob != torso:
+			arms.append(blob)
+	if arms.size() != 2:
 		return {}
+	arms.sort_custom(func(a, b): return a["cx"] < b["cx"])
+	return {
+		"head": head,
+		"body": torso,
+		"arm_l": arms[0],
+		"arm_r": arms[1],
+	}
+
+static func _name_six(group: Array) -> Dictionary:
 	var ordered := group.duplicate()
 	ordered.sort_custom(func(a, b): return a["cy"] < b["cy"])
 	var head: Dictionary = ordered[0]

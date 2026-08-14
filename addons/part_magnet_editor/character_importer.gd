@@ -3,15 +3,13 @@ extends RefCounted
 
 const SheetSlicer := preload("res://addons/part_magnet_editor/sheet_slicer.gd")
 
-const SLOT_NAMES: PackedStringArray = ["head", "body", "arm_l", "arm_r", "leg_l", "leg_r"]
-const SLOT_LABELS: PackedStringArray = ["Cabeça", "Tronco", "Braço E", "Braço D", "Perna E", "Perna D"]
+const SLOT_NAMES: PackedStringArray = ["head", "body", "arm_l", "arm_r"]
+const SLOT_LABELS: PackedStringArray = ["Cabeça", "Tronco", "Braço E", "Braço D"]
 const SLOT_TYPES: Array[PartSlotType.Value] = [
 	PartSlotType.Value.HEAD,
 	PartSlotType.Value.BODY,
 	PartSlotType.Value.ARM_L,
 	PartSlotType.Value.ARM_R,
-	PartSlotType.Value.LEG_L,
-	PartSlotType.Value.LEG_R,
 ]
 
 static func slice_sheet(sheet_path: String, set_id: String) -> Dictionary:
@@ -43,7 +41,6 @@ static func write_defs(set_id: String, display_name: String, values: Array) -> S
 		return "Faltam os 2 números da loja (cabeça, tronco)."
 
 	var visual_values: Array = _visual_values(values)
-	var legs_value := 0
 	var parts: Array[PartDef] = []
 	for i in SLOT_NAMES.size():
 		var slot_name: String = SLOT_NAMES[i]
@@ -57,12 +54,6 @@ static func write_defs(set_id: String, display_name: String, values: Array) -> S
 			return "Falha ao salvar %s" % path
 		parts.append(load(path) as PartDef)
 
-	var legs_kit := _make_legs_kit(set_id, display_name, legs_value)
-	var legs_path := "res://data/parts/%s_legs.tres" % set_id
-	var legs_err := ResourceSaver.save(legs_kit, legs_path)
-	if legs_err != OK:
-		return "Falha ao salvar %s" % legs_path
-
 	var character := CharacterDef.new()
 	character.id = StringName(set_id)
 	character.display_name = display_name
@@ -70,9 +61,6 @@ static func write_defs(set_id: String, display_name: String, values: Array) -> S
 	character.body = parts[1]
 	character.arm_l = parts[2]
 	character.arm_r = parts[3]
-	character.leg_l = parts[4]
-	character.leg_r = parts[5]
-	character.legs = load(legs_path) as PartDef
 	var char_path := "res://data/parts/%s_character.tres" % set_id
 	var char_err := ResourceSaver.save(character, char_path)
 	if char_err != OK:
@@ -82,21 +70,9 @@ static func write_defs(set_id: String, display_name: String, values: Array) -> S
 	return ""
 
 static func _visual_values(values: Array) -> Array:
-	if values.size() >= 6:
-		return values
-	if values.size() >= 3:
-		return [int(values[0]), int(values[1]), int(values[1]), int(values[1]), int(values[2]), int(values[2])]
-	return [int(values[0]), int(values[1]), int(values[1]), int(values[1]), 0, 0]
-
-static func _make_legs_kit(set_id: String, display_name: String, combat_value: int) -> PartDef:
-	var part := PartDef.new()
-	part.id = StringName("%s_legs" % set_id)
-	part.display_name = "%s Pernas" % display_name
-	part.slot_type = PartSlotType.Value.LEGS
-	part.set_id = StringName(set_id)
-	part.combat_value = combat_value
-	part.tier = PartDef.tier_for(combat_value)
-	return part
+	if values.size() >= 4:
+		return [int(values[0]), int(values[1]), int(values[2]), int(values[3])]
+	return [int(values[0]), int(values[1]), int(values[1]), int(values[1])]
 
 static func _make_part(
 	set_id: String,

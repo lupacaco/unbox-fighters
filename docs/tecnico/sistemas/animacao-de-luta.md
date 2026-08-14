@@ -54,7 +54,7 @@ Sons da luta: **boing** no impulso da mola, passo no pouso e poom do choque / KO
 
 Em `assets/characters/<nome>/`:
 
-- Frente: `<nome>_head-1.png`, `_body-1`, `_arm_l-1`, `_arm_r-1`, `_leg_l-1`, `_leg_r-1`
+- Frente: `<nome>_head-1.png`, `_body-1`, `_arm_l-1`, `_arm_r-1`
 - Perfil: os mesmos com `-2` (usado no palco e na caminhada)
 
 Não precisa de pose de golpe (`-3`). O ataque é o kit vencedor saindo do corpo e voando até a peça do adversário. No empate os dois kits voam até o centro.

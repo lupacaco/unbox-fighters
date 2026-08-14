@@ -2,7 +2,7 @@
 class_name CharacterDef
 extends Resource
 
-## @tool lets the magnet editor (Project → Tools) read these six drawings.
+## @tool lets the magnet editor (Project → Tools) read these four drawings.
 
 @export var id: StringName
 @export var display_name: String = "???"

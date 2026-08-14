@@ -32,7 +32,7 @@ func _run() -> void:
 				quit(1)
 				return
 			var set_id := String(character.id)
-			for slot in PartSlotType.visual_slots():
+			for slot in PartSlotType.shop_slots():
 				var part := character.get_part(slot)
 				if part == null:
 					push_error("VERIFY_FAIL %s missing %s" % [set_id, PartSlotType.to_string_name(slot)])
@@ -61,8 +61,8 @@ func _run() -> void:
 	if sheet.get_format() != Image.FORMAT_RGBA8:
 		sheet.convert(Image.FORMAT_RGBA8)
 	var blobs: Array = SheetSlicer._find_blobs(sheet, SheetSlicer._uses_alpha_background(sheet))
-	if blobs.size() < 12:
-		push_error("VERIFY_FAIL doctor sheet should have at least 12 drawings, got %d" % blobs.size())
+	if blobs.size() < 8:
+		push_error("VERIFY_FAIL doctor sheet should have at least 8 drawings, got %d" % blobs.size())
 		quit(1)
 		return
 	var named: Dictionary = SheetSlicer._classify(blobs, sheet.get_width(), sheet.get_height())
@@ -71,13 +71,13 @@ func _run() -> void:
 		quit(1)
 		return
 	if not named.has("front") or not named.has("profile"):
-		push_error("VERIFY_FAIL doctor sheet should split into 6 front + 6 profile")
+		push_error("VERIFY_FAIL doctor sheet should split into 4 front + 4 profile")
 		quit(1)
 		return
 	for pose in ["front", "profile"]:
 		var group: Dictionary = named[pose]
 		if not SheetSlicer._group_complete(group):
-			push_error("VERIFY_FAIL doctor sheet did not name all six %s parts" % pose)
+			push_error("VERIFY_FAIL doctor sheet did not name all four %s parts" % pose)
 			quit(1)
 			return
 		for slot_name in SheetSlicer.SLOT_NAMES:

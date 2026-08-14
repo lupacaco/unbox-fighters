@@ -63,7 +63,7 @@ func _begin_import() -> void:
 		_file_dialog = EditorFileDialog.new()
 		_file_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
 		_file_dialog.access = EditorFileDialog.ACCESS_FILESYSTEM
-		_file_dialog.add_filter("*.png, *.webp", "Folha com 6 desenhos de frente e 6 de perfil")
+		_file_dialog.add_filter("*.png, *.webp", "Folha com 4 desenhos de frente e 4 de perfil")
 		_file_dialog.file_selected.connect(_on_sheet_chosen)
 		EditorInterface.get_base_control().add_child(_file_dialog)
 	_file_dialog.popup_file_dialog()
@@ -98,7 +98,7 @@ func _build_form() -> void:
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.custom_minimum_size.x = 380
-	hint.text = "Folha com 6 desenhos de frente e 6 de perfil. A loja ganha 4 kits (cabeça, tronco, braço E, braço D). A base-mola já vem na carta. Depois marque os ímãs em Ampliar."
+	hint.text = "Folha com 4 desenhos de frente e 4 de perfil (cabeça, tronco, braço E, braço D). A loja ganha esses 4 kits. A base-mola já vem na carta. Depois marque os ímãs em Ampliar."
 	box.add_child(hint)
 	_form_status = Label.new()
 	_form_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

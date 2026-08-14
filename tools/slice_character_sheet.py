@@ -1,8 +1,8 @@
-"""Cut a 6+6 character sheet into twelve 200x200 PNGs (edge-black to transparent).
+"""Cut a 4+4 character sheet into eight 200x200 PNGs (edge-black to transparent).
 
 The sheet has front parts on the left and profile parts on the right,
 or front on top and profile on the bottom.
-Each half must contain 6 separate drawings: head, torso, two arms, two legs.
+Each half must contain 4 separate drawings: head, torso, two arms.
 """
 
 from __future__ import annotations
@@ -15,16 +15,14 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 CANVAS = 200
-SLOTS = ("head", "body", "arm_l", "arm_r", "leg_l", "leg_r")
+SLOTS = ("head", "body", "arm_l", "arm_r")
 SLOT_LABELS = {
 	"head": "Cabeça",
 	"body": "Tronco",
 	"arm_l": "Braço E",
 	"arm_r": "Braço D",
-	"leg_l": "Perna E",
-	"leg_r": "Perna D",
 }
-SLOT_TYPES = {"head": 0, "body": 1, "arm_l": 2, "arm_r": 3, "leg_l": 4, "leg_r": 5}
+SLOT_TYPES = {"head": 0, "body": 1, "arm_l": 2, "arm_r": 3}
 
 
 def uses_alpha_background(im: Image.Image) -> bool:
@@ -88,20 +86,49 @@ def find_blobs(im: Image.Image, opaque_is_ink: bool) -> list[dict]:
 def classify(blobs: list[dict], width: int, height: int) -> dict[str, dict]:
 	left = [b for b in blobs if b["cx"] < width * 0.48]
 	right = [b for b in blobs if b["cx"] >= width * 0.48]
-	if len(left) == 6 and len(right) == 6:
-		return {"front": _name_group(left), "profile": _name_group(right)}
 	top = [b for b in blobs if b["cy"] < height * 0.48]
 	bottom = [b for b in blobs if b["cy"] >= height * 0.48]
+	if len(left) == 4 and len(right) == 4:
+		return {"front": _name_group(left), "profile": _name_group(right)}
+	if len(top) == 4 and len(bottom) == 4:
+		return {"front": _name_group(top), "profile": _name_group(bottom)}
+	if len(left) == 6 and len(right) == 6:
+		return {"front": _name_group(left), "profile": _name_group(right)}
 	if len(top) == 6 and len(bottom) == 6:
 		return {"front": _name_group(top), "profile": _name_group(bottom)}
 	raise RuntimeError(
-		"A folha precisa de 6 desenhos de frente e 6 de perfil, separados. "
+		"A folha precisa de 4 desenhos de frente e 4 de perfil, separados. "
 		f"Achei {len(left)} à esquerda, {len(right)} à direita, {len(top)} em cima e {len(bottom)} embaixo. "
 		"Se o Freak tem roupa preta, use PNG com fundo transparente (não JPG)."
 	)
 
 
 def _name_group(group: list[dict]) -> dict[str, dict]:
+	if len(group) == 4:
+		return _name_four(group)
+	if len(group) == 6:
+		return _name_six(group)
+	raise RuntimeError("Could not name the drawings")
+
+
+def _name_four(group: list[dict]) -> dict[str, dict]:
+	ordered = sorted(group, key=lambda b: b["cy"])
+	head = ordered[0]
+	rest = ordered[1:]
+	torso = max(rest, key=lambda b: b["n"])
+	arms = [b for b in rest if b is not torso]
+	if len(arms) != 2:
+		raise RuntimeError("Could not split the two arms")
+	arms = sorted(arms, key=lambda b: b["cx"])
+	return {
+		"head": head,
+		"body": torso,
+		"arm_l": arms[0],
+		"arm_r": arms[1],
+	}
+
+
+def _name_six(group: list[dict]) -> dict[str, dict]:
 	ordered = sorted(group, key=lambda b: b["cy"])
 	head = ordered[0]
 	rest = ordered[1:]
@@ -323,47 +350,18 @@ def write_part_tres(
 	path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def write_legs_kit(parts_dir: Path, set_id: str, display_name: str, combat: int) -> None:
-	path = parts_dir / f"{set_id}_legs.tres"
-	tier = 1 if combat <= 5 else (2 if combat == 6 else (3 if combat == 7 else (4 if combat == 8 else 5)))
-	path.write_text(
-		"\n".join(
-			[
-				'[gd_resource type="Resource" script_class="PartDef" format=3]',
-				"",
-				'[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]',
-				"",
-				"[resource]",
-				'script = ExtResource("1")',
-				f'id = &"{set_id}_legs"',
-				f'display_name = "{display_name} Pernas"',
-				"slot_type = 6",
-				f'set_id = &"{set_id}"',
-				f"combat_value = {combat}",
-				f"tier = {tier}",
-				"",
-			]
-		),
-		encoding="utf-8",
-	)
-
-
-def write_character(parts_dir: Path, set_id: str, display_name: str, combat: int) -> None:
-	write_legs_kit(parts_dir, set_id, display_name, combat)
+def write_character(parts_dir: Path, set_id: str, display_name: str) -> None:
 	path = parts_dir / f"{set_id}_character.tres"
 	path.write_text(
 		"\n".join(
 			[
-				'[gd_resource type="Resource" script_class="CharacterDef" load_steps=9 format=3]',
+				'[gd_resource type="Resource" script_class="CharacterDef" load_steps=6 format=3]',
 				"",
 				'[ext_resource type="Script" path="res://scripts/data/character_def.gd" id="1"]',
 				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_head.tres" id="2"]',
 				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_body.tres" id="3"]',
 				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_arm_l.tres" id="4"]',
 				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_arm_r.tres" id="5"]',
-				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_leg_l.tres" id="6"]',
-				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_leg_r.tres" id="7"]',
-				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_legs.tres" id="8"]',
 				"",
 				"[resource]",
 				'script = ExtResource("1")',
@@ -373,9 +371,6 @@ def write_character(parts_dir: Path, set_id: str, display_name: str, combat: int
 				'body = ExtResource("3")',
 				'arm_l = ExtResource("4")',
 				'arm_r = ExtResource("5")',
-				'leg_l = ExtResource("6")',
-				'leg_r = ExtResource("7")',
-				'legs = ExtResource("8")',
 				"",
 			]
 		),
@@ -421,28 +416,24 @@ def slice_sheet(sheet_path: Path, set_id: str, out_dir: Path) -> dict:
 
 
 def main() -> None:
-	parser = argparse.ArgumentParser(description="Cut a 6+6 Freak sheet into twelve 200x200 parts.")
+	parser = argparse.ArgumentParser(description="Cut a 4+4 Freak sheet into eight 200x200 parts.")
 	parser.add_argument("sheet", help="Path to the PNG/WEBP sheet")
 	parser.add_argument("--id", required=True, help="Internal id, e.g. leao")
 	parser.add_argument("--name", default="", help="Display name, e.g. Leão")
-	parser.add_argument("--value", type=int, default=4, help="Combat number if --head/--body/--legs are omitted")
+	parser.add_argument("--value", type=int, default=4, help="Combat number if --head/--body are omitted")
 	parser.add_argument("--head", type=int, default=0, help="Shop number for the head kit")
 	parser.add_argument("--body", type=int, default=0, help="Shop number for the torso kit")
-	parser.add_argument("--legs", type=int, default=0, help="Unused shop leftover; the game does not sell legs")
 	parser.add_argument("--write-defs", action="store_true", help="Also write data/parts/*.tres")
 	args = parser.parse_args()
 	set_id = args.id.strip().lower()
 	display_name = args.name.strip() or set_id.capitalize()
 	head_v = args.head or args.value
 	body_v = args.body or args.value
-	legs_v = args.legs or args.value
 	slot_values = {
 		"head": head_v,
 		"body": body_v,
 		"arm_l": body_v,
 		"arm_r": body_v,
-		"leg_l": legs_v,
-		"leg_r": legs_v,
 	}
 	out_dir = ROOT / "assets" / "characters" / set_id
 	report = slice_sheet(Path(args.sheet), set_id, out_dir)
@@ -458,7 +449,7 @@ def main() -> None:
 				report["front"][slot],
 				report["profile"][slot],
 			)
-		write_character(parts_dir, set_id, display_name, legs_v)
+		write_character(parts_dir, set_id, display_name)
 	print("done")
 
 

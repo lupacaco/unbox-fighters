@@ -3,7 +3,7 @@ extends Control
 
 const _Spring := preload("res://scripts/data/spring_base.gd")
 
-## Assembled preview of the six drawings snapped at the magnets.
+## Assembled preview of the four drawings snapped at the magnets.
 
 var parts: Dictionary = {}
 var pose: int = 0
@@ -36,7 +36,7 @@ func _draw() -> void:
 			Color(0.82, 0.84, 0.88, 1)
 		)
 	var textures := {}
-	for slot in PartSlotType.visual_slots():
+	for slot in PartSlotType.shop_slots():
 		textures[slot] = _tex_for(parts.get(slot) as PartDef)
 	var plan := CompositeResolver.resolve_slots(parts, textures)
 	var side := minf(box.size.x - 24.0, box.size.y - 36.0)

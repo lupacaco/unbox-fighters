@@ -43,6 +43,6 @@ Se o Godot estiver em português, use os nomes em português e, entre parêntese
 
 1. No Godot, na lista de arquivos embaixo (é a pasta do projeto), abra **scenes**, depois **assembly**, e clique em **Assembly.tscn**. É a tela principal do jogo.
 2. Na lista da **Cena** (é a lista de tudo que existe nessa tela), clique em **Assembly**.
-3. As cartas ficam nos objetos de carta. O lutador da carta é o desenho da cabeça, do tronco e das pernas juntos.
+3. As cartas ficam nos objetos de carta. O lutador da carta é o desenho da cabeça, do tronco e dos braços juntos.
 4. Eu já liguei o clique: ao clicar na peça, ela solta e volta para a prateleira. Você não precisa digitar nada.
 5. Em cima à direita, clique no triângulo **Play**. Monte uma peça na carta, clique nela e arraste para a prateleira.

@@ -2,7 +2,7 @@
 class_name PartSlotType
 extends Object
 
-## Shop and fight use four kits. Legs stay in the files for the magnet editor.
+## Shop, fight and new sheets use four kits. Old files may still have unused legs.
 enum Value {
 	HEAD,
 	BODY,

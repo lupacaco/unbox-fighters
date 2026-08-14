@@ -8,7 +8,7 @@ Scripts fora do Godot que preparam imagens dos personagens.
 
 | Script | Função |
 |--------|--------|
-| `slice_character_sheet.py` | Corta uma folha 6+6 em 12 PNG 200×200 e, se pedido, cria as fichas |
+| `slice_character_sheet.py` | Corta uma folha 4+4 em 8 PNG 200×200 e, se pedido, cria as fichas |
 | `remove_backgrounds.py` | Remove fundo xadrez / sólido de artes de UI |
 | `fetch_sfx.py` | Baixa e recorta os efeitos sonoros gravados (Mixkit) |
 
@@ -16,11 +16,11 @@ Scripts fora do Godot que preparam imagens dos personagens.
 
 Em `assets/characters/<nome>/`:
 
-- `<nome>_head-1.png`, `_body-1`, `_arm_l-1`, `_arm_r-1`, `_leg_l-1`, `_leg_r-1` — frente
+- `<nome>_head-1.png`, `_body-1`, `_arm_l-1`, `_arm_r-1` — frente
 - Os mesmos com `-2` — perfil
 - Canvas **200×200**
 
-Para um set novo: [Incluir personagem](incluir-personagem.md). O Godot também tem **Project → Tools → Incluir personagem** (corta os 12 PNG e cria as 2 fichas da loja).
+Para um set novo: [Incluir personagem](incluir-personagem.md). O Godot também tem **Project → Tools → Incluir personagem** (corta os 8 PNG e cria as 4 fichas da loja).
 
 ## Por que 200×200
 
