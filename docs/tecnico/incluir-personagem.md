@@ -8,7 +8,9 @@ O jogador manda uma folha de desenho. O jogo precisa de **12 recortes** (6 de fr
 
 ## O que a folha precisa ter
 
-**6 partes de frente à esquerda** e **6 de perfil à direita**, cada uma solta (não grudada na vizinha).
+**6 partes de frente** e **6 de perfil**, cada uma solta (não grudada na vizinha).
+
+Pode ser **frente à esquerda e perfil à direita**, ou **frente em cima e perfil embaixo**.
 
 As 6 partes:
 
@@ -140,4 +142,5 @@ Atualize:
 
 | id | Nome | Números |
 |----|------|---------|
-| `leao` | Leão | 4 nos 3 kits da loja (teste, loja nível 1, total 12) |
+| `leao` | Leão | 4 nos 3 kits da loja (nível 1, total 12) |
+| `medico` | Médico | Cabeça 5 (nível 1), tronco 6 (nível 2), pernas 4 (nível 1). Total 15 |

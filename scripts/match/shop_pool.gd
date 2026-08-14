@@ -3,8 +3,8 @@ class_name ShopPool
 extends RefCounted
 
 const PARTS_DIR := "res://data/parts"
-## Empty = every character file. For this test, only the lion is sold.
-const ACTIVE_SET_IDS: PackedStringArray = ["leao"]
+## Empty = every character file. This test sells the lion and the doctor.
+const ACTIVE_SET_IDS: PackedStringArray = ["leao", "medico"]
 
 static var _all_parts: Array[PartDef] = []
 static var _roster: Array[CharacterDef] = []

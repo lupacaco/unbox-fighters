@@ -27,7 +27,7 @@ Recurso de **uma peça** (kit da loja ou recorte de desenho):
 
 - `id`, `display_name`
 - `slot_type`
-- `set_id` (hoje o teste usa `leao`)
+- `set_id` (hoje o teste usa `leao` e `medico`)
 - `sprite` — frente (pose 1). O kit de pernas da loja **não** tem PNG próprio.
 - `sprite_profile` — perfil (pose 2). Precisa existir nos 6 desenhos para a luta.
 - `combat_value` — número do kit na loja
@@ -52,11 +52,12 @@ A loja lê `shop_parts()` (3 kits). Braços e pernas soltos **não** entram nas 
 
 ## Números atuais (teste)
 
-Só o **Leão** está na loja. As outras fichas (vampiro, policial, etc.) continuam na pasta, mas a loja as ignora (`ShopPool.ACTIVE_SET_IDS = ["leao"]`).
+Só o **Leão** e o **Médico** estão na loja. As outras fichas (vampiro, policial, etc.) continuam na pasta, mas a loja as ignora (`ShopPool.ACTIVE_SET_IDS`).
 
-| Set | Cada kit | Total do set completo |
-|-----|----------|------------------------|
-| Leão | 4 (nível 1) | 12 |
+| Set | Kits | Total do set completo |
+|-----|------|------------------------|
+| Leão | 4, 4, 4 (nível 1) | 12 |
+| Médico | Cabeça 5 (nível 1), tronco 6 (nível 2), pernas 4 (nível 1) | 15 |
 
 A sinergia (3 iguais = 100%, 2 = 75%, 1 = 50%) está em `scripts/match/synergy.gd`.
 
@@ -110,4 +111,6 @@ Pasta: `data/parts/`
 |---------|----------|
 | `leao_character.tres` + `leao_head/body/legs.tres` | Kits da loja (Leão) |
 | `leao_arm_*.tres`, `leao_leg_l/r.tres` | Só desenho (não vendidos) |
-| `vampiro_*`, `policial_*`, `bruxa_*`, `mumia_*`, `medico_*`, `cachorro_*` | Sets antigos de 3 PNGs — desligados da loja |
+| `medico_character.tres` + `medico_head/body/legs.tres` | Kits da loja (Médico) |
+| `medico_arm_*.tres`, `medico_leg_l/r.tres` | Só desenho (não vendidos) |
+| `vampiro_*`, `policial_*`, `bruxa_*`, `mumia_*`, `cachorro_*` | Sets antigos de 3 PNGs — desligados da loja |

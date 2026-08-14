@@ -1,6 +1,7 @@
 """Cut a 6+6 character sheet into twelve 200x200 PNGs (edge-black to transparent).
 
-The sheet has front parts on the left and profile parts on the right.
+The sheet has front parts on the left and profile parts on the right,
+or front on top and profile on the bottom.
 Each half must contain 6 separate drawings: head, torso, two arms, two legs.
 """
 
@@ -74,12 +75,18 @@ def find_blobs(im: Image.Image) -> list[dict]:
 	return blobs
 
 
-def classify(blobs: list[dict], width: int) -> dict[str, dict]:
-	front = [b for b in blobs if b["cx"] < width * 0.48]
-	side = [b for b in blobs if b["cx"] >= width * 0.48]
-	if len(front) != 6 or len(side) != 6:
-		raise RuntimeError(f"Expected 6+6 parts, got {len(front)}+{len(side)}")
-	return {"front": _name_group(front), "profile": _name_group(side)}
+def classify(blobs: list[dict], width: int, height: int) -> dict[str, dict]:
+	left = [b for b in blobs if b["cx"] < width * 0.48]
+	right = [b for b in blobs if b["cx"] >= width * 0.48]
+	if len(left) == 6 and len(right) == 6:
+		return {"front": _name_group(left), "profile": _name_group(right)}
+	top = [b for b in blobs if b["cy"] < height * 0.48]
+	bottom = [b for b in blobs if b["cy"] >= height * 0.48]
+	if len(top) == 6 and len(bottom) == 6:
+		return {"front": _name_group(top), "profile": _name_group(bottom)}
+	raise RuntimeError(
+		f"Expected 6+6 parts (left/right or top/bottom), got left={len(left)} right={len(right)} top={len(top)} bottom={len(bottom)}"
+	)
 
 
 def _name_group(group: list[dict]) -> dict[str, dict]:
@@ -88,11 +95,18 @@ def _name_group(group: list[dict]) -> dict[str, dict]:
 	rest = ordered[1:]
 	torso = max(rest, key=lambda b: b["n"])
 	limbs = [b for b in rest if b is not torso]
-	limbs_by_y = sorted(limbs, key=lambda b: b["cy"])
-	arms = sorted(limbs_by_y[:2], key=lambda b: b["cx"])
-	legs = sorted(limbs_by_y[2:], key=lambda b: b["cx"])
-	if len(arms) != 2 or len(legs) != 2:
+	if len(limbs) != 4:
 		raise RuntimeError("Could not split arms and legs")
+	xs = [b["cx"] for b in limbs]
+	ys = [b["cy"] for b in limbs]
+	if max(xs) - min(xs) > (max(ys) - min(ys)) * 1.4:
+		by_x = sorted(limbs, key=lambda b: b["cx"])
+		arms = by_x[:2]
+		legs = by_x[2:]
+	else:
+		limbs_by_y = sorted(limbs, key=lambda b: b["cy"])
+		arms = sorted(limbs_by_y[:2], key=lambda b: b["cx"])
+		legs = sorted(limbs_by_y[2:], key=lambda b: b["cx"])
 	return {
 		"head": head,
 		"body": torso,
@@ -357,7 +371,7 @@ def write_character(parts_dir: Path, set_id: str, display_name: str, combat: int
 
 def slice_sheet(sheet_path: Path, set_id: str, out_dir: Path) -> dict:
 	sheet = Image.open(sheet_path).convert("RGBA")
-	named = classify(find_blobs(sheet), sheet.width)
+	named = classify(find_blobs(sheet), sheet.width, sheet.height)
 	out_dir.mkdir(parents=True, exist_ok=True)
 	report: dict = {}
 	for pose, suffix in (("front", "1"), ("profile", "2")):
@@ -392,11 +406,25 @@ def main() -> None:
 	parser.add_argument("sheet", help="Path to the PNG/WEBP sheet")
 	parser.add_argument("--id", required=True, help="Internal id, e.g. leao")
 	parser.add_argument("--name", default="", help="Display name, e.g. Leão")
-	parser.add_argument("--value", type=int, default=4, help="Combat number for every part")
+	parser.add_argument("--value", type=int, default=4, help="Combat number if --head/--body/--legs are omitted")
+	parser.add_argument("--head", type=int, default=0, help="Shop number for the head kit")
+	parser.add_argument("--body", type=int, default=0, help="Shop number for the torso kit")
+	parser.add_argument("--legs", type=int, default=0, help="Shop number for the legs kit")
 	parser.add_argument("--write-defs", action="store_true", help="Also write data/parts/*.tres")
 	args = parser.parse_args()
 	set_id = args.id.strip().lower()
 	display_name = args.name.strip() or set_id.capitalize()
+	head_v = args.head or args.value
+	body_v = args.body or args.value
+	legs_v = args.legs or args.value
+	slot_values = {
+		"head": head_v,
+		"body": body_v,
+		"arm_l": body_v,
+		"arm_r": body_v,
+		"leg_l": legs_v,
+		"leg_r": legs_v,
+	}
 	out_dir = ROOT / "assets" / "characters" / set_id
 	report = slice_sheet(Path(args.sheet), set_id, out_dir)
 	if args.write_defs:
@@ -407,11 +435,11 @@ def main() -> None:
 				set_id,
 				display_name,
 				slot,
-				args.value,
+				slot_values[slot],
 				report["front"][slot],
 				report["profile"][slot],
 			)
-		write_character(parts_dir, set_id, display_name, args.value)
+		write_character(parts_dir, set_id, display_name, legs_v)
 	print("done")
 
 

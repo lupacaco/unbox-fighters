@@ -15,9 +15,9 @@ static func slice_to_folder(sheet_path: String, set_id: String) -> PackedStringA
 		return PackedStringArray()
 	img.convert(Image.FORMAT_RGBA8)
 	var blobs := _find_blobs(img)
-	var named := _classify(blobs, img.get_width())
+	var named := _classify(blobs, img.get_width(), img.get_height())
 	if named.is_empty():
-		push_error("Need 6 parts on the left (front) and 6 on the right (profile).")
+		push_error("Need 6+6 parts: front/profile on the left and right, or front on top and profile below.")
 		return PackedStringArray()
 
 	var out_dir := "res://assets/characters/%s" % set_id
@@ -97,21 +97,32 @@ static func _is_ink(c: Color) -> bool:
 		return false
 	return c.r > 0.07 or c.g > 0.07 or c.b > 0.07
 
-static func _classify(blobs: Array, width: int) -> Dictionary:
-	var front: Array = []
-	var side: Array = []
+static func _classify(blobs: Array, width: int, height: int) -> Dictionary:
+	var left: Array = []
+	var right: Array = []
+	var top: Array = []
+	var bottom: Array = []
 	for blob in blobs:
 		if float(blob["cx"]) < float(width) * 0.48:
-			front.append(blob)
+			left.append(blob)
 		else:
-			side.append(blob)
-	if front.size() != 6 or side.size() != 6:
-		push_error("Expected 6+6 parts, got %d+%d" % [front.size(), side.size()])
-		return {}
-	return {
-		"front": _name_group(front),
-		"profile": _name_group(side),
-	}
+			right.append(blob)
+		if float(blob["cy"]) < float(height) * 0.48:
+			top.append(blob)
+		else:
+			bottom.append(blob)
+	if left.size() == 6 and right.size() == 6:
+		return {
+			"front": _name_group(left),
+			"profile": _name_group(right),
+		}
+	if top.size() == 6 and bottom.size() == 6:
+		return {
+			"front": _name_group(top),
+			"profile": _name_group(bottom),
+		}
+	push_error("Expected 6+6 parts, got left=%d right=%d top=%d bottom=%d" % [left.size(), right.size(), top.size(), bottom.size()])
+	return {}
 
 static func _name_group(group: Array) -> Dictionary:
 	var ordered := group.duplicate()
@@ -126,13 +137,25 @@ static func _name_group(group: Array) -> Dictionary:
 	for blob in rest:
 		if blob != torso:
 			limbs.append(blob)
-	limbs.sort_custom(func(a, b): return a["cy"] < b["cy"])
 	if limbs.size() != 4:
 		return {}
-	var arms: Array = [limbs[0], limbs[1]]
-	var legs: Array = [limbs[2], limbs[3]]
-	arms.sort_custom(func(a, b): return a["cx"] < b["cx"])
-	legs.sort_custom(func(a, b): return a["cx"] < b["cx"])
+	var xs: Array[float] = []
+	var ys: Array[float] = []
+	for blob in limbs:
+		xs.append(float(blob["cx"]))
+		ys.append(float(blob["cy"]))
+	var arms: Array
+	var legs: Array
+	if xs.max() - xs.min() > (ys.max() - ys.min()) * 1.4:
+		limbs.sort_custom(func(a, b): return a["cx"] < b["cx"])
+		arms = [limbs[0], limbs[1]]
+		legs = [limbs[2], limbs[3]]
+	else:
+		limbs.sort_custom(func(a, b): return a["cy"] < b["cy"])
+		arms = [limbs[0], limbs[1]]
+		legs = [limbs[2], limbs[3]]
+		arms.sort_custom(func(a, b): return a["cx"] < b["cx"])
+		legs.sort_custom(func(a, b): return a["cx"] < b["cx"])
 	return {
 		"head": head,
 		"body": torso,

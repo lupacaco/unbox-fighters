@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://toxepieiuhxp"
-path="res://.godot/imported/medico_legs-1.png-36ff81f8c3b7d840759d09a74fd55006.ctex"
+uid="uid://bjieuepckru4s"
+path="res://.godot/imported/medico_leg_l-1.png-bbbb47006b14caef651e0a586fb1803e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/characters/medico/medico_legs-1.png"
-dest_files=["res://.godot/imported/medico_legs-1.png-36ff81f8c3b7d840759d09a74fd55006.ctex"]
+source_file="res://assets/characters/medico/medico_leg_l-1.png"
+dest_files=["res://.godot/imported/medico_leg_l-1.png-bbbb47006b14caef651e0a586fb1803e.ctex"]
 
 [params]
 

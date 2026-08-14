@@ -85,7 +85,7 @@ func _build_form() -> void:
 		box.add_child(_labeled_spin(labels[i]))
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.text = "A folha precisa ter 6 partes de frente à esquerda e 6 de perfil à direita (12 recortes). Na loja entram só 3 kits: cabeça, tronco com os dois braços, e as duas pernas juntas. Depois marque os ímãs nas 12 imagens, todas na mesma tela: Projeto → Ferramentas → Ímãs das Peças."
+	hint.text = "A folha precisa ter 12 recortes: 6 de frente e 6 de perfil (esquerda/direita ou frente em cima e perfil embaixo). Na loja entram só 3 kits: cabeça, tronco com os dois braços, e as duas pernas juntas. Depois marque os ímãs nas 12 imagens, todas na mesma tela: Projeto → Ferramentas → Ímãs das Peças."
 	box.add_child(hint)
 	EditorInterface.get_base_control().add_child(_form)
 

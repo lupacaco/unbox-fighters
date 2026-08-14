@@ -11,7 +11,7 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 |--------|----------------|
 | `verify_synergy.gd` | 100/75/50 no modelo de 3 kits, números do leão, curva de pancadas |
 | `verify_combat_sim.gd` | Choque, empate, teto de 12 de dano no HP |
-| `verify_shop_pool.gd` | Só o leão; 3 kits nível 1; 5 ofertas |
+| `verify_shop_pool.gd` | Leão + médico; tronco do médico só no nível 2; 5 ofertas |
 | `verify_match_state.gd` | 4 vivos, HP 40, nomes dos bots, oponente-fantasma |
 | `verify_assembly.gd` | 3 cartas, 5 caixas e VENDER à direita |
 | `verify_crate_open.gd` | Um clique na caixa solta a peça |

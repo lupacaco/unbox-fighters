@@ -20,7 +20,7 @@
 | Fundo de arena | Respiração de vinheta + partículas de poeira (mais escuro na luta) |
 | Áudio | Efeitos gravados (martelo, caixa, ímã, soco, passo, whoosh). Sem bipes de script |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |
-| Dados | **Leão** na loja (3 kits nível 1, total 12). Outros Freaks desligados neste teste |
+| Dados | **Leão** e **Médico** na loja. Outros Freaks desligados neste teste |
 | Scripts de verificação | Rodam checagens sem abrir a interface completa |
 
 ## Parcial / provisório
