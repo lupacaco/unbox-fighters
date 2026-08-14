@@ -21,7 +21,7 @@ var _syncing := false
 
 func _ready() -> void:
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	custom_minimum_size = Vector2(250, 248)
+	custom_minimum_size = Vector2(440, 236)
 	_build()
 
 func set_target(next_part: PartDef, next_pose: int) -> void:
@@ -39,13 +39,22 @@ func _build() -> void:
 	margin.add_theme_constant_override("margin_bottom", 6)
 	add_child(margin)
 
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 4)
-	margin.add_child(column)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	margin.add_child(row)
+
+	var controls := VBoxContainer.new()
+	controls.add_theme_constant_override("separation", 6)
+	controls.custom_minimum_size.x = 168
+	controls.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	controls.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	row.add_child(controls)
 
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override("separation", 6)
-	column.add_child(top)
+	controls.add_child(top)
 
 	_slot_pick = OptionButton.new()
 	_slot_pick.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -69,31 +78,27 @@ func _build() -> void:
 	_z_spin.value_changed.connect(_on_z_changed)
 	top.add_child(_z_spin)
 
-	var actions := HBoxContainer.new()
-	actions.add_theme_constant_override("separation", 6)
-	column.add_child(actions)
-
 	_flip_btn = Button.new()
 	_flip_btn.toggle_mode = true
 	_flip_btn.text = "Virar"
 	_flip_btn.tooltip_text = "Espelha a imagem na horizontal."
 	_flip_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_flip_btn.toggled.connect(_on_flip_toggled)
-	actions.add_child(_flip_btn)
+	controls.add_child(_flip_btn)
 
 	_rotate_btn = Button.new()
 	_rotate_btn.text = "Girar 90°"
 	_rotate_btn.tooltip_text = "Gira a imagem 90 graus."
 	_rotate_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_rotate_btn.pressed.connect(_on_rotate_pressed)
-	actions.add_child(_rotate_btn)
+	controls.add_child(_rotate_btn)
 
 	_tile = MagnetTile.new()
-	_tile.custom_minimum_size = Vector2(160, 160)
+	_tile.custom_minimum_size = Vector2(220, 220)
 	_tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_tile.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	(_tile as MagnetTile).magnets_changed.connect(func() -> void: magnets_changed.emit())
-	column.add_child(_tile)
+	row.add_child(_tile)
 
 func _sync_controls() -> void:
 	_syncing = true

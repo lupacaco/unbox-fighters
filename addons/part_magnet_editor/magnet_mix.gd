@@ -8,7 +8,7 @@ var pose: int = 0
 var caption: String = ""
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(380, 420)
+	custom_minimum_size = Vector2(220, 260)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	mouse_filter = Control.MOUSE_FILTER_IGNORE

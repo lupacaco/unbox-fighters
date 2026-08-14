@@ -39,7 +39,7 @@ var _undo_old := Vector2.ZERO
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_MOVE
-	custom_minimum_size = Vector2(160, 160)
+	custom_minimum_size = Vector2(220, 220)
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	resized.connect(queue_redraw)

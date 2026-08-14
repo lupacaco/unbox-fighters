@@ -22,7 +22,7 @@ var _pending_set_id: String = ""
 
 func _ready() -> void:
 	title = "Ímãs das peças"
-	min_size = Vector2i(880, 560)
+	min_size = Vector2i(980, 580)
 	unresizable = false
 	exclusive = false
 	close_requested.connect(hide)
@@ -120,14 +120,14 @@ func _make_tab(pose: int, caption: String) -> Control:
 	var row := HSplitContainer.new()
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	row.split_offset = 300
+	row.split_offset = 560
 	tab.add_child(row)
 
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size.x = 280
+	scroll.custom_minimum_size.x = 460
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_stretch_ratio = 0.42
+	scroll.size_flags_stretch_ratio = 0.68
 	row.add_child(scroll)
 
 	var list := VBoxContainer.new()
@@ -151,7 +151,8 @@ func _make_tab(pose: int, caption: String) -> Control:
 	var mix := MagnetMix.new()
 	mix.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mix.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	mix.size_flags_stretch_ratio = 0.58
+	mix.size_flags_stretch_ratio = 0.32
+	mix.custom_minimum_size = Vector2(220, 260)
 	row.add_child(mix)
 	if pose == 0:
 		_front_mix = mix

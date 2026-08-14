@@ -67,7 +67,7 @@ A loja lê sozinha as fichas `*_character.tres` em `data/parts/`, e depois filtr
 
 1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**).
 2. No alto, escolha o **Freak**. A janela tem duas abas: **Frente** e **Perfil**.
-3. À esquerda ficam as **6 partes**. À direita, a prévia grande do Freak montado.
+3. À esquerda ficam as **6 partes** (caixas ao lado da imagem grande). À direita, a prévia menor do Freak montado.
 4. Em cada parte:
    - a caixa escolhe o que ela é (cabeça, tronco, braço E/D, perna E/D)
    - **Virar** espelha a imagem
