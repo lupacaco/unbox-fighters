@@ -19,7 +19,10 @@ const GROUND_Y := 128.0
 ## Negative Z hid the stand behind the dark card back.
 const Z_INDEX := 0
 const SHADOW_Z := -1
+const DENT_Z := -2
 const SHADOW_COLOR := Color(0.02, 0.02, 0.05, 0.42)
+## Darker wood socket under the oval shadow, so the spring reads as sitting in the shelf.
+const DENT_COLOR := Color(0.07, 0.04, 0.02, 0.62)
 
 static func texture(pressed: bool) -> Texture2D:
 	return load(TEX_PRESSED if pressed else TEX_LOOSE) as Texture2D
@@ -39,18 +42,17 @@ static func magnet_world(pressed: bool) -> Vector2:
 static func shadow_position() -> Vector2:
 	return Vector2(0.0, GROUND_Y + 6.0)
 
+static func dent_position() -> Vector2:
+	return Vector2(0.0, GROUND_Y + 11.0)
+
 static func make_shadow(node_name: String = "SpringShadow") -> Polygon2D:
-	var poly := Polygon2D.new()
-	poly.name = node_name
-	style_shadow(poly)
-	return poly
+	return _make_oval(node_name, Vector2(150.0, 26.0) * SCALE, SHADOW_COLOR, SHADOW_Z, shadow_position())
+
+static func make_dent(node_name: String = "SpringDent") -> Polygon2D:
+	return _make_oval(node_name, Vector2(92.0, 13.0) * SCALE, DENT_COLOR, DENT_Z, dent_position())
 
 static func style_shadow(poly: Polygon2D) -> void:
-	poly.polygon = _ellipse(Vector2(150.0, 26.0) * SCALE)
-	poly.color = SHADOW_COLOR
-	poly.z_index = SHADOW_Z
-	poly.position = shadow_position()
-	poly.modulate = Color.WHITE
+	_style_oval(poly, Vector2(150.0, 26.0) * SCALE, SHADOW_COLOR, SHADOW_Z, shadow_position())
 
 static func hop_shadow_look(lift: float, hop_height: float) -> Dictionary:
 	var u := clampf(lift / maxf(hop_height, 1.0), 0.0, 1.0)
@@ -58,6 +60,26 @@ static func hop_shadow_look(lift: float, hop_height: float) -> Dictionary:
 		"scale": Vector2(1.0 - 0.34 * u, 1.0 - 0.22 * u),
 		"alpha": 1.0 - 0.48 * u,
 	}
+
+static func hop_dent_look(lift: float, hop_height: float) -> Dictionary:
+	var u := clampf(lift / maxf(hop_height, 1.0), 0.0, 1.0)
+	return {
+		"scale": Vector2(1.0 - 0.10 * u, 1.0 - 0.08 * u),
+		"alpha": 1.0 - 0.18 * u,
+	}
+
+static func _make_oval(node_name: String, radius: Vector2, color: Color, z: int, pos: Vector2) -> Polygon2D:
+	var poly := Polygon2D.new()
+	poly.name = node_name
+	_style_oval(poly, radius, color, z, pos)
+	return poly
+
+static func _style_oval(poly: Polygon2D, radius: Vector2, color: Color, z: int, pos: Vector2) -> void:
+	poly.polygon = _ellipse(radius)
+	poly.color = color
+	poly.z_index = z
+	poly.position = pos
+	poly.modulate = Color.WHITE
 
 static func _ellipse(radius: Vector2, points: int = 18) -> PackedVector2Array:
 	var pts := PackedVector2Array()

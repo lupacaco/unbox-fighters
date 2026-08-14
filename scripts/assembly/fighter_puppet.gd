@@ -19,7 +19,9 @@ const _Spring := preload("res://scripts/data/spring_base.gd")
 const HOP_HZ := 1.2
 const HOP_HEIGHT := 86.0
 const HOP_COMPRESS := 0.22
-const HOP_LAND := 0.86
+const HOP_LAND := 0.83
+const HOP_SQUASH_CROUCH := 0.70
+const HOP_SQUASH_LAND := 0.62
 const ARM_SWING := 0.28
 const IDLE_HZ := 1.35
 
@@ -34,6 +36,7 @@ var _body_root: Node2D
 var _hop_root: Node2D
 var _spring: Sprite2D
 var _shadow: Polygon2D
+var _dent: Polygon2D
 var _body_rest := CompositeResolver.BODY_ORIGIN
 var _spring_rest := Vector2.ZERO
 var _walking: bool = false
@@ -52,9 +55,12 @@ func _ready() -> void:
 	_hop_root = Node2D.new()
 	_hop_root.name = "HopRoot"
 	add_child(_hop_root)
+	_dent = _Spring.make_dent()
+	add_child(_dent)
+	move_child(_dent, 0)
 	_shadow = _Spring.make_shadow()
 	add_child(_shadow)
-	move_child(_shadow, 0)
+	move_child(_shadow, 1)
 	_spring = Sprite2D.new()
 	_spring.name = "Spring"
 	_spring.centered = true
@@ -338,12 +344,17 @@ func _place_spring() -> void:
 	_spring.position = _spring_rest
 
 func _update_shadow() -> void:
-	if _shadow == null:
-		return
-	_shadow.position = _Spring.shadow_position()
-	var look: Dictionary = _Spring.hop_shadow_look(maxf(0.0, -_hop_y), HOP_HEIGHT)
-	_shadow.scale = look["scale"]
-	_shadow.modulate.a = float(look["alpha"])
+	var lift := maxf(0.0, -_hop_y)
+	if _shadow != null:
+		_shadow.position = _Spring.shadow_position()
+		var look: Dictionary = _Spring.hop_shadow_look(lift, HOP_HEIGHT)
+		_shadow.scale = look["scale"]
+		_shadow.modulate.a = float(look["alpha"])
+	if _dent != null:
+		_dent.position = _Spring.dent_position()
+		var dent: Dictionary = _Spring.hop_dent_look(lift, HOP_HEIGHT)
+		_dent.scale = dent["scale"]
+		_dent.modulate.a = float(dent["alpha"])
 
 func _reset_hop() -> void:
 	_hop_y = 0.0
@@ -376,7 +387,7 @@ func _apply_hop(phase: float) -> void:
 	var airborne := false
 	if cycle < HOP_COMPRESS:
 		var u := _smooth(cycle / HOP_COMPRESS)
-		_hop_squash = lerpf(1.0, 0.74, u)
+		_hop_squash = lerpf(1.0, HOP_SQUASH_CROUCH, u)
 		_hop_y = 0.0
 		_hop_lean = 0.05 * u
 		_set_spring_pressed(true)
@@ -391,7 +402,7 @@ func _apply_hop(phase: float) -> void:
 		_set_spring_pressed(false)
 	else:
 		var u := _smooth((cycle - HOP_LAND) / (1.0 - HOP_LAND))
-		_hop_squash = lerpf(0.7, 1.0, u)
+		_hop_squash = lerpf(HOP_SQUASH_LAND, 1.0, u)
 		_hop_y = 0.0
 		_hop_lean = 0.0
 		_set_spring_pressed(true)

@@ -50,6 +50,9 @@ func _run() -> void:
 	assert(FightDir.DUEL_X >= 260.0, "Fighters should stand far enough to throw kits")
 	var shade := walker.get_node_or_null("SpringShadow") as Polygon2D
 	assert(shade != null and shade.visible, "Fight spring should cast a ground shadow")
+	var dent := walker.get_node_or_null("SpringDent") as Polygon2D
+	assert(dent != null and dent.visible, "Fight spring should sit in a wood dent")
+	assert(dent.position.y > shade.position.y, "Wood dent should sit under the oval shadow")
 	_assert_hud_fits(AssemblyLayout.FIGHT_NAME_LEFT, Vector2(280, 54))
 	_assert_hud_fits(AssemblyLayout.FIGHT_HP_LEFT, Vector2(132, 78))
 	_assert_hud_fits(AssemblyLayout.FIGHT_VS, Vector2(220, 52))

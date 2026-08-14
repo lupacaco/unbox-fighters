@@ -277,8 +277,8 @@ func _jump_walk_in(fighter: StageFighter, opponent: bool, heavy: bool, done: Cal
 		await _land_impact(fighter)
 	else:
 		_dust(fighter.puppet.feet_position())
-		await _squash(fighter.visual, Vector2(1.16, 0.82), 0.07)
-		await _squash(fighter.visual, Vector2.ONE, 0.1)
+		await _squash(fighter.visual, Vector2(1.18, 0.78), 0.08)
+		await _squash(fighter.visual, Vector2.ONE, 0.14)
 	await get_tree().create_timer(0.1).timeout
 	fighter.puppet.set_pose(FighterPuppet.Pose.PROFILE)
 	await _squash(fighter.visual, Vector2(1.04, 0.96), 0.1)
@@ -565,9 +565,9 @@ func _land_impact(fighter: StageFighter) -> void:
 	_dust(fighter.puppet.feet_position())
 	_flash(Color(1, 0.95, 0.8, 0.16), 0.08)
 	_camera_punch(12.0, 0.22)
-	await _squash(fighter.visual, Vector2(1.22, 0.68), 0.06)
-	await _squash(fighter.visual, Vector2(0.92, 1.12), 0.08)
-	await _squash(fighter.visual, Vector2.ONE, 0.12)
+	await _squash(fighter.visual, Vector2(1.24, 0.64), 0.07)
+	await _squash(fighter.visual, Vector2(0.94, 1.10), 0.10)
+	await _squash(fighter.visual, Vector2.ONE, 0.16)
 	if _tray == null:
 		return
 	var origin := _tray.position
