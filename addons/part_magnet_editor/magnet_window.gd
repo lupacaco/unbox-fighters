@@ -81,7 +81,7 @@ func _build_ui() -> void:
 	_help = Label.new()
 	_help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_help.modulate = Color(0.78, 0.8, 0.84, 1)
-	_help.text = "Clique Ampliar para marcar o ímã de perto. Z vale só na carta."
+	_help.text = "Imagem escolhe o desenho desta peça. Trocar escolhe outro se você errou. Os arquivos da pasta não são apagados. Ampliar marca o ímã de perto. Z vale só na carta."
 	column.add_child(_help)
 
 	_tabs = TabContainer.new()
@@ -241,6 +241,9 @@ func _on_replace_requested(part: PartDef, pose: int) -> void:
 	_pending_replace_part = part
 	_pending_replace_pose = pose
 	_ensure_image_dialog()
+	var folder := CharacterImporter.character_art_folder(String(part.set_id))
+	if DirAccess.dir_exists_absolute(ProjectSettings.globalize_path(folder)):
+		_image_dialog.current_dir = folder
 	_image_dialog.popup_file_dialog()
 
 func _ensure_image_dialog() -> void:
@@ -248,8 +251,8 @@ func _ensure_image_dialog() -> void:
 		return
 	_image_dialog = EditorFileDialog.new()
 	_image_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
-	_image_dialog.access = EditorFileDialog.ACCESS_FILESYSTEM
-	_image_dialog.add_filter("*.png, *.webp", "Imagem da peça")
+	_image_dialog.access = EditorFileDialog.ACCESS_RESOURCES
+	_image_dialog.add_filter("*.png, *.webp", "Desenho da peça")
 	_image_dialog.file_selected.connect(_on_image_file_selected)
 	add_child(_image_dialog)
 
@@ -258,42 +261,75 @@ func _on_image_file_selected(path: String) -> void:
 	var pose := _pending_replace_pose
 	if part == null:
 		return
-	var dest := CharacterImporter.part_image_path(part, pose)
-	if dest.is_empty():
+	var res_path := CharacterImporter.to_project_path(path)
+	if res_path.is_empty():
 		_status.modulate = Color(0.95, 0.55, 0.4, 1)
-		_status.text = "Não achei o arquivo desta peça."
+		_status.text = "Escolha um PNG de dentro da pasta do jogo. Eu não copio por cima de outro arquivo."
 		return
-	var err := CharacterImporter.replace_part_image(path, dest)
-	if not err.is_empty():
+	var ext := res_path.get_extension().to_lower()
+	if ext != "png" and ext != "webp":
 		_status.modulate = Color(0.95, 0.55, 0.4, 1)
-		_status.text = err
+		_status.text = "Use um arquivo PNG ou WEBP."
 		return
-	_reload_replaced_image(part, pose, dest)
-
-func _reload_replaced_image(part: PartDef, pose: int, dest: String) -> void:
-	var fs := EditorInterface.get_resource_filesystem()
-	if fs != null:
-		fs.update_file(dest)
-		fs.scan()
-		var frames := 0
-		while fs.is_scanning() and frames < 90:
-			await get_tree().process_frame
-			frames += 1
-		await get_tree().create_timer(0.2).timeout
-	var tex := ResourceLoader.load(dest, "", ResourceLoader.CACHE_MODE_REPLACE) as Texture2D
+	var tex := ResourceLoader.load(res_path) as Texture2D
 	if tex == null:
 		_status.modulate = Color(0.95, 0.55, 0.4, 1)
-		_status.text = "A imagem entrou, mas o Godot ainda não leu. Feche e abra a janela."
+		_status.text = "Não consegui abrir essa imagem."
+		return
+	var current := _texture_of(part, pose)
+	if current != null and current.resource_path.replace("\\", "/") == res_path:
+		_status.modulate = Color(0.7, 0.86, 0.62, 1)
+		_status.text = "Essa já era a imagem de %s." % PartSlotType.display_label(part.slot_type)
+		return
+	var other := _part_using_path(part, pose, res_path)
+	if other != null:
+		_set_texture(other, pose, current)
+		_set_texture(part, pose, tex)
+		other.emit_changed()
+		part.emit_changed()
+		_save_resource(other)
+		_save_resource(part)
+		_show_character(_character)
+		_status.modulate = Color(0.7, 0.86, 0.62, 1)
+		_status.text = "Troquei %s ↔ %s. Os arquivos da pasta ficaram iguais." % [
+			PartSlotType.display_label(part.slot_type),
+			PartSlotType.display_label(other.slot_type),
+		]
+		return
+	_set_texture(part, pose, tex)
+	part.emit_changed()
+	_save_resource(part)
+	_show_character(_character)
+	_status.modulate = Color(0.7, 0.86, 0.62, 1)
+	_status.text = "%s agora usa %s. Os arquivos da pasta ficaram iguais." % [
+		PartSlotType.display_label(part.slot_type),
+		res_path.get_file(),
+	]
+
+func _texture_of(part: PartDef, pose: int) -> Texture2D:
+	if part == null:
+		return null
+	return part.sprite_profile if pose == 1 else part.sprite
+
+func _set_texture(part: PartDef, pose: int, tex: Texture2D) -> void:
+	if part == null:
 		return
 	if pose == 1:
 		part.sprite_profile = tex
 	else:
 		part.sprite = tex
-	part.emit_changed()
-	_save_resource(part)
-	_show_character(_character)
-	_status.modulate = Color(0.7, 0.86, 0.62, 1)
-	_status.text = "Troquei a imagem de %s." % PartSlotType.display_label(part.slot_type)
+
+func _part_using_path(skip: PartDef, pose: int, res_path: String) -> PartDef:
+	if _character == null:
+		return null
+	for slot in PartSlotType.shop_slots():
+		var other := _visual_part(_character, slot)
+		if other == null or other == skip:
+			continue
+		var tex := _texture_of(other, pose)
+		if tex != null and tex.resource_path.replace("\\", "/") == res_path:
+			return other
+	return null
 
 func _refresh_mix() -> void:
 	var parts := {}

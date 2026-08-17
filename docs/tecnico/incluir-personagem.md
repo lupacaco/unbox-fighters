@@ -76,7 +76,7 @@ Os ímãs dizem onde cada esfera de metal cola na vizinha.
 1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**).
 2. No alto da janela, escolha o **Freak** (ex.: Vampiro).
 3. Use a aba **Frente** e a aba **Perfil**. As 4 partes ficam em duas colunas compactas. À direita: a prévia. A janela cabe na tela do Godot; arraste o canto se quiser maior.
-4. Se um desenho estiver no tipo errado, escolha o certo na caixa (ex.: Braço E). **Virar** e **Girar** corrigem a imagem. **Z** 1 fica na frente **na carta**. Na luta a ordem é outra: de frente cabeça / braço E / braço D / tronco / mola; de perfil braço D / tronco / cabeça / braço E / mola. **Imagem** escolhe um arquivo do PC. **Ampliar** abre a peça grande para marcar o ímã com precisão (roda do mouse amplia).
+4. Se um desenho estiver no tipo errado, escolha o certo na caixa (ex.: Braço E). **Virar** e **Girar** corrigem a imagem. **Z** 1 fica na frente **na carta**. Na luta a ordem é outra: de frente cabeça / braço E / braço D / tronco / mola; de perfil braço D / tronco / cabeça / braço E / mola. **Imagem** escolhe o PNG desta peça na pasta do Freak. Se errar, **Trocar** escolhe outro — a pasta fica igual. **Ampliar** abre a peça grande para marcar o ímã com precisão (roda do mouse amplia).
 5. Arraste cada bolinha até o **centro da esfera de metal**.
 6. Clique **Salvar**. Cada bolinha que você solta também já grava aquela peça.
 

@@ -104,6 +104,24 @@ func _run() -> void:
 		push_error("VERIFY_FAIL swapped art should become 200x200")
 		quit(1)
 		return
+	var res := "res://assets/characters/vampiro/vampiro_head-1.png"
+	if Importer.to_project_path(res) != res:
+		push_error("VERIFY_FAIL project image path should stay a res:// path")
+		quit(1)
+		return
+	var abs_path := ProjectSettings.globalize_path(res)
+	if Importer.to_project_path(abs_path) != res:
+		push_error("VERIFY_FAIL disk path should map back to res://")
+		quit(1)
+		return
+	if not String(Importer.to_project_path("C:/not-unbox-fighters/x.png")).is_empty():
+		push_error("VERIFY_FAIL files outside the project must not be mapped")
+		quit(1)
+		return
+	if Importer.character_art_folder("vampiro") != "res://assets/characters/vampiro":
+		push_error("VERIFY_FAIL character folder should follow the set id")
+		quit(1)
+		return
 
 	print("VERIFY_PART_MAGNETS_PASS")
 	quit(0)

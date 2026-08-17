@@ -18,6 +18,7 @@ var _z_spin: SpinBox
 var _flip_btn: Button
 var _rotate_btn: Button
 var _replace_btn: Button
+var _swap_btn: Button
 var _expand_btn: Button
 var _tile: Control
 var _syncing := false
@@ -26,7 +27,7 @@ var _zoom_tile: Control
 
 func _ready() -> void:
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	custom_minimum_size = Vector2(268, 156)
+	custom_minimum_size = Vector2(268, 184)
 	_build()
 
 func set_target(next_part: PartDef, next_pose: int) -> void:
@@ -110,17 +111,24 @@ func _build() -> void:
 
 	_replace_btn = Button.new()
 	_replace_btn.text = "Imagem"
-	_replace_btn.tooltip_text = "Escolhe um PNG ou WEBP do computador. O jogo grava em 200×200."
+	_replace_btn.tooltip_text = "Escolhe um PNG da pasta do Freak para esta peça. Não apaga nem substitui arquivos."
 	_replace_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_replace_btn.pressed.connect(_on_replace_pressed)
 	file_row.add_child(_replace_btn)
+
+	_swap_btn = Button.new()
+	_swap_btn.text = "Trocar"
+	_swap_btn.tooltip_text = "Errou o desenho? Escolhe outro PNG. A pasta fica igual; só muda o que esta peça usa."
+	_swap_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_swap_btn.pressed.connect(_on_replace_pressed)
+	file_row.add_child(_swap_btn)
 
 	_expand_btn = Button.new()
 	_expand_btn.text = "Ampliar"
 	_expand_btn.tooltip_text = "Abre a imagem grande para marcar o ímã. Roda do mouse amplia."
 	_expand_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_expand_btn.pressed.connect(_on_expand_pressed)
-	file_row.add_child(_expand_btn)
+	controls.add_child(_expand_btn)
 
 	_tile = MagnetTile.new()
 	_tile.custom_minimum_size = Vector2(128, 128)
@@ -138,6 +146,7 @@ func _sync_controls() -> void:
 		_flip_btn.disabled = true
 		_rotate_btn.disabled = true
 		_replace_btn.disabled = true
+		_swap_btn.disabled = true
 		_expand_btn.disabled = true
 		_syncing = false
 		return
@@ -146,6 +155,7 @@ func _sync_controls() -> void:
 	_flip_btn.disabled = false
 	_rotate_btn.disabled = false
 	_replace_btn.disabled = false
+	_swap_btn.disabled = false
 	_expand_btn.disabled = false
 	_select_slot(part.slot_type)
 	_z_spin.value = part.effective_draw_z()

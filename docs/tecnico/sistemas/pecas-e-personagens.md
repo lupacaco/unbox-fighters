@@ -82,7 +82,7 @@ A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 4 ki
    - **Virar** espelha a imagem
    - **Girar** gira o desenho 90°
    - **Z** é a ordem da frente/trás **na carta**: **1 fica na frente**. Exemplo: cabeça 1, tronco 2 → a cabeça cobre o tronco. **Na luta** a ordem é outra: de frente (cabeça, braço E, braço D, tronco, mola) e de perfil (braço D, tronco, cabeça, braço E, mola).
-   - **Imagem** escolhe um PNG/WEBP no computador. O jogo grava em **200×200** no lugar da peça.
+   - **Imagem** escolhe um PNG da pasta do Freak para esta peça. **Trocar** escolhe outro se você errou. Os arquivos da pasta **não** são apagados nem substituídos.
    - **Ampliar** abre a peça grande. Roda do mouse amplia; botão direito arrasta a imagem; clique duas vezes na miniatura também abre.
 5. Arraste as bolinhas até o **centro das esferas de metal**:
    - Cabeça: **BAIXO**
