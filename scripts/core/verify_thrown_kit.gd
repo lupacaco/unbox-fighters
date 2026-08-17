@@ -10,10 +10,10 @@ func _init() -> void:
 
 func _run() -> void:
 	assert(FightDir.DUEL_X >= 260.0, "Duelists should stand farther apart for a throw")
-	var leao: CharacterDef = load("res://data/parts/leao_character.tres")
+	var vampiro: CharacterDef = load("res://data/parts/vampiro_character.tres")
 	var puppet := FighterPuppet.new()
 	root.add_child(puppet)
-	puppet.setup_loadout(FighterLoadout.from_character(leao), false)
+	puppet.setup_loadout(FighterLoadout.from_character(vampiro), false)
 	puppet.set_pose(FighterPuppet.Pose.PROFILE)
 	var head := puppet.sprite_of(PartSlotType.Value.HEAD)
 	assert(head != null and head.visible)

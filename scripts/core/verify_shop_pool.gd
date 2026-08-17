@@ -30,19 +30,15 @@ func _run() -> void:
 			push_error("VERIFY_FAIL shop sold a visual limb: %s" % part.id)
 			quit(1)
 			return
-		if String(part.set_id) == "medico" and part.tier >= 2:
-			push_error("VERIFY_FAIL doctor torso and arms are shop level 2")
-			quit(1)
-			return
 
 	var high := ShopPool.parts_up_to_tier(5)
 	if high.size() != roster.size() * 4:
 		push_error("VERIFY_FAIL shop should sell 4 kits per Freak, got %d" % high.size())
 		quit(1)
 		return
-	var body: PartDef = load("res://data/parts/medico_body.tres")
-	if body == null or body.combat_value != 6 or body.tier != 2:
-		push_error("VERIFY_FAIL doctor torso should be 6 (shop level 2)")
+	var body: PartDef = load("res://data/parts/vampiro_body.tres")
+	if body == null or body.combat_value != 4 or body.tier != 1:
+		push_error("VERIFY_FAIL vampire torso should be 4 (shop level 1)")
 		quit(1)
 		return
 

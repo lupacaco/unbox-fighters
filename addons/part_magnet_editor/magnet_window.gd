@@ -56,7 +56,7 @@ func _apply_pending() -> void:
 	if chosen == null and _pending_part != null:
 		chosen = _character_for_part(_pending_part)
 	if chosen == null:
-		chosen = _character_by_id("leao")
+		chosen = _character_by_id("vampiro")
 	if chosen == null:
 		chosen = _characters[0]
 	_select_character(chosen)

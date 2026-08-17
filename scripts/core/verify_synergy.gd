@@ -35,30 +35,33 @@ func _check_synergy() -> bool:
 	return true
 
 func _check_part_numbers() -> bool:
-	var leao: CharacterDef = load("res://data/parts/leao_character.tres")
-	if leao == null:
-		push_error("VERIFY_FAIL missing leao")
+	var vampiro: CharacterDef = load("res://data/parts/vampiro_character.tres")
+	if vampiro == null:
+		push_error("VERIFY_FAIL missing vampiro")
 		return false
-	if leao.shop_parts().size() != 4:
-		push_error("VERIFY_FAIL lion should sell 4 kits")
+	if vampiro.shop_parts().size() != 4:
+		push_error("VERIFY_FAIL vampire should sell 4 kits")
 		return false
-	for part in leao.shop_parts():
-		if part == null or part.combat_value != 4 or part.tier != 1:
-			push_error("VERIFY_FAIL lion kits should all be 4 / shop level 1")
+	if vampiro.head.combat_value != 3 or vampiro.body.combat_value != 4:
+		push_error("VERIFY_FAIL vampire head 3 / torso 4")
+		return false
+	for part in vampiro.shop_parts():
+		if part == null or part.tier != 1:
+			push_error("VERIFY_FAIL vampire kits should be shop level 1")
 			return false
-	var full := FighterLoadout.from_character(leao)
-	if full.total_power() != 16:
-		push_error("VERIFY_FAIL lion full should be 16, got %d" % full.total_power())
+	var full := FighterLoadout.from_character(vampiro)
+	if full.total_power() != 15:
+		push_error("VERIFY_FAIL vampire full should be 15, got %d" % full.total_power())
 		return false
-	var solo := FighterLoadout.from_parts(leao.head, null, null)
+	var solo := FighterLoadout.from_parts(vampiro.head, null, null)
 	if solo.combat_value_of(PartSlotType.Value.HEAD) != 2:
-		push_error("VERIFY_FAIL lone lion head should be 2")
+		push_error("VERIFY_FAIL lone vampire head should be 2")
 		return false
-	var pair := FighterLoadout.from_parts(leao.head, leao.body, null)
-	if pair.combat_value_of(PartSlotType.Value.HEAD) != 4:
-		push_error("VERIFY_FAIL two matching lion kits should be 100%")
+	var pair := FighterLoadout.from_parts(vampiro.head, vampiro.body, null)
+	if pair.combat_value_of(PartSlotType.Value.HEAD) != 3:
+		push_error("VERIFY_FAIL two matching vampire kits should be 100%")
 		return false
-	if pair.total_power() != 8:
-		push_error("VERIFY_FAIL head+torso lion should be 8, got %d" % pair.total_power())
+	if pair.total_power() != 7:
+		push_error("VERIFY_FAIL head+torso vampire should be 7, got %d" % pair.total_power())
 		return false
 	return true

@@ -18,13 +18,13 @@ func _run() -> void:
 		"Fight disc should sit on the conveyor rollers"
 	)
 
-	var leao: CharacterDef = load("res://data/parts/leao_character.tres")
+	var vampiro: CharacterDef = load("res://data/parts/vampiro_character.tres")
 	var ys: Array[float] = []
 	var scales: Array[float] = []
 	for i in 3:
 		var puppet := FighterPuppet.new()
 		root.add_child(puppet)
-		puppet.setup_loadout(FighterLoadout.from_character(leao), false)
+		puppet.setup_loadout(FighterLoadout.from_character(vampiro), false)
 		puppet.global_position = Vector2(200.0 * float(i), floor_y)
 		ys.append(puppet.global_position.y)
 		scales.append(puppet.get_part_node(PartSlotType.Value.BODY).scale.x)
@@ -35,7 +35,7 @@ func _run() -> void:
 		assert(is_equal_approx(scales[i], CompositeResolver.display_scale()))
 	var walker := FighterPuppet.new()
 	root.add_child(walker)
-	walker.setup_loadout(FighterLoadout.from_character(leao), false)
+	walker.setup_loadout(FighterLoadout.from_character(vampiro), false)
 	assert(walker.is_spring_pressed(), "Idle freak should keep the spring pressed")
 	_assert_cover_order(walker, [
 		"HopRoot/BodyRoot/head",

@@ -4,9 +4,9 @@ func _init() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
-	var head: PartDef = load("res://data/parts/leao_head.tres")
+	var head: PartDef = load("res://data/parts/vampiro_head.tres")
 	if head == null or head.sprite_profile == null:
-		push_error("VERIFY_FAIL missing lion head")
+		push_error("VERIFY_FAIL missing vampire head")
 		quit(1)
 		return
 	if head.uses_magnet_up() or head.is_torso():
@@ -14,7 +14,7 @@ func _run() -> void:
 		quit(1)
 		return
 	if head.magnet_down.y <= 0:
-		push_error("VERIFY_FAIL lion head magnet should sit at the bottom")
+		push_error("VERIFY_FAIL vampire head magnet should sit at the bottom")
 		quit(1)
 		return
 	if head.texture_for_pose(1) != head.sprite_profile:
@@ -22,9 +22,9 @@ func _run() -> void:
 		quit(1)
 		return
 
-	var body: PartDef = load("res://data/parts/leao_body.tres")
+	var body: PartDef = load("res://data/parts/vampiro_body.tres")
 	if body == null or not body.is_torso():
-		push_error("VERIFY_FAIL lion body should be the torso")
+		push_error("VERIFY_FAIL vampire body should be the torso")
 		quit(1)
 		return
 	if body.socket_names().size() != 5:

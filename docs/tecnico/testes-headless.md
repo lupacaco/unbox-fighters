@@ -9,10 +9,10 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 
 | Script | O que verifica |
 |--------|----------------|
-| `verify_synergy.gd` | 2 iguais = 100% / 1 = 50%, números do leão, curva de pancadas |
+| `verify_synergy.gd` | 2 iguais = 100% / 1 = 50%, números do vampiro, curva de pancadas |
 | `verify_combat_sim.gd` | Choque, empate, teto de 12 de dano no HP, pares sorteados (pode misturar kits) |
-| `verify_shop_pool.gd` | Loja vende todo Freak com ficha; tronco e braços do médico só no nível 2; 5 ofertas |
-| `verify_character_importer.gd` | Id `Leão` → `leao`; cada Freak com 8 desenhos; folha do médico vira 4+4 (folhas antigas 6+6 ainda são lidas) |
+| `verify_shop_pool.gd` | Loja vende todo Freak com ficha; 4 kits por Freak; 5 ofertas |
+| `verify_character_importer.gd` | Acentos viram id simples (`Leão` → `leao`); cada Freak com 8 desenhos; folha do vampiro vira 4+4 |
 | `verify_match_state.gd` | 4 vivos, HP 40, nomes dos bots, oponente-fantasma |
 | `verify_assembly.gd` | 3 cartas, 5 caixas coladas nos rolos, loja acima da esteira, fontes, câmera parada, VENDER à direita, esteira no rodapé em 1920 |
 | `verify_crate_open.gd` | Um clique na caixa solta a peça colada nos rolos |

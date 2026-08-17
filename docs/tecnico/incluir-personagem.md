@@ -21,9 +21,9 @@ As 4 partes:
 
 Cabeça e braços têm **1 esfera** cada, no ponto de união.
 
-Nome interno (`id` / pasta): minúsculo, sem acento. Exemplo: `leao`.
+Nome interno (`id` / pasta): minúsculo, sem acento. Exemplo: `vampiro`.
 
-Nome na carta: com acento se precisar (`Leão`).
+Nome na carta: com acento se precisar (`Bruxa`).
 
 ## Duas formas de incluir
 
@@ -74,7 +74,7 @@ Os ímãs dizem onde cada esfera de metal cola na vizinha.
 **Não chute os números.** Marque na imagem:
 
 1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**).
-2. No alto da janela, escolha o **Freak** (ex.: Leão).
+2. No alto da janela, escolha o **Freak** (ex.: Vampiro).
 3. Use a aba **Frente** e a aba **Perfil**. As 4 partes ficam em duas colunas compactas. À direita: a prévia. A janela cabe na tela do Godot; arraste o canto se quiser maior.
 4. Se um desenho estiver no tipo errado, escolha o certo na caixa (ex.: Braço E). **Virar** e **Girar** corrigem a imagem. **Z** 1 fica na frente **na carta**. Na luta a ordem é outra: de frente cabeça / braço E / braço D / tronco / mola; de perfil braço D / tronco / cabeça / braço E / mola. **Imagem** escolhe um arquivo do PC. **Ampliar** abre a peça grande para marcar o ímã com precisão (roda do mouse amplia).
 5. Arraste cada bolinha até o **centro da esfera de metal**.
@@ -139,7 +139,5 @@ Atualize:
 
 | id | Nome | Números |
 |----|------|---------|
-| `leao` | Leão | Cabeça 4, tronco 4, braços 4 (nível 1, total 16) |
-| `medico` | Médico | Cabeça 5 (nível 1); tronco e braços 6 (nível 2). Total 23 |
 | `vampiro` | Vampiro | Cabeça 3, tronco 4, braços 4 (nível 1). Total 15 |
 | `bruxa` | Bruxa | Cabeça 4, tronco 3, braços 3 (nível 1). Total 13 |

@@ -59,8 +59,6 @@ Cada kit da loja tem **um** número de combate e um **nível** de loja.
 
 | Set | Kits | Total |
 |-----|------|-------|
-| Leão | Cabeça 4, tronco 4, braço E 4, braço D 4 (nível 1) | 16 |
-| Médico | Cabeça 5 (nível 1); tronco 6 e os dois braços 6 (nível 2) | 23 |
 | Vampiro | Cabeça 3, tronco 4, braço E 4, braço D 4 (nível 1) | 15 |
 | Bruxa | Cabeça 4, tronco 3, braço E 3, braço D 3 (nível 1) | 13 |
 
@@ -73,7 +71,7 @@ Conta quantos kits do **mesmo set** estão na carta. Arredonda para cima.
 - 2 iguais: 100%
 - 1: 50%
 
-Exemplo: cabeça 4 sozinha vira **2**. Cabeça + tronco do mesmo set já vale o número cheio (8 no leão). Os dois braços iguais somam mais (set completo do leão = **16**).
+Exemplo: cabeça 4 sozinha vira **2**. Cabeça + tronco do mesmo set já vale o número cheio (7 no vampiro). Os dois braços iguais somam mais (set completo do vampiro = **15**).
 
 ## Luta
 

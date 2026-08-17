@@ -9,21 +9,6 @@ func _run() -> void:
 	var scale := CompositeResolver.display_scale()
 	assert(is_equal_approx(scale, CompositeResolver.PART_SIZE_PX / CompositeResolver.PART_WIDTH_PX))
 	assert(is_equal_approx(scale, 1.0))
-	var leao: CharacterDef = load("res://data/parts/leao_character.tres")
-	assert(leao != null, "Missing lion")
-	for part in leao.visual_parts():
-		_assert_part_art(part)
-	assert(leao.can_fight(), "Lion needs a side view on every drawing")
-	assert(leao.shop_parts().size() == 4)
-	var medico: CharacterDef = load("res://data/parts/medico_character.tres")
-	assert(medico != null, "Missing doctor")
-	for part in medico.visual_parts():
-		_assert_part_art(part)
-	assert(medico.can_fight(), "Doctor needs a side view on every drawing")
-	assert(medico.shop_parts().size() == 4)
-	assert(medico.head.combat_value == 5)
-	assert(medico.body.combat_value == 6)
-	assert(medico.legs.combat_value == 4)
 	var vampiro: CharacterDef = load("res://data/parts/vampiro_character.tres")
 	assert(vampiro != null, "Missing vampire")
 	for part in vampiro.visual_parts():
@@ -39,7 +24,7 @@ func _run() -> void:
 		_assert_part_art(part)
 	assert(bruxa.can_fight(), "Witch needs a side view on every drawing")
 	assert(bruxa.shop_parts().size() == 4)
-	var full := CompositeResolver.resolve(leao)
+	var full := CompositeResolver.resolve(vampiro)
 	assert(full["mode"] == "layered")
 	var textures: Dictionary = full["textures"]
 	var positions: Dictionary = full["positions"]
@@ -51,9 +36,9 @@ func _run() -> void:
 	assert(full.get("spring_texture") != null)
 	assert(positions[PartSlotType.Value.HEAD].y < positions[PartSlotType.Value.BODY].y)
 	assert(float(full["spring_pos"].y) > positions[PartSlotType.Value.BODY].y)
-	var med := CompositeResolver.resolve(medico)
-	var med_pos: Dictionary = med["positions"]
-	assert(med_pos[PartSlotType.Value.HEAD].y < med_pos[PartSlotType.Value.BODY].y)
+	var witch := CompositeResolver.resolve(bruxa)
+	var witch_pos: Dictionary = witch["positions"]
+	assert(witch_pos[PartSlotType.Value.HEAD].y < witch_pos[PartSlotType.Value.BODY].y)
 	print("SIZE_AND_LAYOUT_OK")
 	quit(0)
 

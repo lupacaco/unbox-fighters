@@ -20,7 +20,7 @@ Arena escura, esteira no rodapé como palco, tags coloridas com os números, spo
 
 ## Conteúdo atual
 
-- **Personagens na loja:** todos os Freaks com ficha (hoje Leão, Médico, Vampiro, Bruxa)
+- **Personagens na loja:** todos os Freaks com ficha (hoje Vampiro, Bruxa)
 - **3 cartas** (fila 3º / 2º / 1º)
 - **5 caixas** por rodada, com nível de loja
 - **3 bots** na mesma partida

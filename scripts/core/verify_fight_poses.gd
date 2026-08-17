@@ -4,21 +4,21 @@ func _init() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
-	var leao: CharacterDef = load("res://data/parts/leao_character.tres")
-	assert(leao != null)
-	assert(leao.can_fight())
+	var vampiro: CharacterDef = load("res://data/parts/vampiro_character.tres")
+	assert(vampiro != null)
+	assert(vampiro.can_fight())
 
 	var packed: PackedScene = load("res://scenes/assembly/CharacterSlot.tscn")
 	var slot := packed.instantiate() as CharacterSlot
 	root.add_child(slot)
-	slot.setup(null, [leao])
+	slot.setup(null, [vampiro])
 	assert(slot.get_node("FightButton") != null)
-	assert(slot.can_accept(leao.head))
-	assert(slot.can_accept(leao.body))
-	assert(slot.can_accept(leao.arm_l))
-	assert(slot.can_accept(leao.arm_r))
-	assert(not slot.can_accept(leao.legs))
-	assert(not slot.can_accept(leao.leg_r))
+	assert(slot.can_accept(vampiro.head))
+	assert(slot.can_accept(vampiro.body))
+	assert(slot.can_accept(vampiro.arm_l))
+	assert(slot.can_accept(vampiro.arm_r))
+	assert(not slot.can_accept(vampiro.legs))
+	assert(not slot.can_accept(vampiro.leg_r))
 	assert(not slot.can_fight())
 	var spring := slot.get_node("Display/Spring") as Sprite2D
 	assert(spring != null and spring.visible and spring.texture != null, "Empty card should show the spring")

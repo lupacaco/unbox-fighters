@@ -48,41 +48,41 @@ func _run() -> void:
 		quit(1)
 		return
 
-	var tex := load("res://assets/characters/medico/medico.png") as Texture2D
+	var tex := load("res://assets/characters/vampiro/vampiro.png") as Texture2D
 	if tex == null:
-		push_error("VERIFY_FAIL could not read the doctor sheet")
+		push_error("VERIFY_FAIL could not read the vampire sheet")
 		quit(1)
 		return
 	var sheet := tex.get_image()
 	if sheet == null:
-		push_error("VERIFY_FAIL doctor sheet has no pixels")
+		push_error("VERIFY_FAIL vampire sheet has no pixels")
 		quit(1)
 		return
 	if sheet.get_format() != Image.FORMAT_RGBA8:
 		sheet.convert(Image.FORMAT_RGBA8)
 	var blobs: Array = SheetSlicer._find_blobs(sheet, SheetSlicer._uses_alpha_background(sheet))
 	if blobs.size() < 8:
-		push_error("VERIFY_FAIL doctor sheet should have at least 8 drawings, got %d" % blobs.size())
+		push_error("VERIFY_FAIL vampire sheet should have at least 8 drawings, got %d" % blobs.size())
 		quit(1)
 		return
 	var named: Dictionary = SheetSlicer._classify(blobs, sheet.get_width(), sheet.get_height())
 	if not String(named.get("error", "")).is_empty():
-		push_error("VERIFY_FAIL doctor sheet classify: %s" % named["error"])
+		push_error("VERIFY_FAIL vampire sheet classify: %s" % named["error"])
 		quit(1)
 		return
 	if not named.has("front") or not named.has("profile"):
-		push_error("VERIFY_FAIL doctor sheet should split into 4 front + 4 profile")
+		push_error("VERIFY_FAIL vampire sheet should split into 4 front + 4 profile")
 		quit(1)
 		return
 	for pose in ["front", "profile"]:
 		var group: Dictionary = named[pose]
 		if not SheetSlicer._group_complete(group):
-			push_error("VERIFY_FAIL doctor sheet did not name all four %s parts" % pose)
+			push_error("VERIFY_FAIL vampire sheet did not name all four %s parts" % pose)
 			quit(1)
 			return
 		for slot_name in SheetSlicer.SLOT_NAMES:
 			if not group.has(slot_name):
-				push_error("VERIFY_FAIL doctor sheet missing %s in %s" % [slot_name, pose])
+				push_error("VERIFY_FAIL vampire sheet missing %s in %s" % [slot_name, pose])
 				quit(1)
 				return
 

@@ -89,8 +89,8 @@ func _build_form() -> void:
 	box.add_theme_constant_override("separation", 8)
 	box.custom_minimum_size = Vector2(400, 300)
 	_form.add_child(box)
-	box.add_child(_labeled_edit("Id interno (ex: leao)", true))
-	box.add_child(_labeled_edit("Nome na carta (ex: Leão)", false))
+	box.add_child(_labeled_edit("Id interno (ex: vampiro)", true))
+	box.add_child(_labeled_edit("Nome na carta (ex: Vampiro)", false))
 	var labels: PackedStringArray = ["Cabeça", "Tronco"]
 	_value_spins.clear()
 	for i in labels.size():
@@ -168,7 +168,7 @@ func _editor_tree() -> SceneTree:
 func _run_import() -> void:
 	var set_id := CharacterImporter.clean_id(_id_edit.text)
 	if set_id.is_empty():
-		_set_form_status("O id interno precisa ser minúsculo, sem acento. Exemplo: leao.", true)
+		_set_form_status("O id interno precisa ser minúsculo, sem acento. Exemplo: vampiro.", true)
 		return
 	if _pending_sheet.is_empty():
 		_set_form_status("Escolha de novo a folha PNG ou WEBP.", true)

@@ -34,7 +34,7 @@ static func keep_source_sheet(sheet_path: String, set_id: String) -> void:
 static func write_defs(set_id: String, display_name: String, values: Array) -> String:
 	set_id = clean_id(set_id)
 	if set_id.is_empty():
-		return "O id interno precisa ser minúsculo, sem acento. Exemplo: leao."
+		return "O id interno precisa ser minúsculo, sem acento. Exemplo: vampiro."
 	if display_name.strip_edges().is_empty():
 		display_name = set_id.capitalize()
 	if values.size() < 2:

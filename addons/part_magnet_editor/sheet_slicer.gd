@@ -9,7 +9,7 @@ const SLOT_NAMES: PackedStringArray = ["head", "body", "arm_l", "arm_r"]
 
 static func slice_to_folder(sheet_path: String, set_id: String) -> Dictionary:
 	if set_id.is_empty():
-		return _fail("O id interno precisa ser minúsculo, sem acento. Exemplo: leao.")
+		return _fail("O id interno precisa ser minúsculo, sem acento. Exemplo: vampiro.")
 	var img := Image.new()
 	var err := img.load(sheet_path)
 	if err != OK:

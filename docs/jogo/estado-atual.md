@@ -21,7 +21,7 @@
 | Fundo de arena | Respiração de vinheta + partículas de poeira. Fundo e esteira não mudam na luta |
 | Áudio | Efeitos gravados (martelo, caixa, ímã). Na luta: boing de mola de desenho no impulso, passo no pouso e poom do golpe |
 | Export Web | Scripts `tools/export_web.ps1` + `tools/serve_web.ps1` (localhost) |
-| Dados | Loja lê sozinha todo `*_character.tres` (Leão, Médico, Vampiro, Bruxa) |
+| Dados | Loja lê sozinha todo `*_character.tres` (Vampiro, Bruxa) |
 | Scripts de verificação | Rodam checagens sem abrir a interface completa |
 
 ## Parcial / provisório

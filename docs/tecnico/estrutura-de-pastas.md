@@ -13,10 +13,9 @@ unbox-fighters/
 │   ├── objects/           # Martelo do cursor e base-mola
 │   ├── audio/sfx/         # Efeitos sonoros (.wav)
 │   ├── fonts/             # Letras da interface (Bebas Neue, Oswald)
-│   ├── characters/leao/
-│   ├── characters/medico/
 │   ├── characters/vampiro/
 │   ├── characters/bruxa/
+│   ├── characters/crocodilo/
 │   └── ui/
 ├── data/                  # Dados do jogo (.tres)
 │   └── parts/
@@ -41,7 +40,7 @@ As regras em `.cursor/rules/` ensinam o assistente a falar simples, atualizar do
 |------------|----------|
 | Mudar a tela principal | `scenes/assembly/Assembly.tscn` + `scripts/assembly/assembly_controller.gd` |
 | Mudar comportamento de caixa / peça / carta | `scripts/assembly/` |
-| Mudar atributos ou sprites do leão / médico / vampiro | `data/parts/` |
+| Mudar atributos ou sprites de um Freak | `data/parts/` |
 | Mudar regras de composição visual | `scripts/data/composite_resolver.gd` |
 | Mudar regras de luta / loja / bots | `scripts/match/` |
 | Mudar HUD / fundo / tags | `scripts/ui/` |

@@ -2,7 +2,7 @@
 func _init():
 	call_deferred("_run")
 func _run():
-	var c: CharacterDef = load("res://data/parts/leao_character.tres")
+	var c: CharacterDef = load("res://data/parts/vampiro_character.tres")
 	print("CHAR=", c != null)
 	if c == null:
 		quit(1); return

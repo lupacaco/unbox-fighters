@@ -418,8 +418,8 @@ def slice_sheet(sheet_path: Path, set_id: str, out_dir: Path) -> dict:
 def main() -> None:
 	parser = argparse.ArgumentParser(description="Cut a 4+4 Freak sheet into eight 200x200 parts.")
 	parser.add_argument("sheet", help="Path to the PNG/WEBP sheet")
-	parser.add_argument("--id", required=True, help="Internal id, e.g. leao")
-	parser.add_argument("--name", default="", help="Display name, e.g. Leão")
+	parser.add_argument("--id", required=True, help="Internal id, e.g. vampiro")
+	parser.add_argument("--name", default="", help="Display name, e.g. Vampiro")
 	parser.add_argument("--value", type=int, default=4, help="Combat number if --head/--body are omitted")
 	parser.add_argument("--head", type=int, default=0, help="Shop number for the head kit")
 	parser.add_argument("--body", type=int, default=0, help="Shop number for the torso kit")

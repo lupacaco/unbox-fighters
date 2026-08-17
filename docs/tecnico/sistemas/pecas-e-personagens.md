@@ -65,8 +65,6 @@ Na loja entram **todos** os Freaks que tiverem ficha `*_character.tres`. Hoje:
 
 | Set | Kits | Total do set completo |
 |-----|------|------------------------|
-| Leão | Cabeça 4, tronco 4, braço E 4, braço D 4 (nível 1) | 16 |
-| Médico | Cabeça 5 (nível 1); tronco 6, braço E 6, braço D 6 (nível 2) | 23 |
 | Vampiro | Cabeça 3, tronco 4, braço E 4, braço D 4 (nível 1) | 15 |
 | Bruxa | Cabeça 4, tronco 3, braço E 3, braço D 3 (nível 1) | 13 |
 
@@ -130,7 +128,5 @@ Pasta: `data/parts/`
 
 | Arquivo | Conteúdo |
 |---------|----------|
-| `leao_character.tres` + `leao_head/body/arm_*.tres` | Kits da loja (Leão) |
-| `medico_character.tres` + `medico_head/body/arm_*.tres` | Kits da loja (Médico) |
 | `vampiro_character.tres` + `vampiro_head/body/arm_*.tres` | Kits da loja (Vampiro) |
 | `bruxa_character.tres` + `bruxa_head/body/arm_*.tres` | Kits da loja (Bruxa) |
