@@ -85,7 +85,7 @@ Com só 2 Freaks no jogo, quase toda carta ganha dupla ou tripla. O bônus vira 
 
 - Azul = você, da esquerda para o centro. Vermelha = oponente, da direita para o centro. Na vermelha o Freak olha para a esquerda (para o vão).
 - Ao apertar **LUTAR**, o Freak **salta da carta** até o começo da esteira.
-- Chega na ponta em **5 remadas**. Cada remada anda um pouco; as duas mãos puxam juntas.
+- Chega na ponta em **5 remadas**. Cada remada: os dois braços sobem para a frente, jogam para trás em meia-lua, e **só então** o caixote desliza (com fumacinha atrás). Depois os braços ficam para baixo até o próximo tempo da Agilidade.
 - Tempo entre remadas (Agilidade já com sinergia): **1 → 3 s**, **2 → 2,5 s**, **3 → 2 s**, **4 → 1,5 s**, **5 ou mais → 1 s**.
 - Só o Freak da **ponta** luta. O de trás espera uma remada atrás.
 - Na esteira aparecem as etiquetas de **Poder** (cabeça) e **Resistência** (tronco), iguais às da carta.
@@ -93,6 +93,8 @@ Com só 2 Freaks no jogo, quase toda carta ganha dupla ou tripla. O bônus vira 
 - Os golpes são **um de cada vez**. Primeiro um ataca e causa o dano; se ninguém caiu, o outro responde.
 - O golpe que **mata** é sempre do que vai vencer. Se o troca-troca mataria os dois, a ordem é sorteada e **os dois atacam**.
 - Quem zera a vida do Freak escorrega e **cai no vão** entre as esteiras.
+
+O oponente usa **as mesmas regras** que você: o mesmo dinheiro, a mesma loja, 2 cartas. Ele também gasta tempo para abrir a caixa, encaixar o kit e apertar LUTAR — não monta um Freak no primeiro segundo.
 
 ## Controles
 

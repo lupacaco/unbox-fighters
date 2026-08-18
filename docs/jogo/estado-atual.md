@@ -20,7 +20,7 @@
 | Incluir Freak | Folha 4+4 vira 8 PNG 200×200 + 3 kits na loja; ímãs em Frente e Perfil |
 | Áudio | Efeitos gravados (martelo, caixa, ímã, impacto). Sem som de mola |
 | Dados | Loja lê sozinha todo `*_character.tres` (Bruxa, Advogado) |
-| Bot | Compra, monta e manda lutar com as mesmas regras |
+| Bot | Compra, monta e manda lutar com as mesmas regras e o mesmo tempo de mãos |
 | Scripts de verificação | 11 checagens sem abrir a interface completa |
 
 ## Parcial / provisório

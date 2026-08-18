@@ -59,6 +59,11 @@ static func step() -> void:
 	if s:
 		s.call("step")
 
+static func wood_slide() -> void:
+	var s := _sfx()
+	if s:
+		s.call("wood_slide")
+
 static func ui_click() -> void:
 	var s := _sfx()
 	if s:

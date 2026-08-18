@@ -17,7 +17,7 @@ A cena principal do jogo hoje: loja + cartas + esteiras no mesmo palco.
 2. Sobe a barra de dinheiro, ATUALIZAR/VENDER e as duas barras de vida
 3. Liga o arraste
 4. Começa a `LiveMatch` e sorteia **4 caixas**
-5. O bot começa a jogar no mesmo ritmo
+5. O bot começa a jogar no mesmo ritmo: espera, abre caixa, encaixa, só então LUTAR
 
 ## Layout (1920×1080)
 

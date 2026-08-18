@@ -16,6 +16,7 @@ const PATHS := {
 	"fighter_complete": "res://assets/audio/sfx/fighter_complete.wav",
 	"impact": "res://assets/audio/sfx/impact.wav",
 	"step": "res://assets/audio/sfx/step.wav",
+	"wood_slide": "res://assets/audio/sfx/wood_slide.wav",
 }
 
 var _streams: Dictionary = {}
@@ -114,6 +115,9 @@ func impact() -> void:
 
 func step() -> void:
 	play(&"step", -11.0, randf_range(0.92, 1.1))
+
+func wood_slide() -> void:
+	play(&"wood_slide", -5.5, randf_range(0.94, 1.05))
 
 func ui_click() -> void:
 	play(&"part_pickup", -11.0, randf_range(1.1, 1.22))

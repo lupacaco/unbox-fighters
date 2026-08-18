@@ -15,7 +15,7 @@ Regras da partida 1 contra 1. Ficam em `scripts/match/` para poder testar os nú
 | `synergy.gd` | Dupla +25%, tripla +50%, arredonda para cima |
 | `fighter_loadout.gd` | Os 3 kits de uma carta |
 | `shop_pool.gd` | Sorteia 4 kits entre todos os Freaks |
-| `bot_brain.gd` | O oponente compra, monta e manda lutar |
+| `bot_brain.gd` | O oponente compra, monta e manda lutar no mesmo ritmo que você (abrir caixa, encaixar, LUTAR) |
 
 ## Fluxo
 

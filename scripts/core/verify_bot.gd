@@ -1,10 +1,10 @@
 extends SceneTree
 
-## The opponent plays by the same rules: it waits for money, buys kits onto its
-## cards, prefers matching sets, and sends a finished Freak to its belt.
+## The opponent plays by the same rules and the same hands: it waits for money,
+## spends the time to open a crate and place a kit, and cannot launch a Freak
+## in the first seconds of a match.
 
 const TRAVEL := 700.0
-## Two minutes of play is plenty for a bot that buys every half second.
 const RUN_SECONDS := 120.0
 const STEP := 0.1
 
@@ -27,11 +27,17 @@ func _run() -> void:
 
 	live.freak_launched.connect(_count_launch)
 	var spent_something := false
-	for _i in int(RUN_SECONDS / STEP):
+	var earliest := BotBrain.earliest_launch_time()
+	for i in int(RUN_SECONDS / STEP):
+		var elapsed := float(i) * STEP
 		live.tick(STEP)
 		bot.tick(STEP, live.opponent, live)
 		if live.opponent.money < MatchRules.MAX_MONEY:
 			spent_something = true
+		if elapsed + 0.001 < earliest and _launched > 0:
+			push_error("VERIFY_FAIL the bot launched at %.1fs; a player cannot assemble that fast" % elapsed)
+			quit(1)
+			return
 		if not live.running:
 			break
 
@@ -52,6 +58,10 @@ func _run() -> void:
 		quit(1)
 		return
 	if not _check_taste():
+		quit(1)
+		return
+	if BotBrain.earliest_launch_time() < 6.0:
+		push_error("VERIFY_FAIL assembling three kits must take several seconds")
 		quit(1)
 		return
 

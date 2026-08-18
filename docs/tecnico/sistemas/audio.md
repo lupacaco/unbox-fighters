@@ -29,7 +29,8 @@ Os efeitos passam por um canal **SFX** com compressão leve (segura o volume qua
 | `part_reject` | `part_reject.wav` | Soltou no lugar errado / voltou / sem dinheiro |
 | `fighter_complete` | `fighter_complete.wav` | Carta completa (3 kits) — só na montagem |
 | `impact` | `impact.wav` | Poom do golpe na luta |
-| `step` | `step.wav` | Pouso na esteira e cada remada |
+| `step` | `step.wav` | Pouso na esteira |
+| `wood_slide` | `wood_slide.wav` | Caixote deslizando no chão depois da remada |
 
 Não existe mais som de mola. A base do Freak é o caixote.
 

@@ -1,21 +1,36 @@
 class_name BotBrain
 extends RefCounted
 
-## The opponent plays the same game you do: it waits for money, buys kits onto
-## its two cards, prefers matching sets for the synergy, and sends a card to the
-## belt as soon as all three kits are on it.
+## The opponent plays with the same hands you do: it waits for money, cracks a
+## crate, drags the kit onto a card, and only then presses LUTAR. It cannot
+## assemble a Freak in a blink because opening and placing take real time.
 
-## A short pause after each action so the opponent feels like a hand, not a script.
-const THINK_TIME := 0.55
+## Glance at the shop before the next move.
+const LOOK_TIME := 0.85
+## Matches the crate cracking on your shelves.
+const OPEN_TIME := 0.45
+## Time to pick a kit up and drop it on a card.
+const PLACE_TIME := 1.2
+## Time to notice LUTAR and press it.
+const LAUNCH_TIME := 0.9
 
-var _think: float = 0.0
+static func kit_handle_time() -> float:
+	return OPEN_TIME + PLACE_TIME
+
+## Fastest a finished Freak can leave a card: look, three kits, then LUTAR.
+static func earliest_launch_time() -> float:
+	return LOOK_TIME + kit_handle_time() * 3.0 + LAUNCH_TIME
+
+var _wait: float = 0.0
+var _launch_armed: bool = false
 var cards: Array[FighterLoadout] = []
 
 func _init() -> void:
 	reset()
 
 func reset() -> void:
-	_think = 0.0
+	_wait = LOOK_TIME
+	_launch_armed = false
 	cards.clear()
 	for _i in MatchRules.CARD_COUNT:
 		cards.append(FighterLoadout.new())
@@ -23,18 +38,36 @@ func reset() -> void:
 func tick(delta: float, side: PlayerState, match_ref: LiveMatch) -> void:
 	if side == null or match_ref == null or not match_ref.running:
 		return
-	_think += delta
-	if _think < THINK_TIME:
+	_wait -= delta
+	if _wait > 0.0:
 		return
-	_think = 0.0
-	if _try_launch(side, match_ref):
+	if _launch_armed:
+		_launch_armed = false
+		if _try_launch(side, match_ref):
+			_wait = LOOK_TIME
+			return
+	if _can_launch(side):
+		_launch_armed = true
+		_wait = LAUNCH_TIME
 		return
 	if _try_buy(side):
+		_wait = kit_handle_time()
 		return
-	_try_refresh(side, match_ref)
+	if _try_refresh(side, match_ref):
+		_wait = LOOK_TIME
+		return
+	_wait = LOOK_TIME
+
+func _can_launch(side: PlayerState) -> bool:
+	if side == null or not side.lane.can_accept():
+		return false
+	for card in cards:
+		if card.is_complete():
+			return true
+	return false
 
 func _try_launch(side: PlayerState, match_ref: LiveMatch) -> bool:
-	if not side.lane.can_accept():
+	if not _can_launch(side):
 		return false
 	var best := -1
 	var best_power := -1

@@ -7,10 +7,17 @@ extends Node2D
 const HP_BAR := Vector2(96, 10)
 const HEAD_ARC := 210.0
 const TAG_SCALE := 0.72
-const REACH_ANGLE := 0.7
-const PULL_ANGLE := -0.85
 const JUMP_PEAK := 280.0
 const JUMP_TIME := 0.52
+## One paddle: lift both arms forward, throw them back in a half-moon, then slide.
+const STROKE_TIME := 0.88
+const LIFT_END := 0.24
+const SWEEP_END := 0.50
+const SLIDE_END := 0.82
+## Extra arm rotation from hanging down, in radians, sweeping over the top.
+const ARM_FRONT := -2.05
+const ARM_BACK := -4.55
+const ARM_DOWN := -TAU
 
 var runner: BeltLane.Runner
 var player_side: bool = true
@@ -35,6 +42,7 @@ var _jumping: bool = false
 var _stroking: bool = false
 var _stroke_from_x: float = 0.0
 var _stroke_to_x: float = 0.0
+var _slide_started: bool = false
 
 func setup(loadout: FighterLoadout, lane_runner: BeltLane.Runner, is_player: bool) -> void:
 	runner = lane_runner
@@ -93,13 +101,11 @@ func play_stroke(to_progress: float) -> void:
 	if _dead or _stroking:
 		return
 	_stroking = true
+	_slide_started = false
 	_stroke_from_x = position.x
 	_stroke_to_x = AssemblyLayout.belt_x_at(player_side, to_progress)
-	GameAudio.step()
-	if _dust != null:
-		_dust.emitting = true
 	var tween := create_tween()
-	tween.tween_method(_row_at, 0.0, 1.0, 0.52)
+	tween.tween_method(_row_at, 0.0, 1.0, STROKE_TIME)
 	tween.tween_callback(_finish_stroke)
 
 ## Hard stop at the tip: squash, dust puff.
@@ -129,38 +135,68 @@ func _finish_stroke() -> void:
 	if _dust != null:
 		_dust.emitting = false
 	_stroking = false
+	_slide_started = false
 	if runner != null and runner.at_tip() and not arrived:
 		arrived = true
 		play_arrive()
 
-## 0..1 of one paddle: both hands reach forward, then pull the crate along.
+## Lift both arms forward, throw them back in a half-moon, then the crate slides.
 func _row_at(t: float) -> void:
 	var angle := 0.0
 	var lean := 0.0
 	var bob := 0.0
-	if t < 0.22:
-		var u := t / 0.22
-		angle = lerpf(0.0, REACH_ANGLE, u)
-		lean = lerpf(0.0, 0.09, u)
-		bob = -u * 7.0
-	elif t < 0.72:
-		var u := (t - 0.22) / 0.50
-		angle = lerpf(REACH_ANGLE, PULL_ANGLE, u)
-		lean = lerpf(0.09, -0.07, u)
-		bob = lerpf(-7.0, 0.0, u)
+	if t < LIFT_END:
+		var u := t / LIFT_END
+		u = _smooth(u)
+		angle = lerpf(0.0, ARM_FRONT, u)
+		lean = lerpf(0.0, 0.1, u)
+		bob = lerpf(0.0, -8.0, u)
+		position.x = _stroke_from_x
+	elif t < SWEEP_END:
+		var u := (t - LIFT_END) / (SWEEP_END - LIFT_END)
+		u = _smooth(u)
+		angle = lerpf(ARM_FRONT, ARM_BACK, u)
+		lean = lerpf(0.1, -0.08, u)
+		bob = lerpf(-8.0, -2.0, u)
+		position.x = _stroke_from_x
+	elif t < SLIDE_END:
+		_begin_slide()
+		var u := (t - SWEEP_END) / (SLIDE_END - SWEEP_END)
+		u = 1.0 - (1.0 - u) * (1.0 - u)
+		angle = ARM_BACK
+		lean = lerpf(-0.08, 0.02, u)
+		bob = 0.0
 		position.x = lerpf(_stroke_from_x, _stroke_to_x, u)
 	else:
-		var u := (t - 0.72) / 0.28
-		angle = lerpf(PULL_ANGLE, 0.0, u)
-		lean = lerpf(-0.07, 0.0, u)
+		if _dust != null:
+			_dust.emitting = false
+		var u := (t - SLIDE_END) / maxf(0.001, 1.0 - SLIDE_END)
+		u = _smooth(u)
+		angle = lerpf(ARM_BACK, ARM_DOWN, u)
+		lean = lerpf(0.02, 0.0, u)
+		bob = 0.0
 		position.x = _stroke_to_x
 	_swing(_sprites.get(PartSlotType.Value.ARM_R) as Sprite2D, angle)
-	_swing(_sprites.get(PartSlotType.Value.ARM_L) as Sprite2D, angle * 0.92)
+	_swing(_sprites.get(PartSlotType.Value.ARM_L) as Sprite2D, angle)
 	_body.rotation = lean
 	_body.position.y = bob
 	var head: Sprite2D = _sprites.get(PartSlotType.Value.HEAD)
 	if head != null:
-		head.position = _head_home + Vector2(angle * 4.0, bob * 0.15)
+		head.position = _head_home + Vector2(-sin(angle) * 3.0, bob * 0.12)
+
+func _begin_slide() -> void:
+	if _slide_started:
+		return
+	_slide_started = true
+	GameAudio.wood_slide()
+	if _dust != null:
+		_dust.emitting = false
+		_dust.emitting = true
+	Feel.punch(_body, Vector2(1.12, 0.88), Vector2.ONE)
+
+func _smooth(u: float) -> float:
+	var x := clampf(u, 0.0, 1.0)
+	return x * x * (3.0 - 2.0 * x)
 
 func _settle() -> void:
 	_body.rotation = 0.0
@@ -333,18 +369,19 @@ func _build_body(loadout: FighterLoadout) -> void:
 	_head_home = head.position if head != null else Vector2.ZERO
 
 	_dust = CPUParticles2D.new()
-	_dust.amount = 14
-	_dust.lifetime = 0.5
+	_dust.amount = 28
+	_dust.lifetime = 0.7
+	_dust.explosiveness = 0.35
 	_dust.local_coords = false
-	_dust.direction = Vector2(-1.0, -0.5)
-	_dust.spread = 24.0
-	_dust.initial_velocity_min = 30.0
-	_dust.initial_velocity_max = 90.0
-	_dust.gravity = Vector2(0, 120)
-	_dust.scale_amount_min = 1.5
-	_dust.scale_amount_max = 4.0
-	_dust.color = Color(0.72, 0.68, 0.6, 0.28)
-	_dust.position = Vector2(-40.0 * _display_scale, -4.0)
+	_dust.direction = Vector2(-1.0, -0.35)
+	_dust.spread = 28.0
+	_dust.initial_velocity_min = 18.0
+	_dust.initial_velocity_max = 55.0
+	_dust.gravity = Vector2(0, 50)
+	_dust.scale_amount_min = 2.0
+	_dust.scale_amount_max = 6.0
+	_dust.color = Color(0.84, 0.80, 0.74, 0.42)
+	_dust.position = Vector2(-52.0 * _display_scale, -6.0)
 	_dust.z_index = -1
 	_dust.emitting = false
 	_body.add_child(_dust)
