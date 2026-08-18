@@ -1,34 +1,30 @@
 class_name ActionBar
 extends Node2D
 
-## The two buttons on the right: ATUALIZAR swaps every crate in the shop,
-## VENDER turns the picked piece back into money.
+## Round shop buttons: the blue arrows dump the closed crate, the red bin
+## buys a kit back for half of what you paid.
 
 signal refresh_pressed
 signal sell_pressed
 
-var _refresh: Button
-var _sell: Button
+var _refresh: TextureButton
+var _sell: TextureButton
 var _sell_hint: Label
 var _sell_glow: Tween
 
 func _ready() -> void:
-	_refresh = GameTheme.make_button(
-		"ATUALIZAR $%d" % MatchRules.REFRESH_COST,
+	_refresh = GameTheme.make_icon_button(
+		AssemblyLayout.REFRESH_TEX,
 		AssemblyLayout.REFRESH_BUTTON,
-		AssemblyLayout.ACTION_BUTTON_SIZE,
-		ThemeTokens.REFRESH_BLUE,
-		28
+		AssemblyLayout.ICON_BUTTON_SIZE
 	)
 	_refresh.pressed.connect(func() -> void: refresh_pressed.emit())
 	add_child(_refresh)
 
-	_sell = GameTheme.make_button(
-		"VENDER",
+	_sell = GameTheme.make_icon_button(
+		AssemblyLayout.SELL_TEX,
 		AssemblyLayout.SELL_BUTTON,
-		AssemblyLayout.ACTION_BUTTON_SIZE,
-		ThemeTokens.SELL_RED,
-		28
+		AssemblyLayout.ICON_BUTTON_SIZE
 	)
 	_sell.pressed.connect(func() -> void: sell_pressed.emit())
 	add_child(_sell)
@@ -36,8 +32,8 @@ func _ready() -> void:
 	_sell_hint = GameTheme.make_label(
 		"",
 		24,
-		AssemblyLayout.SELL_BUTTON + Vector2(0, AssemblyLayout.ACTION_BUTTON_SIZE.y * 0.5 + 22.0),
-		Vector2(260, 32),
+		AssemblyLayout.SELL_BUTTON + Vector2(0, AssemblyLayout.ICON_BUTTON_SIZE.y * 0.5 + 18.0),
+		Vector2(160, 32),
 		ThemeTokens.GOLD
 	)
 	add_child(_sell_hint)
@@ -50,7 +46,6 @@ func set_can_refresh(can: bool) -> void:
 	_refresh.modulate = Color.WHITE if can else Color(0.6, 0.6, 0.6, 0.75)
 
 ## Shows what the picked piece is worth. Zero means nothing is picked.
-## The plate stays red even when idle, so it still reads as a button.
 func set_sell_target(refund: int) -> void:
 	if _sell == null:
 		return
@@ -70,10 +65,9 @@ func set_drop_hot(hot: bool) -> void:
 	_sell.modulate = ThemeTokens.GOLD if hot else Color.WHITE
 
 func sell_button_rect() -> Rect2:
-	return Rect2(
-		AssemblyLayout.top_left(AssemblyLayout.SELL_BUTTON, AssemblyLayout.ACTION_BUTTON_SIZE),
-		AssemblyLayout.ACTION_BUTTON_SIZE
-	)
+	if _sell == null:
+		return Rect2()
+	return _sell.get_global_rect()
 
 func play_sold() -> void:
 	Feel.punch(_sell, Vector2(1.2, 0.8), Vector2.ONE)
@@ -87,4 +81,5 @@ func _stop_glow() -> void:
 	if _sell_glow != null and _sell_glow.is_valid():
 		_sell_glow.kill()
 	_sell_glow = null
-	_sell.modulate = Color.WHITE
+	if _sell != null:
+		_sell.modulate = Color.WHITE

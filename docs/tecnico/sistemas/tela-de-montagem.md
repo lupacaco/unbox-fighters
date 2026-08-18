@@ -13,27 +13,26 @@ A cena principal do jogo hoje: loja + cartas + esteiras no mesmo palco.
 
 ## O que o controlador faz ao iniciar
 
-1. Desenha o fundo, as duas esteiras, as 2 cartas e as 4 prateleiras
-2. Sobe a barra de dinheiro, ATUALIZAR/VENDER e as duas barras de vida
-3. Liga o arraste
-4. Começa a `LiveMatch` e sorteia **4 caixas**
+1. Desenha o fundo, as duas esteiras, as 2 cartas suas, as 2 cartas do oponente e 1 prateleira
+2. Sobe o dinheiro ao lado da prateleira, os botões redondos e a barra-balança acima das esteiras
+3. Liga o arraste (só nas cartas azuis)
+4. Começa a `LiveMatch` e sorteia **1 caixa**
 5. O bot começa a jogar no mesmo ritmo: espera, abre caixa, encaixa, só então LUTAR
 
 ## Layout (1920×1080)
 
-- **2 cartas** à esquerda (`carta.png`, 306×606)
-- **4 prateleiras** no meio (`prateleira-loja.png`)
-- **Barra de dinheiro** à direita (10 tijolinhos + `$N`)
-- **ATUALIZAR** (azul) e **VENDER** (vermelho) abaixo do dinheiro
+- **2 cartas azuis** à esquerda (`carta.png`, 306×572)
+- **2 cartas vermelhas** à direita (`carta-oponente.png`) — só mostram a montagem do oponente
+- **1 prateleira** no meio (`prateleira-loja.png`, 438×95), botão de atualizar acima, lixeira e dinheiro ao lado
 - **Esteira azul** embaixo à esquerda, **vermelha** à direita, vão no meio
-- Barras de vida no topo: Você à esquerda, Oponente à direita
+- **Barra-balança** no centro, acima das esteiras (`barra-hp-vazia.png`)
 
 ## Loja
 
-Cada prateleira segura a caixa fechada com o preço. Ao pagar, a caixa abre e o kit fica em cima para arrastar. **ATUALIZAR** troca as caixas fechadas; um kit já pago na prateleira fica.
+A prateleira segura a caixa fechada com o preço. Ao pagar, a caixa abre e o kit fica em cima para arrastar. **Atualizar** joga a caixa fechada no vão e deixa cair uma nova. Um kit já pago na prateleira fica. Quando o kit vai para a carta, uma caixa nova cai sozinha.
 
 ## Relação com outras cenas
 
 - `Crate` — 1 clique → pede para pagar → some → a prateleira instancia `PartView`
-- `CharacterSlot` — recebe 3 kits em cima do caixote; **LUTAR** aparece quando está completo
+- `CharacterSlot` — recebe 3 kits em cima do caixote; **LUTAR** aparece quando está completo (cartas do oponente não têm LUTAR e não aceitam o seu arraste)
 - `BeltFreak` — o Freak na esteira: pula da carta, rema 5 vezes, mostra Poder e Resistência nas partes

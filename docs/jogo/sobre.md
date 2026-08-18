@@ -13,17 +13,17 @@ Você abre caixas, monta Freaks com **3 kits** (cabeça, tronco e os dois braço
 1. **Comprar** kits nas prateleiras (gasta dinheiro)
 2. **Montar** até 2 Freaks nas cartas
 3. **LUTAR**: o Freak completo pula da carta para a esteira azul e rema até a ponta
-4. Na ponta, a **cabeça ataca**. Se ficar sozinho, vai comendo a vida do outro jogador
+4. Na ponta, a **cabeça ataca**. Se ficar sozinho, empurra a barra-balança para o lado dele
 
 ## Tom visual
 
-Arena de oficina, duas esteiras (azul sua, vermelha do oponente), cartas de madeira à esquerda, loja no meio, dinheiro à direita.
+Arena de oficina, duas esteiras (azul sua, vermelha do oponente), cartas azuis à esquerda, cartas vermelhas à direita, loja no meio.
 
 ## Conteúdo atual
 
 - **Personagens na loja:** Bruxa e Advogado
-- **2 cartas** para montar
-- **4 prateleiras** de loja
+- **2 cartas** suas e **2 cartas** do oponente
+- **1 prateleira** de loja no meio
 - **1 oponente** (um bot que joga com as mesmas regras)
 
 ## Resolução da tela

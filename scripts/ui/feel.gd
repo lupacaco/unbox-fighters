@@ -32,7 +32,7 @@ static func punch(node: Node, squash: Vector2 = Vector2(1.14, 0.86), rest: Vecto
 	tween.tween_property(node, "scale", squash, 0.06).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.tween_property(node, "scale", rest, 0.14).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
-static func wire_button(button: Button) -> void:
+static func wire_button(button: BaseButton) -> void:
 	if button == null or bool(button.get_meta("feel_wired", false)):
 		return
 	button.set_meta("feel_wired", true)

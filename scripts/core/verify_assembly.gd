@@ -1,7 +1,8 @@
 extends SceneTree
 
 ## Opens the match screen for real and checks the furniture is all there and in
-## the right place: two cards, four shelves, two belts, money, life and buttons.
+## the right place: two cards of yours, two of theirs, one shelf, two belts,
+## money, the tug bar and the round buttons.
 
 func _init() -> void:
 	call_deferred("_run")
@@ -32,6 +33,14 @@ func _check_furniture(scene: Node) -> bool:
 	if cards == null or cards.get_child_count() != MatchRules.CARD_COUNT:
 		push_error("VERIFY_FAIL expected %d cards" % MatchRules.CARD_COUNT)
 		return false
+	var opponent_cards := scene.get_node_or_null("OpponentCards")
+	if opponent_cards == null or opponent_cards.get_child_count() != MatchRules.CARD_COUNT:
+		push_error("VERIFY_FAIL expected %d opponent cards" % MatchRules.CARD_COUNT)
+		return false
+	for card in opponent_cards.get_children():
+		if not (card as CharacterSlot).is_opponent:
+			push_error("VERIFY_FAIL the red cards should be marked as the opponent's")
+			return false
 	var shelves := scene.get_node_or_null("Shelves")
 	if shelves == null or shelves.get_child_count() != MatchRules.SHOP_SLOTS:
 		push_error("VERIFY_FAIL expected %d shelves" % MatchRules.SHOP_SLOTS)
@@ -41,8 +50,11 @@ func _check_furniture(scene: Node) -> bool:
 			push_error("VERIFY_FAIL every shelf should open with a crate on it")
 			return false
 	var hud := scene.get_node_or_null("Hud")
-	if hud == null or hud.get_child_count() < 4:
-		push_error("VERIFY_FAIL the right column needs money, buttons and two life bars")
+	if hud == null or hud.get_node_or_null("TugBar") == null:
+		push_error("VERIFY_FAIL the screen needs money, buttons and the tug bar")
+		return false
+	if hud.get_node_or_null("MoneyBar") == null or hud.get_node_or_null("ActionBar") == null:
+		push_error("VERIFY_FAIL money and the round buttons should sit in the HUD")
 		return false
 	var background := scene.get_node_or_null("Background") as Sprite2D
 	if background == null or background.texture == null:

@@ -1,13 +1,13 @@
 class_name PlayerState
 extends RefCounted
 
-## One side of the match: a life bar, a wallet, a shop and a belt.
+## One side of the match: a wallet, a shop and a belt.
 ## Both the human and the bot use this, so the two play by the same rules.
+## Match life lives on LiveMatch.tug, not here — it is one shared number.
 
 var id: StringName = &"player"
 var display_name: String = MatchRules.PLAYER_NAME
 var is_bot: bool = false
-var hp: int = MatchRules.STARTING_HP
 var money: int = MatchRules.STARTING_MONEY
 var shop_offers: Array[PartDef] = []
 ## What each shop slot cost, so selling can give half of it back.
@@ -20,7 +20,6 @@ func _init() -> void:
 	reset_shop_slots()
 
 func reset() -> void:
-	hp = MatchRules.STARTING_HP
 	money = MatchRules.STARTING_MONEY
 	_money_timer = 0.0
 	lane.clear()
@@ -32,9 +31,6 @@ func reset_shop_slots() -> void:
 	for i in MatchRules.SHOP_SLOTS:
 		shop_offers.append(null)
 		shop_prices[i] = 0
-
-func is_alive() -> bool:
-	return hp > 0
 
 ## Returns true on the ticks where the wallet actually gained a coin.
 func tick_money(delta: float) -> bool:
@@ -72,7 +68,7 @@ func roll_shop(rng: RandomNumberGenerator, keep: PackedInt32Array = PackedInt32A
 		shop_prices[i] = PartStats.price_of(fresh[i])
 
 func refresh_shop(rng: RandomNumberGenerator, keep: PackedInt32Array = PackedInt32Array()) -> bool:
-	if not spend(MatchRules.REFRESH_COST):
+	if MatchRules.REFRESH_COST > 0 and not spend(MatchRules.REFRESH_COST):
 		return false
 	roll_shop(rng, keep)
 	return true
@@ -91,6 +87,3 @@ func buy(index: int) -> PartDef:
 		return null
 	shop_offers[index] = null
 	return part
-
-func take_chip_damage() -> void:
-	hp = maxi(0, hp - MatchRules.CHIP_DAMAGE)

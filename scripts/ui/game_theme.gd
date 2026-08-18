@@ -95,6 +95,19 @@ static func make_button(text: String, center: Vector2, size: Vector2, fill: Colo
 	return button
 
 
+static func make_icon_button(texture_path: String, center: Vector2, size: Vector2) -> TextureButton:
+	var button := TextureButton.new()
+	button.texture_normal = load(texture_path)
+	button.ignore_texture_size = true
+	button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	button.size = size
+	button.position = AssemblyLayout.top_left(center, size)
+	button.focus_mode = Control.FOCUS_NONE
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	Feel.wire_button(button)
+	return button
+
+
 static func make_label(text: String, font_px: int, center: Vector2, size: Vector2, color: Color, display: bool = true) -> Label:
 	var label := Label.new()
 	label.text = text

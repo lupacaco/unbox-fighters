@@ -93,8 +93,11 @@ func _check_prices() -> bool:
 func _check_money() -> bool:
 	var side := PlayerState.new()
 	side.reset()
-	if side.money != MatchRules.STARTING_MONEY or side.hp != MatchRules.STARTING_HP:
-		push_error("VERIFY_FAIL a fresh player starts full")
+	if side.money != MatchRules.STARTING_MONEY:
+		push_error("VERIFY_FAIL a fresh player starts with a full wallet")
+		return false
+	if side.shop_offers.size() != MatchRules.SHOP_SLOTS:
+		push_error("VERIFY_FAIL a fresh shop has %d crate(s)" % MatchRules.SHOP_SLOTS)
 		return false
 	if side.tick_money(MatchRules.MONEY_INTERVAL * 2.0):
 		push_error("VERIFY_FAIL a full wallet cannot grow")
@@ -113,10 +116,15 @@ func _check_money() -> bool:
 	if side.money != MatchRules.MAX_MONEY:
 		push_error("VERIFY_FAIL the wallet stops at %d" % MatchRules.MAX_MONEY)
 		return false
-	for _i in MatchRules.STARTING_HP:
-		side.take_chip_damage()
-	if side.is_alive():
-		push_error("VERIFY_FAIL one chip a second should empty the life bar")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3
+	side.roll_shop(rng)
+	var money_before := side.money
+	if not side.refresh_shop(rng):
+		push_error("VERIFY_FAIL a free refresh should always work")
+		return false
+	if side.money != money_before:
+		push_error("VERIFY_FAIL refreshing the shop is free")
 		return false
 	return true
 

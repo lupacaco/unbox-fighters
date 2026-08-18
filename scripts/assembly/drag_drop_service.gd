@@ -120,7 +120,7 @@ func _finish_drag() -> void:
 func _sell_contains(mouse: Vector2) -> bool:
 	if _action_bar == null:
 		return false
-	return _action_bar.sell_button_rect().has_point(_action_bar.to_local(mouse))
+	return _action_bar.sell_button_rect().has_point(mouse)
 
 func _clear_drag_visuals() -> void:
 	if _hover_card != null:

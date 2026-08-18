@@ -1,8 +1,9 @@
 class_name ShopShelf
 extends Node2D
 
-## One of the four wooden shelves. It holds a closed crate with a price, and
-## after you pay, the kit that came out of it, waiting to be dragged to a card.
+## The wooden shop board. It holds a closed crate with a price, and after you
+## pay, the kit that came out of it. Refresh dumps the closed crate into the
+## gap; a kit you already paid for stays put.
 
 signal buy_requested(shelf: ShopShelf)
 
@@ -32,6 +33,8 @@ func surface() -> Vector2:
 func show_offer(part: PartDef, part_price: int) -> void:
 	if has_part():
 		return
+	if part != null and offer == part and _crate != null and is_instance_valid(_crate):
+		return
 	clear()
 	offer = part
 	price = part_price
@@ -39,14 +42,19 @@ func show_offer(part: PartDef, part_price: int) -> void:
 		return
 	_crate = CRATE_SCENE.instantiate() as Crate
 	add_child(_crate)
-	_crate.position = to_local(surface())
+	var rest := to_local(surface())
+	_crate.position = rest + Vector2(0.0, -110.0)
 	_crate.clicked.connect(func(_c: Crate) -> void: buy_requested.emit(self))
 	_crate.setup(part_price)
-	_crate.scale = Vector2(0.6, 0.6)
-	_crate.modulate.a = 0.0
+	_crate.scale = Vector2(0.72, 0.72)
 	var tween := _crate.create_tween()
-	tween.tween_property(_crate, "modulate:a", 1.0, 0.16)
-	tween.parallel().tween_property(_crate, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_crate, "position", rest, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(_crate, "scale", Vector2.ONE, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_callback(func() -> void:
+		if is_instance_valid(_crate):
+			Feel.punch(_crate, Vector2(1.08, 0.9), Vector2.ONE)
+			GameAudio.step()
+	)
 
 func set_affordable(can_pay: bool) -> void:
 	if _crate != null and is_instance_valid(_crate):
@@ -81,6 +89,39 @@ func has_part() -> bool:
 func take_part() -> void:
 	_part = null
 
+## Sends the closed crate in an arc into the gap. A paid kit is never dumped.
+func dump_closed(host: Node2D) -> void:
+	if has_part() or _crate == null or not is_instance_valid(_crate):
+		return
+	var crate := _crate
+	_crate = null
+	offer = null
+	price = 0
+	var start := crate.global_position
+	var end_at := AssemblyLayout.dump_point()
+	var peak := Vector2(lerpf(start.x, end_at.x, 0.4), minf(start.y, end_at.y) - 160.0)
+	var parent := crate.get_parent()
+	if parent != null:
+		parent.remove_child(crate)
+	if host == null:
+		crate.queue_free()
+		return
+	host.add_child(crate)
+	crate.global_position = start
+	GameAudio.wood_slide()
+	var tween := crate.create_tween()
+	tween.tween_method(_follow_dump.bind(crate, start, peak, end_at), 0.0, 1.0, 0.48).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(crate, "modulate:a", 0.0, 0.2).set_delay(0.28)
+	await tween.finished
+	if is_instance_valid(crate):
+		crate.queue_free()
+
+func _follow_dump(t: float, crate: Node2D, start: Vector2, peak: Vector2, end_at: Vector2) -> void:
+	if not is_instance_valid(crate):
+		return
+	crate.global_position = _arc(start, peak, end_at, t)
+	crate.rotation_degrees = lerpf(0.0, 38.0, t)
+
 ## Takes the closed crate away. A kit you already paid for is never thrown out.
 func clear() -> void:
 	offer = null
@@ -98,3 +139,7 @@ func _build_board() -> void:
 	_board.centered = true
 	_board.z_index = -1
 	add_child(_board)
+
+func _arc(start: Vector2, peak: Vector2, finish: Vector2, t: float) -> Vector2:
+	var u := 1.0 - t
+	return u * u * start + 2.0 * u * t * peak + t * t * finish

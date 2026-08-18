@@ -118,6 +118,9 @@ func _check_live_match() -> bool:
 	if live.player.shop_offers.size() != MatchRules.SHOP_SLOTS:
 		push_error("VERIFY_FAIL the shop should open with %d crates" % MatchRules.SHOP_SLOTS)
 		return false
+	if live.tug != 0:
+		push_error("VERIFY_FAIL the tug bar should start empty")
+		return false
 	if live.launch(live.player, FighterLoadout.new()) != null:
 		push_error("VERIFY_FAIL an unfinished card cannot fight")
 		return false
@@ -126,18 +129,18 @@ func _check_live_match() -> bool:
 		return false
 
 	_chips = 0
-	live.player_chipped.connect(_count_chip)
-	## Long enough for five paddles plus one chip a second through 100 life.
-	var ticks := int((MatchRules.STARTING_HP * MatchRules.CHIP_INTERVAL + 30.0) / 0.1)
+	live.tug_changed.connect(_count_chip)
+	## Long enough for five paddles plus one chip a second through 50 on the bar.
+	var ticks := int((MatchRules.TUG_MAX * MatchRules.CHIP_INTERVAL + 30.0) / 0.1)
 	for _i in ticks:
 		live.tick(0.1)
 		if not live.running:
 			break
-	if _chips < MatchRules.STARTING_HP:
-		push_error("VERIFY_FAIL a lone Freak at the tip should chip the other player, got %d" % _chips)
+	if _chips < MatchRules.TUG_MAX:
+		push_error("VERIFY_FAIL a lone Freak at the tip should push the bar, got %d" % _chips)
 		return false
-	if live.opponent.is_alive():
-		push_error("VERIFY_FAIL 100 chips should end the match")
+	if live.tug != -MatchRules.TUG_MAX:
+		push_error("VERIFY_FAIL 50 chips from 0 should fill your side of the bar")
 		return false
 	if live.winner != live.player:
 		push_error("VERIFY_FAIL the side still standing wins")
@@ -164,7 +167,7 @@ func _check_live_duel() -> bool:
 		return false
 	return true
 
-func _count_chip(_victim: PlayerState, _attacker: PlayerState) -> void:
+func _count_chip(_tug: int, _attacker: PlayerState) -> void:
 	_chips += 1
 
 func _loadout(set_id: StringName) -> FighterLoadout:

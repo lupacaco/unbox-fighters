@@ -4,10 +4,9 @@ extends Object
 ## Every position on the match screen, in a 1920×1080 world
 ## (origin top-left, Y grows downward).
 ##
-## Left: two hanging cards where you build a Freak.
-## Middle: four shop shelves.
-## Right: the money bar with ATUALIZAR and VENDER.
-## Bottom: the blue belt (yours) and the red belt (theirs), with a gap between.
+## Left: your two hanging cards. Middle: one shop shelf.
+## Right: the opponent's two cards (look, do not drop).
+## Above the belts: the shared tug bar.
 
 const WIDTH := 1920.0
 const HEIGHT := 1080.0
@@ -15,9 +14,15 @@ const CENTER_X := WIDTH * 0.5
 
 const BACKGROUND_TEX := "res://assets/nova-ui/fundo.png"
 const CARD_TEX := "res://assets/nova-ui/carta.png"
+const CARD_OPPONENT_TEX := "res://assets/nova-ui/carta-oponente.png"
 const SHELF_TEX := "res://assets/nova-ui/prateleira-loja.png"
 const BELT_PLAYER_TEX := "res://assets/nova-ui/esteira-blue.png"
 const BELT_OPPONENT_TEX := "res://assets/nova-ui/esteira-red.png"
+const REFRESH_TEX := "res://assets/nova-ui/atualizar.png"
+const SELL_TEX := "res://assets/nova-ui/vender.png"
+const TUG_FRAME_TEX := "res://assets/nova-ui/barra-hp-vazia.png"
+const TUG_PLAYER_TEX := "res://assets/nova-ui/liquido-jogador.png"
+const TUG_OPPONENT_TEX := "res://assets/nova-ui/liquido-oponente.png"
 
 # ---------------------------------------------------------------- belts
 const BELT_SIZE := Vector2(840, 129)
@@ -30,9 +35,10 @@ const BELT_ENTRY_INSET := 70.0
 const BELT_FREAK_SCALE := 0.62
 
 # ---------------------------------------------------------------- cards
-const CARD_SIZE := Vector2(306, 606)
+const CARD_SIZE := Vector2(306, 572)
 const CARD_CENTER_Y := 350.0
-const CARD_X: Array[float] = [252.0, 606.0]
+const CARD_X: Array[float] = [188.0, 514.0]
+const CARD_OPPONENT_X: Array[float] = [1406.0, 1732.0]
 ## Local Y of the little wooden ledge inside the card, where the crate rests.
 const CARD_FLOOR_Y := 200.0
 const CARD_FREAK_SCALE := 0.92
@@ -45,29 +51,27 @@ const FIGHT_BUTTON_SIZE := Vector2(214, 58)
 const FIGHT_BUTTON_DROP := 348.0
 
 # ---------------------------------------------------------------- shop
-const SHELF_SIZE := Vector2(316, 68)
-const SHELF_X: Array[float] = [1032.0, 1392.0]
-const SHELF_Y: Array[float] = [304.0, 596.0]
+const SHELF_SIZE := Vector2(438, 95)
+const SHELF_CENTER := Vector2(1036.0, 508.0)
 ## From the shelf center up to the wooden surface a crate sits on.
-const SHELF_SURFACE_FROM_CENTER := 26.0
+const SHELF_SURFACE_FROM_CENTER := 36.0
 const SHOP_CRATE_HEIGHT := 156.0
 const SHOP_PART_SCALE := 0.62
 const PRICE_TAG_DROP := 96.0
 
-# ---------------------------------------------------------------- right column
-const MONEY_X := 1794.0
-const MONEY_LABEL_Y := 286.0
-const MONEY_BOTTOM_Y := 700.0
+# ---------------------------------------------------------------- buttons and money beside the shelf
+const ICON_BUTTON_SIZE := Vector2(128, 128)
+const REFRESH_BUTTON := Vector2(1036.0, 338.0)
+const SELL_BUTTON := Vector2(742.0, 508.0)
+const MONEY_X := 1336.0
+const MONEY_LABEL_Y := 292.0
+const MONEY_BOTTOM_Y := 620.0
 const MONEY_BRICK := Vector2(78, 26)
 const MONEY_BRICK_STEP := 34.0
-const REFRESH_BUTTON := Vector2(1794, 774)
-const SELL_BUTTON := Vector2(1794, 856)
-const ACTION_BUTTON_SIZE := Vector2(224, 62)
 
-# ---------------------------------------------------------------- top bars
-const HP_SIZE := Vector2(430, 34)
-const HP_PLAYER := Vector2(300, 64)
-const HP_OPPONENT := Vector2(1620, 64)
+# ---------------------------------------------------------------- tug bar (above the belts)
+const TUG_SIZE := Vector2(819, 149)
+const TUG_CENTER := Vector2(960.0, 868.0)
 const BANNER_CENTER := Vector2(960, 210)
 
 static func belt_top() -> float:
@@ -102,18 +106,24 @@ static func belt_x_at(player_side: bool, progress: float) -> float:
 static func gap_center_x() -> float:
 	return CENTER_X
 
+## Where a dumped closed crate lands, in the hole between the belts.
+static func dump_point() -> Vector2:
+	return Vector2(CENTER_X, belt_floor_y() + 80.0)
+
 static func card_center(index: int) -> Vector2:
 	var x: float = CARD_X[clampi(index, 0, CARD_X.size() - 1)]
 	return Vector2(x, CARD_CENTER_Y)
 
-static func shelf_center(index: int) -> Vector2:
-	var col := index % SHELF_X.size()
-	var row := (index / SHELF_X.size()) % SHELF_Y.size()
-	return Vector2(SHELF_X[col], SHELF_Y[row])
+static func opponent_card_center(index: int) -> Vector2:
+	var x: float = CARD_OPPONENT_X[clampi(index, 0, CARD_OPPONENT_X.size() - 1)]
+	return Vector2(x, CARD_CENTER_Y)
+
+static func shelf_center(_index: int = 0) -> Vector2:
+	return SHELF_CENTER
 
 ## Where a crate or a loose part rests on that shelf.
-static func shelf_surface(index: int) -> Vector2:
-	var center := shelf_center(index)
+static func shelf_surface(_index: int = 0) -> Vector2:
+	var center := shelf_center(_index)
 	return Vector2(center.x, center.y - SHELF_SURFACE_FROM_CENTER)
 
 static func money_brick_center(index: int) -> Vector2:

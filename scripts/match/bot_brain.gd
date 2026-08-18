@@ -50,7 +50,7 @@ func tick(delta: float, side: PlayerState, match_ref: LiveMatch) -> void:
 		_launch_armed = true
 		_wait = LAUNCH_TIME
 		return
-	if _try_buy(side):
+	if _try_buy(side, match_ref):
 		_wait = kit_handle_time()
 		return
 	if _try_refresh(side, match_ref):
@@ -87,7 +87,7 @@ func _try_launch(side: PlayerState, match_ref: LiveMatch) -> bool:
 	cards[best] = FighterLoadout.new()
 	return true
 
-func _try_buy(side: PlayerState) -> bool:
+func _try_buy(side: PlayerState, match_ref: LiveMatch) -> bool:
 	var best_offer := -1
 	var best_card := -1
 	var best_score := 0
@@ -107,12 +107,11 @@ func _try_buy(side: PlayerState) -> bool:
 	if bought == null:
 		return false
 	cards[best_card].set_part(bought.slot_type, bought)
+	match_ref.restock_shop(side, _filled_slots(side))
 	return true
 
-## Rerolls only when the shop has nothing it can use and there is money to spare.
+## Free reroll when the crate on offer cannot go on any card.
 func _try_refresh(side: PlayerState, match_ref: LiveMatch) -> bool:
-	if side.money < MatchRules.MAX_MONEY - 1:
-		return false
 	for i in side.shop_offers.size():
 		var part := side.shop_offers[i]
 		if part == null:
@@ -121,6 +120,13 @@ func _try_refresh(side: PlayerState, match_ref: LiveMatch) -> bool:
 			if _score(card, part) > 0:
 				return false
 	return match_ref.refresh_shop(side)
+
+func _filled_slots(side: PlayerState) -> PackedInt32Array:
+	var keep := PackedInt32Array()
+	for i in side.shop_offers.size():
+		if side.shop_offers[i] != null:
+			keep.append(i)
+	return keep
 
 ## Higher is better: finishing a set beats a big lone number.
 func _score(card: FighterLoadout, part: PartDef) -> int:

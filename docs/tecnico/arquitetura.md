@@ -26,13 +26,13 @@ Arte e recursos (assets/, data/)
 |------|--------|
 | `AssemblyController` | Maestro: loja, cartas, esteiras, animações |
 | `LiveMatch` | Tempo correndo: dinheiro, esteira, duelo, fim da partida |
-| `PlayerState` | Vida, carteira, loja e esteira de **um** lado (você ou o bot) |
+| `PlayerState` | Carteira, loja e esteira de **um** lado (você ou o bot) |
 | `BeltLane` | Até 2 Freaks remando até a ponta (5 remadas) |
 | `Duel` | Contas de um troca-troca de golpes |
 | `FreakStats` / `Synergy` | Poder, Resistência e Agilidade já com o bônus |
 | `ShopPool` / `BotBrain` | Sorteio da loja e o oponente jogando igual a você |
 | `BeltFreak` / `FlyingHead` | Desenho do Freak na esteira e a cabeça que voa |
-| `MoneyBar` / `ActionBar` / `PlayerHpBar` | Dinheiro, ATUALIZAR/VENDER, barras de vida |
+| `MoneyBar` / `ActionBar` / `TugBar` | Dinheiro, botões redondos, barra-balança |
 | `DragDropService` | Arraste de peça, soltar na carta, vender |
 | `Crate` / `PartView` / `CharacterSlot` / `ShopShelf` | Caixa, peça, carta, prateleira |
 | `CompositeResolver` / `PartKit` | Cola cabeça, tronco e cada braço no caixote |
@@ -64,8 +64,8 @@ Arte e recursos (assets/, data/)
 ```mermaid
 flowchart TD
   AC[AssemblyController] --> LM[LiveMatch]
-  AC --> Cards[2 cartas]
-  AC --> Shop[4 prateleiras]
+  AC --> Cards[2 cartas suas + 2 do oponente]
+  AC --> Shop[1 prateleira]
   LM --> PS[PlayerState x2]
   PS --> Lane[BeltLane]
   LM --> Bot[BotBrain]

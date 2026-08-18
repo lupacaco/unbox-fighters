@@ -6,17 +6,17 @@
 
 | Área | Situação |
 |------|----------|
-| Partida | 1 oponente, 100 de vida cada, jogo corre sem relógio de rodada |
+| Partida | 1 oponente, barra-balança 50-0-50, jogo corre sem relógio de rodada |
 | Dinheiro | Começa em $10, +$1 a cada 2 s, teto $10. Substitui as pancadas |
-| Loja | 4 prateleiras com preço na caixa; ATUALIZAR $1; VENDER pela metade |
-| Montagem | 2 cartas; só Freak completo (3 kits) vai para a esteira |
-| Esteiras | Azul sua, vermelha deles; pulo da carta; 5 remadas (ritmo pela Agilidade); oponente olha para a esquerda; etiquetas de Poder e Resistência |
+| Loja | 1 prateleira no meio; atualizar grátis; VENDER pela metade |
+| Montagem | 2 cartas suas à esquerda; 2 cartas vermelhas do oponente à direita |
+| Esteiras | Azul sua, vermelha deles; pulo da carta (também o oponente); 5 remadas (ritmo pela Agilidade); oponente olha para a esquerda; etiquetas de Poder e Resistência |
 | Luta | Só a cabeça ataca; golpes um de cada vez; o vencedor dá o golpe final; morto cai no vão |
-| Chip | Freak sozinho na ponta tira 1 de vida por segundo do outro jogador |
-| Visual | Fundo, cartas, prateleiras e esteiras da arte nova (`assets/nova-ui`) |
-| Arrastar e soltar | Da prateleira para a carta; clicar seleciona para vender; arrastar em VENDER também vende |
+| Chip | Freak sozinho na ponta empurra a balança 1 ponto por segundo; 50 no lado dele vence |
+| Visual | Fundo, cartas, prateleira e esteiras da arte nova (`assets/nova-ui`) |
+| Arrastar e soltar | Da prateleira para as cartas azuis; clicar seleciona para vender; arrastar na lixeira também vende |
 | Composição | Caixote do tronco é o chão. Ímãs unem cabeça no pescoço e braços nos ombros |
-| Interface | Barra de dinheiro em tijolinhos, barras de vida em cima, botões ATUALIZAR / VENDER |
+| Interface | Dinheiro ao lado da prateleira; botões redondos de atualizar e vender; uma barra-balança acima das esteiras |
 | Incluir Freak | Folha 4+4 vira 8 PNG 200×200 + 3 kits na loja; ímãs em Frente e Perfil |
 | Áudio | Efeitos gravados (martelo, caixa, ímã, impacto). Sem som de mola |
 | Dados | Loja lê sozinha todo `*_character.tres` (Bruxa, Advogado) |

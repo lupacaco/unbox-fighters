@@ -3,8 +3,9 @@ extends RefCounted
 
 ## Closed numbers for the live 1-versus-1 match. Keep presentation code out of here.
 
-## Each player has a life bar. A Freak alone at the end of the belt drains it.
-const STARTING_HP := 100
+## One shared tug bar: 0 in the middle, 50 toward you (left) or them (right).
+## A Freak alone at the belt tip pushes that number 1 per second.
+const TUG_MAX := 50
 const CHIP_DAMAGE := 1
 const CHIP_INTERVAL := 1.0
 
@@ -13,9 +14,9 @@ const STARTING_MONEY := 10
 const MAX_MONEY := 10
 const MONEY_INTERVAL := 2.0
 
-## The shop shows four crates at once and rerolling all four costs a coin.
-const SHOP_SLOTS := 4
-const REFRESH_COST := 1
+## The shop shows one crate. Rerolling it is free.
+const SHOP_SLOTS := 1
+const REFRESH_COST := 0
 
 ## Two cards, so you can build the next Freak while the first one fights.
 const CARD_COUNT := 2

@@ -6,27 +6,28 @@ O que o jogador pode fazer hoje, e as regras que o jogo aplica.
 
 Não tem relógio de 60 segundos nem rodadas. O jogo **corre o tempo todo**.
 
-1. Cada jogador começa com **100 de vida** e **$10**.
+1. Cada jogador começa com **$10**. A barra-balança no meio começa **vazia** (o centro é 0).
 2. O dinheiro sobe **+$1 a cada 2 segundos**, até **$10**.
 3. Você compra kits, monta nas cartas e aperta **LUTAR**.
 4. O Freak **pula da carta** para o começo da esteira e vai **remando** com as mãos até a ponta. Lá, luta contra o Freak do oponente.
-5. Um Freak sozinho na ponta tira **1 de vida por segundo** do outro jogador.
-6. Quem zera a vida perde.
+5. Um Freak sozinho na ponta empurra a **balança** **1 ponto por segundo** para o lado dele (azul para a esquerda, vermelho para a direita).
+6. O primeiro que enche **50** no lado dele vence.
 
-Há **1 jogador + 1 oponente**. Derrotar um Freak **não** tira vida do jogador — só o “beliscão” de 1 por segundo faz isso.
+Há **1 jogador + 1 oponente**. Derrotar um Freak **não** mexe na balança — só o “beliscão” de 1 por segundo, quando um lado está sozinho na ponta.
 
 ## Dinheiro
 
 - Começa a partida com a barra **cheia** ($10).
 - Sobe sozinho +$1 a cada 2 s, teto $10.
-- **ATUALIZAR** troca as 4 caixas da loja por **$1**. Caixas que você já pagou e ainda estão na prateleira **não** saem.
-- **VENDER** devolve **metade** do que você pagou, arredondado para cima (pagou $5, recebe $3).
+- **ATUALIZAR** (botão redondo azul) troca a caixa da loja **de graça**. A caixa fechada cai no vão entre as esteiras e uma nova cai na prateleira. Um kit que você já pagou e ainda está na prateleira **não** sai.
+- **VENDER** (botão redondo vermelho da lixeira) devolve **metade** do que você pagou, arredondado para cima (pagou $5, recebe $3).
 
 ## Loja
 
-- Sempre **4 prateleiras**.
+- Sempre **1 prateleira**, no meio da tela, com **1 caixa**.
+- O oponente tem a mesma regra (1 caixa, atualizar grátis, o mesmo dinheiro), mas a caixa dele **não aparece** — só as cartas vermelhas.
 - Cada caixa tem um **preço** escrito embaixo.
-- 1 clique paga e abre. A peça fica em cima da prateleira para arrastar.
+- 1 clique paga e abre. A peça fica em cima da prateleira para arrastar. Quando você leva o kit para a carta, uma caixa nova cai sozinha.
 - Sem dinheiro suficiente: a caixa treme e a barra de dinheiro também.
 
 ## Preço das peças
@@ -41,9 +42,10 @@ O preço sai do número da peça, não de um valor solto:
 
 ## Cartas
 
-- **2 cartas** à esquerda.
-- Só vai para a esteira o Freak com **os 3 kits**. Aí aparece o botão **LUTAR**.
-- Ao lutar, a carta **esvazia** para montar o próximo.
+- **2 cartas azuis** suas à esquerda.
+- **2 cartas vermelhas** do oponente à direita: mostram o que ele está encaixando. Você **não** arrasta peças nelas.
+- Só vai para a esteira o Freak com **os 3 kits**. Aí aparece o botão **LUTAR** (só nas suas cartas).
+- Ao lutar, a carta **esvazia** para montar o próximo. O Freak do oponente também **pula da carta vermelha**.
 - Cada esteira cabe **2 Freaks**. Se já tem 2, LUTAR recusa.
 
 ## Peças
@@ -94,11 +96,11 @@ Com só 2 Freaks no jogo, quase toda carta ganha dupla ou tripla. O bônus vira 
 - O golpe que **mata** é sempre do que vai vencer. Se o troca-troca mataria os dois, a ordem é sorteada e **os dois atacam**.
 - Quem zera a vida do Freak escorrega e **cai no vão** entre as esteiras.
 
-O oponente usa **as mesmas regras** que você: o mesmo dinheiro, a mesma loja, 2 cartas. Ele também gasta tempo para abrir a caixa, encaixar o kit e apertar LUTAR — não monta um Freak no primeiro segundo.
+O oponente usa **as mesmas regras** que você: o mesmo dinheiro, 1 caixa, atualizar grátis, 2 cartas. Ele também gasta tempo para abrir a caixa, encaixar o kit e apertar LUTAR — não monta um Freak no primeiro segundo.
 
 ## Controles
 
-- Mouse: martelo nas caixas; arrastar peças para a carta; **ATUALIZAR**; clicar numa peça e **VENDER** (ou arrastar até o botão).
+- Mouse: martelo nas caixas; arrastar peças para as cartas **azuis**; botão redondo de **atualizar**; clicar numa peça e no botão da **lixeira** (ou arrastar até ele).
 - Se o encaixe já tem peça, a nova entra e a antiga volta para a prateleira.
 - Sem gamepad por enquanto.
 

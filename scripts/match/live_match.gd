@@ -3,14 +3,14 @@ extends RefCounted
 
 ## The whole match in one place, with no drawing in it. Time keeps running:
 ## money ticks up, Freaks paddle down the belts, and whoever is alone at the tip
-## chips away at the other player's life. The screen listens to the signals.
+## pushes the shared tug bar. The screen listens to the signals.
 
 signal money_gained(player: PlayerState)
 signal shop_rolled(player: PlayerState)
 signal freak_launched(player: PlayerState, runner: BeltLane.Runner)
 signal blows_traded(exchange: Duel.Exchange, left: BeltLane.Runner, right: BeltLane.Runner)
 signal freak_died(player: PlayerState, runner: BeltLane.Runner)
-signal player_chipped(victim: PlayerState, attacker: PlayerState)
+signal tug_changed(tug: int, attacker: PlayerState)
 signal match_ended(winner: PlayerState)
 
 var player := PlayerState.new()
@@ -18,6 +18,8 @@ var opponent := PlayerState.new()
 var rng := RandomNumberGenerator.new()
 var running: bool = false
 var winner: PlayerState = null
+## 0 is the middle. Negative fills your (left) side. Positive fills theirs.
+var tug: int = 0
 
 var _duel_timer: float = 0.0
 var _chip_timer: float = 0.0
@@ -34,6 +36,7 @@ func _init() -> void:
 
 func start() -> void:
 	winner = null
+	tug = 0
 	_duel_timer = 0.0
 	_chip_timer = 0.0
 	_exchange_open = false
@@ -72,6 +75,13 @@ func refresh_shop(side: PlayerState, keep: PackedInt32Array = PackedInt32Array()
 		return false
 	shop_rolled.emit(side)
 	return true
+
+## Fills empty shop slots without charging. Paid kits on the shelf stay put.
+func restock_shop(side: PlayerState, keep: PackedInt32Array = PackedInt32Array()) -> void:
+	if not running or side == null:
+		return
+	side.roll_shop(rng, keep)
+	shop_rolled.emit(side)
 
 func other(side: PlayerState) -> PlayerState:
 	return opponent if side == player else player
@@ -138,10 +148,13 @@ func _tick_chip(delta: float, player_leads: bool) -> void:
 		return
 	_chip_timer -= MatchRules.CHIP_INTERVAL
 	var attacker := player if player_leads else opponent
-	var victim := other(attacker)
-	victim.take_chip_damage()
-	player_chipped.emit(victim, attacker)
-	if not victim.is_alive():
+	tug = clampi(
+		tug + (-MatchRules.CHIP_DAMAGE if player_leads else MatchRules.CHIP_DAMAGE),
+		-MatchRules.TUG_MAX,
+		MatchRules.TUG_MAX
+	)
+	tug_changed.emit(tug, attacker)
+	if absi(tug) >= MatchRules.TUG_MAX:
 		_finish(attacker)
 
 func _finish(champion: PlayerState) -> void:

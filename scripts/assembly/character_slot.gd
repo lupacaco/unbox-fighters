@@ -10,6 +10,11 @@ signal part_detached(slot: CharacterSlot, part: PartDef)
 signal assembly_changed(slot: CharacterSlot)
 signal fight_requested(slot: CharacterSlot)
 
+## Opponent cards only show what they built. You cannot drop kits on them.
+var is_opponent: bool = false
+var _shown_parts: Dictionary = {}
+var _shown_key: String = ""
+
 ## Drop areas in card-local space. A kit may also be dropped anywhere on the card.
 const ZONES := {
 	PartSlotType.Value.HEAD: [Rect2(-112, -150, 224, 152)],
@@ -36,12 +41,14 @@ var _drop_hot: bool = false
 var _synergy_shown: Synergy.Level = Synergy.Level.NONE
 var _glow_pulse: Tween
 
-func setup() -> void:
+func setup(as_opponent: bool = false) -> void:
+	is_opponent = as_opponent
 	_build_frame()
 	_build_display()
 	_build_pills()
 	_build_zones()
-	_build_fight_button()
+	if not is_opponent:
+		_build_fight_button()
 	_build_banner()
 	_refresh_display(false)
 	_refresh_pills()
@@ -55,6 +62,8 @@ func to_loadout() -> FighterLoadout:
 	return loadout
 
 func get_attached_part(slot: PartSlotType.Value) -> PartDef:
+	if is_opponent:
+		return _shown_parts.get(slot) as PartDef
 	if not _bound_parts.has(slot):
 		return null
 	var view = _bound_parts[slot]
@@ -93,7 +102,7 @@ func set_locked(locked: bool) -> void:
 # ---------------------------------------------------------------- drop
 
 func can_accept(part: PartDef) -> bool:
-	if _locked or part == null:
+	if is_opponent or _locked or part == null:
 		return false
 	return PartSlotType.is_shop_slot(part.slot_type)
 
@@ -106,7 +115,7 @@ func contains_card_point(global_point: Vector2) -> bool:
 	return CARD_BOUNDS.has_point(to_local(global_point))
 
 func find_part_at(global_point: Vector2) -> PartView:
-	if _locked:
+	if is_opponent or _locked:
 		return null
 	for slot in PartSlotType.shop_slots():
 		if _bound_parts.has(slot) and _zone_contains(slot, global_point):
@@ -116,7 +125,7 @@ func find_part_at(global_point: Vector2) -> PartView:
 	return null
 
 func try_attach(part_view: PartView) -> bool:
-	if _locked or part_view == null or part_view.part_def == null:
+	if is_opponent or _locked or part_view == null or part_view.part_def == null:
 		return false
 	if not can_accept(part_view.part_def):
 		return false
@@ -186,8 +195,36 @@ func clear_after_launch() -> void:
 	_refresh_fight_button()
 	assembly_changed.emit(self)
 
+## Paints the kits the opponent has placed. No dragging on this card.
+func show_loadout(loadout: FighterLoadout) -> void:
+	if not is_opponent:
+		return
+	var next := {}
+	if loadout != null:
+		for slot in PartSlotType.shop_slots():
+			var part := loadout.get_part(slot)
+			if part != null:
+				next[slot] = part
+	var key := _parts_key(next)
+	if key == _shown_key:
+		return
+	var grew := next.size() > _shown_parts.size()
+	_shown_parts = next
+	_shown_key = key
+	_refresh_display(grew)
+	_refresh_pills()
+	if grew:
+		_pulse_attach()
+
+func _parts_key(parts: Dictionary) -> String:
+	var bits: PackedStringArray = []
+	for slot in PartSlotType.shop_slots():
+		var part: PartDef = parts.get(slot)
+		bits.append("" if part == null else String(part.id))
+	return "|".join(bits)
+
 func set_drop_highlight(enabled: bool, _slot: PartSlotType.Value = PartSlotType.Value.BODY) -> void:
-	if _locked:
+	if is_opponent or _locked:
 		enabled = false
 	if _drop_hot == enabled:
 		return
@@ -224,7 +261,9 @@ func play_launch_swing() -> void:
 func _build_frame() -> void:
 	if _frame != null:
 		return
-	var tex: Texture2D = load(AssemblyLayout.CARD_TEX)
+	var tex: Texture2D = load(
+		AssemblyLayout.CARD_OPPONENT_TEX if is_opponent else AssemblyLayout.CARD_TEX
+	)
 	_shadow = Sprite2D.new()
 	_shadow.name = "CardShadow"
 	_shadow.texture = tex
@@ -251,11 +290,12 @@ func _build_frame() -> void:
 	_frame.centered = true
 	add_child(_frame)
 
-	_hint = GameTheme.make_label(
-		"monte 3 peças", 30, Vector2(0, -40), Vector2(240, 48), Color(0.62, 0.56, 0.46, 0.55)
-	)
-	_hint.z_index = 2
-	add_child(_hint)
+	if not is_opponent:
+		_hint = GameTheme.make_label(
+			"monte 3 peças", 30, Vector2(0, -40), Vector2(240, 48), Color(0.62, 0.56, 0.46, 0.55)
+		)
+		_hint.z_index = 2
+		add_child(_hint)
 
 func _build_display() -> void:
 	if _display != null:
@@ -371,7 +411,8 @@ func _shop_parts_map() -> Dictionary:
 func _refresh_display(animate: bool) -> void:
 	if _display == null:
 		return
-	_hint.visible = not has_any_part()
+	if _hint != null:
+		_hint.visible = not has_any_part()
 	if not animate or _crossfade_busy:
 		_apply_plan()
 		return
@@ -455,7 +496,7 @@ func _zone_contains(slot: PartSlotType.Value, global_point: Vector2) -> bool:
 	return false
 
 func _on_zone_input(_viewport: Node, event: InputEvent, _shape_idx: int, slot: PartSlotType.Value) -> void:
-	if _locked:
+	if is_opponent or _locked:
 		return
 	if not (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed):
 		return

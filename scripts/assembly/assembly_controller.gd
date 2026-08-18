@@ -1,12 +1,11 @@
 class_name AssemblyController
 extends Node2D
 
-## The match screen. It builds the furniture (background, cards, shelves, belts,
-## money bar, life bars, buttons), runs LiveMatch, and turns what the match says
+## The match screen. It builds the furniture (background, cards, one shelf, belts,
+## money, tug bar, buttons), runs LiveMatch, and turns what the match says
 ## into something you can watch.
 
 const CARD_SCENE := preload("res://scenes/assembly/CharacterSlot.tscn")
-const SHELF_COUNT := MatchRules.SHOP_SLOTS
 ## Beat after a hit lands, so the number can be read before the answer.
 const SWING_STAGGER := 0.18
 
@@ -16,12 +15,13 @@ var _match := LiveMatch.new()
 var _bot := BotBrain.new()
 
 var _cards: Array[CharacterSlot] = []
+var _opponent_cards: Array[CharacterSlot] = []
 var _shelves: Array[ShopShelf] = []
 var _freaks_root: Node2D
+var _dump_host: Node2D
 var _money_bar: MoneyBar
 var _action_bar: ActionBar
-var _hp_player: PlayerHpBar
-var _hp_opponent: PlayerHpBar
+var _tug_bar: TugBar
 var _banner: Label
 
 var _player_freaks: Dictionary = {}
@@ -29,6 +29,7 @@ var _opponent_freaks: Dictionary = {}
 var _pending_deaths: Array[BeltFreak] = []
 var _selected: PartView = null
 var _fight_busy: bool = false
+var _shop_busy: bool = false
 var _pending_jump_from := Vector2.ZERO
 
 func _ready() -> void:
@@ -38,7 +39,7 @@ func _ready() -> void:
 	_build_freak_layer()
 	_build_cards()
 	_build_shelves()
-	_build_right_column()
+	_build_hud()
 	_build_banner()
 	_drag_service.setup(_cards, _action_bar)
 	_drag_service.sell_requested.connect(_sell)
@@ -54,6 +55,7 @@ func _process(delta: float) -> void:
 	_bot.tick(delta, _match.opponent, _match)
 	_sync_lane(_match.player, _player_freaks)
 	_sync_lane(_match.opponent, _opponent_freaks)
+	_sync_opponent_cards()
 
 ## What is in your wallet right now. Used by the headless checks.
 func player_money() -> int:
@@ -89,6 +91,10 @@ func _build_freak_layer() -> void:
 	_freaks_root.name = "Freaks"
 	_freaks_root.z_index = 10
 	add_child(_freaks_root)
+	_dump_host = Node2D.new()
+	_dump_host.name = "Dump"
+	_dump_host.z_index = 12
+	add_child(_dump_host)
 
 func _build_cards() -> void:
 	var root := Node2D.new()
@@ -98,45 +104,52 @@ func _build_cards() -> void:
 		var card := CARD_SCENE.instantiate() as CharacterSlot
 		root.add_child(card)
 		card.position = AssemblyLayout.card_center(i)
-		card.setup()
+		card.setup(false)
 		card.fight_requested.connect(_on_fight_requested)
 		card.play_intro(0.1 * float(i))
 		_cards.append(card)
+
+	var theirs := Node2D.new()
+	theirs.name = "OpponentCards"
+	add_child(theirs)
+	for i in MatchRules.CARD_COUNT:
+		var card := CARD_SCENE.instantiate() as CharacterSlot
+		theirs.add_child(card)
+		card.position = AssemblyLayout.opponent_card_center(i)
+		card.setup(true)
+		card.play_intro(0.1 * float(i))
+		_opponent_cards.append(card)
 
 func _build_shelves() -> void:
 	var root := Node2D.new()
 	root.name = "Shelves"
 	add_child(root)
-	for i in SHELF_COUNT:
+	for i in MatchRules.SHOP_SLOTS:
 		var shelf := ShopShelf.new()
 		root.add_child(shelf)
 		shelf.setup(i, _drag_service)
 		shelf.buy_requested.connect(_on_buy_requested)
 		_shelves.append(shelf)
 
-func _build_right_column() -> void:
+func _build_hud() -> void:
 	var root := Node2D.new()
 	root.name = "Hud"
 	root.z_index = 20
 	add_child(root)
 
 	_money_bar = MoneyBar.new()
+	_money_bar.name = "MoneyBar"
 	root.add_child(_money_bar)
 
 	_action_bar = ActionBar.new()
+	_action_bar.name = "ActionBar"
 	root.add_child(_action_bar)
 	_action_bar.refresh_pressed.connect(_on_refresh_pressed)
 	_action_bar.sell_pressed.connect(_on_sell_pressed)
 
-	_hp_player = PlayerHpBar.new()
-	_hp_player.position = AssemblyLayout.HP_PLAYER
-	root.add_child(_hp_player)
-	_hp_player.setup(MatchRules.PLAYER_NAME, ThemeTokens.BELT_PLAYER, false)
-
-	_hp_opponent = PlayerHpBar.new()
-	_hp_opponent.position = AssemblyLayout.HP_OPPONENT
-	root.add_child(_hp_opponent)
-	_hp_opponent.setup(MatchRules.OPPONENT_NAME, ThemeTokens.BELT_OPPONENT, true)
+	_tug_bar = TugBar.new()
+	_tug_bar.name = "TugBar"
+	root.add_child(_tug_bar)
 
 func _build_banner() -> void:
 	_banner = GameTheme.make_label(
@@ -154,7 +167,7 @@ func _wire_match() -> void:
 	_match.freak_launched.connect(_on_freak_launched)
 	_match.blows_traded.connect(_on_blows_traded)
 	_match.freak_died.connect(_on_freak_died)
-	_match.player_chipped.connect(_on_player_chipped)
+	_match.tug_changed.connect(_on_tug_changed)
 	_match.match_ended.connect(_on_match_ended)
 
 func _start_match() -> void:
@@ -163,8 +176,7 @@ func _start_match() -> void:
 	_bot.reset()
 	_match.start()
 	_money_bar.set_amount(_match.player.money, false)
-	_hp_player.set_hp(_match.player.hp)
-	_hp_opponent.set_hp(_match.opponent.hp)
+	_tug_bar.set_tug(0, false)
 	_refresh_affordability()
 
 # ---------------------------------------------------------------- shop
@@ -193,12 +205,20 @@ func _on_buy_requested(shelf: ShopShelf) -> void:
 	await shelf.open()
 
 func _on_refresh_pressed() -> void:
-	if not _match.running:
+	if not _match.running or _shop_busy:
 		return
-	if not _match.refresh_shop(_match.player, _busy_shelves()):
+	var keep := _busy_shelves()
+	if keep.size() >= _shelves.size():
+		return
+	_shop_busy = true
+	_action_bar.set_can_refresh(false)
+	for shelf in _shelves:
+		await shelf.dump_closed(_dump_host)
+	if not _match.refresh_shop(_match.player, keep):
 		_money_bar.deny()
-		return
 	_money_bar.set_amount(_match.player.money)
+	_shop_busy = false
+	_refresh_affordability()
 
 ## Shelves still holding a kit you paid for. A reroll must leave them alone.
 func _busy_shelves() -> PackedInt32Array:
@@ -208,11 +228,23 @@ func _busy_shelves() -> PackedInt32Array:
 			busy.append(shelf.index)
 	return busy
 
+func _keep_offers() -> PackedInt32Array:
+	var keep := _busy_shelves()
+	for shelf in _shelves:
+		if shelf.offer != null and shelf.index not in keep:
+			keep.append(shelf.index)
+	return keep
+
+func _restock_player_shop() -> void:
+	if not _match.running:
+		return
+	_match.restock_shop(_match.player, _keep_offers())
+
 func _refresh_affordability() -> void:
 	var side := _match.player
 	for shelf in _shelves:
 		shelf.set_affordable(side.can_afford(side.price_at(shelf.index)))
-	_action_bar.set_can_refresh(side.can_afford(MatchRules.REFRESH_COST))
+	_action_bar.set_can_refresh(not _shop_busy and side.can_afford(MatchRules.REFRESH_COST))
 
 func _on_money_gained(side: PlayerState) -> void:
 	if side != _match.player:
@@ -232,6 +264,8 @@ func _on_part_clicked(part: PartView) -> void:
 func _on_drag_ended(part: PartView, accepted: bool) -> void:
 	if accepted and part == _selected:
 		_select(null)
+	if accepted:
+		_restock_player_shop()
 
 func _on_sell_pressed() -> void:
 	if _selected == null:
@@ -253,6 +287,7 @@ func _sell(part: PartView) -> void:
 	_action_bar.set_sell_target(0)
 	_refresh_affordability()
 	GameAudio.part_place()
+	_restock_player_shop()
 
 func _select(part: PartView) -> void:
 	if _selected != null and is_instance_valid(_selected):
@@ -289,18 +324,47 @@ func _on_freak_launched(side: PlayerState, runner: BeltLane.Runner) -> void:
 	var freak := BeltFreak.new()
 	_freaks_root.add_child(freak)
 	freak.setup(runner.loadout, runner, is_player)
-	freak.play_jump_from(_jump_origin(is_player))
+	freak.play_jump_from(_jump_origin(is_player, runner))
 	_views_of(is_player)[runner.id] = freak
 
-func _jump_origin(is_player: bool) -> Vector2:
+func _jump_origin(is_player: bool, runner: BeltLane.Runner) -> Vector2:
 	if is_player and _pending_jump_from != Vector2.ZERO:
 		var from := _pending_jump_from
 		_pending_jump_from = Vector2.ZERO
 		return from
+	if not is_player:
+		var card := _opponent_card_for(runner)
+		if card != null:
+			card.play_launch_swing()
+			return card.global_floor_point()
 	return Vector2(
 		AssemblyLayout.belt_entry_x(is_player),
 		AssemblyLayout.belt_floor_y() - 280.0
 	)
+
+func _opponent_card_for(runner: BeltLane.Runner) -> CharacterSlot:
+	if runner == null or runner.loadout == null:
+		return null
+	for card in _opponent_cards:
+		if _same_loadout(card.to_loadout(), runner.loadout):
+			return card
+	for card in _opponent_cards:
+		if card.is_complete():
+			return card
+	return null
+
+func _same_loadout(a: FighterLoadout, b: FighterLoadout) -> bool:
+	if a == null or b == null:
+		return false
+	for slot in PartSlotType.shop_slots():
+		if a.get_part(slot) != b.get_part(slot):
+			return false
+	return true
+
+func _sync_opponent_cards() -> void:
+	for i in _opponent_cards.size():
+		var loadout := _bot.cards[i] if i < _bot.cards.size() else null
+		_opponent_cards[i].show_loadout(loadout)
 
 func _sync_lane(side: PlayerState, views: Dictionary) -> void:
 	for runner in side.lane.runners:
@@ -393,15 +457,14 @@ func _play_pending_deaths() -> void:
 
 # ---------------------------------------------------------------- life
 
-func _on_player_chipped(victim: PlayerState, _attacker: PlayerState) -> void:
-	if victim == _match.player:
-		_hp_player.set_hp(victim.hp)
-	else:
-		_hp_opponent.set_hp(victim.hp)
+func _on_tug_changed(value: int, _attacker: PlayerState) -> void:
+	_tug_bar.set_tug(value)
 
 func _on_match_ended(winner: PlayerState) -> void:
 	_drag_service.set_locked(true)
 	for card in _cards:
+		card.set_locked(true)
+	for card in _opponent_cards:
 		card.set_locked(true)
 	var won := winner == _match.player
 	_banner.text = "VOCÊ VENCEU" if won else "VOCÊ PERDEU"

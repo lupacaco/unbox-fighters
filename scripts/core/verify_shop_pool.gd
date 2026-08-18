@@ -1,7 +1,7 @@
 extends SceneTree
 
 ## The shop reads data/parts by itself: every Freak file shows up, each one sells
-## three kits (head, torso, arm pair), and a roll fills the four shelves.
+## three kits (head, torso, arm pair), and a roll fills the shop.
 
 func _init() -> void:
 	call_deferred("_run")
@@ -50,7 +50,7 @@ func _run() -> void:
 	rng.seed = 1
 	var offers := ShopPool.roll(rng, MatchRules.SHOP_SLOTS)
 	if offers.size() != MatchRules.SHOP_SLOTS:
-		push_error("VERIFY_FAIL a roll should fill %d shelves" % MatchRules.SHOP_SLOTS)
+		push_error("VERIFY_FAIL a roll should fill %d shop slots" % MatchRules.SHOP_SLOTS)
 		quit(1)
 		return
 	print("VERIFY_SHOP_POOL_PASS")
