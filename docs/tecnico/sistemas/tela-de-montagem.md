@@ -21,11 +21,12 @@ A cena principal do jogo hoje: loja + cartas + esteiras no mesmo palco.
 
 ## Layout (1920×1080)
 
-- **2 cartas azuis** à esquerda (`carta.png`, 306×572)
+- **2 cartas azuis** à esquerda (`carta.png`, 306×572), espelhadas com as vermelhas
 - **2 cartas vermelhas** à direita (`carta-oponente.png`) — só mostram a montagem do oponente
-- **1 prateleira** no meio (`prateleira-loja.png`, 438×95), botão de atualizar acima, lixeira e dinheiro ao lado
+- **1 prateleira** no centro da tela (`prateleira-loja.png`, 438×95); atualizar e lixeira à esquerda, dinheiro à direita
+- Caixa da loja com **280 px** de altura
 - **Esteira azul** embaixo à esquerda, **vermelha** à direita, vão no meio
-- **Barra-balança** no centro, acima das esteiras (`barra-hp-vazia.png`)
+- **Barra-balança** no centro, acima das esteiras e **atrás** dos Freaks (`barra-hp-vazia.png`, 70% do tamanho)
 
 ## Loja
 

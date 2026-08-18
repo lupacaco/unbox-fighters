@@ -36,6 +36,7 @@ func _ready() -> void:
 	_drag_service.add_to_group("drag_drop_service")
 	_build_background()
 	_build_belts()
+	_build_tug_bar()
 	_build_freak_layer()
 	_build_cards()
 	_build_shelves()
@@ -86,6 +87,12 @@ func _build_belts() -> void:
 		belt.position = AssemblyLayout.belt_center(is_player)
 		belts.add_child(belt)
 
+func _build_tug_bar() -> void:
+	_tug_bar = TugBar.new()
+	_tug_bar.name = "TugBar"
+	_tug_bar.z_index = 2
+	add_child(_tug_bar)
+
 func _build_freak_layer() -> void:
 	_freaks_root = Node2D.new()
 	_freaks_root.name = "Freaks"
@@ -99,6 +106,7 @@ func _build_freak_layer() -> void:
 func _build_cards() -> void:
 	var root := Node2D.new()
 	root.name = "Cards"
+	root.z_index = 6
 	add_child(root)
 	for i in MatchRules.CARD_COUNT:
 		var card := CARD_SCENE.instantiate() as CharacterSlot
@@ -111,6 +119,7 @@ func _build_cards() -> void:
 
 	var theirs := Node2D.new()
 	theirs.name = "OpponentCards"
+	theirs.z_index = 6
 	add_child(theirs)
 	for i in MatchRules.CARD_COUNT:
 		var card := CARD_SCENE.instantiate() as CharacterSlot
@@ -123,6 +132,7 @@ func _build_cards() -> void:
 func _build_shelves() -> void:
 	var root := Node2D.new()
 	root.name = "Shelves"
+	root.z_index = 8
 	add_child(root)
 	for i in MatchRules.SHOP_SLOTS:
 		var shelf := ShopShelf.new()
@@ -146,10 +156,6 @@ func _build_hud() -> void:
 	root.add_child(_action_bar)
 	_action_bar.refresh_pressed.connect(_on_refresh_pressed)
 	_action_bar.sell_pressed.connect(_on_sell_pressed)
-
-	_tug_bar = TugBar.new()
-	_tug_bar.name = "TugBar"
-	root.add_child(_tug_bar)
 
 func _build_banner() -> void:
 	_banner = GameTheme.make_label(

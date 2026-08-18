@@ -43,10 +43,10 @@ func show_offer(part: PartDef, part_price: int) -> void:
 	_crate = CRATE_SCENE.instantiate() as Crate
 	add_child(_crate)
 	var rest := to_local(surface())
-	_crate.position = rest + Vector2(0.0, -110.0)
+	_crate.position = rest + Vector2(0.0, -180.0)
 	_crate.clicked.connect(func(_c: Crate) -> void: buy_requested.emit(self))
 	_crate.setup(part_price)
-	_crate.scale = Vector2(0.72, 0.72)
+	_crate.scale = Vector2(0.88, 0.88)
 	var tween := _crate.create_tween()
 	tween.tween_property(_crate, "position", rest, 0.28).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.parallel().tween_property(_crate, "scale", Vector2.ONE, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)

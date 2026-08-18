@@ -4,9 +4,9 @@ extends Object
 ## Every position on the match screen, in a 1920×1080 world
 ## (origin top-left, Y grows downward).
 ##
-## Left: your two hanging cards. Middle: one shop shelf.
-## Right: the opponent's two cards (look, do not drop).
-## Above the belts: the shared tug bar.
+## Left: your two hanging cards. Right: the opponent's two cards.
+## Middle column: sell / refresh, one shop crate, money.
+## Tug bar sits above the belts and behind the Freaks.
 
 const WIDTH := 1920.0
 const HEIGHT := 1080.0
@@ -36,9 +36,10 @@ const BELT_FREAK_SCALE := 0.62
 
 # ---------------------------------------------------------------- cards
 const CARD_SIZE := Vector2(306, 572)
-const CARD_CENTER_Y := 350.0
-const CARD_X: Array[float] = [188.0, 514.0]
-const CARD_OPPONENT_X: Array[float] = [1406.0, 1732.0]
+const CARD_CENTER_Y := 328.0
+## Centers 326 px apart (306 art + 20 gap). Mirrored around the screen middle.
+const CARD_X: Array[float] = [160.0, 486.0]
+const CARD_OPPONENT_X: Array[float] = [1434.0, 1760.0]
 ## Local Y of the little wooden ledge inside the card, where the crate rests.
 const CARD_FLOOR_Y := 200.0
 const CARD_FREAK_SCALE := 0.92
@@ -50,29 +51,33 @@ const CARD_PILL_STEP := 84.0
 const FIGHT_BUTTON_SIZE := Vector2(214, 58)
 const FIGHT_BUTTON_DROP := 348.0
 
-# ---------------------------------------------------------------- shop
+# ---------------------------------------------------------------- shop (centered column between the cards)
 const SHELF_SIZE := Vector2(438, 95)
-const SHELF_CENTER := Vector2(1036.0, 508.0)
+const SHELF_CENTER := Vector2(CENTER_X, 588.0)
 ## From the shelf center up to the wooden surface a crate sits on.
 const SHELF_SURFACE_FROM_CENTER := 36.0
-const SHOP_CRATE_HEIGHT := 156.0
-const SHOP_PART_SCALE := 0.62
-const PRICE_TAG_DROP := 96.0
+const SHOP_CRATE_HEIGHT := 280.0
+const SHOP_PART_SCALE := 0.95
+const PRICE_TAG_DROP := 108.0
 
-# ---------------------------------------------------------------- buttons and money beside the shelf
-const ICON_BUTTON_SIZE := Vector2(128, 128)
-const REFRESH_BUTTON := Vector2(1036.0, 338.0)
-const SELL_BUTTON := Vector2(742.0, 508.0)
-const MONEY_X := 1336.0
-const MONEY_LABEL_Y := 292.0
-const MONEY_BOTTOM_Y := 620.0
+# ---------------------------------------------------------------- buttons and money, same row as the shelf, mirrored
+const ICON_BUTTON_SIZE := Vector2(110, 110)
+const SHOP_SIDE_OFFSET := 230.0
+const REFRESH_BUTTON := Vector2(CENTER_X - SHOP_SIDE_OFFSET, 518.0)
+const SELL_BUTTON := Vector2(CENTER_X - SHOP_SIDE_OFFSET, 658.0)
+const MONEY_X := CENTER_X + SHOP_SIDE_OFFSET
+const MONEY_LABEL_Y := 430.0
+const MONEY_BOTTOM_Y := 700.0
 const MONEY_BRICK := Vector2(78, 26)
-const MONEY_BRICK_STEP := 34.0
+const MONEY_BRICK_STEP := 28.0
 
-# ---------------------------------------------------------------- tug bar (above the belts)
+# ---------------------------------------------------------------- tug bar (above the belts, drawn behind Freaks)
 const TUG_SIZE := Vector2(819, 149)
-const TUG_CENTER := Vector2(960.0, 868.0)
-const BANNER_CENTER := Vector2(960, 210)
+const TUG_SCALE := 0.70
+const TUG_CENTER := Vector2(CENTER_X, 886.0)
+## Inner glass of barra-hp-vazia.png, in frame-local pixels (sprite is centered).
+const TUG_GLASS := Rect2(-348.0, -33.0, 696.0, 66.0)
+const BANNER_CENTER := Vector2(CENTER_X, 210.0)
 
 static func belt_top() -> float:
 	return HEIGHT - BELT_SIZE.y

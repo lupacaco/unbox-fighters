@@ -45,7 +45,9 @@ Pasta `assets/fonts/`:
 
 Os botões da loja são os círculos da arte, sem texto “ATUALIZAR $1”. Ao passar o mouse eles crescem um pouco; ao clicar, esmagam. O dinheiro são **tijolinhos** dourados ao lado da prateleira.
 
-A barra-balança começa vazia. O líquido azul cresce do centro para a esquerda; o vermelho, para a direita. Nunca os dois ao mesmo tempo. Cada +1 dá um pulso gostoso.
+A barra-balança começa vazia. O líquido azul cresce do centro para a esquerda; o vermelho, para a direita. Nunca os dois ao mesmo tempo. Cada +1 dá um pulso gostoso. A barra fica **atrás** dos Freaks da esteira e um pouco menor que a arte original.
+
+A caixa da loja é grande (cerca de 280 px de altura) e senta no centro, entre as quatro cartas.
 
 As peças dos Freaks são arquivos **200×200**. No jogo todas ficam no mesmo tamanho.
 

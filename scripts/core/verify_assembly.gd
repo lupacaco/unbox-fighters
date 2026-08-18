@@ -50,11 +50,34 @@ func _check_furniture(scene: Node) -> bool:
 			push_error("VERIFY_FAIL every shelf should open with a crate on it")
 			return false
 	var hud := scene.get_node_or_null("Hud")
-	if hud == null or hud.get_node_or_null("TugBar") == null:
-		push_error("VERIFY_FAIL the screen needs money, buttons and the tug bar")
-		return false
-	if hud.get_node_or_null("MoneyBar") == null or hud.get_node_or_null("ActionBar") == null:
+	if hud == null or hud.get_node_or_null("MoneyBar") == null or hud.get_node_or_null("ActionBar") == null:
 		push_error("VERIFY_FAIL money and the round buttons should sit in the HUD")
+		return false
+	var tug := scene.get_node_or_null("TugBar") as TugBar
+	if tug == null:
+		push_error("VERIFY_FAIL the tug bar should sit behind the Freaks, not in the HUD")
+		return false
+	var freaks := scene.get_node_or_null("Freaks") as Node2D
+	if freaks == null or tug.z_index >= freaks.z_index:
+		push_error("VERIFY_FAIL Freaks should draw in front of the tug bar")
+		return false
+	tug.set_tug(-25, false)
+	if not tug.player_fill_visible() or tug.opponent_fill_visible():
+		push_error("VERIFY_FAIL your side of the bar should fill left from the middle")
+		return false
+	tug.set_tug(25, false)
+	if not tug.opponent_fill_visible() or tug.player_fill_visible():
+		push_error("VERIFY_FAIL their side of the bar should fill right from the middle")
+		return false
+	tug.set_tug(0, false)
+	if absf(AssemblyLayout.SHELF_CENTER.x - AssemblyLayout.CENTER_X) > 0.5:
+		push_error("VERIFY_FAIL the shop shelf should sit on the screen center")
+		return false
+	if absf(AssemblyLayout.CARD_X[0] + AssemblyLayout.CARD_OPPONENT_X[1] - AssemblyLayout.WIDTH) > 1.0:
+		push_error("VERIFY_FAIL the outer cards should mirror each other")
+		return false
+	if absf(AssemblyLayout.CARD_X[1] + AssemblyLayout.CARD_OPPONENT_X[0] - AssemblyLayout.WIDTH) > 1.0:
+		push_error("VERIFY_FAIL the inner cards should mirror each other")
 		return false
 	var background := scene.get_node_or_null("Background") as Sprite2D
 	if background == null or background.texture == null:
