@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="CharacterDef" format=3]
+[gd_resource type="Resource" script_class="CharacterDef" format=3 uid="uid://b8s4pqaqs7egu"]
 
-[ext_resource type="Resource" path="res://data/parts/advogado_arm_l.tres" id="1_8ie18"]
-[ext_resource type="Resource" path="res://data/parts/advogado_arm_r.tres" id="2_jq0x1"]
+[ext_resource type="Resource" uid="uid://ekilrio3ddei" path="res://data/parts/advogado_arm_l.tres" id="1_8ie18"]
+[ext_resource type="Resource" uid="uid://bqiga7e1i74sg" path="res://data/parts/advogado_arm_r.tres" id="2_jq0x1"]
 [ext_resource type="Resource" path="res://data/parts/advogado_arms.tres" id="3_btgpm"]
-[ext_resource type="Resource" path="res://data/parts/advogado_body.tres" id="4_7mw7x"]
-[ext_resource type="Resource" path="res://data/parts/advogado_head.tres" id="5_46ivl"]
-[ext_resource type="Script" path="res://scripts/data/character_def.gd" id="6_eo4n8"]
+[ext_resource type="Resource" uid="uid://b0a15adryurr2" path="res://data/parts/advogado_body.tres" id="4_7mw7x"]
+[ext_resource type="Resource" uid="uid://bif2kkolhxvkc" path="res://data/parts/advogado_head.tres" id="5_46ivl"]
+[ext_resource type="Script" uid="uid://dxa8yuntrbh2d" path="res://scripts/data/character_def.gd" id="6_eo4n8"]
 
 [resource]
 script = ExtResource("6_eo4n8")

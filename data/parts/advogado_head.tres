@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="PartDef" format=3]
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://bif2kkolhxvkc"]
 
-[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_nqo4j"]
-[ext_resource type="Texture2D" path="res://assets/characters/advogado/advogado_head-1.png" id="2_xg5dc"]
-[ext_resource type="Texture2D" path="res://assets/characters/advogado/advogado_head-2.png" id="3_6igw3"]
+[ext_resource type="Script" uid="uid://71ffw17l5buf" path="res://scripts/data/part_def.gd" id="1_nqo4j"]
+[ext_resource type="Texture2D" uid="uid://1y8segehd2ve" path="res://assets/characters/advogado/advogado_head-1.png" id="2_xg5dc"]
+[ext_resource type="Texture2D" uid="uid://wnjuby2akqh6" path="res://assets/characters/advogado/advogado_head-2.png" id="3_6igw3"]
 
 [resource]
 script = ExtResource("1_nqo4j")
@@ -13,5 +13,5 @@ sprite = ExtResource("2_xg5dc")
 sprite_profile = ExtResource("3_6igw3")
 stat_value = 4
 tier = 2
-magnet_down = Vector2(0, 80)
-magnet_down_profile = Vector2(-13, 82)
+magnet_down = Vector2(1, 91)
+magnet_down_profile = Vector2(-15, 84)

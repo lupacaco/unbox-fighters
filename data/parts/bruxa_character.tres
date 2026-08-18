@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="CharacterDef" format=3]
+[gd_resource type="Resource" script_class="CharacterDef" format=3 uid="uid://dwomp387c60dc"]
 
-[ext_resource type="Resource" path="res://data/parts/bruxa_arm_l.tres" id="1_wk6wx"]
-[ext_resource type="Resource" path="res://data/parts/bruxa_arm_r.tres" id="2_q3sk6"]
+[ext_resource type="Resource" uid="uid://cb43a3aceyxbr" path="res://data/parts/bruxa_arm_l.tres" id="1_wk6wx"]
+[ext_resource type="Resource" uid="uid://b0dk0u5i5db6u" path="res://data/parts/bruxa_arm_r.tres" id="2_q3sk6"]
 [ext_resource type="Resource" path="res://data/parts/bruxa_arms.tres" id="3_0k7td"]
-[ext_resource type="Resource" path="res://data/parts/bruxa_body.tres" id="4_0llep"]
-[ext_resource type="Resource" path="res://data/parts/bruxa_head.tres" id="5_giohx"]
-[ext_resource type="Script" path="res://scripts/data/character_def.gd" id="6_im3f2"]
+[ext_resource type="Resource" uid="uid://caifb4t1o1cyv" path="res://data/parts/bruxa_body.tres" id="4_0llep"]
+[ext_resource type="Resource" uid="uid://b1pwu82ol254q" path="res://data/parts/bruxa_head.tres" id="5_giohx"]
+[ext_resource type="Script" uid="uid://dxa8yuntrbh2d" path="res://scripts/data/character_def.gd" id="6_im3f2"]
 
 [resource]
 script = ExtResource("6_im3f2")

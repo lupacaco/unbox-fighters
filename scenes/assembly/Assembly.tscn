@@ -3,11 +3,11 @@
 [ext_resource type="Script" uid="uid://c2i8i6homfw00" path="res://scripts/assembly/assembly_controller.gd" id="1"]
 [ext_resource type="Script" uid="uid://dlxuaogko1lqp" path="res://scripts/assembly/drag_drop_service.gd" id="2"]
 
-[node name="Assembly" type="Node2D"]
+[node name="Assembly" type="Node2D" unique_id=111075929]
 script = ExtResource("1")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1026013215]
 position = Vector2(960, 540)
 
-[node name="DragDropService" type="Node" parent="."]
+[node name="DragDropService" type="Node" parent="." unique_id=700965140]
 script = ExtResource("2")
