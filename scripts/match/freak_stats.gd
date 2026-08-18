@@ -21,9 +21,6 @@ static func from_loadout(loadout: FighterLoadout) -> FreakStats:
 	stats.set_name = _dominant_name(parts)
 	return stats
 
-func speed() -> float:
-	return MatchRules.belt_speed(agility)
-
 func is_ready() -> bool:
 	return power > 0 and toughness > 0 and agility > 0
 

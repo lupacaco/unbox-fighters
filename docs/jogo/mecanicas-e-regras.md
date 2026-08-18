@@ -9,7 +9,7 @@ Não tem relógio de 60 segundos nem rodadas. O jogo **corre o tempo todo**.
 1. Cada jogador começa com **100 de vida** e **$10**.
 2. O dinheiro sobe **+$1 a cada 2 segundos**, até **$10**.
 3. Você compra kits, monta nas cartas e aperta **LUTAR**.
-4. O Freak desliza na esteira. Na ponta, luta contra o Freak do oponente.
+4. O Freak **pula da carta** para o começo da esteira e vai **remando** com as mãos até a ponta. Lá, luta contra o Freak do oponente.
 5. Um Freak sozinho na ponta tira **1 de vida por segundo** do outro jogador.
 6. Quem zera a vida perde.
 
@@ -54,7 +54,7 @@ Nas caixas existem **3 kits**:
 |------|------------------------|-------------------------|
 | Cabeça | Cabeça | **Poder** — quanto tira de vida por golpe |
 | Tronco | Tronco dentro do caixote | **Resistência** — a vida daquele Freak |
-| Braços | Os dois braços juntos | **Agilidade** — velocidade na esteira |
+| Braços | Os dois braços juntos | **Agilidade** — tempo entre cada remada na esteira |
 
 O tronco **é** o chão do Freak (a base do caixote). Não tem pernas e não tem mola.
 
@@ -83,11 +83,15 @@ Com só 2 Freaks no jogo, quase toda carta ganha dupla ou tripla. O bônus vira 
 
 ## Esteira e luta
 
-- Azul = você, da esquerda para o centro. Vermelha = oponente, da direita para o centro.
-- Velocidade: **120 + Agilidade × 60** pixels por segundo.
-- Só o Freak da **ponta** luta. O de trás espera.
-- Só a **cabeça** ataca: pula, voa, bate e volta.
-- A ordem de quem bate primeiro é sorteada, mas **os dois atacam**. O dano entra depois dos dois.
+- Azul = você, da esquerda para o centro. Vermelha = oponente, da direita para o centro. Na vermelha o Freak olha para a esquerda (para o vão).
+- Ao apertar **LUTAR**, o Freak **salta da carta** até o começo da esteira.
+- Chega na ponta em **5 remadas**. Cada remada anda um pouco; as duas mãos puxam juntas.
+- Tempo entre remadas (Agilidade já com sinergia): **1 → 3 s**, **2 → 2,5 s**, **3 → 2 s**, **4 → 1,5 s**, **5 ou mais → 1 s**.
+- Só o Freak da **ponta** luta. O de trás espera uma remada atrás.
+- Na esteira aparecem as etiquetas de **Poder** (cabeça) e **Resistência** (tronco), iguais às da carta.
+- Só a **cabeça** ataca: pula, voa, bate e volta. O número do dano sobe do Freak atingido.
+- Os golpes são **um de cada vez**. Primeiro um ataca e causa o dano; se ninguém caiu, o outro responde.
+- O golpe que **mata** é sempre do que vai vencer. Se o troca-troca mataria os dois, a ordem é sorteada e **os dois atacam**.
 - Quem zera a vida do Freak escorrega e **cai no vão** entre as esteiras.
 
 ## Controles

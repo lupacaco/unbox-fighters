@@ -1,8 +1,8 @@
 extends SceneTree
 
-## The maths of one exchange of blows, with no screen involved: both Freaks
-## always land their hit, damage equals the attacker's Power, and a Freak with
-## no life left is marked dead.
+## The maths of one exchange of blows, with no screen involved: blows are
+## sequential, a killing hit is thrown by the winner, and both only swing when
+## the trade would drop them together.
 
 func _init() -> void:
 	call_deferred("_run")
@@ -30,13 +30,32 @@ func _check_exchange() -> bool:
 	if trade.damage_to_right != 8 or trade.damage_to_left != 4:
 		push_error("VERIFY_FAIL damage should equal the attacker's Power")
 		return false
-	if trade.left_dies or trade.right_dies:
-		push_error("VERIFY_FAIL nobody dies on the first blow here")
+	if trade.left_dies or trade.right_dies or not trade.second_happens:
+		push_error("VERIFY_FAIL nobody dies here, so both should swing")
+		return false
+
+	var winner_left := Duel.exchange(strong, quick, 20, 5, rng)
+	if not winner_left.first_is_left or winner_left.second_happens:
+		push_error("VERIFY_FAIL the Freak that can finish the fight should strike alone")
+		return false
+	if winner_left.left_dies or not winner_left.right_dies:
+		push_error("VERIFY_FAIL only the loser should fall on a clean killing blow")
+		return false
+	if winner_left.damage_to_left != 0:
+		push_error("VERIFY_FAIL a finished Freak does not get a counter")
+		return false
+
+	var winner_right := Duel.exchange(quick, strong, 5, 20, rng)
+	if winner_right.first_is_left or winner_right.second_happens:
+		push_error("VERIFY_FAIL the right-hand winner should strike first and alone")
+		return false
+	if not winner_right.left_dies or winner_right.right_dies:
+		push_error("VERIFY_FAIL only the left Freak should fall here")
 		return false
 
 	var lethal := Duel.exchange(strong, quick, 3, 5, rng)
-	if not lethal.left_dies or not lethal.right_dies:
-		push_error("VERIFY_FAIL both should fall when neither survives the trade")
+	if not lethal.left_dies or not lethal.right_dies or not lethal.second_happens:
+		push_error("VERIFY_FAIL both should swing when the trade would drop them together")
 		return false
 	if not lethal.both_die():
 		push_error("VERIFY_FAIL both_die should agree with the two flags")

@@ -1,7 +1,7 @@
 class_name BeltLane
 extends RefCounted
 
-## One side's conveyor. Freaks enter at the far end, slide to the fighting tip
+## One side's conveyor. Freaks enter at the far end, paddle to the fighting tip
 ## and queue up. Only the Freak at the tip fights; the one behind waits.
 ##
 ## Progress runs 0 (just dropped on) to 1 (at the tip), so the same code works
@@ -16,6 +16,11 @@ class Runner extends RefCounted:
 	var alive: bool = true
 	## Stable id so the screen can match a drawing to this runner.
 	var id: int = 0
+	## False while the jump from the card (or the sky) is still in the air.
+	var landed: bool = true
+	var stroke_timer: float = 0.0
+	## Set when this tick actually moved the Freak, so the screen can paddle.
+	var pending_stroke: bool = false
 
 	func at_tip() -> bool:
 		return progress >= 1.0
@@ -54,23 +59,29 @@ func is_empty() -> bool:
 	return runners.is_empty()
 
 func advance(delta: float) -> void:
-	if travel_px <= 0.0:
-		travel_px = 1.0
 	var blocked_at := 1.0
-	for i in runners.size():
-		var runner := runners[i]
+	var gap := MatchRules.stroke_step()
+	for runner in runners:
 		if not runner.alive:
 			continue
-		var step := runner.stats.speed() * delta / travel_px
-		runner.progress = minf(runner.progress + step, blocked_at)
-		blocked_at = maxf(0.0, runner.progress - _gap_share())
-
-## Freaks queue one behind the other instead of stacking on the same spot.
-func _gap_share() -> float:
-	return clampf(180.0 / travel_px, 0.05, 0.45)
+		runner.pending_stroke = false
+		if not runner.landed or runner.at_tip():
+			blocked_at = maxf(0.0, runner.progress - gap)
+			continue
+		runner.stroke_timer += delta
+		var interval := MatchRules.stroke_interval(runner.stats.agility)
+		while runner.stroke_timer >= interval and not runner.at_tip():
+			var next_p := minf(runner.progress + gap, blocked_at)
+			if next_p <= runner.progress + 0.0001:
+				runner.stroke_timer = interval
+				break
+			runner.stroke_timer -= interval
+			runner.progress = next_p
+			runner.pending_stroke = true
+		blocked_at = maxf(0.0, runner.progress - gap)
 
 func take_damage(runner: Runner, amount: int) -> bool:
-	if runner == null or not runner.alive:
+	if runner == null or not runner.alive or amount <= 0:
 		return false
 	runner.hp = maxi(0, runner.hp - amount)
 	if runner.hp > 0:

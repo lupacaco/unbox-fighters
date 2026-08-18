@@ -25,7 +25,7 @@ O jogo ainda **não está pronto**. Estes docs descrevem o que **já existe** ho
 | [Peças e personagens](tecnico/sistemas/pecas-e-personagens.md) | Dados dos personagens, sinergia e composição visual |
 | [Incluir personagem](tecnico/incluir-personagem.md) | Folha 4+4 → 8 PNG 200×200, 3 kits na loja, ímãs |
 | [Arrastar e soltar](tecnico/sistemas/arrastar-e-soltar.md) | Peças da prateleira para a carta, vender |
-| [Animação de luta](tecnico/sistemas/animacao-de-luta.md) | Deslize na esteira, cabeça que voa, morte no vão |
+| [Animação de luta](tecnico/sistemas/animacao-de-luta.md) | Pulo da carta, remadas, cabeça que voa, morte no vão |
 | [Visual e UI](tecnico/sistemas/visual-e-ui.md) | Fundo, cartas, prateleiras, barras, botões |
 | [Áudio](tecnico/sistemas/audio.md) | Efeitos gravados: caixa, ímã, luta |
 | [Pipeline de arte](tecnico/pipeline-de-arte.md) | Scripts que preparam imagens dos personagens |

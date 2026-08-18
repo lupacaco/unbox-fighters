@@ -16,8 +16,8 @@ powershell -File tools/run_checks.ps1
 | Script | O que verifica |
 |--------|----------------|
 | `verify_synergy.gd` | Dupla +25% / tripla +50%; Bruxa 8→10 e 8→12; carta mista |
-| `verify_duel.gd` | Os dois golpes entram; preço; dinheiro sobe a cada 2 s |
-| `verify_belt.gd` | Deslize até a ponta, fila de 2, chip sozinho vence a partida |
+| `verify_duel.gd` | Golpes intercalados; o vencedor mata sozinho; preço; dinheiro |
+| `verify_belt.gd` | 5 remadas até a ponta, fila de 2, chip sozinho vence a partida |
 | `verify_bot.gd` | O oponente gasta, manda Freak e prefere fechar o set |
 | `verify_shop_pool.gd` | Loja vende todo Freak com ficha; 3 kits por Freak; 4 ofertas |
 | `verify_character_importer.gd` | Acentos viram id simples; folha da Bruxa vira 4+4; `_slice.json` tem ímãs |

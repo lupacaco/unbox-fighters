@@ -7,8 +7,8 @@ extends Node2D
 
 const CARD_SCENE := preload("res://scenes/assembly/CharacterSlot.tscn")
 const SHELF_COUNT := MatchRules.SHOP_SLOTS
-## How long the second Freak waits before swinging, so the blows read as a trade.
-const SWING_STAGGER := 0.14
+## Beat after a hit lands, so the number can be read before the answer.
+const SWING_STAGGER := 0.18
 
 @onready var _drag_service: DragDropService = $DragDropService
 
@@ -29,6 +29,7 @@ var _opponent_freaks: Dictionary = {}
 var _pending_deaths: Array[BeltFreak] = []
 var _selected: PartView = null
 var _fight_busy: bool = false
+var _pending_jump_from := Vector2.ZERO
 
 func _ready() -> void:
 	_drag_service.add_to_group("drag_drop_service")
@@ -272,7 +273,9 @@ func _on_fight_requested(card: CharacterSlot) -> void:
 		card.play_launch_swing()
 		GameAudio.part_reject()
 		return
+	_pending_jump_from = card.global_floor_point()
 	if _match.launch(_match.player, card.to_loadout()) == null:
+		_pending_jump_from = Vector2.ZERO
 		return
 	if _selected != null and _selected.attached_slot() == card:
 		_select(null)
@@ -286,21 +289,25 @@ func _on_freak_launched(side: PlayerState, runner: BeltLane.Runner) -> void:
 	var freak := BeltFreak.new()
 	_freaks_root.add_child(freak)
 	freak.setup(runner.loadout, runner, is_player)
-	freak.play_land()
+	freak.play_jump_from(_jump_origin(is_player))
 	_views_of(is_player)[runner.id] = freak
+
+func _jump_origin(is_player: bool) -> Vector2:
+	if is_player and _pending_jump_from != Vector2.ZERO:
+		var from := _pending_jump_from
+		_pending_jump_from = Vector2.ZERO
+		return from
+	return Vector2(
+		AssemblyLayout.belt_entry_x(is_player),
+		AssemblyLayout.belt_floor_y() - 280.0
+	)
 
 func _sync_lane(side: PlayerState, views: Dictionary) -> void:
 	for runner in side.lane.runners:
 		var freak: BeltFreak = views.get(runner.id)
 		if freak == null or not is_instance_valid(freak):
 			continue
-		freak.set_progress(runner.progress)
-		if runner.at_tip():
-			if not freak.arrived:
-				freak.arrived = true
-				freak.play_arrive()
-		else:
-			freak.set_moving(true)
+		freak.follow_runner()
 
 func _views_of(is_player: bool) -> Dictionary:
 	return _player_freaks if is_player else _opponent_freaks
@@ -308,28 +315,58 @@ func _views_of(is_player: bool) -> Dictionary:
 func _on_blows_traded(
 	exchange: Duel.Exchange, left: BeltLane.Runner, right: BeltLane.Runner
 ) -> void:
+	_fight_busy = true
 	var mine: BeltFreak = _player_freaks.get(left.id)
 	var theirs: BeltFreak = _opponent_freaks.get(right.id)
-	if mine == null or theirs == null or not is_instance_valid(mine) or not is_instance_valid(theirs):
-		return
-	_fight_busy = true
-	var first := mine if exchange.first_is_left else theirs
-	var second := theirs if exchange.first_is_left else mine
-	var first_damage := exchange.damage_to_right if exchange.first_is_left else exchange.damage_to_left
-	var second_damage := exchange.damage_to_left if exchange.first_is_left else exchange.damage_to_right
-	_swing(first, second, first_damage)
-	await get_tree().create_timer(SWING_STAGGER).timeout
-	await _swing(second, first, second_damage)
+	var visuals_ok := (
+		mine != null and theirs != null and is_instance_valid(mine) and is_instance_valid(theirs)
+	)
+	if visuals_ok:
+		var first := mine if exchange.first_is_left else theirs
+		var second := theirs if exchange.first_is_left else mine
+		var first_side := _match.opponent if exchange.first_is_left else _match.player
+		var second_side := _match.player if exchange.first_is_left else _match.opponent
+		var first_runner := right if exchange.first_is_left else left
+		var second_runner := left if exchange.first_is_left else right
+		var first_damage := exchange.damage_to_right if exchange.first_is_left else exchange.damage_to_left
+		var second_damage := exchange.damage_to_left if exchange.first_is_left else exchange.damage_to_right
+		await _swing(first, second, first_damage, first_side, first_runner)
+		if exchange.second_happens:
+			await get_tree().create_timer(SWING_STAGGER).timeout
+			await _swing(second, first, second_damage, second_side, second_runner)
+	else:
+		_apply_exchange_hits(exchange, left, right)
+	_match.close_exchange()
 	_fight_busy = false
 	_play_pending_deaths()
 
-func _swing(attacker: BeltFreak, victim: BeltFreak, damage: int) -> void:
-	if not is_instance_valid(attacker) or not is_instance_valid(victim):
+func _apply_exchange_hits(
+	exchange: Duel.Exchange, left: BeltLane.Runner, right: BeltLane.Runner
+) -> void:
+	if exchange.first_is_left:
+		_match.apply_hit(_match.opponent, right, exchange.damage_to_right)
+		if exchange.second_happens:
+			_match.apply_hit(_match.player, left, exchange.damage_to_left)
+	else:
+		_match.apply_hit(_match.player, left, exchange.damage_to_left)
+		if exchange.second_happens:
+			_match.apply_hit(_match.opponent, right, exchange.damage_to_right)
+
+func _swing(
+	attacker: BeltFreak,
+	victim: BeltFreak,
+	damage: int,
+	victim_side: PlayerState,
+	victim_runner: BeltLane.Runner
+) -> void:
+	if not is_instance_valid(attacker):
+		_match.apply_hit(victim_side, victim_runner, damage)
 		return
 	await attacker.attack(
 		func() -> Vector2:
 			return victim.head_global_position() if is_instance_valid(victim) else attacker.global_position,
 		func() -> void:
+			_match.apply_hit(victim_side, victim_runner, damage)
 			if is_instance_valid(victim):
 				victim.flash_hit(damage)
 	)

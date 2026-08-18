@@ -6,13 +6,13 @@
 
 ## Ideia em uma frase
 
-Você abre caixas, monta Freaks com **3 kits** (cabeça, tronco e os dois braços juntos) em cima de um **caixote**, e manda eles deslizarem na esteira para lutar contra o oponente.
+Você abre caixas, monta Freaks com **3 kits** (cabeça, tronco e os dois braços juntos) em cima de um **caixote**, e manda eles remarem na esteira para lutar contra o oponente.
 
 ## Loop principal
 
 1. **Comprar** kits nas prateleiras (gasta dinheiro)
 2. **Montar** até 2 Freaks nas cartas
-3. **LUTAR**: o Freak completo vai para a esteira azul e desliza até a ponta
+3. **LUTAR**: o Freak completo pula da carta para a esteira azul e rema até a ponta
 4. Na ponta, a **cabeça ataca**. Se ficar sozinho, vai comendo a vida do outro jogador
 
 ## Tom visual

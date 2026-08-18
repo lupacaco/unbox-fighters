@@ -2,7 +2,7 @@ class_name LiveMatch
 extends RefCounted
 
 ## The whole match in one place, with no drawing in it. Time keeps running:
-## money ticks up, Freaks slide down the belts, and whoever is alone at the tip
+## money ticks up, Freaks paddle down the belts, and whoever is alone at the tip
 ## chips away at the other player's life. The screen listens to the signals.
 
 signal money_gained(player: PlayerState)
@@ -21,6 +21,7 @@ var winner: PlayerState = null
 
 var _duel_timer: float = 0.0
 var _chip_timer: float = 0.0
+var _exchange_open: bool = false
 
 func _init() -> void:
 	rng.randomize()
@@ -35,6 +36,7 @@ func start() -> void:
 	winner = null
 	_duel_timer = 0.0
 	_chip_timer = 0.0
+	_exchange_open = false
 	for side in [player, opponent]:
 		side.reset()
 		side.roll_shop(rng)
@@ -74,7 +76,27 @@ func refresh_shop(side: PlayerState, keep: PackedInt32Array = PackedInt32Array()
 func other(side: PlayerState) -> PlayerState:
 	return opponent if side == player else player
 
+## Applies one landed hit. Returns true when that Freak just fell.
+func apply_hit(side: PlayerState, runner: BeltLane.Runner, amount: int) -> bool:
+	if side == null:
+		return false
+	if not side.lane.take_damage(runner, amount):
+		return false
+	freak_died.emit(side, runner)
+	return true
+
+## Lets the belts move and fight again after the screen has shown the exchange.
+func close_exchange() -> void:
+	if not _exchange_open:
+		return
+	player.lane.remove_dead()
+	opponent.lane.remove_dead()
+	_exchange_open = false
+	_duel_timer = 0.0
+
 func _tick_combat(delta: float) -> void:
+	if _exchange_open:
+		return
 	var mine := player.lane.champion()
 	var theirs := opponent.lane.champion()
 	if mine != null and theirs != null:
@@ -91,15 +113,24 @@ func _tick_duel(delta: float, mine: BeltLane.Runner, theirs: BeltLane.Runner) ->
 	_duel_timer += delta
 	if _duel_timer < MatchRules.DUEL_INTERVAL:
 		return
-	_duel_timer -= MatchRules.DUEL_INTERVAL
+	_duel_timer = 0.0
 	var trade := Duel.exchange(mine.stats, theirs.stats, mine.hp, theirs.hp, rng)
+	_exchange_open = true
+	if blows_traded.get_connections().is_empty():
+		_resolve_quietly(trade, mine, theirs)
+		return
 	blows_traded.emit(trade, mine, theirs)
-	if player.lane.take_damage(mine, trade.damage_to_left):
-		freak_died.emit(player, mine)
-	if opponent.lane.take_damage(theirs, trade.damage_to_right):
-		freak_died.emit(opponent, theirs)
-	player.lane.remove_dead()
-	opponent.lane.remove_dead()
+
+func _resolve_quietly(trade: Duel.Exchange, mine: BeltLane.Runner, theirs: BeltLane.Runner) -> void:
+	if trade.first_is_left:
+		apply_hit(opponent, theirs, trade.damage_to_right)
+		if trade.second_happens:
+			apply_hit(player, mine, trade.damage_to_left)
+	else:
+		apply_hit(player, mine, trade.damage_to_left)
+		if trade.second_happens:
+			apply_hit(opponent, theirs, trade.damage_to_right)
+	close_exchange()
 
 func _tick_chip(delta: float, player_leads: bool) -> void:
 	_chip_timer += delta

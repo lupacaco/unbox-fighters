@@ -10,7 +10,7 @@ Na **loja** existem **3 kits**:
 - **Tronco** (o peito dentro do caixote)
 - **Braços** (os dois juntos numa caixa)
 
-Na **carta** e na **esteira** o kit de braços vira **dois desenhos** (braço E e braço D), para cada braço poder se mexer.
+Na **carta** e na **esteira** o kit de braços vira **dois desenhos** (braço E e braço D), para cada braço poder se mexer. Na esteira, a cabeça leva a etiqueta de **Poder** e o tronco a de **Resistência**.
 
 O chão do Freak é a **base do caixote**. Não tem pernas e não tem mola.
 

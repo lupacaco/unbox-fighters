@@ -36,4 +36,4 @@ Cada prateleira segura a caixa fechada com o preço. Ao pagar, a caixa abre e o 
 
 - `Crate` — 1 clique → pede para pagar → some → a prateleira instancia `PartView`
 - `CharacterSlot` — recebe 3 kits em cima do caixote; **LUTAR** aparece quando está completo
-- `BeltFreak` — o Freak desenhado em cima da esteira
+- `BeltFreak` — o Freak na esteira: pula da carta, rema 5 vezes, mostra Poder e Resistência nas partes

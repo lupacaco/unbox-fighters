@@ -27,7 +27,7 @@ Arte e recursos (assets/, data/)
 | `AssemblyController` | Maestro: loja, cartas, esteiras, animações |
 | `LiveMatch` | Tempo correndo: dinheiro, esteira, duelo, fim da partida |
 | `PlayerState` | Vida, carteira, loja e esteira de **um** lado (você ou o bot) |
-| `BeltLane` | Até 2 Freaks deslizando até a ponta |
+| `BeltLane` | Até 2 Freaks remando até a ponta (5 remadas) |
 | `Duel` | Contas de um troca-troca de golpes |
 | `FreakStats` / `Synergy` | Poder, Resistência e Agilidade já com o bônus |
 | `ShopPool` / `BotBrain` | Sorteio da loja e o oponente jogando igual a você |

@@ -2,16 +2,21 @@
 
 A luta de verdade é calculada em `Duel`. A tela só **mostra** o resultado nas esteiras.
 
-Só a **cabeça** ataca. O Freak não tem pernas: ele desliza puxando o chão com as mãos, sentado no caixote.
+Só a **cabeça** ataca. O Freak não tem pernas: ele **rema** com as duas mãos, sentado no caixote.
 
 ## Sequência
 
-1. Você aperta **LUTAR**. O Freak **cai** no começo da esteira (azul à esquerda, vermelha à direita).
-2. **Desliza** até a ponta: os braços puxam o chão em ciclo, o corpo balança, sai poeirinha nos rolos.
-3. Na ponta: **freia** (esmaga um pouco) e olha para o inimigo. Se já tem alguém na ponta, os dois esperam o intervalo do duelo.
-4. **Golpe:** agacha, a cabeça sai, voa em arco com rastro, trava um instante no impacto, o atingido pisca e recua, a cabeça volta como bumerangue.
-5. Os dois golpes acontecem; o dano entra depois. Quem zera **perde a cor**, escorrega e **cai no vão** entre as esteiras, girando.
-6. Se um lado fica sozinho na ponta: a cada segundo a barra de vida do outro jogador **pula** (1 de dano).
+1. Você aperta **LUTAR**. O Freak **salta da carta** em arco até o começo da esteira (azul à esquerda). O oponente cai de cima no começo da vermelha.
+2. **Rema** até a ponta em **5 remadas**. As duas mãos vão para a frente e puxam juntas; o caixote anda um pouco; sai poeirinha. O tempo entre remadas vem da Agilidade (3 s … 1 s).
+3. Na ponta: **freia** (esmaga um pouco). Se já tem alguém na ponta, os dois esperam o intervalo do duelo.
+4. **Golpe:** agacha, a cabeça sai, voa em arco com rastro, trava um instante no impacto, o atingido pisca, recua e mostra o número do dano, a cabeça volta como bumerangue.
+5. Os golpes são **um de cada vez**. Se o primeiro não derrubou ninguém, o outro responde. O golpe que mata é sempre do vencedor. Se os dois cairiam, os dois atacam.
+6. Quem zera **perde a cor**, escorrega e **cai no vão** entre as esteiras, girando.
+7. Se um lado fica sozinho na ponta: a cada segundo a barra de vida do outro jogador **pula** (1 de dano).
+
+Na esteira, o Freak do oponente fica virado para a esquerda (para o vão). O seu fica virado para a direita.
+
+Na esteira aparecem as etiquetas coloridas de **Poder** na cabeça e **Resistência** no tronco, iguais às da carta.
 
 Na luta, quem cobre quem **não** usa o Z da ferramenta de ímãs. **1 fica na frente**.
 
@@ -29,7 +34,7 @@ Na luta, quem cobre quem **não** usa o Z da ferramenta de ímãs. **1 fica na f
 3. Cabeça
 4. Braço esquerdo
 
-Sons da luta: passo no deslize / pouso e poom do golpe. Sem boing de mola.
+Sons da luta: passo no pulo e em cada remada, poom do golpe. Sem boing de mola.
 
 ## Arquivos
 

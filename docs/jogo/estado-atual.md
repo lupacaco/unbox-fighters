@@ -10,8 +10,8 @@
 | Dinheiro | Começa em $10, +$1 a cada 2 s, teto $10. Substitui as pancadas |
 | Loja | 4 prateleiras com preço na caixa; ATUALIZAR $1; VENDER pela metade |
 | Montagem | 2 cartas; só Freak completo (3 kits) vai para a esteira |
-| Esteiras | Azul sua, vermelha do oponente, vão no meio; até 2 Freaks por lado |
-| Luta | Só a cabeça ataca; os dois golpes entram juntos; morto cai no vão |
+| Esteiras | Azul sua, vermelha deles; pulo da carta; 5 remadas (ritmo pela Agilidade); oponente olha para a esquerda; etiquetas de Poder e Resistência |
+| Luta | Só a cabeça ataca; golpes um de cada vez; o vencedor dá o golpe final; morto cai no vão |
 | Chip | Freak sozinho na ponta tira 1 de vida por segundo do outro jogador |
 | Visual | Fundo, cartas, prateleiras e esteiras da arte nova (`assets/nova-ui`) |
 | Arrastar e soltar | Da prateleira para a carta; clicar seleciona para vender; arrastar em VENDER também vende |
