@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://b7sgdo30ttuoq"]
 
 [ext_resource type="Script" uid="uid://csutnb6o1dqae" path="res://scripts/assembly/character_slot.gd" id="1"]
-[ext_resource type="Script" uid="uid://ckdkyklwtm5gt" path="res://scripts/ui/stat_readout.gd" id="2"]
 [ext_resource type="Texture2D" uid="uid://en1wlomew4t1" path="res://assets/ui/frame_premium.png" id="3"]
 [ext_resource type="Texture2D" uid="uid://dpocxae7hs60h" path="res://assets/objects/base-mola-solta.png" id="4"]
 
@@ -89,86 +88,3 @@ collision_layer = 2
 collision_mask = 0
 monitoring = false
 monitorable = false
-
-[node name="StatReadout" type="Control" parent="." unique_id=676885028]
-layout_mode = 3
-anchors_preset = 0
-offset_left = -148.0
-offset_top = 176.0
-offset_right = 148.0
-offset_bottom = 258.0
-script = ExtResource("2")
-
-[node name="Panel" type="ColorRect" parent="StatReadout" unique_id=1826146353]
-layout_mode = 0
-offset_right = 296.0
-offset_bottom = 82.0
-color = Color(0.07, 0.08, 0.1, 0.92)
-
-[node name="Edge" type="ColorRect" parent="StatReadout" unique_id=489433634]
-layout_mode = 0
-offset_right = 296.0
-offset_bottom = 1.0
-color = Color(0.55, 0.61, 0.71, 0.35)
-
-[node name="CompleteGlow" type="ColorRect" parent="StatReadout" unique_id=199920262]
-visible = false
-layout_mode = 0
-offset_right = 296.0
-offset_bottom = 82.0
-color = Color(0.79, 0.7, 0.49, 0.12)
-
-[node name="NameLabel" type="Label" parent="StatReadout" unique_id=1515451651]
-layout_mode = 0
-offset_left = 8.0
-offset_top = 6.0
-offset_right = 288.0
-offset_bottom = 34.0
-theme_override_colors/font_color = Color(0.9, 0.92, 0.94, 1)
-theme_override_font_sizes/font_size = 18
-text = "???"
-horizontal_alignment = 1
-
-[node name="TotalLabel" type="Label" parent="StatReadout" unique_id=1643431402]
-layout_mode = 0
-offset_left = 8.0
-offset_top = 34.0
-offset_right = 288.0
-offset_bottom = 76.0
-theme_override_colors/font_color = Color(0.96, 0.93, 0.86, 1)
-theme_override_font_sizes/font_size = 13
-text = "Ameaça 0   Força 0   Agilidade 0   ·  0"
-horizontal_alignment = 1
-
-[node name="Stats" type="HBoxContainer" parent="StatReadout" unique_id=422657878]
-visible = false
-layout_mode = 0
-offset_left = 10.0
-offset_top = 64.0
-offset_right = 230.0
-offset_bottom = 88.0
-theme_override_constants/separation = 8
-
-[node name="Brain" type="Label" parent="StatReadout/Stats" unique_id=1227864077]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.55, 0.61, 0.71, 1)
-theme_override_font_sizes/font_size = 13
-text = "BRN 0"
-horizontal_alignment = 1
-
-[node name="Power" type="Label" parent="StatReadout/Stats" unique_id=531724901]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.77, 0.3, 0.35, 1)
-theme_override_font_sizes/font_size = 13
-text = "PWR 0"
-horizontal_alignment = 1
-
-[node name="Speed" type="Label" parent="StatReadout/Stats" unique_id=1369983544]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.7, 0.72, 0.76, 1)
-theme_override_font_sizes/font_size = 13
-text = "SPD 0"
-horizontal_alignment = 1

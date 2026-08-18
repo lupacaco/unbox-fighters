@@ -12,7 +12,6 @@ Interface da preparação e da luta. As posições da tela seguem o mesmo mapa d
 | `scripts/ui/shop_bar.gd` | NÍVEL e ATUALIZAR à esquerda; TRAVAR à direita; 10 bolinhas douradas no topo |
 | `scripts/ui/stat_tag.gd` | Pílula colorida com o número da peça |
 | `scripts/ui/fight_plaque.gd` | Placa dourada: nomes, HP, números do choque, KO |
-| `scripts/ui/stat_readout.gd` | Nome + números da cabeça, tronco e braços · total |
 | `scripts/ui/background_fx.gd` | Fundo de arena, vinheta e poeira |
 | `scripts/ui/theme_tokens.gd` | Paleta: ouro, creme, vermelho do PRONTO, gelo do travar |
 | `scripts/ui/feel.gd` | Reação gostosa: hover, clique, squash. Esconde retângulo de colisão |

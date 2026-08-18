@@ -21,7 +21,7 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 | `verify_part_sizes.gd` | Sprites 200×200 e perfil nos desenhos visíveis |
 | `verify_fight_line.gd` | Fila no mesmo chão; disco da mola nos rolos da esteira; pulo da mola inteira; dois pulos até o ataque; sombra e recorte nos rolos; um boing ao sair do chão; duelistas afastados; placas de HP cabem no topo |
 | `verify_thrown_kit.gd` | Kit copiado do boneco some do corpo e pode voltar |
-| `verify_fight_poses.gd` | Personagem tem perfil; carta mostra a mola e a sombra; aceita cabeça, tronco e braços, recusa pernas |
+| `verify_fight_poses.gd` | Personagem tem perfil; carta mostra a mola e a sombra, sem placa de nome embaixo; Freak mais baixo no quadro; aceita cabeça, tronco e braços, recusa pernas |
 | `verify_fight_lock.gd` | Travamento da carta; soltar kit em lugar ocupado devolve o antigo |
 | `debug_parts.gd` | Carrega peça e checa visibilidade do sprite |
 | `debug_reveal.gd` | Força revelar peça da caixa e checa transparência |

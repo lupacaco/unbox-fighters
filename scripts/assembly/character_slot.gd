@@ -14,7 +14,7 @@ const TAG_OFFSETS := {
 }
 const _Spring := preload("res://scripts/data/spring_base.gd")
 ## Lower the spring and Freak on the card. Fight shelf uses its own floor.
-const TOY_Y := 22.0
+const TOY_Y := 50.0
 
 @onready var _card_shadow: Sprite2D = $CardShadow
 @onready var _card_frame: Sprite2D = $CardFrame
@@ -23,12 +23,9 @@ const TOY_Y := 22.0
 @onready var _sprite_composite: Sprite2D = $Display/Composite
 @onready var _highlight: Line2D = $DropHighlight
 @onready var _glow: Polygon2D = $CompleteGlow
-@onready var _readout: StatReadout = $StatReadout
 @onready var _fight_button: Button = $FightButton
 
-var character: CharacterDef
 var queue_rank: int = 3
-var _roster: Array[CharacterDef] = []
 var _bound_parts: Dictionary = {}
 var _layer_sprites: Dictionary = {}
 var _zones: Dictionary = {}
@@ -44,17 +41,12 @@ var _drop_hot: bool = false
 var _spring: Sprite2D
 var _spring_shadow: Polygon2D
 
-func setup(def: CharacterDef = null, roster: Array[CharacterDef] = []) -> void:
-	character = def
-	_roster = roster
+func setup(_def: CharacterDef = null, _incoming_roster: Array[CharacterDef] = []) -> void:
 	_rest_y = position.y
 	_lifted = false
 	visible = true
 	scale = Vector2.ONE
 	modulate.a = 1.0
-	_readout.set_display_name("???")
-	_readout.set_from_loadout(FighterLoadout.new())
-	_readout.set_complete(false)
 	_glow.visible = false
 	_highlight.visible = false
 	_drop_hot = false
@@ -88,7 +80,7 @@ func steal_all_parts() -> Dictionary:
 		if view != null:
 			stolen[slot] = view
 	_refresh_display(false)
-	_update_stats()
+	_refresh_tags()
 	return stolen
 
 func receive_parts(parts: Dictionary) -> void:
@@ -228,7 +220,7 @@ func try_attach(part_view: PartView) -> bool:
 	part_view.set_attached_slot(self)
 	part_view.snap_hide_for_slot()
 	_refresh_display(true)
-	_update_stats()
+	_refresh_tags()
 	_pulse_attach()
 	GameAudio.part_place()
 	var now_complete := is_complete()
@@ -250,7 +242,7 @@ func detach_part(slot: PartSlotType.Value, refresh: bool = true) -> PartView:
 	part_view.set_attached_slot(null)
 	if refresh:
 		_refresh_display(true)
-		_update_stats()
+		_refresh_tags()
 	part_detached.emit(self, part_view.part_def)
 	assembly_changed.emit(self)
 	return part_view
@@ -433,7 +425,6 @@ func _refresh_display(animate: bool) -> void:
 	var plan := CompositeResolver.resolve_slots(PartKit.expand_shop_parts(_shop_parts_map()))
 	var complete := is_complete()
 	_glow.visible = complete
-	_readout.set_complete(complete)
 	_empty_hint.visible = false
 
 	if not animate or _crossfade_busy:
@@ -504,31 +495,6 @@ func _place_sprite(
 	)
 	sprite.position = spread["center"]
 	sprite.rotation += float(spread["extra"])
-
-func _update_stats() -> void:
-	var loadout := to_loadout()
-	_readout.set_from_loadout(loadout)
-	_readout.set_display_name(_resolve_display_name())
-	_refresh_tags()
-
-func _resolve_display_name() -> String:
-	if not is_complete():
-		if to_loadout().is_empty():
-			return "—"
-		return "???"
-	for def in _roster:
-		if def == null:
-			continue
-		var same := true
-		for slot in PartSlotType.shop_slots():
-			var attached := get_attached_part(slot)
-			var expected := def.get_part(slot)
-			if attached == null or expected == null or attached.id != expected.id:
-				same = false
-				break
-		if same:
-			return def.display_name
-	return "MIX"
 
 func _pulse_attach() -> void:
 	Feel.punch(_display_root, Vector2(1.08, 0.92), Vector2.ONE)

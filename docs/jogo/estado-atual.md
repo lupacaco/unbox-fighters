@@ -15,7 +15,7 @@
 | Fim de partida | **Você venceu!** / **Você saiu** e botão **NOVA PARTIDA** |
 | Abrir caixas | 1 clique, custa 1 pancada |
 | Arrastar e soltar | Peças nas cartas (troca no lugar ocupado); botão direito vende; Freak inteiro troca de carta ou vai para VENDER. Sem retângulo vermelho: a carta acende ouro |
-| Visual composto | Base-mola em toda carta (menor que as peças e um pouco mais baixa; solta vazia, pressionada com peça). Ímãs unem cabeça e tronco pelas esferas; cada braço cola no ombro. Na frente os braços abrem um pouco |
+| Visual composto | Base-mola em toda carta (menor que as peças e mais baixa no quadro; solta vazia, pressionada com peça). Sem placa de nome embaixo. Ímãs unem cabeça e tronco pelas esferas; cada braço cola no ombro. Na frente os braços abrem um pouco |
 | Interface | Fontes de jogo, botões com borda ouro, loja nas laterais (não em cima da esteira) |
 | Incluir Freak | Folha 4+4 vira 8 PNG 200×200 + 4 kits na loja; ímãs em janela compacta (Ampliar para precisão). A mola já está na carta |
 | Fundo de arena | Respiração de vinheta + partículas de poeira. Fundo e esteira não mudam na luta |
