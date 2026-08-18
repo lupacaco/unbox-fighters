@@ -6,7 +6,7 @@ O que o jogador pode fazer hoje, e as regras que o jogo aplica.
 
 Não tem relógio de 60 segundos nem rodadas. O jogo **corre o tempo todo**.
 
-1. Cada jogador começa com **$10**. A barra-balança no meio começa **vazia** (o centro é 0).
+1. Cada jogador começa com **$10**. A barra-balança no **topo** começa **vazia** (o centro é 0). À esquerda está escrito **JOGADOR**, à direita **OPONENTE**.
 2. O dinheiro sobe **+$1 a cada 2 segundos**, até **$10**.
 3. Você compra kits, monta nas cartas e aperta **LUTAR**.
 4. O Freak **pula da carta** para o começo da esteira e vai **remando** com as mãos até a ponta. Lá, luta contra o Freak do oponente.

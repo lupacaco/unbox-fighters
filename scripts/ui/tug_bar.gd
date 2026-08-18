@@ -1,13 +1,19 @@
 class_name TugBar
 extends Node2D
 
-## One wooden tube above the belts. Empty at 0. Blue grows left for you,
-## red grows right for them. Never both at once. Liquids sit in front of the
-## opaque glass, clipped so they stay inside the window.
+## One wooden tube at the top of the screen. Empty at 0. Blue grows left for
+## you, red grows right for them. Never both at once. Liquids sit in front of
+## the opaque glass, clipped so they stay inside the window. Captions sit on
+## each half: JOGADOR on your blue, OPONENTE on their red.
+
+const PLAYER_CAPTION := "JOGADOR"
+const OPPONENT_CAPTION := "OPONENTE"
 
 var _frame: Sprite2D
 var _player: Sprite2D
 var _opponent: Sprite2D
+var _player_label: Label
+var _opponent_label: Label
 var _shown: int = 0
 
 func _ready() -> void:
@@ -32,6 +38,7 @@ func _ready() -> void:
 	_opponent = _make_liquid(AssemblyLayout.TUG_OPPONENT_TEX)
 	mask.add_child(_player)
 	mask.add_child(_opponent)
+	_add_captions()
 	set_tug(0, false)
 
 func set_tug(value: int, animate: bool = true) -> void:
@@ -48,6 +55,35 @@ func player_fill_visible() -> bool:
 
 func opponent_fill_visible() -> bool:
 	return _opponent != null and _opponent.visible
+
+func has_side_captions() -> bool:
+	return (
+		_player_label != null
+		and _player_label.text == PLAYER_CAPTION
+		and _opponent_label != null
+		and _opponent_label.text == OPPONENT_CAPTION
+	)
+
+func _add_captions() -> void:
+	## The bar itself is scaled down. This host grows the same amount back so
+	## the words stay a readable size on screen.
+	var names := Node2D.new()
+	names.name = "Captions"
+	names.scale = Vector2.ONE / maxf(AssemblyLayout.TUG_SCALE, 0.01)
+	names.z_index = 3
+	add_child(names)
+	var glass := AssemblyLayout.TUG_GLASS
+	var half := glass.size.x * 0.25 * AssemblyLayout.TUG_SCALE
+	_player_label = GameTheme.make_label(
+		PLAYER_CAPTION, 28, Vector2(-half, 0.0), Vector2(220, 40), ThemeTokens.CREAM
+	)
+	_player_label.name = "PlayerCaption"
+	names.add_child(_player_label)
+	_opponent_label = GameTheme.make_label(
+		OPPONENT_CAPTION, 28, Vector2(half, 0.0), Vector2(220, 40), ThemeTokens.CREAM
+	)
+	_opponent_label.name = "OpponentCaption"
+	names.add_child(_opponent_label)
 
 func _make_liquid(path: String) -> Sprite2D:
 	var sprite := Sprite2D.new()

@@ -90,7 +90,7 @@ func _build_belts() -> void:
 func _build_tug_bar() -> void:
 	_tug_bar = TugBar.new()
 	_tug_bar.name = "TugBar"
-	_tug_bar.z_index = 2
+	_tug_bar.z_index = 16
 	add_child(_tug_bar)
 
 func _build_freak_layer() -> void:

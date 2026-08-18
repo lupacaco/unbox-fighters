@@ -21,7 +21,7 @@ powershell -File tools/run_checks.ps1
 | `verify_bot.gd` | O oponente gasta, não lança no primeiro segundo, manda Freak e prefere fechar o set |
 | `verify_shop_pool.gd` | Loja vende todo Freak com ficha; 3 kits por Freak; 1 oferta |
 | `verify_character_importer.gd` | Acentos viram id simples; folha da Bruxa vira 4+4; `_slice.json` tem ímãs |
-| `verify_assembly.gd` | 2+2 cartas, 1 prateleira, barra-balança, 2 esteiras, fundo, fontes, câmera parada |
+| `verify_assembly.gd` | 2+2 cartas no topo, 1 prateleira, barra-balança no topo (JOGADOR / OPONENTE), 2 esteiras, fundo, fontes, câmera parada |
 | `verify_crate_open.gd` | Pagar a caixa deixa o kit na prateleira pelo preço certo |
 | `verify_composite.gd` | Caixote no chão; cabeça no pescoço; kit de braços vira dois |
 | `verify_part_magnets.gd` | Cabeça só embaixo; tronco com 4 ímãs; virar X; Z da carta e da luta |

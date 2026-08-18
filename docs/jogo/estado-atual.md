@@ -16,7 +16,7 @@
 | Visual | Fundo, cartas, prateleira e esteiras da arte nova (`assets/nova-ui`) |
 | Arrastar e soltar | Da prateleira para as cartas azuis; clicar seleciona para vender; arrastar na lixeira também vende |
 | Composição | Caixote do tronco é o chão. Ímãs unem cabeça no pescoço e braços nos ombros |
-| Interface | Dinheiro ao lado da prateleira; botões redondos de atualizar e vender; uma barra-balança acima das esteiras |
+| Interface | Dinheiro ao lado da prateleira; botões redondos de atualizar e vender; barra-balança no topo (JOGADOR / OPONENTE) |
 | Incluir Freak | Folha 4+4 vira 8 PNG 200×200 + 3 kits na loja; ímãs em Frente e Perfil |
 | Áudio | Efeitos gravados (martelo, caixa, ímã, impacto). Sem som de mola |
 | Dados | Loja lê sozinha todo `*_character.tres` (Bruxa, Advogado) |

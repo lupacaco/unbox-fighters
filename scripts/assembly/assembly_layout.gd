@@ -6,7 +6,7 @@ extends Object
 ##
 ## Left: your two hanging cards. Right: the opponent's two cards.
 ## Middle column: sell / refresh, one shop crate, money.
-## Tug bar sits above the belts and behind the Freaks.
+## Tug bar sits at the top center, in the gap between the inner cards.
 
 const WIDTH := 1920.0
 const HEIGHT := 1080.0
@@ -32,11 +32,12 @@ const BELT_ROLLER_FROM_TOP := 24.0
 const BELT_TIP_INSET := 40.0
 ## Where a Freak drops on, measured from the outer end of the belt.
 const BELT_ENTRY_INSET := 70.0
-const BELT_FREAK_SCALE := 0.62
+const BELT_FREAK_SCALE := 0.85
 
 # ---------------------------------------------------------------- cards
 const CARD_SIZE := Vector2(306, 572)
-const CARD_CENTER_Y := 328.0
+## Half the card art: the chain hooks sit flush with the top of the screen.
+const CARD_CENTER_Y := 286.0
 ## Centers 326 px apart (306 art + 20 gap). Mirrored around the screen middle.
 const CARD_X: Array[float] = [160.0, 486.0]
 const CARD_OPPONENT_X: Array[float] = [1434.0, 1760.0]
@@ -71,10 +72,11 @@ const MONEY_BOTTOM_Y := 700.0
 const MONEY_BRICK := Vector2(78, 26)
 const MONEY_BRICK_STEP := 28.0
 
-# ---------------------------------------------------------------- tug bar (above the belts, drawn behind Freaks)
+# ---------------------------------------------------------------- tug bar (top center, in the gap between the inner cards)
 const TUG_SIZE := Vector2(819, 149)
 const TUG_SCALE := 0.70
-const TUG_CENTER := Vector2(CENTER_X, 886.0)
+## A few pixels below the top so the wooden rim is not clipped.
+const TUG_CENTER := Vector2(CENTER_X, 58.0)
 ## Inner glass of barra-hp-vazia.png, in frame-local pixels (sprite is centered).
 const TUG_GLASS := Rect2(-348.0, -33.0, 696.0, 66.0)
 const BANNER_CENTER := Vector2(CENTER_X, 210.0)

@@ -55,11 +55,26 @@ func _check_furniture(scene: Node) -> bool:
 		return false
 	var tug := scene.get_node_or_null("TugBar") as TugBar
 	if tug == null:
-		push_error("VERIFY_FAIL the tug bar should sit behind the Freaks, not in the HUD")
+		push_error("VERIFY_FAIL the tug bar should sit on the match screen, not in the HUD")
+		return false
+	if AssemblyLayout.TUG_CENTER.y > 100.0:
+		push_error("VERIFY_FAIL the tug bar should sit at the top of the screen")
+		return false
+	if absf(tug.position.y - AssemblyLayout.TUG_CENTER.y) > 1.0:
+		push_error("VERIFY_FAIL the tug bar should use the layout center")
 		return false
 	var freaks := scene.get_node_or_null("Freaks") as Node2D
-	if freaks == null or tug.z_index >= freaks.z_index:
-		push_error("VERIFY_FAIL Freaks should draw in front of the tug bar")
+	if freaks == null:
+		push_error("VERIFY_FAIL missing Freaks layer")
+		return false
+	if not tug.has_side_captions():
+		push_error("VERIFY_FAIL the tug bar should read JOGADOR on the left and OPONENTE on the right")
+		return false
+	if absf(AssemblyLayout.CARD_CENTER_Y - AssemblyLayout.CARD_SIZE.y * 0.5) > 1.0:
+		push_error("VERIFY_FAIL the four cards should hang flush with the top of the screen")
+		return false
+	if AssemblyLayout.BELT_FREAK_SCALE < 0.8:
+		push_error("VERIFY_FAIL Freaks on the belts should be close to card size")
 		return false
 	tug.set_tug(-25, false)
 	if not tug.player_fill_visible() or tug.opponent_fill_visible():
