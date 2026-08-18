@@ -117,7 +117,7 @@ func step() -> void:
 	play(&"step", -11.0, randf_range(0.92, 1.1))
 
 func wood_slide() -> void:
-	play(&"wood_slide", -5.5, randf_range(0.94, 1.05))
+	play(&"wood_slide", -7.0, randf_range(0.92, 1.08))
 
 func ui_click() -> void:
 	play(&"part_pickup", -11.0, randf_range(1.1, 1.22))

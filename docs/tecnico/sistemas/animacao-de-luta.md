@@ -34,7 +34,7 @@ Na luta, quem cobre quem **não** usa o Z da ferramenta de ímãs. **1 fica na f
 3. Cabeça
 4. Braço esquerdo
 
-Sons da luta: passo no pulo, madeira arrastando no deslize, poom do golpe. Sem boing de mola.
+Sons da luta: passo no pulo, raspar curto de madeira no deslize, poom do golpe. Sem boing de mola.
 
 ## Arquivos
 
