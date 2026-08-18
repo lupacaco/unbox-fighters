@@ -62,7 +62,7 @@ func _build() -> void:
 
 	_slot_pick = OptionButton.new()
 	_slot_pick.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	for slot in PartSlotType.shop_slots():
+	for slot in PartSlotType.visual_slots():
 		_slot_pick.add_item(PartSlotType.display_label(slot))
 		_slot_pick.set_item_metadata(_slot_pick.item_count - 1, int(slot))
 	_slot_pick.item_selected.connect(_on_slot_selected)

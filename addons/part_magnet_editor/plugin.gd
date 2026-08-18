@@ -5,6 +5,13 @@ const MagnetInspectorPlugin := preload("res://addons/part_magnet_editor/magnet_i
 const MagnetWindowScene := preload("res://addons/part_magnet_editor/magnet_window.gd")
 const CharacterImporter := preload("res://addons/part_magnet_editor/character_importer.gd")
 
+## The three numbers the shop and the fight read, in the order write_defs wants.
+const STAT_SPINS: Array[Dictionary] = [
+	{"label": "Cabeça — Poder", "slot": PartSlotType.Value.HEAD},
+	{"label": "Tronco — Resistência", "slot": PartSlotType.Value.BODY},
+	{"label": "Braços — Agilidade", "slot": PartSlotType.Value.ARMS},
+]
+
 var _inspector_plugin: EditorInspectorPlugin
 var _window
 var _file_dialog: EditorFileDialog
@@ -89,16 +96,15 @@ func _build_form() -> void:
 	box.add_theme_constant_override("separation", 8)
 	box.custom_minimum_size = Vector2(400, 300)
 	_form.add_child(box)
-	box.add_child(_labeled_edit("Id interno (ex: vampiro)", true))
-	box.add_child(_labeled_edit("Nome na carta (ex: Vampiro)", false))
-	var labels: PackedStringArray = ["Cabeça", "Tronco"]
+	box.add_child(_labeled_edit("Id interno (ex: bruxa)", true))
+	box.add_child(_labeled_edit("Nome na carta (ex: Bruxa)", false))
 	_value_spins.clear()
-	for i in labels.size():
-		box.add_child(_labeled_spin(labels[i]))
+	for spec in STAT_SPINS:
+		box.add_child(_labeled_spin(spec))
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.custom_minimum_size.x = 380
-	hint.text = "Folha com 4 desenhos de frente e 4 de perfil (cabeça, tronco, braço E, braço D). A loja ganha esses 4 kits. A base-mola já vem na carta. Depois marque os ímãs em Ampliar."
+	hint.text = "Folha com 4 desenhos de frente e 4 de perfil (cabeça, tronco, braço E, braço D). A loja vende 3 kits: cabeça, tronco e os dois braços juntos. Depois marque os ímãs em Ampliar."
 	box.add_child(hint)
 	_form_status = Label.new()
 	_form_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -120,16 +126,17 @@ func _labeled_edit(caption: String, is_id: bool) -> Control:
 		_name_edit = edit
 	return row
 
-func _labeled_spin(caption: String) -> Control:
+func _labeled_spin(spec: Dictionary) -> Control:
 	var row := HBoxContainer.new()
 	var lab := Label.new()
-	lab.text = caption
+	lab.text = String(spec["label"])
 	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(lab)
 	var spin := SpinBox.new()
-	spin.min_value = 3
-	spin.max_value = 9
-	spin.value = 4
+	var span: Vector2i = PartStats.range_of(spec["slot"])
+	spin.min_value = span.x
+	spin.max_value = span.y
+	spin.value = int(round(float(span.x + span.y) * 0.5))
 	row.add_child(spin)
 	_value_spins.append(spin)
 	return row
@@ -168,7 +175,7 @@ func _editor_tree() -> SceneTree:
 func _run_import() -> void:
 	var set_id := CharacterImporter.clean_id(_id_edit.text)
 	if set_id.is_empty():
-		_set_form_status("O id interno precisa ser minúsculo, sem acento. Exemplo: vampiro.", true)
+		_set_form_status("O id interno precisa ser minúsculo, sem acento. Exemplo: bruxa.", true)
 		return
 	if _pending_sheet.is_empty():
 		_set_form_status("Escolha de novo a folha PNG ou WEBP.", true)
@@ -187,7 +194,7 @@ func _run_import() -> void:
 		push_error(slice_err)
 		return
 	CharacterImporter.keep_source_sheet(_pending_sheet, set_id)
-	_set_form_status("Esperando o Godot ler as 12 imagens…", false)
+	_set_form_status("Esperando o Godot ler as 8 imagens…", false)
 	var fs := EditorInterface.get_resource_filesystem()
 	var err := ""
 	var values: Array = []

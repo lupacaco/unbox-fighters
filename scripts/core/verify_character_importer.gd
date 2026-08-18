@@ -48,43 +48,67 @@ func _run() -> void:
 		quit(1)
 		return
 
-	var tex := load("res://assets/characters/vampiro/vampiro.png") as Texture2D
+	var tex := load("res://assets/characters/bruxa/bruxa.png") as Texture2D
 	if tex == null:
-		push_error("VERIFY_FAIL could not read the vampire sheet")
+		push_error("VERIFY_FAIL could not read the bruxa sheet")
 		quit(1)
 		return
 	var sheet := tex.get_image()
 	if sheet == null:
-		push_error("VERIFY_FAIL vampire sheet has no pixels")
+		push_error("VERIFY_FAIL the bruxa sheet has no pixels")
 		quit(1)
 		return
 	if sheet.get_format() != Image.FORMAT_RGBA8:
 		sheet.convert(Image.FORMAT_RGBA8)
 	var blobs: Array = SheetSlicer._find_blobs(sheet, SheetSlicer._uses_alpha_background(sheet))
 	if blobs.size() < 8:
-		push_error("VERIFY_FAIL vampire sheet should have at least 8 drawings, got %d" % blobs.size())
+		push_error("VERIFY_FAIL the sheet should have at least 8 drawings, got %d" % blobs.size())
 		quit(1)
 		return
 	var named: Dictionary = SheetSlicer._classify(blobs, sheet.get_width(), sheet.get_height())
 	if not String(named.get("error", "")).is_empty():
-		push_error("VERIFY_FAIL vampire sheet classify: %s" % named["error"])
+		push_error("VERIFY_FAIL classify: %s" % named["error"])
 		quit(1)
 		return
 	if not named.has("front") or not named.has("profile"):
-		push_error("VERIFY_FAIL vampire sheet should split into 4 front + 4 profile")
+		push_error("VERIFY_FAIL the sheet should split into 4 front + 4 profile")
 		quit(1)
 		return
 	for pose in ["front", "profile"]:
 		var group: Dictionary = named[pose]
 		if not SheetSlicer._group_complete(group):
-			push_error("VERIFY_FAIL vampire sheet did not name all four %s parts" % pose)
+			push_error("VERIFY_FAIL the sheet did not name all four %s parts" % pose)
 			quit(1)
 			return
 		for slot_name in SheetSlicer.SLOT_NAMES:
 			if not group.has(slot_name):
-				push_error("VERIFY_FAIL vampire sheet missing %s in %s" % [slot_name, pose])
+				push_error("VERIFY_FAIL the sheet is missing %s in %s" % [slot_name, pose])
 				quit(1)
 				return
 
+	if not _check_slice_report():
+		quit(1)
+		return
+
 	print("VERIFY_CHARACTER_IMPORTER_PASS")
 	quit(0)
+
+## The Python cutter leaves a <id>_slice.json with the joints it found. The
+## importer reads it, so a missing or empty report means the kits lose their magnets.
+func _check_slice_report() -> bool:
+	var magnets: Dictionary = CharacterImporter.read_slice_magnets("bruxa")
+	if magnets.is_empty():
+		push_error("VERIFY_FAIL missing bruxa_slice.json")
+		return false
+	for pose in ["front", "profile"]:
+		var group: Dictionary = magnets.get(pose, {})
+		var body: Dictionary = group.get("body", {})
+		for socket in ["ground", "neck", "shoulder_l", "shoulder_r"]:
+			if not body.has(socket):
+				push_error("VERIFY_FAIL the cutter did not find the %s magnet (%s)" % [socket, pose])
+				return false
+		for limb in ["head", "arm_l", "arm_r"]:
+			if not Dictionary(group.get(limb, {})).has("join"):
+				push_error("VERIFY_FAIL the cutter did not find the %s magnet (%s)" % [limb, pose])
+				return false
+	return true

@@ -1,6 +1,6 @@
 # Sistema: tela de montagem
 
-A cena principal do jogo hoje: preparação + loja + luta no mesmo palco.
+A cena principal do jogo hoje: loja + cartas + esteiras no mesmo palco.
 
 ## Arquivos
 
@@ -13,29 +13,27 @@ A cena principal do jogo hoje: preparação + loja + luta no mesmo palco.
 
 ## O que o controlador faz ao iniciar
 
-1. Liga o arraste (peça, carta, vender)
-2. Carrega o elenco (todo `*_character.tres`)
-3. Sobe o HUD: **PREP**, relógio no centro, vs oponente, HP, PRONTO, barra da loja
-4. Liga as **3 cartas** (3º / 2º / 1º)
-5. Começa a partida (`MatchState`) e sorteia **5 caixas**
-6. Os 3 bots compram na hora
+1. Desenha o fundo, as duas esteiras, as 2 cartas e as 4 prateleiras
+2. Sobe a barra de dinheiro, ATUALIZAR/VENDER e as duas barras de vida
+3. Liga o arraste
+4. Começa a `LiveMatch` e sorteia **4 caixas**
+5. O bot começa a jogar no mesmo ritmo
 
-## Layout
+## Layout (1920×1080)
 
-- Cartas em X = 380, 960, 1540; Y = 400 — etiquetas 3º, 2º, 1º (1º à direita)
-- Esteira no rodapé da tela, largura 1920, colada embaixo. As caixas e as peças ficam **coladas nos rolos** (sem flutuar). Na luta, o disco da mola encosta nos rolos (a beira da frente entra um pouco entre os cilindros)
-- 5 caixas, espaçadas 250 px
-- Área **VENDER +1** à **direita**, ao lado das caixas (não em cima da esteira)
-- HUD de cima: **PREP** à esquerda, relógio no centro, pancadas douradas embaixo do relógio, **PRONTO** à direita
-- Loja nas laterais, acima da esteira: **NÍVEL** e **ATUALIZAR** à esquerda; **TRAVAR** à direita
+- **2 cartas** à esquerda (`carta.png`, 306×606)
+- **4 prateleiras** no meio (`prateleira-loja.png`)
+- **Barra de dinheiro** à direita (10 tijolinhos + `$N`)
+- **ATUALIZAR** (azul) e **VENDER** (vermelho) abaixo do dinheiro
+- **Esteira azul** embaixo à esquerda, **vermelha** à direita, vão no meio
+- Barras de vida no topo: Você à esquerda, Oponente à direita
 
 ## Loja
 
-Ofertas vêm do nível da loja (e abaixo). Quebrar caixa gasta 1 pancada.  
-O botão **NÍVEL 1  (4)** mostra o custo para subir. Clique nele para pagar.
+Cada prateleira segura a caixa fechada com o preço. Ao pagar, a caixa abre e o kit fica em cima para arrastar. **ATUALIZAR** troca as caixas fechadas; um kit já pago na prateleira fica.
 
 ## Relação com outras cenas
 
-- `Crate` — 1 clique → some → instancia `PartView`  
-- `CharacterSlot` — recebe 4 kits em cima da base-mola (cabeça, tronco, braço E, braço D; mola menor e mais baixa no quadro, sombra no chão); o rótulo da fila arrasta o Freak inteiro. Sem placa de nome embaixo da carta; o número de cada peça fica na pílula colorida  
-- `FightDirector` — palco da luta
+- `Crate` — 1 clique → pede para pagar → some → a prateleira instancia `PartView`
+- `CharacterSlot` — recebe 3 kits em cima do caixote; **LUTAR** aparece quando está completo
+- `BeltFreak` — o Freak desenhado em cima da esteira

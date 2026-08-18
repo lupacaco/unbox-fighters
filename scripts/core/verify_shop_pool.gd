@@ -1,5 +1,8 @@
 extends SceneTree
 
+## The shop reads data/parts by itself: every Freak file shows up, each one sells
+## three kits (head, torso, arm pair), and a roll fills the four shelves.
+
 func _init() -> void:
 	call_deferred("_run")
 
@@ -16,37 +19,38 @@ func _run() -> void:
 		ids.append(String(character.id))
 	ids.sort()
 	if ids != on_disk:
-		push_error("VERIFY_FAIL shop should sell every Freak file, got %s expected %s" % [", ".join(ids), ", ".join(on_disk)])
+		push_error("VERIFY_FAIL shop should sell every Freak file, got %s expected %s" % [
+			", ".join(ids), ", ".join(on_disk)
+		])
 		quit(1)
 		return
 
-	var tier1 := ShopPool.parts_up_to_tier(1)
-	if tier1.is_empty():
-		push_error("VERIFY_FAIL shop level 1 should sell kits")
+	var parts := ShopPool.all_parts()
+	if parts.size() != roster.size() * PartSlotType.shop_slots().size():
+		push_error("VERIFY_FAIL shop should sell 3 kits per Freak, got %d" % parts.size())
 		quit(1)
 		return
-	for part in tier1:
+	for part in parts:
 		if not PartSlotType.is_shop_slot(part.slot_type):
-			push_error("VERIFY_FAIL shop sold a visual limb: %s" % part.id)
+			push_error("VERIFY_FAIL shop sold a drawing, not a kit: %s" % part.id)
+			quit(1)
+			return
+		if PartStats.price_of(part) < PartStats.MIN_PRICE:
+			push_error("VERIFY_FAIL no crate may be free: %s" % part.id)
 			quit(1)
 			return
 
-	var high := ShopPool.parts_up_to_tier(5)
-	if high.size() != roster.size() * 4:
-		push_error("VERIFY_FAIL shop should sell 4 kits per Freak, got %d" % high.size())
-		quit(1)
-		return
-	var body: PartDef = load("res://data/parts/vampiro_body.tres")
-	if body == null or body.combat_value != 4 or body.tier != 1:
-		push_error("VERIFY_FAIL vampire torso should be 4 (shop level 1)")
+	var arms := ShopPool.character_by_id(&"bruxa").arms
+	if arms == null or not arms.is_bundle() or PartKit.expand_shop_part(arms).size() != 2:
+		push_error("VERIFY_FAIL the arm kit should open into two arms")
 		quit(1)
 		return
 
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1
-	var offers := ShopPool.roll(1, rng)
+	var offers := ShopPool.roll(rng, MatchRules.SHOP_SLOTS)
 	if offers.size() != MatchRules.SHOP_SLOTS:
-		push_error("VERIFY_FAIL shop should roll 5")
+		push_error("VERIFY_FAIL a roll should fill %d shelves" % MatchRules.SHOP_SLOTS)
 		quit(1)
 		return
 	print("VERIFY_SHOP_POOL_PASS")

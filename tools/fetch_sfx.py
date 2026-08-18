@@ -3,7 +3,7 @@
 Substitui os bipes antigos gerados por seno/ruído.
 
   python tools/fetch_sfx.py
-  python tools/fetch_sfx.py spring_boing
+  python tools/fetch_sfx.py impact
 
 Precisa: pip install miniaudio numpy
 """
@@ -35,7 +35,6 @@ JOBS: dict[str, dict] = {
 	"fighter_complete": {"id": 2865, "fade_out": 0.1},
 	"impact": {"id": 2143, "fade_out": 0.08},
 	"step": {"id": 542, "start": 0.15, "end": 0.40, "fade_in": 0.008, "fade_out": 0.07},
-	"spring_boing": {"id": 736, "end": 0.82, "fade_out": 0.08},
 }
 
 

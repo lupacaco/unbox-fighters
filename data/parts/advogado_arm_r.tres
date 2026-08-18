@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_fdfw4"]
+[ext_resource type="Texture2D" path="res://assets/characters/advogado/advogado_arm_r-1.png" id="2_g572p"]
+[ext_resource type="Texture2D" path="res://assets/characters/advogado/advogado_arm_r-2.png" id="3_04o2g"]
+
+[resource]
+script = ExtResource("1_fdfw4")
+id = &"advogado_arm_r"
+display_name = "Advogado Braço D"
+slot_type = 3
+set_id = &"advogado"
+sprite = ExtResource("2_g572p")
+sprite_profile = ExtResource("3_04o2g")
+stat_value = 5
+tier = 5
+magnet_up = Vector2(2, -85)
+magnet_up_profile = Vector2(4, -80)

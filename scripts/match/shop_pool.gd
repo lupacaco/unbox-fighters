@@ -2,6 +2,9 @@
 class_name ShopPool
 extends RefCounted
 
+## Every kit the shop can offer, read straight from data/parts/*_character.tres.
+## Drop a new Freak in that folder and it shows up in the shop by itself.
+
 const PARTS_DIR := "res://data/parts"
 ## Empty = every *_character.tres. Fill only to hide Freaks in a test.
 const ACTIVE_SET_IDS: PackedStringArray = []
@@ -26,23 +29,27 @@ static func all_parts() -> Array[PartDef]:
 	return _all_parts
 
 
-static func parts_up_to_tier(tier: int) -> Array[PartDef]:
-	var pool: Array[PartDef] = []
-	for part in all_parts():
-		if part.tier <= tier:
-			pool.append(part)
-	return pool
+static func character_by_id(set_id: StringName) -> CharacterDef:
+	for character in roster():
+		if character.id == set_id:
+			return character
+	return null
 
 
-static func roll(tier: int, rng: RandomNumberGenerator, count: int = MatchRules.SHOP_SLOTS) -> Array:
-	var pool := parts_up_to_tier(tier)
-	var offers: Array = []
+## Fills the shelves. Avoids showing the same kit twice while the pool allows it.
+static func roll(rng: RandomNumberGenerator, count: int = MatchRules.SHOP_SLOTS) -> Array[PartDef]:
+	var offers: Array[PartDef] = []
+	var pool := all_parts().duplicate()
 	if pool.is_empty():
-		for _i in count:
-			offers.append(null)
+		offers.resize(count)
 		return offers
+	var bag: Array[PartDef] = []
 	for _i in count:
-		offers.append(pool[rng.randi_range(0, pool.size() - 1)])
+		if bag.is_empty():
+			bag = pool.duplicate()
+		var pick := rng.randi_range(0, bag.size() - 1) if rng != null else 0
+		offers.append(bag[pick])
+		bag.remove_at(pick)
 	return offers
 
 

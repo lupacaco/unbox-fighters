@@ -13,6 +13,6 @@ Quando o jogador mandar uma folha (PNG/WEBP) ou pedir para incluir um set:
 Armadilhas:
 
 - Fundo preto: apague só o que toca a **borda**. Mancha, olho e tubo pretos ficam.
-- Ímã: abra **Project → Tools → Ímãs das Peças**, escolha o Freak. Abas **Frente** e **Perfil**: 4 partes à esquerda, prévia à direita. Arraste as bolinhas até as **esferas de metal**. No tronco são 5 (pescoço, dois ombros, dois quadris). Não force X = 0. Marque frente e perfil.
+- Ímã: abra **Project → Tools → Ímãs das Peças**, escolha o Freak. Abas **Frente** e **Perfil**: 4 partes à esquerda, prévia à direita. Arraste as bolinhas até as **esferas de metal**. No tronco são 4 (pescoço, dois ombros, chão do caixote). Não force X = 0. Marque frente e perfil.
 - A loja lê sozinha as fichas `data/parts/*_character.tres`. Não precisa ligar o set na tela na mão.
 - Atualize a tabela em `docs/tecnico/sistemas/pecas-e-personagens.md`.

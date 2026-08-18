@@ -2,29 +2,21 @@
 class_name PartSlotType
 extends Object
 
-## Shop, fight and new sheets use four kits. Old files may still have unused legs.
+## The shop sells three kits: head, torso and the arm pair.
+## The screen draws four pieces, because the arm kit becomes two arms.
 enum Value {
 	HEAD,
 	BODY,
 	ARM_L,
 	ARM_R,
-	LEG_L,
-	LEG_R,
-	LEGS,
+	ARMS,
 }
 
 static func shop_slots() -> Array[Value]:
-	return [Value.HEAD, Value.BODY, Value.ARM_L, Value.ARM_R]
+	return [Value.HEAD, Value.BODY, Value.ARMS]
 
 static func visual_slots() -> Array[Value]:
-	return [
-		Value.HEAD,
-		Value.BODY,
-		Value.ARM_L,
-		Value.ARM_R,
-		Value.LEG_L,
-		Value.LEG_R,
-	]
+	return [Value.HEAD, Value.BODY, Value.ARM_L, Value.ARM_R]
 
 static func all_slots() -> Array[Value]:
 	return visual_slots()
@@ -39,22 +31,15 @@ static func default_draw_z(slot: Value) -> int:
 	match slot:
 		Value.HEAD:
 			return 1
-		Value.ARM_L, Value.ARM_R:
+		Value.ARM_L, Value.ARM_R, Value.BODY:
 			return 2
-		Value.BODY:
-			return 2
-		Value.LEG_L, Value.LEG_R:
-			return 3
 		_:
-			return 4
+			return 3
 
 ## Palco: 1 fica na frente (igual à carta). Godot desenha o número maior por cima, então invertemos.
-## Perfil: braço D, tronco, cabeça, braço E, mola. Frente: cabeça, braço E, braço D, tronco, mola.
+## Perfil: braço D, tronco, cabeça, braço E. Frente: cabeça, braço E, braço D, tronco.
 static func fight_z_index(slot: Value, profile: bool = true) -> int:
 	return _fight_godot_z(_fight_rank(slot, profile))
-
-static func fight_spring_z_index() -> int:
-	return _fight_godot_z(5)
 
 static func _fight_rank(slot: Value, profile: bool) -> int:
 	if profile:
@@ -85,9 +70,8 @@ static func _fight_godot_z(rank: int) -> int:
 	return 6 - rank
 
 static func draw_order_for(parts: Dictionary) -> Array[Value]:
-	var slots := visual_slots()
 	var ordered: Array[Value] = []
-	for slot in slots:
+	for slot in visual_slots():
 		ordered.append(slot)
 	ordered.sort_custom(func(a: Value, b: Value) -> bool:
 		var za := _draw_z_of(parts, a)
@@ -105,9 +89,15 @@ static func _draw_z_of(parts: Dictionary, slot: Value) -> int:
 	return default_draw_z(slot)
 
 static func is_shop_slot(value: Value) -> bool:
-	return value == Value.HEAD or value == Value.BODY or value == Value.ARM_L or value == Value.ARM_R
+	return value == Value.HEAD or value == Value.BODY or value == Value.ARMS
 
+static func is_arm(value: Value) -> bool:
+	return value == Value.ARM_L or value == Value.ARM_R
+
+## Which drawings a shop kit puts on screen. The arm kit becomes both arms.
 static func visual_slots_for(shop_slot: Value) -> Array[Value]:
+	if shop_slot == Value.ARMS:
+		return [Value.ARM_L, Value.ARM_R]
 	return [shop_slot]
 
 static func to_string_name(value: Value) -> StringName:
@@ -120,12 +110,8 @@ static func to_string_name(value: Value) -> StringName:
 			return &"arm_l"
 		Value.ARM_R:
 			return &"arm_r"
-		Value.LEG_L:
-			return &"leg_l"
-		Value.LEG_R:
-			return &"leg_r"
-		Value.LEGS:
-			return &"legs"
+		Value.ARMS:
+			return &"arms"
 		_:
 			return &"unknown"
 
@@ -139,11 +125,7 @@ static func display_label(value: Value) -> String:
 			return "Braço E"
 		Value.ARM_R:
 			return "Braço D"
-		Value.LEG_L:
-			return "Perna E"
-		Value.LEG_R:
-			return "Perna D"
-		Value.LEGS:
-			return "Pernas"
+		Value.ARMS:
+			return "Braços"
 		_:
 			return "Peça"

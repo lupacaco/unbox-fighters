@@ -56,8 +56,6 @@ func _apply_pending() -> void:
 	if chosen == null and _pending_part != null:
 		chosen = _character_for_part(_pending_part)
 	if chosen == null:
-		chosen = _character_by_id("vampiro")
-	if chosen == null:
 		chosen = _characters[0]
 	_select_character(chosen)
 
@@ -142,7 +140,7 @@ func _make_tab(pose: int, caption: String) -> Control:
 	scroll.add_child(grid)
 
 	var cards: Array[Control] = []
-	for _i in PartSlotType.shop_slots().size():
+	for _i in PartSlotType.visual_slots().size():
 		var card := MagnetPartCard.new()
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		card.magnets_changed.connect(_refresh_mix)
@@ -193,7 +191,7 @@ func _select_character(character: CharacterDef) -> void:
 func _show_character(character: CharacterDef) -> void:
 	_character = character
 	_status.text = ""
-	var slots := PartSlotType.shop_slots()
+	var slots := PartSlotType.visual_slots()
 	for i in slots.size():
 		var part := _visual_part(character, slots[i])
 		(_front_cards[i] as MagnetPartCard).set_target(part, 0)
@@ -207,7 +205,7 @@ func _on_transform_changed() -> void:
 func _sync_shared_fields() -> void:
 	if _character == null:
 		return
-	var slots := PartSlotType.shop_slots()
+	var slots := PartSlotType.visual_slots()
 	for i in slots.size():
 		var part := _visual_part(_character, slots[i])
 		(_front_cards[i] as MagnetPartCard).set_target(part, 0)
@@ -322,7 +320,7 @@ func _set_texture(part: PartDef, pose: int, tex: Texture2D) -> void:
 func _part_using_path(skip: PartDef, pose: int, res_path: String) -> PartDef:
 	if _character == null:
 		return null
-	for slot in PartSlotType.shop_slots():
+	for slot in PartSlotType.visual_slots():
 		var other := _visual_part(_character, slot)
 		if other == null or other == skip:
 			continue
@@ -334,7 +332,7 @@ func _part_using_path(skip: PartDef, pose: int, res_path: String) -> PartDef:
 func _refresh_mix() -> void:
 	var parts := {}
 	if _character != null:
-		for slot in PartSlotType.shop_slots():
+		for slot in PartSlotType.visual_slots():
 			parts[slot] = _visual_part(_character, slot)
 	if _front_mix != null:
 		(_front_mix as MagnetMix).set_mix(parts, 0, "Prévia")
@@ -347,7 +345,7 @@ func _save_all() -> void:
 		return
 	var saved := 0
 	var seen: Dictionary = {}
-	for slot in PartSlotType.shop_slots():
+	for slot in PartSlotType.visual_slots():
 		var part := _visual_part(_character, slot)
 		if part == null or part.resource_path.is_empty() or seen.has(part.resource_path):
 			continue
@@ -377,11 +375,9 @@ func _character_for_part(part: PartDef) -> CharacterDef:
 	if by_id != null:
 		return by_id
 	for character in _characters:
-		for slot in PartSlotType.shop_slots():
+		for slot in PartSlotType.visual_slots():
 			if _visual_part(character, slot) == part:
 				return character
-		if character.legs == part:
-			return character
 	return null
 
 func _character_by_id(set_id: String) -> CharacterDef:

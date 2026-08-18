@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_w0rn5"]
+[ext_resource type="Texture2D" path="res://assets/characters/advogado/advogado_body-1.png" id="2_fcrse"]
+[ext_resource type="Texture2D" path="res://assets/characters/advogado/advogado_body-2.png" id="3_q5oaj"]
+
+[resource]
+script = ExtResource("1_w0rn5")
+id = &"advogado_body"
+display_name = "Advogado Tronco"
+slot_type = 1
+set_id = &"advogado"
+sprite = ExtResource("2_fcrse")
+sprite_profile = ExtResource("3_q5oaj")
+stat_value = 18
+tier = 4
+magnet_neck = Vector2(-2, -82)
+magnet_shoulder_l = Vector2(-64, -35)
+magnet_shoulder_r = Vector2(64, -46)
+magnet_ground = Vector2(0, 99)
+magnet_neck_profile = Vector2(-16, -96)
+magnet_shoulder_l_profile = Vector2(-22, -43)
+magnet_shoulder_r_profile = Vector2(-22, -43)
+magnet_ground_profile = Vector2(2, 99)

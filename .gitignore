@@ -46,3 +46,7 @@ __pycache__/
 *.pyc
 tools/_sfx_cache/
 tools/_sfx_probe/
+
+# Generated magnet overlays and screenshots (keep .gdignore so Godot skips the folder)
+tools/checks/*.png
+tools/checks/*.import

@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://dg7f2ia0b3mr0"]
+[gd_resource type="Resource" script_class="PartDef" format=3]
 
-[ext_resource type="Script" uid="uid://71ffw17l5buf" path="res://scripts/data/part_def.gd" id="1_mucqf"]
-[ext_resource type="Texture2D" uid="uid://bu012cb56idn" path="res://assets/characters/bruxa/bruxa_body-1.png" id="2_8d06c"]
-[ext_resource type="Texture2D" uid="uid://bttbny8e0seio" path="res://assets/characters/bruxa/bruxa_body-2.png" id="3_c8n4g"]
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_mucqf"]
+[ext_resource type="Texture2D" path="res://assets/characters/bruxa/bruxa_body-1.png" id="2_8d06c"]
+[ext_resource type="Texture2D" path="res://assets/characters/bruxa/bruxa_body-2.png" id="3_c8n4g"]
 
 [resource]
 script = ExtResource("1_mucqf")
@@ -12,14 +12,13 @@ slot_type = 1
 set_id = &"bruxa"
 sprite = ExtResource("2_8d06c")
 sprite_profile = ExtResource("3_c8n4g")
-combat_value = 3
-magnet_neck = Vector2(-1, -85)
-magnet_shoulder_l = Vector2(-47, -71)
-magnet_shoulder_r = Vector2(44, -71)
-magnet_hip_l = Vector2(-37, 71)
-magnet_hip_r = Vector2(36, 72)
-magnet_neck_profile = Vector2(7, -91)
-magnet_shoulder_l_profile = Vector2(-9, -55)
-magnet_shoulder_r_profile = Vector2(-5, -53)
-magnet_hip_l_profile = Vector2(-7, 65)
-magnet_hip_r_profile = Vector2(-5, 64)
+stat_value = 15
+tier = 3
+magnet_neck = Vector2(-1, -78)
+magnet_shoulder_l = Vector2(-65, -46)
+magnet_shoulder_r = Vector2(63, -46)
+magnet_ground = Vector2(-2, 99)
+magnet_neck_profile = Vector2(-23, -96)
+magnet_shoulder_l_profile = Vector2(-24, -43)
+magnet_shoulder_r_profile = Vector2(-24, -43)
+magnet_ground_profile = Vector2(1, 99)

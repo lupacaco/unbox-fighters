@@ -1,0 +1,87 @@
+{
+	"id": "advogado",
+	"display_name": "Advogado",
+	"stats": {
+		"power": 4,
+		"toughness": 18,
+		"agility": 5
+	},
+	"magnets": {
+		"front": {
+			"head": {
+				"join": [
+					0,
+					80
+				]
+			},
+			"body": {
+				"ground": [
+					0,
+					99
+				],
+				"neck": [
+					-2,
+					-82
+				],
+				"shoulder_l": [
+					-64,
+					-35
+				],
+				"shoulder_r": [
+					64,
+					-46
+				]
+			},
+			"arm_l": {
+				"join": [
+					-6,
+					-81
+				]
+			},
+			"arm_r": {
+				"join": [
+					2,
+					-85
+				]
+			}
+		},
+		"profile": {
+			"head": {
+				"join": [
+					-13,
+					82
+				]
+			},
+			"body": {
+				"ground": [
+					2,
+					99
+				],
+				"neck": [
+					-16,
+					-96
+				],
+				"shoulder_l": [
+					-22,
+					-43
+				],
+				"shoulder_r": [
+					-22,
+					-43
+				]
+			},
+			"arm_l": {
+				"join": [
+					-8,
+					-82
+				]
+			},
+			"arm_r": {
+				"join": [
+					4,
+					-80
+				]
+			}
+		}
+	}
+}

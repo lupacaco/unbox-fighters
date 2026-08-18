@@ -1,217 +1,134 @@
 class_name DragDropService
 extends Node
 
+## Carries a kit from the shelf to a card, or to the VENDER button.
+## A short press with no movement counts as a click, which picks the kit
+## instead of moving it, so the VENDER button knows what to buy back.
+
 signal drag_started(part: PartView)
 signal drag_ended(part: PartView, accepted: bool)
-signal part_sold(part: PartView)
-signal card_sold(slot: CharacterSlot)
-signal cards_swapped(a: CharacterSlot, b: CharacterSlot)
+signal sell_requested(part: PartView)
+signal part_clicked(part: PartView)
+
+## How far the mouse may wander and still count as a click, not a drag.
+const CLICK_SLOP := 8.0
 
 var _dragging: PartView = null
-var _dragging_card: CharacterSlot = null
-var _slots: Array[CharacterSlot] = []
-var _tray: Node2D = null
-var _hover_slot: CharacterSlot = null
+var _cards: Array[CharacterSlot] = []
+var _action_bar: ActionBar = null
+var _hover_card: CharacterSlot = null
 var _locked: bool = false
-var _sell_zone: Area2D = null
 var _last_mouse := Vector2.ZERO
+var _press_at := Vector2.ZERO
+var _moved: bool = false
+var _over_sell: bool = false
 
-func setup(slots: Array[CharacterSlot], tray: Node2D, sell_zone: Area2D = null) -> void:
-	_slots = slots
-	_tray = tray
-	_sell_zone = sell_zone
+func setup(cards: Array[CharacterSlot], action_bar: ActionBar) -> void:
+	_cards = cards
+	_action_bar = action_bar
 
 func set_locked(locked: bool) -> void:
 	_locked = locked
-	if locked:
-		if _dragging != null:
-			_dragging.cancel_drag_return()
-			_dragging = null
-		_dragging_card = null
-		_set_sell_highlight(false)
-		set_process(false)
+	if not locked:
+		return
+	if _dragging != null:
+		_dragging.return_home()
+	_clear_drag_visuals()
 
 func is_locked() -> bool:
 	return _locked
 
+func is_dragging() -> bool:
+	return _dragging != null
+
 func begin_drag(part: PartView) -> void:
-	if _locked or _dragging != null or _dragging_card != null or part == null or not part.can_interact():
+	if _locked or _dragging != null or part == null or not part.can_interact():
 		return
 	_dragging = part
-	_last_mouse = get_viewport().get_mouse_position()
+	_press_at = get_viewport().get_mouse_position()
+	_last_mouse = _press_at
+	_moved = false
 	set_process(true)
 	part.begin_drag()
 	GameAudio.part_pickup()
 	drag_started.emit(part)
 
-func begin_card_drag(slot: CharacterSlot) -> void:
-	if _locked or _dragging != null or _dragging_card != null or slot == null:
-		return
-	_dragging_card = slot
-	_last_mouse = get_viewport().get_mouse_position()
-	set_process(true)
-	Feel.to_scale(slot, Vector2.ONE * 1.05, 0.1)
-	GameAudio.part_pickup()
-
-func _process(_delta: float) -> void:
-	if _dragging != null:
-		var mouse := get_viewport().get_mouse_position()
-		_dragging.apply_drag_tilt(mouse.x - _last_mouse.x)
-		_last_mouse = mouse
-		_dragging.global_position = mouse
-		_update_hover()
-		_update_sell_highlight()
-	elif _dragging_card != null:
-		_update_card_hover()
-		_update_sell_highlight()
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
-		if not _locked:
-			_try_sell_under_mouse()
-			get_viewport().set_input_as_handled()
-		return
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-		if _dragging != null:
-			_finish_drag()
-			get_viewport().set_input_as_handled()
-		elif _dragging_card != null:
-			_finish_card_drag()
-			get_viewport().set_input_as_handled()
-
-func _update_hover() -> void:
-	var next := _find_compatible_slot(_dragging)
-	if next == _hover_slot:
-		return
-	if _hover_slot != null:
-		_hover_slot.set_drop_highlight(false, _dragging.part_def.slot_type)
-		_dragging.set_over_target(false)
-	_hover_slot = next
-	if _hover_slot != null:
-		_hover_slot.set_drop_highlight(true, _dragging.part_def.slot_type)
-		_dragging.set_over_target(true)
-
-func _update_card_hover() -> void:
-	var next := _find_card_under_mouse()
-	if next == _hover_slot:
-		return
-	if _hover_slot != null:
-		_hover_slot.set_drop_highlight(false, PartSlotType.Value.BODY)
-	_hover_slot = next
-	if _hover_slot != null and _hover_slot != _dragging_card:
-		_hover_slot.set_drop_highlight(true, PartSlotType.Value.BODY)
-
-func _finish_drag() -> void:
-	var part := _dragging
-	_dragging = null
-	set_process(false)
-	if _hover_slot != null:
-		_hover_slot.set_drop_highlight(false, part.part_def.slot_type)
-	part.set_over_target(false)
-	var target := _hover_slot
-	_hover_slot = null
-	_set_sell_highlight(false)
-	if _is_over_sell():
-		part_sold.emit(part)
-		drag_ended.emit(part, true)
-		return
-	var accepted := false
-	if target != null and target.can_accept(part.part_def):
-		accepted = target.try_attach(part)
-	if not accepted:
-		if part.is_attached():
-			part.cancel_drag_return()
-		else:
-			part.return_to_tray()
-		GameAudio.part_reject()
-	drag_ended.emit(part, accepted)
-
-func _finish_card_drag() -> void:
-	var card := _dragging_card
-	_dragging_card = null
-	set_process(false)
-	if _hover_slot != null:
-		_hover_slot.set_drop_highlight(false, PartSlotType.Value.BODY)
-	var target := _hover_slot
-	_hover_slot = null
-	_set_sell_highlight(false)
-	if _is_over_sell():
-		Feel.to_scale(card, Vector2.ONE, 0.08)
-		card_sold.emit(card)
-		return
-	if target != null and target != card:
-		Feel.to_scale(card, Vector2.ONE, 0.1)
-		cards_swapped.emit(card, target)
-		return
-	Feel.to_scale(card, Vector2.ONE, 0.12)
-	GameAudio.part_reject()
-
 func notify_drag_process_needed() -> void:
 	set_process(true)
 
-func _is_over_sell() -> bool:
-	if _sell_zone == null:
+func _process(_delta: float) -> void:
+	if _dragging == null:
+		set_process(false)
+		return
+	var mouse := get_viewport().get_mouse_position()
+	if not _moved and mouse.distance_to(_press_at) > CLICK_SLOP:
+		_moved = true
+	_dragging.apply_drag_tilt(mouse.x - _last_mouse.x)
+	_last_mouse = mouse
+	_dragging.global_position = mouse
+	_update_hover(mouse)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _dragging == null:
+		return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+		_finish_drag()
+		get_viewport().set_input_as_handled()
+
+func _update_hover(mouse: Vector2) -> void:
+	var sell_hot := _sell_contains(mouse)
+	if sell_hot != _over_sell:
+		_over_sell = sell_hot
+		if _action_bar != null:
+			_action_bar.set_drop_hot(sell_hot)
+	var next: CharacterSlot = null
+	if not sell_hot:
+		for card in _cards:
+			if card.can_accept_at(_dragging.part_def, mouse):
+				next = card
+				break
+	if next == _hover_card:
+		_dragging.set_over_target(next != null or sell_hot)
+		return
+	if _hover_card != null:
+		_hover_card.set_drop_highlight(false)
+	_hover_card = next
+	if _hover_card != null:
+		_hover_card.set_drop_highlight(true)
+	_dragging.set_over_target(_hover_card != null or sell_hot)
+
+func _finish_drag() -> void:
+	var part := _dragging
+	var was_click := not _moved
+	var target := _hover_card
+	var sold := _over_sell
+	_clear_drag_visuals()
+	part.set_over_target(false)
+	if sold:
+		sell_requested.emit(part)
+		drag_ended.emit(part, true)
+		return
+	var accepted := not was_click and target != null and target.try_attach(part)
+	if not accepted:
+		part.return_home()
+		if was_click:
+			part_clicked.emit(part)
+		else:
+			GameAudio.part_reject()
+	drag_ended.emit(part, accepted)
+
+func _sell_contains(mouse: Vector2) -> bool:
+	if _action_bar == null:
 		return false
-	var mouse := get_viewport().get_mouse_position()
-	var rect: Rect2 = _sell_zone.get_meta("rect", Rect2())
-	return rect.has_point(_sell_zone.to_local(mouse))
-
-func _update_sell_highlight() -> void:
-	_set_sell_highlight(_is_over_sell())
-
-func _set_sell_highlight(on: bool) -> void:
-	if _sell_zone != null and _sell_zone.has_method("set_highlight"):
-		_sell_zone.set_highlight(on)
-
-func _find_compatible_slot(part: PartView) -> CharacterSlot:
-	var mouse := get_viewport().get_mouse_position()
-	for slot in _slots:
-		if slot.can_accept_at(part.part_def, mouse):
-			return slot
-	return null
-
-func _find_card_under_mouse() -> CharacterSlot:
-	var mouse := get_viewport().get_mouse_position()
-	for slot in _slots:
-		if slot.contains_card_point(mouse):
-			return slot
-	return null
-
-func _try_sell_under_mouse() -> void:
-	if _dragging != null:
-		var dragged := _dragging
-		_clear_drag_visuals()
-		part_sold.emit(dragged)
-		return
-	if _dragging_card != null:
-		return
-	var mouse := get_viewport().get_mouse_position()
-	var loose := _find_loose_part_at(mouse)
-	if loose != null:
-		part_sold.emit(loose)
-		return
-	for slot in _slots:
-		var on_card := slot.find_part_at(mouse)
-		if on_card != null:
-			on_card.unbind_from_card()
-			part_sold.emit(on_card)
-			return
-
-func _find_loose_part_at(mouse: Vector2) -> PartView:
-	if _tray == null:
-		return null
-	for child in _tray.get_children():
-		if child is PartView:
-			var part := child as PartView
-			if part.can_interact() and not part.is_attached() and part.contains_point(mouse):
-				return part
-	return null
+	return _action_bar.sell_button_rect().has_point(_action_bar.to_local(mouse))
 
 func _clear_drag_visuals() -> void:
-	if _hover_slot != null:
-		_hover_slot.set_drop_highlight(false, PartSlotType.Value.BODY)
-		_hover_slot = null
+	if _hover_card != null:
+		_hover_card.set_drop_highlight(false)
+		_hover_card = null
+	if _over_sell and _action_bar != null:
+		_action_bar.set_drop_hot(false)
+	_over_sell = false
 	_dragging = null
-	_dragging_card = null
-	_set_sell_highlight(false)
+	_moved = false
 	set_process(false)

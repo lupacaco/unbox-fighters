@@ -1,14 +1,19 @@
 class_name PartKit
 extends RefCounted
 
-## Turns a shop kit into the drawing used on screen.
-## Legs stay in the files for the magnet editor; the game draws a spring instead.
+## Turns a shop kit into the drawings that go on screen.
+## The arm kit is one box in the shop but two drawings on the Freak.
 
 static func expand_shop_part(part: PartDef) -> Dictionary:
 	var visual := {}
 	if part == null:
 		return visual
-	if PartSlotType.is_shop_slot(part.slot_type):
+	if part.is_bundle():
+		for piece in part.kit_parts:
+			if piece != null:
+				visual[piece.slot_type] = piece
+		return visual
+	if PartSlotType.is_shop_slot(part.slot_type) or PartSlotType.is_arm(part.slot_type):
 		visual[part.slot_type] = part
 	return visual
 

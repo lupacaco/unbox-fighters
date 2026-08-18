@@ -1,0 +1,87 @@
+{
+	"id": "bruxa",
+	"display_name": "Bruxa",
+	"stats": {
+		"power": 8,
+		"toughness": 15,
+		"agility": 2
+	},
+	"magnets": {
+		"front": {
+			"head": {
+				"join": [
+					-1,
+					81
+				]
+			},
+			"body": {
+				"ground": [
+					-2,
+					99
+				],
+				"neck": [
+					-1,
+					-78
+				],
+				"shoulder_l": [
+					-65,
+					-46
+				],
+				"shoulder_r": [
+					63,
+					-46
+				]
+			},
+			"arm_l": {
+				"join": [
+					-6,
+					-82
+				]
+			},
+			"arm_r": {
+				"join": [
+					2,
+					-83
+				]
+			}
+		},
+		"profile": {
+			"head": {
+				"join": [
+					-10,
+					78
+				]
+			},
+			"body": {
+				"ground": [
+					1,
+					99
+				],
+				"neck": [
+					-23,
+					-96
+				],
+				"shoulder_l": [
+					-24,
+					-43
+				],
+				"shoulder_r": [
+					-24,
+					-43
+				]
+			},
+			"arm_l": {
+				"join": [
+					-8,
+					-82
+				]
+			},
+			"arm_r": {
+				"join": [
+					5,
+					-80
+				]
+			}
+		}
+	}
+}

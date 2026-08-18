@@ -1,96 +1,13 @@
 [gd_scene format=3 uid="uid://c5h3xb5tswr3j"]
 
 [ext_resource type="Script" uid="uid://c2i8i6homfw00" path="res://scripts/assembly/assembly_controller.gd" id="1"]
-[ext_resource type="Script" uid="uid://btyepuuc3404r" path="res://scripts/ui/background_fx.gd" id="2"]
-[ext_resource type="Script" uid="uid://dlxuaogko1lqp" path="res://scripts/assembly/drag_drop_service.gd" id="3"]
-[ext_resource type="PackedScene" uid="uid://b7sgdo30ttuoq" path="res://scenes/assembly/CharacterSlot.tscn" id="4"]
-[ext_resource type="PackedScene" uid="uid://bybfdwqe4xpfp" path="res://scenes/assembly/Crate.tscn" id="5"]
-[ext_resource type="Texture2D" uid="uid://dggow7pil84dp" path="res://assets/ui/bg_premium.png" id="6"]
-[ext_resource type="Texture2D" uid="uid://b7wpdxqumblk1" path="res://assets/ui/esteira-01.png" id="7"]
+[ext_resource type="Script" uid="uid://dlxuaogko1lqp" path="res://scripts/assembly/drag_drop_service.gd" id="2"]
 
-[node name="Assembly" type="Node2D" unique_id=1114481662]
+[node name="Assembly" type="Node2D"]
 script = ExtResource("1")
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=2004982124]
+[node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(960, 540)
 
-[node name="BackgroundFX" type="Node2D" parent="." unique_id=674547504]
-z_index = -20
+[node name="DragDropService" type="Node" parent="."]
 script = ExtResource("2")
-
-[node name="ArenaBackground" type="Sprite2D" parent="BackgroundFX" unique_id=284376527]
-modulate = Color(0.92, 0.93, 0.95, 1)
-z_index = -20
-position = Vector2(960, 540)
-scale = Vector2(1.25, 1.0546875)
-texture = ExtResource("6")
-
-[node name="Vignette" type="Polygon2D" parent="BackgroundFX" unique_id=605349070]
-z_index = -18
-color = Color(0, 0, 0, 0.45)
-polygon = PackedVector2Array(-100, -100, 2020, -100, 2020, 1180, -100, 1180)
-
-[node name="Dust" type="CPUParticles2D" parent="BackgroundFX" unique_id=1255033785]
-z_index = -15
-position = Vector2(960, 480)
-emitting = false
-
-[node name="Slots" type="Node2D" parent="." unique_id=1479939184]
-
-[node name="Slot0" parent="Slots" unique_id=1518538138 instance=ExtResource("4")]
-position = Vector2(380, 400)
-
-[node name="Slot1" parent="Slots" unique_id=1772954287 instance=ExtResource("4")]
-position = Vector2(960, 400)
-
-[node name="Slot2" parent="Slots" unique_id=412445779 instance=ExtResource("4")]
-position = Vector2(1540, 400)
-
-[node name="Tray" type="Node2D" parent="." unique_id=1093555678]
-position = Vector2(960, 920)
-
-[node name="Shelf" type="Sprite2D" parent="Tray" unique_id=315548021]
-z_index = -1
-position = Vector2(0, 68)
-texture = ExtResource("7")
-
-[node name="Crate0" parent="Tray" unique_id=271263522 instance=ExtResource("5")]
-position = Vector2(-660, -72)
-
-[node name="Crate1" parent="Tray" unique_id=1055760682 instance=ExtResource("5")]
-position = Vector2(-495, -72)
-
-[node name="Crate2" parent="Tray" unique_id=408890494 instance=ExtResource("5")]
-position = Vector2(-330, -72)
-
-[node name="Crate3" parent="Tray" unique_id=897639340 instance=ExtResource("5")]
-position = Vector2(-165, -72)
-
-[node name="Crate4" parent="Tray" unique_id=1334653743 instance=ExtResource("5")]
-position = Vector2(0, -72)
-
-[node name="FxLayer" type="Node2D" parent="." unique_id=1892017742]
-z_index = 50
-
-[node name="DragDropService" type="Node" parent="." unique_id=1418776426]
-script = ExtResource("3")
-
-[node name="HUD" type="CanvasLayer" parent="." unique_id=863654356]
-
-[node name="Title" type="Label" parent="HUD" unique_id=748885774]
-offset_left = 64.0
-offset_top = 40.0
-offset_right = 760.0
-offset_bottom = 92.0
-theme_override_colors/font_color = Color(0.9, 0.92, 0.94, 1)
-theme_override_font_sizes/font_size = 36
-text = "UNBOX FIGHTERS"
-
-[node name="Subtitle" type="Label" parent="HUD" unique_id=130183640]
-offset_left = 66.0
-offset_top = 92.0
-offset_right = 760.0
-offset_bottom = 120.0
-theme_override_colors/font_color = Color(0.54, 0.58, 0.64, 1)
-theme_override_font_sizes/font_size = 16
-text = "Assemble your fighters"

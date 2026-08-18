@@ -4,7 +4,7 @@ Como o programa está organizado por dentro (visão simples).
 
 ## Em uma frase
 
-Há **uma tela principal**. As **regras da partida** (loja, sinergia, luta) ficam em código puro; a tela só **mostra** o que aconteceu.
+Há **uma tela principal**. As **regras da partida** (dinheiro, esteira, luta) ficam em código puro; a tela só **mostra** o que aconteceu.
 
 ## Camadas
 
@@ -24,33 +24,35 @@ Arte e recursos (assets/, data/)
 
 | Peça | Papel |
 |------|--------|
-| `AssemblyController` | Maestro: prep ↔ luta, loja, cartas |
-| `MatchState` | Rodada, HP, pancadas, bots, pareamento |
-| `CombatSim` | Calcula a luta e devolve uma lista de eventos |
-| `Synergy` | 2 iguais = 100%, 1 = 50% na mesma carta |
-| `ShopPool` / `BotBrain` | Sorteio da loja e compras dos bots. A loja lê todas as fichas `*_character.tres` |
-| `FightDirector` / `FighterPuppet` / `ThrownKit` / `FightPlaque` | Mostra o palco: pulo na mola, caminhada pulando, só o kit vencedor voa até o alvo, KO |
-| `PrepHud` / `ShopBar` / `StatTag` | PREP, pancadas, tags coloridas |
-| `DragDropService` | Arraste de peça, troca de carta, vender |
-| `Crate` / `PartView` / `CharacterSlot` | Caixa, peça, carta |
-| `CompositeResolver` / `PartKit` / `SpringBase` | Cola cabeça, tronco e cada braço na mola ou no ombro |
+| `AssemblyController` | Maestro: loja, cartas, esteiras, animações |
+| `LiveMatch` | Tempo correndo: dinheiro, esteira, duelo, fim da partida |
+| `PlayerState` | Vida, carteira, loja e esteira de **um** lado (você ou o bot) |
+| `BeltLane` | Até 2 Freaks deslizando até a ponta |
+| `Duel` | Contas de um troca-troca de golpes |
+| `FreakStats` / `Synergy` | Poder, Resistência e Agilidade já com o bônus |
+| `ShopPool` / `BotBrain` | Sorteio da loja e o oponente jogando igual a você |
+| `BeltFreak` / `FlyingHead` | Desenho do Freak na esteira e a cabeça que voa |
+| `MoneyBar` / `ActionBar` / `PlayerHpBar` | Dinheiro, ATUALIZAR/VENDER, barras de vida |
+| `DragDropService` | Arraste de peça, soltar na carta, vender |
+| `Crate` / `PartView` / `CharacterSlot` / `ShopShelf` | Caixa, peça, carta, prateleira |
+| `CompositeResolver` / `PartKit` | Cola cabeça, tronco e cada braço no caixote |
 
 ## Organização dos scripts
 
 | Pasta | Responsabilidade |
 |-------|------------------|
-| `scripts/assembly/` | Tela: cartas, caixas, luta visível |
+| `scripts/assembly/` | Tela: cartas, caixas, esteira visível |
 | `scripts/match/` | Regras (podem ser testadas sem abrir o jogo) |
 | `scripts/data/` | Definições de peças e composição visual |
 | `scripts/ui/` | HUD, tags, cores |
-| `scripts/core/` | Scripts de verificação |
+| `scripts/core/` | Scripts de verificação e importar o elenco |
 
 ## Padrões usados
 
 - **Dados em Resource** (`.tres`): fichas editáveis no Godot.
 - **Cenas instanciadas**: carta, caixa, peça.
-- **Sinais**: “PRONTO”, “atualizar”, “peça vendida”.
-- **Lógica pura** em `CombatSim` e `Synergy`: a animação não inventa o resultado.
+- **Sinais**: “loja sorteada”, “Freak lançado”, “golpes trocados”. Um sinal é um aviso de que algo aconteceu, sem a outra parte ficar perguntando o tempo todo.
+- **Lógica pura** em `Duel` e `Synergy`: a animação não inventa o resultado.
 
 ## O que ainda não há na arquitetura
 
@@ -61,12 +63,13 @@ Arte e recursos (assets/, data/)
 
 ```mermaid
 flowchart TD
-  AC[AssemblyController] --> MS[MatchState]
-  AC --> CS[CharacterSlot x3]
-  AC --> Shop[Loja 5 caixas]
-  MS --> Bot[BotBrain]
-  MS --> Sim[CombatSim]
-  Sim --> FD[FightDirector]
-  Syn[Synergy] --> Sim
-  Syn --> CS
+  AC[AssemblyController] --> LM[LiveMatch]
+  AC --> Cards[2 cartas]
+  AC --> Shop[4 prateleiras]
+  LM --> PS[PlayerState x2]
+  PS --> Lane[BeltLane]
+  LM --> Bot[BotBrain]
+  LM --> Duel[Duel]
+  Syn[Synergy] --> Stats[FreakStats]
+  Stats --> Lane
 ```

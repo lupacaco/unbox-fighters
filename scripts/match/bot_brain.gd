@@ -1,134 +1,108 @@
 class_name BotBrain
 extends RefCounted
 
-## Instant shop turn, matching Unity scoring: finish a set, then fill, then
-## replace only if the card gets stronger. Levels up slowly and refills the shop.
+## The opponent plays the same game you do: it waits for money, buys kits onto
+## its two cards, prefers matching sets for the synergy, and sends a card to the
+## belt as soon as all three kits are on it.
 
-const TURN_GUARD := 48
+## A short pause after each action so the opponent feels like a hand, not a script.
+const THINK_TIME := 0.55
 
-static func take_turn(bot: Contestant, rng: RandomNumberGenerator) -> void:
-	if bot == null or not bot.is_alive():
+var _think: float = 0.0
+var cards: Array[FighterLoadout] = []
+
+func _init() -> void:
+	reset()
+
+func reset() -> void:
+	_think = 0.0
+	cards.clear()
+	for _i in MatchRules.CARD_COUNT:
+		cards.append(FighterLoadout.new())
+
+func tick(delta: float, side: PlayerState, match_ref: LiveMatch) -> void:
+	if side == null or match_ref == null or not match_ref.running:
 		return
-	var guard := TURN_GUARD
-	while bot.gold > 0 and guard > 0:
-		guard -= 1
-		if _try_buy_best(bot):
-			continue
-		var upgrade := MatchRules.upgrade_cost(bot.shop_tier)
-		var want_level := (
-			bot.shop_tier < MatchRules.SHOP_MAX_TIER
-			and upgrade > 0
-			and bot.gold >= upgrade + 1
-			and bot.shop_tier < 2 + (1 if bot.gold >= 6 else 0)
-		)
-		if want_level and bot.gold >= upgrade:
-			bot.gold -= upgrade
-			bot.shop_tier += 1
-			bot.frozen = false
-			bot.shop_offers = ShopPool.roll(bot.shop_tier, rng)
-			continue
-		if bot.gold >= MatchRules.REFRESH_COST:
-			bot.gold -= MatchRules.REFRESH_COST
-			bot.frozen = false
-			bot.shop_offers = ShopPool.roll(bot.shop_tier, rng)
-			continue
-		break
-	bot.frozen = _shop_helps_board(bot)
+	_think += delta
+	if _think < THINK_TIME:
+		return
+	_think = 0.0
+	if _try_launch(side, match_ref):
+		return
+	if _try_buy(side):
+		return
+	_try_refresh(side, match_ref)
 
-
-static func _try_buy_best(bot: Contestant) -> bool:
-	var best_index := _best_buy_index(bot)
-	if best_index < 0 or bot.gold < MatchRules.OPEN_CRATE_COST:
+func _try_launch(side: PlayerState, match_ref: LiveMatch) -> bool:
+	if not side.lane.can_accept():
 		return false
-	var part: PartDef = bot.shop_offers[best_index]
-	var card_index := _best_card_for(bot.board, part)
-	if card_index < 0:
+	var best := -1
+	var best_power := -1
+	for i in cards.size():
+		var card := cards[i]
+		if not card.is_complete():
+			continue
+		var stats := card.stats()
+		var worth := stats.power * 3 + stats.toughness + stats.agility
+		if worth > best_power:
+			best_power = worth
+			best = i
+	if best < 0:
 		return false
-	bot.shop_offers[best_index] = null
-	bot.gold -= MatchRules.OPEN_CRATE_COST
-	bot.board.fighters[card_index].set_part(part.slot_type, part)
+	if match_ref.launch(side, cards[best]) == null:
+		return false
+	cards[best] = FighterLoadout.new()
 	return true
 
-
-static func _best_buy_index(bot: Contestant) -> int:
-	var best := -1
+func _try_buy(side: PlayerState) -> bool:
+	var best_offer := -1
+	var best_card := -1
 	var best_score := 0
-	for i in bot.shop_offers.size():
-		var part: PartDef = bot.shop_offers[i]
+	for i in side.shop_offers.size():
+		var part := side.shop_offers[i]
+		if part == null or not side.can_afford(side.price_at(i)):
+			continue
+		for c in cards.size():
+			var score := _score(cards[c], part)
+			if score > best_score:
+				best_score = score
+				best_offer = i
+				best_card = c
+	if best_offer < 0:
+		return false
+	var bought := side.buy(best_offer)
+	if bought == null:
+		return false
+	cards[best_card].set_part(bought.slot_type, bought)
+	return true
+
+## Rerolls only when the shop has nothing it can use and there is money to spare.
+func _try_refresh(side: PlayerState, match_ref: LiveMatch) -> bool:
+	if side.money < MatchRules.MAX_MONEY - 1:
+		return false
+	for i in side.shop_offers.size():
+		var part := side.shop_offers[i]
 		if part == null:
 			continue
-		var card := _best_card_for(bot.board, part)
-		if card < 0:
-			continue
-		var score := _score_placement(bot.board.fighters[card], part)
-		if score > best_score:
-			best_score = score
-			best = i
-	return best
+		for card in cards:
+			if _score(card, part) > 0:
+				return false
+	return match_ref.refresh_shop(side)
 
-
-static func _best_card_for(board: BoardLoadout, part: PartDef) -> int:
-	if board == null or part == null:
-		return -1
-	var best := -1
-	var best_score := -1
-	for i in board.fighters.size():
-		var card: FighterLoadout = board.fighters[i]
-		var current := card.get_part(part.slot_type)
-		if current != null and current.set_id == part.set_id:
-			continue
-		var score := _score_placement(card, part)
-		if current != null:
-			var old_power := card.total_power()
-			var trial := card.duplicate_loadout()
-			trial.set_part(part.slot_type, part)
-			var next_power := trial.total_power()
-			if next_power <= old_power:
-				continue
-			score = next_power
-		elif score < 1:
-			score = 1
-		if score > best_score:
-			best_score = score
-			best = i
-	return best
-
-
-static func _score_placement(card: FighterLoadout, part: PartDef) -> int:
+## Higher is better: finishing a set beats a big lone number.
+func _score(card: FighterLoadout, part: PartDef) -> int:
 	if card == null or part == null:
 		return 0
-	var same := 0
+	if card.get_part(part.slot_type) != null:
+		return 0
+	var matching := 0
 	for slot in PartSlotType.shop_slots():
 		var owned := card.get_part(slot)
 		if owned != null and owned.set_id == part.set_id:
-			same += 1
-	if card.get_part(part.slot_type) != null:
-		same -= 1
-	if same >= 3:
-		return 40 + part.combat_value
-	if same >= 2:
-		return 30 + part.combat_value
-	if same >= 1:
-		return 12 + part.combat_value
-	if card.is_empty():
-		return 3 + part.combat_value
-	return part.combat_value
-
-
-static func _shop_helps_board(bot: Contestant) -> bool:
-	for offer in bot.shop_offers:
-		var part := offer as PartDef
-		if part == null:
-			continue
-		for card in bot.board.fighters:
-			if card.get_part(part.slot_type) != null:
-				continue
-			var helps := false
-			for slot in PartSlotType.shop_slots():
-				var owned := card.get_part(slot)
-				if owned != null and owned.set_id == part.set_id:
-					helps = true
-					break
-			if helps:
-				return true
-	return false
+			matching += 1
+	var bonus := 0
+	if matching >= 2:
+		bonus = 40
+	elif matching == 1:
+		bonus = 18
+	return 1 + bonus + part.stat_value

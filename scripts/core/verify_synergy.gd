@@ -1,67 +1,76 @@
 extends SceneTree
 
+## Synergy: two matching kits give +25%, three give +50%, always rounding up.
+## Also checks the numbers on the two Freaks that ship with the game.
+
 func _init() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
-	if not _check_synergy():
+	if not _check_scaling():
 		quit(1)
 		return
-	if not _check_part_numbers():
+	if not _check_card():
 		quit(1)
 		return
 	print("VERIFY_SYNERGY_PASS")
 	quit(0)
 
-func _check_synergy() -> bool:
-	if Synergy.scaled_value(4, 1) != 2:
-		push_error("VERIFY_FAIL 4 alone should be 2")
+func _check_scaling() -> bool:
+	if Synergy.scaled_value(8, 1) != 8:
+		push_error("VERIFY_FAIL a lone kit keeps its number")
 		return false
-	if Synergy.scaled_value(4, 2) != 4:
-		push_error("VERIFY_FAIL 4 with matching torso should stay 4")
+	if Synergy.scaled_value(8, 2) != 10:
+		push_error("VERIFY_FAIL 8 in a pair should be 10")
 		return false
-	if Synergy.scaled_value(9, 1) != 5:
-		push_error("VERIFY_FAIL 9 at 50% should be 5")
+	if Synergy.scaled_value(8, 3) != 12:
+		push_error("VERIFY_FAIL 8 in a triple should be 12")
 		return false
-	if Synergy.scaled_value(9, 2) != 9:
-		push_error("VERIFY_FAIL 9 with a matching pair should stay 9")
+	if Synergy.scaled_value(15, 2) != 19 or Synergy.scaled_value(15, 3) != 23:
+		push_error("VERIFY_FAIL toughness 15 should be 19 in a pair and 23 in a triple")
 		return false
-	if MatchRules.gold_for_round(1) != 3 or MatchRules.gold_for_round(8) != 10:
-		push_error("VERIFY_FAIL gold curve")
+	if Synergy.scaled_value(2, 3) != 3:
+		push_error("VERIFY_FAIL agility 2 in a triple should round up to 3")
 		return false
-	if MatchRules.upgrade_cost(1) != 4 or MatchRules.upgrade_cost(5) != -1:
-		push_error("VERIFY_FAIL upgrade costs")
+	if Synergy.level_for(1) != Synergy.Level.NONE:
+		push_error("VERIFY_FAIL one kit is not synergy")
+		return false
+	if Synergy.level_for(2) != Synergy.Level.PAIR or Synergy.level_for(3) != Synergy.Level.TRIPLE:
+		push_error("VERIFY_FAIL synergy levels")
 		return false
 	return true
 
-func _check_part_numbers() -> bool:
-	var vampiro: CharacterDef = load("res://data/parts/vampiro_character.tres")
-	if vampiro == null:
-		push_error("VERIFY_FAIL missing vampiro")
+func _check_card() -> bool:
+	var bruxa: CharacterDef = load("res://data/parts/bruxa_character.tres")
+	var advogado: CharacterDef = load("res://data/parts/advogado_character.tres")
+	if bruxa == null or advogado == null:
+		push_error("VERIFY_FAIL missing bruxa or advogado")
 		return false
-	if vampiro.shop_parts().size() != 4:
-		push_error("VERIFY_FAIL vampire should sell 4 kits")
+	if bruxa.head.stat_value != 8 or bruxa.body.stat_value != 15 or bruxa.arms.stat_value != 2:
+		push_error("VERIFY_FAIL bruxa should be 8 / 15 / 2")
 		return false
-	if vampiro.head.combat_value != 3 or vampiro.body.combat_value != 4:
-		push_error("VERIFY_FAIL vampire head 3 / torso 4")
+	if advogado.head.stat_value != 4 or advogado.body.stat_value != 18 or advogado.arms.stat_value != 5:
+		push_error("VERIFY_FAIL advogado should be 4 / 18 / 5")
 		return false
-	for part in vampiro.shop_parts():
-		if part == null or part.tier != 1:
-			push_error("VERIFY_FAIL vampire kits should be shop level 1")
-			return false
-	var full := FighterLoadout.from_character(vampiro)
-	if full.total_power() != 15:
-		push_error("VERIFY_FAIL vampire full should be 15, got %d" % full.total_power())
+
+	var mixed := FighterLoadout.from_parts(bruxa.head, bruxa.body, advogado.arms)
+	if mixed.stat_of(PartSlotType.Value.HEAD) != 10:
+		push_error("VERIFY_FAIL a pair should lift power 8 to 10")
 		return false
-	var solo := FighterLoadout.from_parts(vampiro.head, null, null)
-	if solo.combat_value_of(PartSlotType.Value.HEAD) != 2:
-		push_error("VERIFY_FAIL lone vampire head should be 2")
+	if mixed.stat_of(PartSlotType.Value.BODY) != 19:
+		push_error("VERIFY_FAIL a pair should lift toughness 15 to 19")
 		return false
-	var pair := FighterLoadout.from_parts(vampiro.head, vampiro.body, null)
-	if pair.combat_value_of(PartSlotType.Value.HEAD) != 3:
-		push_error("VERIFY_FAIL two matching vampire kits should be 100%")
+	if mixed.stat_of(PartSlotType.Value.ARMS) != 5:
+		push_error("VERIFY_FAIL the odd kit out keeps its own number")
 		return false
-	if pair.total_power() != 7:
-		push_error("VERIFY_FAIL head+torso vampire should be 7, got %d" % pair.total_power())
+
+	var full := FighterLoadout.from_character(bruxa).stats()
+	if full.power != 12 or full.toughness != 23 or full.agility != 3:
+		push_error("VERIFY_FAIL full bruxa should be 12 / 23 / 3, got %d / %d / %d" % [
+			full.power, full.toughness, full.agility
+		])
+		return false
+	if full.synergy_level != Synergy.Level.TRIPLE:
+		push_error("VERIFY_FAIL a whole Freak is a triple")
 		return false
 	return true

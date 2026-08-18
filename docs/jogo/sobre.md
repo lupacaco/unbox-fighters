@@ -6,24 +6,25 @@
 
 ## Ideia em uma frase
 
-Você abre caixas, monta Freaks com **4 kits** (cabeça, tronco, braço esquerdo e braço direito) em cima de uma **base-mola** que já vem na carta, e eles lutam sozinhos em fila contra bots. Eles andam pulando na mola.
+Você abre caixas, monta Freaks com **3 kits** (cabeça, tronco e os dois braços juntos) em cima de um **caixote**, e manda eles deslizarem na esteira para lutar contra o oponente.
 
 ## Loop principal
 
-1. **Abrir** caixas na loja (gasta pancadas)
-2. **Montar** até 3 Freaks nas cartas
-3. **Lutar** em auto-battle (parte contra parte, de cima para baixo)
+1. **Comprar** kits nas prateleiras (gasta dinheiro)
+2. **Montar** até 2 Freaks nas cartas
+3. **LUTAR**: o Freak completo vai para a esteira azul e desliza até a ponta
+4. Na ponta, a **cabeça ataca**. Se ficar sozinho, vai comendo a vida do outro jogador
 
 ## Tom visual
 
-Arena escura, esteira no rodapé como palco, tags coloridas com os números, spotlight no choque do centro.
+Arena de oficina, duas esteiras (azul sua, vermelha do oponente), cartas de madeira à esquerda, loja no meio, dinheiro à direita.
 
 ## Conteúdo atual
 
-- **Personagens na loja:** todos os Freaks com ficha (hoje Vampiro, Bruxa)
-- **3 cartas** (fila 3º / 2º / 1º)
-- **5 caixas** por rodada, com nível de loja
-- **3 bots** na mesma partida
+- **Personagens na loja:** Bruxa e Advogado
+- **2 cartas** para montar
+- **4 prateleiras** de loja
+- **1 oponente** (um bot que joga com as mesmas regras)
 
 ## Resolução da tela
 

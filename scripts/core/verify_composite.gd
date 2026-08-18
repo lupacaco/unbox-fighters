@@ -1,94 +1,105 @@
 ﻿extends SceneTree
 
+## How the pieces snap together: the crate base is the floor, the head sits on
+## the neck magnet, the arms hang from the shoulder magnets and open outward.
+
 func _init() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
-	var vampiro: CharacterDef = load("res://data/parts/vampiro_character.tres")
+	var bruxa: CharacterDef = load("res://data/parts/bruxa_character.tres")
+	if bruxa == null:
+		push_error("VERIFY_FAIL missing bruxa")
+		quit(1)
+		return
+	if not _check_anchor(bruxa):
+		quit(1)
+		return
+	if not _check_stack(bruxa):
+		quit(1)
+		return
+	if not _check_arms(bruxa):
+		quit(1)
+		return
+	print("VERIFY_COMPOSITE_PASS")
+	quit(0)
+
+func _check_anchor(bruxa: CharacterDef) -> bool:
 	var empty := CompositeResolver.resolve_slots({})
-	if empty.get("spring_texture") == null:
-		push_error("VERIFY_FAIL empty card should still show the spring")
-		quit(1)
-		return
-	if empty.get("spring_pressed") != false:
-		push_error("VERIFY_FAIL empty spring should be loose")
-		quit(1)
-		return
-	var only_head := CompositeResolver.resolve_slots({PartSlotType.Value.HEAD: vampiro.head})
-	if only_head["mode"] != "layered" or only_head["textures"].get(PartSlotType.Value.HEAD) == null:
-		push_error("VERIFY_FAIL head-only should be layered with head texture")
-		quit(1)
-		return
-	if only_head.get("spring_pressed") != true:
-		push_error("VERIFY_FAIL a part on the spring should press it")
-		quit(1)
-		return
+	for slot in PartSlotType.visual_slots():
+		if empty["textures"].get(slot) != null:
+			push_error("VERIFY_FAIL an empty card draws nothing")
+			return false
+
 	var scale := CompositeResolver.display_scale()
-	var spring := preload("res://scripts/data/spring_base.gd")
-	var sphere: Vector2 = spring.magnet_world(true)
-	var head_down := CompositeResolver.socket_of(vampiro.head, "down", vampiro.head.sprite) * scale
-	var head_center: Vector2 = only_head["positions"][PartSlotType.Value.HEAD]
-	if not head_center.is_equal_approx(sphere - head_down):
-		push_error("VERIFY_FAIL head-only should sit on the spring sphere")
-		quit(1)
-		return
-	var body_only := CompositeResolver.resolve_slots({PartSlotType.Value.BODY: vampiro.body})
-	var sit := CompositeResolver.socket_of(vampiro.body, "hip_l", vampiro.body.sprite)
-	sit = (sit + CompositeResolver.socket_of(vampiro.body, "hip_r", vampiro.body.sprite)) * 0.5 * scale
+	var body_only := CompositeResolver.resolve_slots({PartSlotType.Value.BODY: bruxa.body})
+	var ground := CompositeResolver.socket_of(bruxa.body, "ground", bruxa.body.sprite) * scale
 	var body_center: Vector2 = body_only["positions"][PartSlotType.Value.BODY]
-	if not body_center.is_equal_approx(sphere - sit):
-		push_error("VERIFY_FAIL torso should sit on the spring sphere")
-		quit(1)
-		return
-	var full := CompositeResolver.resolve(vampiro)
+	if not body_center.is_equal_approx(-ground):
+		push_error("VERIFY_FAIL the crate base should land on the floor line")
+		return false
+
+	var head_only := CompositeResolver.resolve_slots({PartSlotType.Value.HEAD: bruxa.head})
+	if head_only["textures"].get(PartSlotType.Value.HEAD) == null:
+		push_error("VERIFY_FAIL a lone head should still be drawn")
+		return false
+	if head_only["positions"][PartSlotType.Value.HEAD].y >= 0.0:
+		push_error("VERIFY_FAIL a lone head floats above the floor line")
+		return false
+	return true
+
+func _check_stack(bruxa: CharacterDef) -> bool:
+	var full := CompositeResolver.resolve(bruxa)
 	var textures: Dictionary = full["textures"]
 	var positions: Dictionary = full["positions"]
-	if textures.get(PartSlotType.Value.BODY) == null or textures.get(PartSlotType.Value.ARM_L) == null:
-		push_error("VERIFY_FAIL full vampire missing textures")
-		quit(1)
-		return
-	if textures.get(PartSlotType.Value.LEG_L) != null or textures.get(PartSlotType.Value.LEG_R) != null:
-		push_error("VERIFY_FAIL legs should not be drawn")
-		quit(1)
-		return
-	var body_kit := PartKit.expand_shop_part(vampiro.body)
+	for slot in PartSlotType.visual_slots():
+		if textures.get(slot) == null:
+			push_error("VERIFY_FAIL a whole Freak draws all four pieces")
+			return false
+	if positions[PartSlotType.Value.HEAD].y >= positions[PartSlotType.Value.BODY].y:
+		push_error("VERIFY_FAIL the head sits above the torso")
+		return false
+
+	var scale := CompositeResolver.display_scale()
+	var neck: Vector2 = positions[PartSlotType.Value.BODY] + CompositeResolver.socket_of(
+		bruxa.body, "neck", bruxa.body.sprite
+	) * scale
+	var head_joint: Vector2 = positions[PartSlotType.Value.HEAD] + CompositeResolver.socket_of(
+		bruxa.head, "down", bruxa.head.sprite
+	) * scale
+	if not neck.is_equal_approx(head_joint):
+		push_error("VERIFY_FAIL the head magnet should meet the neck magnet")
+		return false
+	return true
+
+func _check_arms(bruxa: CharacterDef) -> bool:
+	var arm_kit := PartKit.expand_shop_part(bruxa.arms)
+	if arm_kit.size() != 2:
+		push_error("VERIFY_FAIL one arm crate opens into two arms")
+		return false
+	if not arm_kit.has(PartSlotType.Value.ARM_L) or not arm_kit.has(PartSlotType.Value.ARM_R):
+		push_error("VERIFY_FAIL the arm crate should give a left and a right")
+		return false
+	var body_kit := PartKit.expand_shop_part(bruxa.body)
 	if body_kit.size() != 1 or not body_kit.has(PartSlotType.Value.BODY):
-		push_error("VERIFY_FAIL torso kit should draw only the torso")
-		quit(1)
-		return
-	var arm_kit := PartKit.expand_shop_part(vampiro.arm_l)
-	if arm_kit.size() != 1 or not arm_kit.has(PartSlotType.Value.ARM_L):
-		push_error("VERIFY_FAIL left arm kit should draw only that arm")
-		quit(1)
-		return
-	if not (positions[PartSlotType.Value.HEAD].y < positions[PartSlotType.Value.BODY].y):
-		push_error("VERIFY_FAIL head should sit above the torso")
-		quit(1)
-		return
-	if not (float(full["spring_pos"].y) > positions[PartSlotType.Value.BODY].y):
-		push_error("VERIFY_FAIL spring should sit below the torso")
-		quit(1)
-		return
+		push_error("VERIFY_FAIL a torso crate draws only the torso")
+		return false
+
 	if CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_L) <= 0.0:
-		push_error("VERIFY_FAIL front left arm should open outward")
-		quit(1)
-		return
+		push_error("VERIFY_FAIL the front left arm should open outward")
+		return false
 	if not is_equal_approx(
 		CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_R),
 		-CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_L)
 	):
-		push_error("VERIFY_FAIL front arms should open as a pair")
-		quit(1)
-		return
+		push_error("VERIFY_FAIL the front arms should open as a pair")
+		return false
+
 	var center := Vector2(10, 20)
 	var magnet := Vector2(0, -50)
 	var extra := CompositeResolver.FRONT_ARM_SPREAD
 	var pivoted := CompositeResolver.center_after_pivot(center, magnet, extra)
-	var old_joint := center + magnet
-	var new_joint := pivoted + magnet.rotated(extra)
-	if not old_joint.is_equal_approx(new_joint):
-		push_error("VERIFY_FAIL arm spread should keep the shoulder magnet")
-		quit(1)
-		return
-	print("VERIFY_COMPOSITE_PASS head=", positions[PartSlotType.Value.HEAD], " body=", positions[PartSlotType.Value.BODY])
-	quit(0)
+	if not (center + magnet).is_equal_approx(pivoted + magnet.rotated(extra)):
+		push_error("VERIFY_FAIL opening an arm should keep the shoulder magnet in place")
+		return false
+	return true

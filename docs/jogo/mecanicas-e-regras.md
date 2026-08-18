@@ -4,95 +4,98 @@ O que o jogador pode fazer hoje, e as regras que o jogo aplica.
 
 ## Loop da partida
 
-1. **Preparação** (até 60 segundos, ou aperte **PRONTO**).
-2. **Luta** contra 1 oponente (os outros dois bots lutam entre si, sem você ver).
-3. Quem toma dano no HP. Quem chega a 0 sai.
-4. Volta à preparação com as peças das cartas **intactas** (a luta usa uma cópia).
-5. O último com HP ganha.
+Não tem relógio de 60 segundos nem rodadas. O jogo **corre o tempo todo**.
 
-Há **1 jogador + 3 bots** (Sombra, Ferrugem, Névoa). HP inicial **40**. Não enfrenta o mesmo oponente duas vezes seguidas, se der. Com 3 vivos, o bot que sobra luta contra uma **cópia** do oponente do jogador: se a cópia perde, o oponente de verdade **não** perde vida.
+1. Cada jogador começa com **100 de vida** e **$10**.
+2. O dinheiro sobe **+$1 a cada 2 segundos**, até **$10**.
+3. Você compra kits, monta nas cartas e aperta **LUTAR**.
+4. O Freak desliza na esteira. Na ponta, luta contra o Freak do oponente.
+5. Um Freak sozinho na ponta tira **1 de vida por segundo** do outro jogador.
+6. Quem zera a vida perde.
 
-## Pancadas (o “ouro”)
+Há **1 jogador + 1 oponente**. Derrotar um Freak **não** tira vida do jogador — só o “beliscão” de 1 por segundo faz isso.
 
-- Rodada 1: **3**. Sobe **+1 por rodada**, máximo **10**.
-- O que sobrar **não** junta com a próxima rodada.
-- Gastos: quebrar caixa **1**, atualizar loja **1**, subir nível da loja **4 / 5 / 6 / 7** (níveis 1→5).
-- **Travar** é de graça: as 5 caixas atuais ficam no próximo round.
-- **Vender** uma peça (ou o Freak inteiro) devolve **1** pancada.
+## Dinheiro
+
+- Começa a partida com a barra **cheia** ($10).
+- Sobe sozinho +$1 a cada 2 s, teto $10.
+- **ATUALIZAR** troca as 4 caixas da loja por **$1**. Caixas que você já pagou e ainda estão na prateleira **não** saem.
+- **VENDER** devolve **metade** do que você pagou, arredondado para cima (pagou $5, recebe $3).
 
 ## Loja
 
-- Sempre **5 caixas**. Peças do **nível da loja** (e abaixo).
-- Nível 1 não vende peça 9.
-- ATUALIZAR = nova leva, custa 1, solta o travar.
-- Abrir caixa: **1 clique**, custa 1 pancada.
+- Sempre **4 prateleiras**.
+- Cada caixa tem um **preço** escrito embaixo.
+- 1 clique paga e abre. A peça fica em cima da prateleira para arrastar.
+- Sem dinheiro suficiente: a caixa treme e a barra de dinheiro também.
 
-## Cartas e fila
+## Preço das peças
 
-- 3 cartas, da esquerda para a direita: **3º**, **2º**, **1º**.
-- O **1º** (direita) luta primeiro.
-- Pode ir incompleto (só a cabeça, por exemplo). Carta vazia é pulada.
-- Arrastar o Freak pelo rótulo **3º/2º/1º** troca a ordem com outra carta.
+O preço sai do número da peça, não de um valor solto:
+
+| Kit | Número | Preço |
+|-----|--------|-------|
+| Cabeça | Poder 1 a 10 | o próprio Poder |
+| Tronco | Resistência 10 a 20 | Resistência − 10 (mínimo $1) |
+| Braços | Agilidade 1 a 5 | a própria Agilidade |
+
+## Cartas
+
+- **2 cartas** à esquerda.
+- Só vai para a esteira o Freak com **os 3 kits**. Aí aparece o botão **LUTAR**.
+- Ao lutar, a carta **esvazia** para montar o próximo.
+- Cada esteira cabe **2 Freaks**. Se já tem 2, LUTAR recusa.
 
 ## Peças
 
-Nas caixas existem **4 kits**. Cada um ocupa um encaixe da carta:
+Nas caixas existem **3 kits**:
 
-| Tipo | O que o jogador recebe | Tag |
-|------|------------------------|-----|
-| HEAD | Cabeça | Azul |
-| BODY | Tronco (sem os braços) | Roxo |
-| ARM_L | Braço esquerdo (de quem olha) | Laranja |
-| ARM_R | Braço direito (de quem olha) | Vermelho-claro |
+| Tipo | O que o jogador recebe | O que isso vale na luta |
+|------|------------------------|-------------------------|
+| Cabeça | Cabeça | **Poder** — quanto tira de vida por golpe |
+| Tronco | Tronco dentro do caixote | **Resistência** — a vida daquele Freak |
+| Braços | Os dois braços juntos | **Agilidade** — velocidade na esteira |
 
-Toda carta já tem uma **base-mola**. Ela não sai da carta, não vem na caixa e **não tem número** de luta. Em cima da mola tem uma esfera de metal: é o ímã onde a peça senta.
+O tronco **é** o chão do Freak (a base do caixote). Não tem pernas e não tem mola.
 
-- Carta vazia: mola **solta** (alta).
-- Qualquer peça encaixada: mola **pressionada** (baixa).
-- Só a cabeça: a cabeça cola na esfera da mola.
-- Cabeça + tronco: o tronco cola na esfera; a cabeça cola no pescoço do tronco (como já era).
-- Braço com tronco: cola no ombro. Sem tronco: senta na mola, um pouco para o lado.
+Cada kit tem **um** número. Na carta, as pílulas mostram o número **já com a sinergia**.
 
-Não dá para tirar a mola. Não dá para encaixar pernas — o jogo não vende pernas.
-
-Cada kit da loja tem **um** número de combate e um **nível** de loja.
-
-| Set | Kits | Total |
-|-----|------|-------|
-| Vampiro | Cabeça 3, tronco 4, braço E 4, braço D 4 (nível 1) | 15 |
-| Bruxa | Cabeça 4, tronco 3, braço E 3, braço D 3 (nível 1) | 13 |
-
-Nível da loja pela força do kit: 3–5 → 1; 6 → 2; 7 → 3; 8 → 4; 9 → 5.
+| Set | Poder | Resistência | Agilidade | Custo dos 3 kits |
+|-----|-------|-------------|-----------|------------------|
+| Bruxa | 8 | 15 | 2 | $8 + $5 + $2 = **$15** |
+| Advogado | 4 | 18 | 5 | $4 + $8 + $5 = **$17** |
 
 ## Sinergia (na mesma carta)
 
-Conta quantos kits do **mesmo set** estão na carta. Arredonda para cima.
+Conta quantos kits do **mesmo Freak** estão na carta. Arredonda para cima.
 
-- 2 iguais: 100%
-- 1: 50%
+- **Dupla (2 do mesmo):** +25% nessas 2 peças
+- **Tripla (3 do mesmo):** +50% nos 3 atributos
 
-Exemplo: cabeça 4 sozinha vira **2**. Cabeça + tronco do mesmo set já vale o número cheio (7 no vampiro). Os dois braços iguais somam mais (set completo do vampiro = **15**).
+Exemplo com a Bruxa (8 / 15 / 2):
 
-## Luta
+- Cabeça + tronco da Bruxa e braços de outro: Poder **10**, Resistência **19**, Agilidade fica a do outro
+- Bruxa inteira: Poder **12**, Resistência **23**, Agilidade **3**
 
-Cada choque sorteia **um kit vivo de cada lado**. Pode ser cabeça contra braço, tronco contra cabeça, etc. Não segue ordem fixa. Pula o que estiver vazio.
+O **preço na loja** continua sendo o número base. O bônus entra só na hora de lutar.
 
-- Se A > B: só A ataca. B fica no corpo até levar o golpe e voar para fora. A fica A−B e pode ser sorteada de novo.
-- Se empatar: os dois kits morrem. Na tela os dois atacam juntos, batem no centro e voam para fora.
-- Quando o Freak inteiro cai, entra o próximo da fila.
+Com só 2 Freaks no jogo, quase toda carta ganha dupla ou tripla. O bônus vira o normal até entrar um terceiro personagem.
 
-Dano no HP do perdedor = soma do que sobrou em cada Freak vivo do vencedor, **no máximo 12 por Freak**.
+## Esteira e luta
 
-Na tela: entra **um contra um**. O 1º de cada lado **pula** na esteira e **dá dois pulos** até o lugar do ataque: a mola aperta, impulsiona, o brinquedo inteiro sai do chão e cai. Só quando um cai inteiro (**KO**) o próximo daquele lado pula e se aproxima. No choque, **só o kit que vai ganhar** sai do corpo e voa até a peça do outro. A que perde **fica colada** até o impacto; aí **voa para fora da tela e some**. A que ganha volta no corpo como bumerangue. Se os números forem iguais, **os dois atacam**, batem no centro e os dois voam para fora. As placas mostram os números. As cartas **sobem e somem** durante a batalha e voltam depois.
+- Azul = você, da esquerda para o centro. Vermelha = oponente, da direita para o centro.
+- Velocidade: **120 + Agilidade × 60** pixels por segundo.
+- Só o Freak da **ponta** luta. O de trás espera.
+- Só a **cabeça** ataca: pula, voa, bate e volta.
+- A ordem de quem bate primeiro é sorteada, mas **os dois atacam**. O dano entra depois dos dois.
+- Quem zera a vida do Freak escorrega e **cai no vão** entre as esteiras.
 
 ## Controles
 
-- Mouse: martelo nas caixas; arrastar peças; arrastar carta pelo rótulo 3º/2º/1º; PRONTO; ATUALIZAR; TRAVAR; clicar em NÍVEL para subir a loja.
-- Soltar em **VENDER** (à direita, ao lado das caixas) vende. **Botão direito** no mouse também vende a peça embaixo do cursor.
-- Se o encaixe já tem peça, a nova entra e a antiga volta para a esteira.
-- No fim da partida, **NOVA PARTIDA** recomeça.
+- Mouse: martelo nas caixas; arrastar peças para a carta; **ATUALIZAR**; clicar numa peça e **VENDER** (ou arrastar até o botão).
+- Se o encaixe já tem peça, a nova entra e a antiga volta para a prateleira.
 - Sem gamepad por enquanto.
 
 ## O que ainda não é regra
 
-Multiplayer, habilidades de set, freeze por caixa, 4º slot.
+Multiplayer, habilidades extras de set, menus, salvamento.

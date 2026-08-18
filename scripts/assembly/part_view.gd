@@ -1,9 +1,10 @@
 class_name PartView
 extends Area2D
 
-signal pressed(part: PartView)
+## A kit you can pick up: one drawing for the head or the torso, two for the arms.
+## It remembers what it cost, so selling can pay half of it back.
 
-const KIT_PREVIEW_SCALE := 0.48
+signal pressed(part: PartView)
 
 @onready var _sprite: Sprite2D = $Sprite
 @onready var _shadow: Sprite2D = $Shadow
@@ -12,17 +13,24 @@ const KIT_PREVIEW_SCALE := 0.48
 @onready var _collision: CollisionShape2D = $CollisionShape2D
 
 var part_def: PartDef
-var tray_home: Vector2 = Vector2.ZERO
+var paid_price: int = 0
+var home_shelf: ShopShelf
+var rest_home: Vector2 = Vector2.ZERO
+
 var _interaction_locked: bool = false
 var _dragging: bool = false
+var _selected: bool = false
 var _attached_slot: CharacterSlot = null
 var _drag_service: DragDropService
 var _kit_root: Node2D
 var _kit_sprites: Dictionary = {}
-var _kit_home := Vector2.ZERO
 var _shows_kit: bool = false
 var _over_target: bool = false
+var _base_scale: float = 1.0
+var _select_pulse: Tween
 var _shadow_rest := Vector2(8, 14)
+## The card this kit was pulled from, so a bad drop puts it back where it was.
+var _origin_card: CharacterSlot = null
 
 func setup(def: PartDef, drag_service: DragDropService) -> void:
 	part_def = def
@@ -42,14 +50,34 @@ func setup(def: PartDef, drag_service: DragDropService) -> void:
 		_sprite.texture = def.sprite if def != null else null
 		_shadow.texture = _sprite.texture
 		_shadow.modulate = Color(0, 0, 0, 0.45)
-		_shadow.position = Vector2(8, 14)
+		_shadow.position = _shadow_rest
 		_sprite.flip_h = false
 		_sprite.rotation = 0.0
 		if def != null:
 			def.apply_to_sprite(_sprite, def.sprite)
 			_shadow.flip_h = _sprite.flip_h
 			_shadow.rotation = _sprite.rotation
-		_fit_single()
+		_fit_hitbox(Vector2(CompositeResolver.PART_SIZE_PX * 0.82, CompositeResolver.PART_SIZE_PX * 0.82))
+
+## Places the kit so its bottom rests on `surface`, at the given scale.
+func stand_on(surface: Vector2, display_scale: float) -> void:
+	_base_scale = display_scale
+	scale = Vector2.ONE * display_scale
+	global_position = surface - Vector2(0.0, _visual_bottom_local() * display_scale)
+	rest_home = global_position
+
+func play_reveal() -> void:
+	modulate.a = 0.0
+	var start := global_position
+	global_position = start - Vector2(0.0, 26.0)
+	scale = Vector2.ONE * _base_scale * 0.8
+	var tween := create_tween()
+	tween.tween_property(self, "modulate:a", 1.0, 0.2).set_trans(Tween.TRANS_SINE)
+	tween.parallel().tween_property(self, "global_position", start, 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(self, "scale", Vector2.ONE * _base_scale, 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+func sell_value() -> int:
+	return PartStats.sell_price(paid_price)
 
 func can_interact() -> bool:
 	return not _interaction_locked and part_def != null
@@ -57,23 +85,48 @@ func can_interact() -> bool:
 func is_attached() -> bool:
 	return _attached_slot != null
 
+func attached_slot() -> CharacterSlot:
+	return _attached_slot
+
 func set_attached_slot(slot: CharacterSlot) -> void:
 	_attached_slot = slot
 	visible = slot == null
+	if slot == null:
+		return
+	_origin_card = null
+	if home_shelf != null:
+		home_shelf.take_part()
+		home_shelf = null
+
+## Gold pulse that says "this is the one VENDER will take".
+func set_selected(on: bool) -> void:
+	if _selected == on:
+		return
+	_selected = on
+	_stop_select_pulse()
+	if not on:
+		modulate = Color.WHITE
+		return
+	_select_pulse = create_tween().set_loops()
+	_select_pulse.tween_property(self, "modulate", Color(1.35, 1.18, 0.72, 1), 0.42).set_trans(Tween.TRANS_SINE)
+	_select_pulse.tween_property(self, "modulate", Color.WHITE, 0.42).set_trans(Tween.TRANS_SINE)
+
+func is_selected() -> bool:
+	return _selected
 
 func begin_drag() -> void:
 	_dragging = true
 	_over_target = false
-	_stop_idle_float()
 	z_index = 120
 	_plate.visible = false
 	_glow.visible = false
 	rotation = 0.0
 	_shadow.position = Vector2(18, 28)
 	_shadow.modulate = Color(0, 0, 0, 0.55)
-	Feel.punch(self, Vector2(1.16, 0.88), Vector2.ONE * 1.12)
+	Feel.punch(self, Vector2(_base_scale * 1.2, _base_scale * 0.84), Vector2.ONE * _base_scale * 1.14)
+	_origin_card = _attached_slot
 	if _attached_slot != null:
-		_attached_slot.detach_part(part_def.slot_type, false)
+		_attached_slot.detach_part(part_def.slot_type, true)
 		_attached_slot = null
 		visible = true
 	_drag_service.notify_drag_process_needed()
@@ -81,8 +134,7 @@ func begin_drag() -> void:
 func apply_drag_tilt(mouse_dx: float) -> void:
 	if not _dragging:
 		return
-	var target := clampf(mouse_dx * 0.045, -0.18, 0.18)
-	rotation = lerp_angle(rotation, target, 0.28)
+	rotation = lerp_angle(rotation, clampf(mouse_dx * 0.045, -0.18, 0.18), 0.28)
 
 func set_over_target(on: bool) -> void:
 	if _over_target == on:
@@ -90,26 +142,13 @@ func set_over_target(on: bool) -> void:
 	_over_target = on
 	if not _dragging:
 		return
-	Feel.to_scale(self, Vector2.ONE * (1.2 if on else 1.12), 0.1)
-
-func _clear_drag_pose() -> void:
-	_dragging = false
-	_over_target = false
-	z_index = 0
-	rotation = 0.0
-	_shadow.position = _shadow_rest
-	_shadow.modulate = Color(0, 0, 0, 0.45)
-
-func cancel_drag_return() -> void:
-	_clear_drag_pose()
-	return_to_tray()
+	Feel.to_scale(self, Vector2.ONE * _base_scale * (1.24 if on else 1.14), 0.1)
 
 func contains_point(global_point: Vector2) -> bool:
 	var shape := _collision.shape as RectangleShape2D
 	if shape == null:
 		return false
-	var local := to_local(global_point)
-	return Rect2(-shape.size * 0.5, shape.size).has_point(local)
+	return Rect2(-shape.size * 0.5, shape.size).has_point(to_local(global_point))
 
 func unbind_from_card() -> void:
 	if _attached_slot == null:
@@ -118,24 +157,29 @@ func unbind_from_card() -> void:
 	_attached_slot = null
 	visible = true
 
-func return_to_tray() -> void:
+## Puts the kit back where it belongs: on the card it came from, or on its shelf.
+func return_home() -> void:
 	_clear_drag_pose()
 	_attached_slot = null
 	visible = true
 	Feel.kill_scale(self)
+	var card := _origin_card
+	_origin_card = null
+	if card != null and is_instance_valid(card) and card.try_attach(self):
+		return
 	if not is_inside_tree():
-		global_position = tray_home
-		scale = Vector2.ONE
+		global_position = rest_home
+		scale = Vector2.ONE * _base_scale
 		return
 	var tween := create_tween()
-	tween.tween_property(self, "global_position", tray_home, 0.24).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(self, "scale", Vector2.ONE, 0.24).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "global_position", rest_home, 0.24).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(self, "scale", Vector2.ONE * _base_scale, 0.24).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func snap_hide_for_slot() -> void:
 	_clear_drag_pose()
-	scale = Vector2.ONE
+	set_selected(false)
+	scale = Vector2.ONE * _base_scale
 	visible = false
-	_stop_idle_float()
 
 func lock_interaction(locked: bool) -> void:
 	_interaction_locked = locked
@@ -149,6 +193,9 @@ func _ready() -> void:
 	Feel.hide_collision_debug(_collision)
 	_ensure_kit()
 
+func _exit_tree() -> void:
+	_stop_select_pulse()
+
 func _input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if not can_interact():
 		return
@@ -156,6 +203,19 @@ func _input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 		pressed.emit(self)
 		_drag_service.begin_drag(self)
 		get_viewport().set_input_as_handled()
+
+func _clear_drag_pose() -> void:
+	_dragging = false
+	_over_target = false
+	z_index = 0
+	rotation = 0.0
+	_shadow.position = _shadow_rest
+	_shadow.modulate = Color(0, 0, 0, 0.45)
+
+func _stop_select_pulse() -> void:
+	if _select_pulse != null and _select_pulse.is_valid():
+		_select_pulse.kill()
+	_select_pulse = null
 
 func _ensure_kit() -> void:
 	if _kit_root != null:
@@ -175,9 +235,9 @@ func _ensure_kit() -> void:
 
 func _apply_kit(expanded: Dictionary) -> void:
 	var plan := CompositeResolver.resolve_slots(expanded)
-	var textures: Dictionary = plan.get("textures", {})
-	var positions: Dictionary = plan.get("positions", {})
-	var s := CompositeResolver.display_scale() * KIT_PREVIEW_SCALE
+	var textures: Dictionary = plan["textures"]
+	var positions: Dictionary = plan["positions"]
+	var s := CompositeResolver.display_scale()
 	for slot in PartSlotType.draw_order_for(expanded):
 		var sprite: Sprite2D = _kit_sprites.get(slot)
 		if sprite == null:
@@ -190,19 +250,14 @@ func _apply_kit(expanded: Dictionary) -> void:
 		sprite.texture = texture
 		sprite.visible = true
 		sprite.scale = Vector2.ONE * s
-		sprite.position = positions.get(slot, Vector2.ZERO) * KIT_PREVIEW_SCALE
+		sprite.position = positions.get(slot, Vector2.ZERO)
 		sprite.flip_h = false
 		sprite.rotation = 0.0
 		var part := expanded.get(slot) as PartDef
 		if part != null:
 			part.apply_to_sprite(sprite, texture)
-		var spread: Dictionary = CompositeResolver.spread_front_arm(
-			slot, part, texture, sprite.position, s
-		)
-		sprite.position = spread["center"]
-		sprite.rotation += float(spread["extra"])
 	_center_kit()
-	_fit_kit_hitbox()
+	_fit_hitbox(Vector2(190, 200))
 
 func _center_kit() -> void:
 	var bounds := Rect2()
@@ -213,61 +268,29 @@ func _center_kit() -> void:
 			continue
 		var half := sprite.texture.get_size() * sprite.scale.abs() * 0.5
 		var rect := Rect2(sprite.position - half, half * 2.0)
-		if first:
-			bounds = rect
-			first = false
-		else:
-			bounds = bounds.merge(rect)
+		bounds = rect if first else bounds.merge(rect)
+		first = false
 	_kit_root.position = Vector2.ZERO if first else -bounds.get_center()
-	_kit_home = _kit_root.position
 
-func _fit_kit_hitbox() -> void:
+func _fit_hitbox(size: Vector2) -> void:
 	var shape := RectangleShape2D.new()
-	shape.size = Vector2(168, 230)
+	shape.size = size
 	_collision.shape = shape
-	var hw := 84.0
-	var hh := 115.0
+	var half := size * 0.5
 	_plate.polygon = PackedVector2Array([
-		Vector2(-hw * 0.7, hh * 0.58), Vector2(hw * 0.7, hh * 0.58),
-		Vector2(hw * 0.58, hh * 0.82), Vector2(-hw * 0.58, hh * 0.82)
+		Vector2(-half.x * 0.7, half.y * 0.58), Vector2(half.x * 0.7, half.y * 0.58),
+		Vector2(half.x * 0.58, half.y * 0.82), Vector2(-half.x * 0.58, half.y * 0.82)
 	])
 	_plate.color = Color(0, 0, 0, 0.3)
 	_glow.polygon = PackedVector2Array([
-		Vector2(-hw, -hh), Vector2(hw, -hh), Vector2(hw, hh), Vector2(-hw, hh)
+		Vector2(-half.x, -half.y), Vector2(half.x, -half.y), Vector2(half.x, half.y), Vector2(-half.x, half.y)
 	])
 	_plate.visible = false
 	_glow.visible = false
 	_glow.color = Color(0, 0, 0, 0)
 	Feel.hide_collision_debug(_collision)
 
-func _fit_single() -> void:
-	var target := CompositeResolver.PART_SIZE_PX
-	var s := CompositeResolver.display_scale()
-	_sprite.scale = Vector2.ONE * s
-	_shadow.scale = Vector2.ONE * s
-	var shape := RectangleShape2D.new()
-	shape.size = Vector2(target, CompositeResolver.PART_HEIGHT_PX * s) * 0.82
-	_collision.shape = shape
-	var hw := target * 0.5
-	var hh := CompositeResolver.PART_HEIGHT_PX * s * 0.5
-	_plate.polygon = PackedVector2Array([
-		Vector2(-hw * 0.7, hh * 0.58), Vector2(hw * 0.7, hh * 0.58),
-		Vector2(hw * 0.58, hh * 0.82), Vector2(-hw * 0.58, hh * 0.82)
-	])
-	_plate.color = Color(0, 0, 0, 0.3)
-	_glow.polygon = PackedVector2Array([
-		Vector2(-hw, -hh), Vector2(hw, -hh), Vector2(hw, hh), Vector2(-hw, hh)
-	])
-	_plate.visible = false
-	_glow.visible = false
-	_glow.color = Color(0, 0, 0, 0)
-	Feel.hide_collision_debug(_collision)
-
-func rest_on_belt() -> void:
-	var local_bottom := _visual_bottom_local()
-	global_position.y = AssemblyLayout.belt_roller_y() - local_bottom
-	tray_home = global_position
-
+## Lowest drawn pixel, in local units before the node scale.
 func _visual_bottom_local() -> float:
 	if _shows_kit and _kit_root != null:
 		var max_y := 0.0
@@ -285,18 +308,12 @@ func _visual_bottom_local() -> float:
 			return max_y
 	if _sprite != null and _sprite.texture != null:
 		return _sprite.position.y + _sprite.texture.get_size().y * absf(_sprite.scale.y) * 0.5
-	return AssemblyLayout.CRATE_SIT_OFFSET
-
-func _stop_idle_float() -> void:
-	if _sprite != null:
-		_sprite.position.y = 0.0
-	if _kit_root != null:
-		_kit_root.position = _kit_home
+	return CompositeResolver.PART_SIZE_PX * 0.5
 
 func _on_mouse_entered() -> void:
 	if can_interact() and not _dragging:
-		Feel.to_scale(self, Vector2.ONE * 1.08, 0.1)
+		Feel.to_scale(self, Vector2.ONE * _base_scale * 1.08, 0.1)
 
 func _on_mouse_exited() -> void:
 	if not _dragging:
-		Feel.to_scale(self, Vector2.ONE, 0.12)
+		Feel.to_scale(self, Vector2.ONE * _base_scale, 0.12)

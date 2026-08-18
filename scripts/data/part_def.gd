@@ -11,8 +11,11 @@ extends Resource
 @export var sprite_profile: Texture2D
 ## Attack pose. Optional; the side view is used if this is empty.
 @export var sprite_attack: Texture2D
-@export var combat_value: int = 0
+## Poder (cabeça), Resistência (tronco) ou Agilidade (braços). Veja PartStats.
+@export var stat_value: int = 0
 @export var tier: int = 1
+## A shop kit that puts more than one drawing on screen, like the arm pair.
+@export var kit_parts: Array[PartDef] = []
 ## 1 = in front. Lower number draws on top of a higher number.
 @export var draw_z: int = 0
 @export var flip_h: bool = false
@@ -26,52 +29,41 @@ extends Resource
 @export var magnet_down: Vector2 = Vector2.ZERO
 @export var magnet_up_profile: Vector2 = Vector2.ZERO
 @export var magnet_down_profile: Vector2 = Vector2.ZERO
-## Torso hub: neck, two shoulders, two hips.
+## Torso hub: neck, two shoulders, and the crate base that rests on the floor.
 @export var magnet_neck: Vector2 = Vector2.ZERO
 @export var magnet_shoulder_l: Vector2 = Vector2.ZERO
 @export var magnet_shoulder_r: Vector2 = Vector2.ZERO
-@export var magnet_hip_l: Vector2 = Vector2.ZERO
-@export var magnet_hip_r: Vector2 = Vector2.ZERO
+@export var magnet_ground: Vector2 = Vector2.ZERO
 @export var magnet_neck_profile: Vector2 = Vector2.ZERO
 @export var magnet_shoulder_l_profile: Vector2 = Vector2.ZERO
 @export var magnet_shoulder_r_profile: Vector2 = Vector2.ZERO
-@export var magnet_hip_l_profile: Vector2 = Vector2.ZERO
-@export var magnet_hip_r_profile: Vector2 = Vector2.ZERO
-
-static func tier_for(value: int) -> int:
-	if value <= 5:
-		return 1
-	if value == 6:
-		return 2
-	if value == 7:
-		return 3
-	if value == 8:
-		return 4
-	return 5
+@export var magnet_ground_profile: Vector2 = Vector2.ZERO
 
 func is_torso() -> bool:
 	return slot_type == PartSlotType.Value.BODY
 
-func is_legs_kit() -> bool:
-	return slot_type == PartSlotType.Value.LEGS
+## A kit that draws several pieces (the arm pair) has no magnets of its own.
+func is_bundle() -> bool:
+	return not kit_parts.is_empty()
+
+func price() -> int:
+	return PartStats.price_of(self)
+
+func stat_label() -> String:
+	return PartStats.label_of(slot_type)
 
 func uses_hub_sockets() -> bool:
 	return is_torso() and magnet_neck.length_squared() > 0.01
 
 func uses_magnet_up() -> bool:
-	return (
-		slot_type == PartSlotType.Value.ARM_L
-		or slot_type == PartSlotType.Value.ARM_R
-		or slot_type == PartSlotType.Value.LEG_L
-		or slot_type == PartSlotType.Value.LEG_R
-	)
+	return PartSlotType.is_arm(slot_type)
 
 func uses_magnet_down() -> bool:
 	return slot_type == PartSlotType.Value.HEAD
 
 func socket_names() -> PackedStringArray:
 	if is_torso():
-		return PackedStringArray(["neck", "shoulder_l", "shoulder_r", "hip_l", "hip_r"])
+		return PackedStringArray(["neck", "shoulder_l", "shoulder_r", "ground"])
 	if slot_type == PartSlotType.Value.HEAD:
 		return PackedStringArray(["down"])
 	if uses_magnet_up():
@@ -79,7 +71,10 @@ func socket_names() -> PackedStringArray:
 	return PackedStringArray()
 
 func has_fight_poses() -> bool:
-	if is_legs_kit():
+	if is_bundle():
+		for part in kit_parts:
+			if part == null or part.sprite_profile == null:
+				return false
 		return true
 	return sprite_profile != null
 
@@ -89,8 +84,7 @@ func profile_magnets_marked() -> bool:
 			magnet_neck_profile.length_squared() > 0.01
 			or magnet_shoulder_l_profile.length_squared() > 0.01
 			or magnet_shoulder_r_profile.length_squared() > 0.01
-			or magnet_hip_l_profile.length_squared() > 0.01
-			or magnet_hip_r_profile.length_squared() > 0.01
+			or magnet_ground_profile.length_squared() > 0.01
 		)
 	return magnet_up_profile.length_squared() > 0.01 or magnet_down_profile.length_squared() > 0.01
 
@@ -117,10 +111,8 @@ func socket_for(socket: String, shown: Texture2D) -> Vector2:
 			return magnet_shoulder_l_profile if profile else magnet_shoulder_l
 		"shoulder_r":
 			return magnet_shoulder_r_profile if profile else magnet_shoulder_r
-		"hip_l":
-			return magnet_hip_l_profile if profile else magnet_hip_l
-		"hip_r":
-			return magnet_hip_r_profile if profile else magnet_hip_r
+		"ground":
+			return magnet_ground_profile if profile else magnet_ground
 		_:
 			return Vector2.ZERO
 
@@ -152,16 +144,11 @@ func set_socket(socket: String, pose: int, magnet: Vector2) -> void:
 				magnet_shoulder_r_profile = magnet
 			else:
 				magnet_shoulder_r = magnet
-		"hip_l":
+		"ground":
 			if profile:
-				magnet_hip_l_profile = magnet
+				magnet_ground_profile = magnet
 			else:
-				magnet_hip_l = magnet
-		"hip_r":
-			if profile:
-				magnet_hip_r_profile = magnet
-			else:
-				magnet_hip_r = magnet
+				magnet_ground = magnet
 
 func texture_for_pose(pose: int) -> Texture2D:
 	if pose == 1:
@@ -242,7 +229,10 @@ func draw_transformed(ci: CanvasItem, tex: Texture2D, dest: Rect2, pose: int, ex
 
 func _validate_property(property: Dictionary) -> void:
 	var name := String(property.name)
-	if is_legs_kit() and (name.begins_with("magnet_") or name.begins_with("sprite")):
+	if is_bundle() and name.begins_with("magnet_"):
+		property.usage = PROPERTY_USAGE_NO_EDITOR
+		return
+	if name == "kit_parts" and not is_bundle() and slot_type != PartSlotType.Value.ARMS:
 		property.usage = PROPERTY_USAGE_NO_EDITOR
 		return
 	if name.begins_with("magnet_") and name.contains("profile"):
@@ -251,7 +241,7 @@ func _validate_property(property: Dictionary) -> void:
 	if name in ["flip_h_profile", "rotation_degrees_profile"]:
 		property.usage = PROPERTY_USAGE_NO_EDITOR
 		return
-	if name in ["magnet_neck", "magnet_shoulder_l", "magnet_shoulder_r", "magnet_hip_l", "magnet_hip_r"]:
+	if name in ["magnet_neck", "magnet_shoulder_l", "magnet_shoulder_r", "magnet_ground"]:
 		if not is_torso():
 			property.usage = PROPERTY_USAGE_NO_EDITOR
 		return

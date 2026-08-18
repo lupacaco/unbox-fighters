@@ -1,152 +1,58 @@
 class_name CharacterSlot
 extends Node2D
 
+## A hanging card where one Freak is built. Three kits go on it: head, torso and
+## the arm pair. When all three are there, LUTAR appears and sends it to the belt,
+## leaving the card empty for the next one.
+
 signal part_attached(slot: CharacterSlot, part: PartDef)
 signal part_detached(slot: CharacterSlot, part: PartDef)
-signal card_drag_requested(slot: CharacterSlot)
 signal assembly_changed(slot: CharacterSlot)
+signal fight_requested(slot: CharacterSlot)
 
-const TAG_OFFSETS := {
-	PartSlotType.Value.HEAD: Vector2(108, -150),
-	PartSlotType.Value.BODY: Vector2(108, -20),
-	PartSlotType.Value.ARM_L: Vector2(-120, 8),
-	PartSlotType.Value.ARM_R: Vector2(108, 70),
+## Drop areas in card-local space. A kit may also be dropped anywhere on the card.
+const ZONES := {
+	PartSlotType.Value.HEAD: [Rect2(-112, -150, 224, 152)],
+	PartSlotType.Value.BODY: [Rect2(-74, 18, 148, 194)],
+	PartSlotType.Value.ARMS: [Rect2(-126, 2, 58, 200), Rect2(68, 2, 58, 200)],
 }
-const _Spring := preload("res://scripts/data/spring_base.gd")
-## Lower the spring and Freak on the card. Fight shelf uses its own floor.
-const TOY_Y := 50.0
+const CARD_BOUNDS := Rect2(-150, -300, 300, 600)
 
-@onready var _card_shadow: Sprite2D = $CardShadow
-@onready var _card_frame: Sprite2D = $CardFrame
-@onready var _empty_hint: Label = $EmptyHint
-@onready var _display_root: Node2D = $Display
-@onready var _sprite_composite: Sprite2D = $Display/Composite
-@onready var _highlight: Line2D = $DropHighlight
-@onready var _glow: Polygon2D = $CompleteGlow
-@onready var _fight_button: Button = $FightButton
+var _frame: Sprite2D
+var _shadow: Sprite2D
+var _glow: Polygon2D
+var _display: Node2D
+var _hint: Label
+var _fight_button: Button
+var _banner: Label
 
-var queue_rank: int = 3
 var _bound_parts: Dictionary = {}
 var _layer_sprites: Dictionary = {}
-var _zones: Dictionary = {}
+var _zone_areas: Dictionary = {}
+var _pills: Dictionary = {}
 var _crossfade_busy: bool = false
-var _rest_y: float = 0.0
-var _fight_locked: bool = false
-var _lifted: bool = false
-var _rank_label: Label
-var _tags: Dictionary = {}
-var _grip: Area2D
-var _card_motion: Tween
+var _locked: bool = false
 var _drop_hot: bool = false
-var _spring: Sprite2D
-var _spring_shadow: Polygon2D
+var _synergy_shown: Synergy.Level = Synergy.Level.NONE
+var _glow_pulse: Tween
 
-func setup(_def: CharacterDef = null, _incoming_roster: Array[CharacterDef] = []) -> void:
-	_rest_y = position.y
-	_lifted = false
-	visible = true
-	scale = Vector2.ONE
-	modulate.a = 1.0
-	_glow.visible = false
-	_highlight.visible = false
-	_drop_hot = false
-	_card_frame.modulate = Color.WHITE
-	if _empty_hint != null:
-		GameTheme.apply_display(_empty_hint, 40, Color(0.62, 0.56, 0.46, 0.4), 0)
-	_build_visuals()
-	_setup_zones()
-	_hide_fight_button()
-	_ensure_rank_label()
-	_ensure_tags()
-	_ensure_grip()
+func setup() -> void:
+	_build_frame()
+	_build_display()
+	_build_pills()
+	_build_zones()
+	_build_fight_button()
+	_build_banner()
 	_refresh_display(false)
-	_refresh_tags()
+	_refresh_pills()
 
-func set_queue_rank(rank: int) -> void:
-	queue_rank = rank
-	_ensure_rank_label()
-	_rank_label.text = "%dº" % rank
+# ---------------------------------------------------------------- state
 
 func to_loadout() -> FighterLoadout:
 	var loadout := FighterLoadout.new()
 	for slot in PartSlotType.shop_slots():
 		loadout.set_part(slot, get_attached_part(slot))
 	return loadout
-
-func steal_all_parts() -> Dictionary:
-	var stolen := {}
-	for slot in PartSlotType.shop_slots():
-		var view := detach_part(slot, false)
-		if view != null:
-			stolen[slot] = view
-	_refresh_display(false)
-	_refresh_tags()
-	return stolen
-
-func receive_parts(parts: Dictionary) -> void:
-	for slot in parts.keys():
-		var view: PartView = parts[slot]
-		if view != null:
-			try_attach(view)
-
-func find_part_at(global_point: Vector2) -> PartView:
-	if _fight_locked:
-		return null
-	for slot in PartSlotType.shop_slots():
-		if not _bound_parts.has(slot):
-			continue
-		if _zone_contains(slot, global_point):
-			var view: PartView = _bound_parts[slot]
-			if view != null and is_instance_valid(view):
-				return view
-	return null
-
-func play_leave_for_fight() -> void:
-	if _lifted:
-		return
-	set_drop_highlight(false, PartSlotType.Value.BODY)
-	Feel.kill_scale(self)
-	_lifted = true
-	set_fight_locked(true)
-	_kill_card_motion()
-	_card_motion = create_tween()
-	_card_motion.tween_property(self, "position:y", _rest_y - AssemblyLayout.CARD_LIFT, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	_card_motion.parallel().tween_property(self, "scale", Vector2(0.78, 0.78), 0.4)
-	_card_motion.parallel().tween_property(self, "modulate:a", 0.0, 0.38).set_trans(Tween.TRANS_SINE)
-	_card_motion.tween_callback(func() -> void:
-		position.y = _rest_y
-		scale = Vector2.ONE
-		modulate.a = 1.0
-		visible = false
-	)
-
-func play_return_from_fight() -> void:
-	_kill_card_motion()
-	visible = true
-	position.y = _rest_y - AssemblyLayout.CARD_SETTLE
-	scale = Vector2(0.84, 0.84)
-	modulate.a = 1.0
-	_card_motion = create_tween()
-	_card_motion.tween_property(self, "position:y", _rest_y, 0.42).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	_card_motion.parallel().tween_property(self, "scale", Vector2.ONE, 0.42)
-	_card_motion.tween_callback(func() -> void:
-		_lifted = false
-		set_fight_locked(false)
-	)
-
-func _kill_card_motion() -> void:
-	if _card_motion != null and _card_motion.is_valid():
-		_card_motion.kill()
-	_card_motion = null
-
-func contains_card_point(global_point: Vector2) -> bool:
-	return Rect2(Vector2(-135, -205), Vector2(270, 400)).has_point(to_local(global_point))
-
-func is_complete() -> bool:
-	for slot in PartSlotType.shop_slots():
-		if get_attached_part(slot) == null:
-			return false
-	return true
 
 func get_attached_part(slot: PartSlotType.Value) -> PartDef:
 	if not _bound_parts.has(slot):
@@ -157,31 +63,11 @@ func get_attached_part(slot: PartSlotType.Value) -> PartDef:
 		return null
 	return (view as PartView).part_def
 
-func set_fight_locked(locked: bool) -> void:
-	_fight_locked = locked
-	for key in _bound_parts.keys():
-		var view = _bound_parts[key]
-		if view != null and is_instance_valid(view):
-			(view as PartView).lock_interaction(locked)
-
-func attached_parts_can_fight() -> bool:
-	if not is_complete():
-		return false
-	var visual := PartKit.expand_shop_parts(_shop_parts_map())
-	for slot in PartSlotType.visual_slots():
-		var part: PartDef = visual.get(slot)
-		if part != null and part.sprite_profile == null:
+func is_complete() -> bool:
+	for slot in PartSlotType.shop_slots():
+		if get_attached_part(slot) == null:
 			return false
 	return true
-
-func can_fight() -> bool:
-	return attached_parts_can_fight() and not _fight_locked
-
-func set_fighter_visible(visible_flag: bool) -> void:
-	_display_root.visible = visible_flag
-
-func get_fighter_global_position() -> Vector2:
-	return _display_root.global_position
 
 func has_any_part() -> bool:
 	for slot in PartSlotType.shop_slots():
@@ -189,25 +75,48 @@ func has_any_part() -> bool:
 			return true
 	return false
 
+func can_fight() -> bool:
+	if _locked or not is_complete():
+		return false
+	for part in PartKit.expand_shop_parts(_shop_parts_map()).values():
+		if (part as PartDef).sprite_profile == null:
+			return false
+	return true
+
+func set_locked(locked: bool) -> void:
+	_locked = locked
+	for view in _bound_parts.values():
+		if view != null and is_instance_valid(view):
+			(view as PartView).lock_interaction(locked)
+	_refresh_fight_button()
+
+# ---------------------------------------------------------------- drop
+
 func can_accept(part: PartDef) -> bool:
-	if _fight_locked or part == null:
+	if _locked or part == null:
 		return false
 	return PartSlotType.is_shop_slot(part.slot_type)
 
 func can_accept_at(part: PartDef, global_point: Vector2) -> bool:
 	if not can_accept(part):
 		return false
-	return _zone_contains(part.slot_type, global_point) or _contains_point_expanded(global_point)
+	return CARD_BOUNDS.has_point(to_local(global_point))
 
-func _zone_contains(slot: PartSlotType.Value, global_point: Vector2) -> bool:
-	var zone := _zone_for(slot)
-	if zone == null or not zone.has_meta("rect"):
-		return false
-	var rect: Rect2 = zone.get_meta("rect")
-	return rect.has_point(to_local(global_point))
+func contains_card_point(global_point: Vector2) -> bool:
+	return CARD_BOUNDS.has_point(to_local(global_point))
+
+func find_part_at(global_point: Vector2) -> PartView:
+	if _locked:
+		return null
+	for slot in PartSlotType.shop_slots():
+		if _bound_parts.has(slot) and _zone_contains(slot, global_point):
+			var view: PartView = _bound_parts[slot]
+			if view != null and is_instance_valid(view):
+				return view
+	return null
 
 func try_attach(part_view: PartView) -> bool:
-	if _fight_locked or part_view == null or part_view.part_def == null:
+	if _locked or part_view == null or part_view.part_def == null:
 		return false
 	if not can_accept(part_view.part_def):
 		return false
@@ -215,181 +124,341 @@ func try_attach(part_view: PartView) -> bool:
 	var displaced: PartView = null
 	if _bound_parts.has(slot):
 		displaced = detach_part(slot, false)
-	var was_complete := is_complete()
+	var before := Synergy.best_level(to_loadout().parts_array())
 	_bound_parts[slot] = part_view
 	part_view.set_attached_slot(self)
 	part_view.snap_hide_for_slot()
 	_refresh_display(true)
-	_refresh_tags()
+	_refresh_pills()
 	_pulse_attach()
 	GameAudio.part_place()
-	var now_complete := is_complete()
-	if now_complete and not was_complete:
+	var after := Synergy.best_level(to_loadout().parts_array())
+	if after > before:
+		_celebrate_synergy(after)
+	if is_complete():
 		GameAudio.fighter_complete()
+	_refresh_fight_button()
 	part_attached.emit(self, part_view.part_def)
 	assembly_changed.emit(self)
 	if displaced != null:
-		displaced.return_to_tray()
+		displaced.return_home()
 	return true
 
 func detach_part(slot: PartSlotType.Value, refresh: bool = true) -> PartView:
-	if _fight_locked:
-		return null
-	if not _bound_parts.has(slot):
+	if _locked or not _bound_parts.has(slot):
 		return null
 	var part_view: PartView = _bound_parts[slot]
 	_bound_parts.erase(slot)
 	part_view.set_attached_slot(null)
 	if refresh:
 		_refresh_display(true)
-		_refresh_tags()
+		_refresh_pills()
+	_refresh_fight_button()
 	part_detached.emit(self, part_view.part_def)
 	assembly_changed.emit(self)
 	return part_view
 
-func set_drop_highlight(enabled: bool, _slot: PartSlotType.Value) -> void:
-	_highlight.visible = false
-	if _lifted or _fight_locked:
+func steal_all_parts() -> Dictionary:
+	var stolen := {}
+	for slot in PartSlotType.shop_slots():
+		if not _bound_parts.has(slot):
+			continue
+		var view: PartView = _bound_parts[slot]
+		_bound_parts.erase(slot)
+		if view != null and is_instance_valid(view):
+			view.set_attached_slot(null)
+			stolen[slot] = view
+	_refresh_display(false)
+	_refresh_pills()
+	_refresh_fight_button()
+	assembly_changed.emit(self)
+	return stolen
+
+## Empties the card after the Freak jumped onto the belt.
+func clear_after_launch() -> void:
+	for view in _bound_parts.values():
+		if view != null and is_instance_valid(view):
+			(view as PartView).queue_free()
+	_bound_parts.clear()
+	_synergy_shown = Synergy.Level.NONE
+	_refresh_display(false)
+	_refresh_pills()
+	_refresh_fight_button()
+	assembly_changed.emit(self)
+
+func set_drop_highlight(enabled: bool, _slot: PartSlotType.Value = PartSlotType.Value.BODY) -> void:
+	if _locked:
 		enabled = false
 	if _drop_hot == enabled:
 		return
 	_drop_hot = enabled
-	var frame_color := Color(1.18, 1.12, 0.92, 1) if enabled else Color.WHITE
-	var card_scale := Vector2.ONE * 1.045 if enabled else Vector2.ONE
-	Feel.to_scale(self, card_scale, 0.12)
+	Feel.to_scale(self, Vector2.ONE * (1.045 if enabled else 1.0), 0.12)
 	var tween := create_tween()
-	tween.tween_property(_card_frame, "modulate", frame_color, 0.12).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(
+		_frame, "modulate", Color(1.22, 1.14, 0.92, 1) if enabled else Color.WHITE, 0.12
+	).set_trans(Tween.TRANS_SINE)
+
+# ---------------------------------------------------------------- looks
+
+func global_floor_point() -> Vector2:
+	return to_global(Vector2(0.0, AssemblyLayout.CARD_FLOOR_Y))
+
+func freak_layers() -> Dictionary:
+	return _layer_sprites
 
 func play_intro(delay: float) -> void:
 	modulate.a = 0.0
-	position.y = _rest_y + 28.0
+	var rest := position.y
+	position.y = rest - 40.0
 	var tween := create_tween()
 	tween.tween_interval(delay)
-	tween.tween_property(self, "modulate:a", 1.0, 0.45).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(self, "position:y", _rest_y, 0.55).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "modulate:a", 1.0, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(self, "position:y", rest, 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
-func _build_visuals() -> void:
-	var frame_tex: Texture2D = load("res://assets/ui/frame_premium.png")
-	_card_frame.texture = frame_tex
-	_card_shadow.texture = frame_tex
-	_card_frame.centered = true
-	_card_shadow.centered = true
-	var tex_size := frame_tex.get_size()
-	var s := 450.0 / maxf(tex_size.y, 1.0)
-	_card_frame.scale = Vector2.ONE * s
-	_card_shadow.scale = Vector2.ONE * s
-	_glow.polygon = PackedVector2Array([
-		Vector2(-130, -200), Vector2(130, -200), Vector2(130, 180), Vector2(-130, 180)
-	])
-	_glow.color = Color(0.79, 0.7, 0.49, 0.1)
-	_ensure_layers()
+func play_launch_swing() -> void:
+	var tween := create_tween()
+	tween.tween_property(self, "rotation_degrees", 3.0, 0.1).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(self, "rotation_degrees", -2.0, 0.16).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(self, "rotation_degrees", 0.0, 0.22).set_trans(Tween.TRANS_SINE)
 
-func _layer_name(slot: PartSlotType.Value) -> String:
-	match slot:
-		PartSlotType.Value.HEAD:
-			return "Head"
-		PartSlotType.Value.BODY:
-			return "Body"
-		PartSlotType.Value.ARM_L:
-			return "ArmL"
-		PartSlotType.Value.ARM_R:
-			return "ArmR"
-		PartSlotType.Value.LEG_L:
-			return "LegL"
-		PartSlotType.Value.LEGS:
-			return "Legs"
-		_:
-			return "LegR"
-
-func _ensure_layers() -> void:
-	for slot in PartSlotType.draw_order():
-		var node_name := _layer_name(slot)
-		var sprite := _display_root.get_node_or_null(node_name) as Sprite2D
-		if sprite == null:
-			sprite = Sprite2D.new()
-			sprite.name = node_name
-			sprite.centered = true
-			_display_root.add_child(sprite)
-		_layer_sprites[slot] = sprite
-	_spring = _display_root.get_node_or_null("Spring") as Sprite2D
-	if _spring == null:
-		_spring = Sprite2D.new()
-		_spring.name = "Spring"
-		_spring.centered = true
-		_display_root.add_child(_spring)
-	_spring_shadow = _display_root.get_node_or_null("SpringShadow") as Polygon2D
-	if _spring_shadow == null:
-		_spring_shadow = _Spring.make_shadow()
-		_display_root.add_child(_spring_shadow)
-	else:
-		_Spring.style_shadow(_spring_shadow)
-	_display_root.z_index = 1
-	_display_root.position.y = TOY_Y
-	_display_root.move_child(_spring_shadow, 0)
-	_display_root.move_child(_spring, 1)
-	_spring.z_index = _Spring.Z_INDEX
-	_spring.visible = true
-	for leg_name in ["LegL", "LegR"]:
-		var leftover_sprite := _display_root.get_node_or_null(leg_name) as Sprite2D
-		if leftover_sprite != null:
-			leftover_sprite.visible = false
-			leftover_sprite.texture = null
-
-func _setup_zones() -> void:
-	var zones_root: Node2D = $Zones
-	var leftover := zones_root.get_node_or_null("Legs") as Area2D
-	if leftover != null:
-		leftover.input_pickable = false
-		leftover.monitoring = false
-		leftover.monitorable = false
-		leftover.visible = false
-	var rects := {
-		PartSlotType.Value.HEAD: Rect2(-95, -190 + TOY_Y, 190, 110),
-		PartSlotType.Value.BODY: Rect2(-55, -80 + TOY_Y, 110, 170),
-		PartSlotType.Value.ARM_L: Rect2(-130, -70 + TOY_Y, 75, 190),
-		PartSlotType.Value.ARM_R: Rect2(55, -70 + TOY_Y, 75, 190),
-	}
-	for slot in PartSlotType.shop_slots():
-		var node_name := _layer_name(slot)
-		var zone := zones_root.get_node_or_null(node_name) as Area2D
-		if zone == null:
-			zone = Area2D.new()
-			zone.name = node_name
-			zone.collision_layer = 2
-			zone.collision_mask = 0
-			zones_root.add_child(zone)
-		_configure_zone(zone, rects[slot])
-		_zones[slot] = zone
-
-func _configure_zone(zone: Area2D, rect: Rect2) -> void:
-	zone.set_meta("rect", rect)
-	zone.monitoring = false
-	zone.monitorable = false
-	zone.input_pickable = true
-	if zone.get_meta("wired", false):
-		for child in zone.get_children():
-			var shape_node := child as CollisionShape2D
-			if shape_node != null and shape_node.shape is RectangleShape2D:
-				(shape_node.shape as RectangleShape2D).size = rect.size
-				shape_node.position = rect.position + rect.size * 0.5
-				Feel.hide_collision_debug(shape_node)
+func _build_frame() -> void:
+	if _frame != null:
 		return
-	zone.set_meta("wired", true)
-	var shape_owner := CollisionShape2D.new()
-	var shape := RectangleShape2D.new()
-	shape.size = rect.size
-	shape_owner.shape = shape
-	shape_owner.position = rect.position + rect.size * 0.5
-	Feel.hide_collision_debug(shape_owner)
-	zone.add_child(shape_owner)
-	zone.input_event.connect(_on_zone_input.bind(zone))
+	var tex: Texture2D = load(AssemblyLayout.CARD_TEX)
+	_shadow = Sprite2D.new()
+	_shadow.name = "CardShadow"
+	_shadow.texture = tex
+	_shadow.centered = true
+	_shadow.position = Vector2(10, 16)
+	_shadow.modulate = Color(0, 0, 0, 0.45)
+	_shadow.z_index = -3
+	add_child(_shadow)
 
-func _on_zone_input(_viewport: Node, event: InputEvent, _shape_idx: int, zone: Area2D) -> void:
-	if _fight_locked:
+	_glow = Polygon2D.new()
+	_glow.name = "CompleteGlow"
+	var well := AssemblyLayout.CARD_WELL.grow(16.0)
+	_glow.polygon = PackedVector2Array([
+		well.position, well.position + Vector2(well.size.x, 0),
+		well.end, well.position + Vector2(0, well.size.y),
+	])
+	_glow.color = Color(0.98, 0.79, 0.33, 0.0)
+	_glow.z_index = -2
+	add_child(_glow)
+
+	_frame = Sprite2D.new()
+	_frame.name = "CardFrame"
+	_frame.texture = tex
+	_frame.centered = true
+	add_child(_frame)
+
+	_hint = GameTheme.make_label(
+		"monte 3 peças", 30, Vector2(0, -40), Vector2(240, 48), Color(0.62, 0.56, 0.46, 0.55)
+	)
+	_hint.z_index = 2
+	add_child(_hint)
+
+func _build_display() -> void:
+	if _display != null:
+		return
+	_display = Node2D.new()
+	_display.name = "Display"
+	_display.position = Vector2(0.0, AssemblyLayout.CARD_FLOOR_Y)
+	_display.scale = Vector2.ONE * AssemblyLayout.CARD_FREAK_SCALE
+	_display.z_index = 1
+	add_child(_display)
+	for slot in PartSlotType.draw_order():
+		var sprite := Sprite2D.new()
+		sprite.name = String(PartSlotType.to_string_name(slot))
+		sprite.centered = true
+		sprite.visible = false
+		_display.add_child(sprite)
+		_layer_sprites[slot] = sprite
+
+func _build_pills() -> void:
+	if not _pills.is_empty():
+		return
+	var slots := PartSlotType.shop_slots()
+	for i in slots.size():
+		var pill := StatTag.new()
+		pill.position = Vector2(
+			(float(i) - float(slots.size() - 1) * 0.5) * AssemblyLayout.CARD_PILL_STEP,
+			AssemblyLayout.CARD_PILL_Y
+		)
+		pill.z_index = 6
+		add_child(pill)
+		_pills[slots[i]] = pill
+
+func _build_zones() -> void:
+	if not _zone_areas.is_empty():
+		return
+	var root := Node2D.new()
+	root.name = "Zones"
+	add_child(root)
+	for slot in PartSlotType.shop_slots():
+		var area := Area2D.new()
+		area.name = String(PartSlotType.to_string_name(slot))
+		area.collision_layer = 2
+		area.collision_mask = 0
+		area.monitoring = false
+		area.monitorable = false
+		area.input_pickable = true
+		for rect in ZONES[slot]:
+			var shape := CollisionShape2D.new()
+			var box := RectangleShape2D.new()
+			box.size = (rect as Rect2).size
+			shape.shape = box
+			shape.position = (rect as Rect2).get_center()
+			Feel.hide_collision_debug(shape)
+			area.add_child(shape)
+		area.input_event.connect(_on_zone_input.bind(slot))
+		root.add_child(area)
+		_zone_areas[slot] = area
+
+func _build_fight_button() -> void:
+	if _fight_button != null:
+		return
+	_fight_button = GameTheme.make_button(
+		"LUTAR",
+		Vector2(0.0, AssemblyLayout.FIGHT_BUTTON_DROP),
+		AssemblyLayout.FIGHT_BUTTON_SIZE,
+		ThemeTokens.SELL_RED,
+		32
+	)
+	_fight_button.pressed.connect(func() -> void: fight_requested.emit(self))
+	add_child(_fight_button)
+	_refresh_fight_button()
+
+func _build_banner() -> void:
+	if _banner != null:
+		return
+	_banner = GameTheme.make_label("", 30, Vector2(0, -216), Vector2(280, 44), ThemeTokens.GOLD)
+	_banner.z_index = 9
+	_banner.modulate.a = 0.0
+	add_child(_banner)
+
+func _refresh_fight_button() -> void:
+	if _fight_button == null:
+		return
+	var ready := can_fight()
+	_fight_button.visible = ready
+	_fight_button.disabled = not ready
+	_fight_button.mouse_filter = Control.MOUSE_FILTER_STOP if ready else Control.MOUSE_FILTER_IGNORE
+	if ready and _glow_pulse == null:
+		_start_glow()
+	elif not ready:
+		_stop_glow()
+
+func _start_glow() -> void:
+	_glow_pulse = create_tween().set_loops()
+	_glow_pulse.tween_property(_glow, "color:a", 0.26, 0.6).set_trans(Tween.TRANS_SINE)
+	_glow_pulse.tween_property(_glow, "color:a", 0.06, 0.6).set_trans(Tween.TRANS_SINE)
+
+func _stop_glow() -> void:
+	if _glow_pulse != null and _glow_pulse.is_valid():
+		_glow_pulse.kill()
+	_glow_pulse = null
+	if _glow != null:
+		_glow.color.a = 0.0
+
+func _shop_parts_map() -> Dictionary:
+	var shop := {}
+	for slot in PartSlotType.shop_slots():
+		var part := get_attached_part(slot)
+		if part != null:
+			shop[slot] = part
+	return shop
+
+func _refresh_display(animate: bool) -> void:
+	if _display == null:
+		return
+	_hint.visible = not has_any_part()
+	if not animate or _crossfade_busy:
+		_apply_plan()
+		return
+	_crossfade_busy = true
+	var tween := create_tween()
+	tween.tween_property(_display, "modulate:a", 0.0, 0.09).set_trans(Tween.TRANS_SINE)
+	tween.tween_callback(_apply_plan)
+	tween.tween_property(_display, "modulate:a", 1.0, 0.17).set_trans(Tween.TRANS_SINE)
+	tween.tween_callback(func() -> void: _crossfade_busy = false)
+
+func _apply_plan() -> void:
+	var expanded := PartKit.expand_shop_parts(_shop_parts_map())
+	var plan := CompositeResolver.resolve_slots(expanded)
+	var textures: Dictionary = plan["textures"]
+	var positions: Dictionary = plan["positions"]
+	var order := PartSlotType.draw_order_for(expanded)
+	for i in order.size():
+		var slot: PartSlotType.Value = order[i]
+		var sprite: Sprite2D = _layer_sprites.get(slot)
+		if sprite == null:
+			continue
+		_display.move_child(sprite, i)
+		var texture: Texture2D = textures.get(slot)
+		if texture == null:
+			sprite.texture = null
+			sprite.visible = false
+			continue
+		sprite.texture = texture
+		sprite.visible = true
+		sprite.centered = true
+		sprite.position = positions.get(slot, Vector2.ZERO)
+		sprite.scale = Vector2.ONE * CompositeResolver.display_scale()
+		sprite.flip_h = false
+		sprite.rotation = 0.0
+		var part := expanded.get(slot) as PartDef
+		if part != null:
+			part.apply_to_sprite(sprite, texture, false)
+		var spread: Dictionary = CompositeResolver.spread_front_arm(
+			slot, part, texture, sprite.position, CompositeResolver.display_scale()
+		)
+		sprite.position = spread["center"]
+		sprite.rotation += float(spread["extra"])
+
+func _refresh_pills() -> void:
+	var loadout := to_loadout()
+	var parts := loadout.parts_array()
+	for slot in _pills.keys():
+		var pill: StatTag = _pills[slot]
+		var part := loadout.get_part(slot)
+		var boosted := Synergy.matching_kits(part, parts) >= 2
+		pill.setup(loadout.stat_of(slot), ThemeTokens.color_for_slot(slot), boosted)
+
+func _celebrate_synergy(level: Synergy.Level) -> void:
+	_synergy_shown = level
+	_banner.text = Synergy.level_name(level)
+	_banner.modulate.a = 0.0
+	_banner.scale = Vector2(0.7, 0.7)
+	_banner.pivot_offset = _banner.size * 0.5
+	var tween := create_tween()
+	tween.tween_property(_banner, "modulate:a", 1.0, 0.14)
+	tween.parallel().tween_property(_banner, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_interval(0.85)
+	tween.tween_property(_banner, "modulate:a", 0.0, 0.3)
+	var flash := create_tween()
+	flash.tween_property(_glow, "color:a", 0.55, 0.1)
+	flash.tween_property(_glow, "color:a", 0.08, 0.5).set_trans(Tween.TRANS_SINE)
+	for pill in _pills.values():
+		(pill as StatTag).play_boost()
+
+func _pulse_attach() -> void:
+	Feel.punch(_display, Vector2(1.08, 0.92), Vector2.ONE)
+	var tween := create_tween()
+	tween.tween_property(_frame, "modulate", Color(1.2, 1.14, 0.95, 1), 0.08)
+	tween.tween_property(_frame, "modulate", Color.WHITE, 0.28).set_trans(Tween.TRANS_SINE)
+
+func _zone_contains(slot: PartSlotType.Value, global_point: Vector2) -> bool:
+	var local := to_local(global_point)
+	for rect in ZONES.get(slot, []):
+		if (rect as Rect2).has_point(local):
+			return true
+	return false
+
+func _on_zone_input(_viewport: Node, event: InputEvent, _shape_idx: int, slot: PartSlotType.Value) -> void:
+	if _locked:
 		return
 	if not (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed):
 		return
-	var slot := _slot_for_zone(zone)
 	if not _bound_parts.has(slot):
 		return
 	var part_view: PartView = detach_part(slot, true)
@@ -401,161 +470,3 @@ func _on_zone_input(_viewport: Node, event: InputEvent, _shape_idx: int, zone: A
 	if drag != null:
 		drag.begin_drag(part_view)
 	get_viewport().set_input_as_handled()
-
-func _slot_for_zone(zone: Area2D) -> PartSlotType.Value:
-	for slot in _zones.keys():
-		if _zones[slot] == zone:
-			return slot
-	return PartSlotType.Value.BODY
-
-func _zone_for(slot: PartSlotType.Value) -> Area2D:
-	return _zones.get(slot) as Area2D
-
-func _contains_point_expanded(global_point: Vector2) -> bool:
-	var local := to_local(global_point)
-	return Rect2(Vector2(-135, -205), Vector2(270, 400)).has_point(local)
-
-func _shop_parts_map() -> Dictionary:
-	var shop := {}
-	for slot in PartSlotType.shop_slots():
-		shop[slot] = get_attached_part(slot)
-	return shop
-
-func _refresh_display(animate: bool) -> void:
-	var plan := CompositeResolver.resolve_slots(PartKit.expand_shop_parts(_shop_parts_map()))
-	var complete := is_complete()
-	_glow.visible = complete
-	_empty_hint.visible = false
-
-	if not animate or _crossfade_busy:
-		_apply_plan(plan)
-		return
-
-	_crossfade_busy = true
-	var tween := create_tween()
-	tween.tween_property(_display_root, "modulate:a", 0.0, 0.1).set_trans(Tween.TRANS_SINE)
-	tween.tween_callback(_apply_plan.bind(plan))
-	tween.tween_property(_display_root, "modulate:a", 1.0, 0.18).set_trans(Tween.TRANS_SINE)
-	tween.tween_callback(func() -> void: _crossfade_busy = false)
-
-func _apply_plan(plan: Dictionary) -> void:
-	_sprite_composite.visible = false
-	var textures: Dictionary = plan.get("textures", {})
-	var positions: Dictionary = plan.get("positions", {})
-	var expanded := PartKit.expand_shop_parts(_shop_parts_map())
-	for slot in PartSlotType.draw_order_for(expanded):
-		var sprite: Sprite2D = _layer_sprites.get(slot)
-		if sprite == null:
-			continue
-		if slot == PartSlotType.Value.LEG_L or slot == PartSlotType.Value.LEG_R:
-			sprite.visible = false
-			sprite.texture = null
-			continue
-		_place_sprite(sprite, textures.get(slot), positions.get(slot, Vector2.ZERO), expanded.get(slot) as PartDef, slot)
-	_place_spring(plan)
-
-func _place_spring(plan: Dictionary) -> void:
-	if _spring == null:
-		return
-	var tex: Texture2D = plan.get("spring_texture")
-	_spring.texture = tex if tex != null else _Spring.texture(false)
-	_spring.visible = true
-	_spring.centered = true
-	_spring.position = plan.get("spring_pos", Vector2.ZERO)
-	var spring_scale := float(plan.get("spring_scale", _Spring.SCALE))
-	_spring.scale = Vector2.ONE * spring_scale
-	_spring.z_index = _Spring.Z_INDEX
-	_display_root.z_index = 1
-	if _spring_shadow != null:
-		_Spring.style_shadow(_spring_shadow)
-		_spring_shadow.visible = true
-
-func _place_sprite(
-	sprite: Sprite2D,
-	texture: Texture2D,
-	pos: Vector2,
-	part: PartDef = null,
-	slot: PartSlotType.Value = PartSlotType.Value.BODY
-) -> void:
-	if texture == null:
-		sprite.texture = null
-		sprite.visible = false
-		return
-	sprite.texture = texture
-	sprite.visible = true
-	sprite.centered = true
-	sprite.position = pos
-	sprite.scale = Vector2.ONE * CompositeResolver.display_scale()
-	sprite.flip_h = false
-	sprite.rotation = 0.0
-	if part != null:
-		part.apply_to_sprite(sprite, texture)
-	var spread: Dictionary = CompositeResolver.spread_front_arm(
-		slot, part, texture, sprite.position, CompositeResolver.display_scale()
-	)
-	sprite.position = spread["center"]
-	sprite.rotation += float(spread["extra"])
-
-func _pulse_attach() -> void:
-	Feel.punch(_display_root, Vector2(1.08, 0.92), Vector2.ONE)
-	var tween := create_tween()
-	tween.tween_property(_card_frame, "modulate", Color(1.2, 1.14, 0.95, 1), 0.08)
-	tween.tween_property(_card_frame, "modulate", Color.WHITE, 0.28).set_trans(Tween.TRANS_SINE)
-
-func _hide_fight_button() -> void:
-	if _fight_button == null:
-		return
-	_fight_button.visible = false
-	_fight_button.disabled = true
-	_fight_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-func _ensure_rank_label() -> void:
-	if _rank_label != null:
-		return
-	_rank_label = Label.new()
-	_rank_label.position = Vector2(-48, -252)
-	_rank_label.size = Vector2(96, 44)
-	_rank_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_rank_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	GameTheme.apply_display(_rank_label, 36, ThemeTokens.GOLD, 5)
-	add_child(_rank_label)
-
-func _ensure_tags() -> void:
-	if not _tags.is_empty():
-		return
-	for slot in PartSlotType.shop_slots():
-		var tag := StatTag.new()
-		tag.position = TAG_OFFSETS[slot] + Vector2(0.0, TOY_Y)
-		add_child(tag)
-		_tags[slot] = tag
-
-func _refresh_tags() -> void:
-	_ensure_tags()
-	var loadout := to_loadout()
-	for slot in _tags.keys():
-		var tag: StatTag = _tags[slot]
-		var value := loadout.combat_value_of(slot)
-		tag.setup(value, ThemeTokens.color_for_slot(slot))
-
-func _ensure_grip() -> void:
-	if _grip != null:
-		return
-	_grip = Area2D.new()
-	_grip.name = "CardGrip"
-	var shape := CollisionShape2D.new()
-	var rect := RectangleShape2D.new()
-	rect.size = Vector2(220, 48)
-	shape.shape = rect
-	shape.position = Vector2(0, -226)
-	Feel.hide_collision_debug(shape)
-	_grip.add_child(shape)
-	_grip.input_pickable = true
-	_grip.input_event.connect(_on_grip_input)
-	add_child(_grip)
-
-func _on_grip_input(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
-	if _fight_locked:
-		return
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		card_drag_requested.emit(self)
-		get_viewport().set_input_as_handled()

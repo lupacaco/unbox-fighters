@@ -1,22 +1,18 @@
-[gd_resource type="Resource" script_class="CharacterDef" format=3 uid="uid://dpnbpp3lb6fqt"]
+[gd_resource type="Resource" script_class="CharacterDef" format=3]
 
-[ext_resource type="Resource" uid="uid://8w5apalptihd" path="res://data/parts/bruxa_arm_l.tres" id="1_0k7td"]
-[ext_resource type="Resource" uid="uid://c8dh3grrrxg7l" path="res://data/parts/bruxa_arm_r.tres" id="2_0llep"]
-[ext_resource type="Resource" uid="uid://dg7f2ia0b3mr0" path="res://data/parts/bruxa_body.tres" id="3_giohx"]
-[ext_resource type="Resource" uid="uid://dfqr23d2pmwyx" path="res://data/parts/bruxa_head.tres" id="4_im3f2"]
-[ext_resource type="Resource" uid="uid://doht1548tkqky" path="res://data/parts/bruxa_leg_l.tres" id="5_phtgr"]
-[ext_resource type="Resource" uid="uid://bj6m5eevu2tcv" path="res://data/parts/bruxa_leg_r.tres" id="6_063m8"]
-[ext_resource type="Resource" uid="uid://du3j6xui36c0l" path="res://data/parts/bruxa_legs.tres" id="7_nro5o"]
-[ext_resource type="Script" uid="uid://dxa8yuntrbh2d" path="res://scripts/data/character_def.gd" id="8_gwst5"]
+[ext_resource type="Resource" path="res://data/parts/bruxa_arm_l.tres" id="1_wk6wx"]
+[ext_resource type="Resource" path="res://data/parts/bruxa_arm_r.tres" id="2_q3sk6"]
+[ext_resource type="Resource" path="res://data/parts/bruxa_arms.tres" id="3_0k7td"]
+[ext_resource type="Resource" path="res://data/parts/bruxa_body.tres" id="4_0llep"]
+[ext_resource type="Resource" path="res://data/parts/bruxa_head.tres" id="5_giohx"]
+[ext_resource type="Script" path="res://scripts/data/character_def.gd" id="6_im3f2"]
 
 [resource]
-script = ExtResource("8_gwst5")
+script = ExtResource("6_im3f2")
 id = &"bruxa"
 display_name = "Bruxa"
-head = ExtResource("4_im3f2")
-body = ExtResource("3_giohx")
-arm_l = ExtResource("1_0k7td")
-arm_r = ExtResource("2_0llep")
-leg_l = ExtResource("5_phtgr")
-leg_r = ExtResource("6_063m8")
-legs = ExtResource("7_nro5o")
+head = ExtResource("5_giohx")
+body = ExtResource("4_0llep")
+arm_l = ExtResource("1_wk6wx")
+arm_r = ExtResource("2_q3sk6")
+arms = ExtResource("3_0k7td")

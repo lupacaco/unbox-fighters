@@ -1,29 +1,37 @@
 """Cut a 4+4 character sheet into eight 200x200 PNGs (edge-black to transparent).
 
-The sheet has front parts on the left and profile parts on the right,
-or front on top and profile on the bottom.
-Each half must contain 4 separate drawings: head, torso, two arms.
+The sheet holds four drawings of the same Freak twice: head, torso and two arms,
+front pose and profile pose. Front may be the top row or the left column.
+
+It also writes <id>_slice.json next to the PNGs with the three fight numbers and
+the joints it could find, so Godot can build data/parts/*.tres with the magnets
+already close to right:
+
+* head and arms carry a metal ball, always the tip that sticks out
+* the torso carries recessed metal cups (neck and shoulders) and a crate base
+
+Use --overlay to save a check image with every joint drawn on top of the part.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 from collections import deque
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
+## Outside assets/ so Godot never imports the check images as game art.
+CHECK_DIR = ROOT / "tools" / "checks"
 CANVAS = 200
 SLOTS = ("head", "body", "arm_l", "arm_r")
-SLOT_LABELS = {
-	"head": "Cabeça",
-	"body": "Tronco",
-	"arm_l": "Braço E",
-	"arm_r": "Braço D",
-}
-SLOT_TYPES = {"head": 0, "body": 1, "arm_l": 2, "arm_r": 3}
+MIN_BLOB = 400
+INK_ALPHA = 40
 
+
+# --------------------------------------------------------------------------- sheet
 
 def uses_alpha_background(im: Image.Image) -> bool:
 	w, h = im.size
@@ -55,12 +63,9 @@ def find_blobs(im: Image.Image, opaque_is_ink: bool) -> list[dict]:
 			n = 0
 			minx = maxx = x
 			miny = maxy = y
-			sx = sy = 0
 			while q:
 				cx, cy = q.popleft()
 				n += 1
-				sx += cx
-				sy += cy
 				minx = min(minx, cx)
 				maxx = max(maxx, cx)
 				miny = min(miny, cy)
@@ -70,91 +75,55 @@ def find_blobs(im: Image.Image, opaque_is_ink: bool) -> list[dict]:
 					if 0 <= nx < w and 0 <= ny < h and not seen[ny][nx] and is_ink(px, nx, ny, opaque_is_ink):
 						seen[ny][nx] = True
 						q.append((nx, ny))
-			if n < 400:
+			if n < MIN_BLOB:
 				continue
-			blobs.append(
-				{
-					"n": n,
-					"cx": sx / n,
-					"cy": sy / n,
-					"box": (minx, miny, maxx + 1, maxy + 1),
-				}
-			)
+			blobs.append({"n": n, "box": (minx, miny, maxx + 1, maxy + 1)})
 	return blobs
 
 
-def classify(blobs: list[dict], width: int, height: int) -> dict[str, dict]:
-	left = [b for b in blobs if b["cx"] < width * 0.48]
-	right = [b for b in blobs if b["cx"] >= width * 0.48]
-	top = [b for b in blobs if b["cy"] < height * 0.48]
-	bottom = [b for b in blobs if b["cy"] >= height * 0.48]
-	if len(left) == 4 and len(right) == 4:
-		return {"front": _name_group(left), "profile": _name_group(right)}
-	if len(top) == 4 and len(bottom) == 4:
-		return {"front": _name_group(top), "profile": _name_group(bottom)}
-	if len(left) == 6 and len(right) == 6:
-		return {"front": _name_group(left), "profile": _name_group(right)}
-	if len(top) == 6 and len(bottom) == 6:
-		return {"front": _name_group(top), "profile": _name_group(bottom)}
+def _bands(blobs: list[dict], axis: int) -> list[list[dict]]:
+	"""Group drawings that share the same row (axis 1) or the same column (axis 0)."""
+	lo_i, hi_i = (0, 2) if axis == 0 else (1, 3)
+	bands: list[list[dict]] = []
+	edge = -1
+	for blob in sorted(blobs, key=lambda b: b["box"][lo_i]):
+		if bands and blob["box"][lo_i] < edge:
+			bands[-1].append(blob)
+			edge = max(edge, blob["box"][hi_i])
+		else:
+			bands.append([blob])
+			edge = blob["box"][hi_i]
+	return bands
+
+
+def classify(blobs: list[dict]) -> dict[str, dict]:
+	rows = _bands(blobs, 1)
+	if len(rows) == 2 and all(len(r) == 4 for r in rows):
+		return {"front": _name_four(rows[0]), "profile": _name_four(rows[1])}
+	cols = _bands(blobs, 0)
+	if len(cols) == 2 and all(len(c) == 4 for c in cols):
+		return {"front": _name_four(cols[0]), "profile": _name_four(cols[1])}
 	raise RuntimeError(
 		"A folha precisa de 4 desenhos de frente e 4 de perfil, separados. "
-		f"Achei {len(left)} à esquerda, {len(right)} à direita, {len(top)} em cima e {len(bottom)} embaixo. "
+		f"Achei {len(blobs)} desenhos, em {len(rows)} linhas e {len(cols)} colunas. "
 		"Se o Freak tem roupa preta, use PNG com fundo transparente (não JPG)."
 	)
 
 
-def _name_group(group: list[dict]) -> dict[str, dict]:
-	if len(group) == 4:
-		return _name_four(group)
-	if len(group) == 6:
-		return _name_six(group)
-	raise RuntimeError("Could not name the drawings")
-
-
 def _name_four(group: list[dict]) -> dict[str, dict]:
-	ordered = sorted(group, key=lambda b: b["cy"])
-	head = ordered[0]
-	rest = ordered[1:]
-	torso = max(rest, key=lambda b: b["n"])
-	arms = [b for b in rest if b is not torso]
-	if len(arms) != 2:
-		raise RuntimeError("Could not split the two arms")
-	arms = sorted(arms, key=lambda b: b["cx"])
-	return {
-		"head": head,
-		"body": torso,
-		"arm_l": arms[0],
-		"arm_r": arms[1],
-	}
+	"""Torso is the biggest drawing; the two arms are the closest pair in size."""
+	torso = max(group, key=lambda b: b["n"])
+	rest = [b for b in group if b is not torso]
+	if len(rest) != 3:
+		raise RuntimeError("Não consegui separar cabeça e braços")
+	pairs = [(a, b) for i, a in enumerate(rest) for b in rest[i + 1:]]
+	arms = min(pairs, key=lambda p: abs(p[0]["n"] - p[1]["n"]))
+	head = next(b for b in rest if b is not arms[0] and b is not arms[1])
+	left, right = sorted(arms, key=lambda b: b["box"][0])
+	return {"head": head, "body": torso, "arm_l": left, "arm_r": right}
 
 
-def _name_six(group: list[dict]) -> dict[str, dict]:
-	ordered = sorted(group, key=lambda b: b["cy"])
-	head = ordered[0]
-	rest = ordered[1:]
-	torso = max(rest, key=lambda b: b["n"])
-	limbs = [b for b in rest if b is not torso]
-	if len(limbs) != 4:
-		raise RuntimeError("Could not split arms and legs")
-	xs = [b["cx"] for b in limbs]
-	ys = [b["cy"] for b in limbs]
-	if max(xs) - min(xs) > (max(ys) - min(ys)) * 1.4:
-		by_x = sorted(limbs, key=lambda b: b["cx"])
-		arms = by_x[:2]
-		legs = by_x[2:]
-	else:
-		limbs_by_y = sorted(limbs, key=lambda b: b["cy"])
-		arms = sorted(limbs_by_y[:2], key=lambda b: b["cx"])
-		legs = sorted(limbs_by_y[2:], key=lambda b: b["cx"])
-	return {
-		"head": head,
-		"body": torso,
-		"arm_l": arms[0],
-		"arm_r": arms[1],
-		"leg_l": legs[0],
-		"leg_r": legs[1],
-	}
-
+# --------------------------------------------------------------------------- canvas
 
 def flood_edge_black(im: Image.Image, keep_dark_clothes: bool = False) -> None:
 	w, h = im.size
@@ -194,51 +163,110 @@ def flood_edge_black(im: Image.Image, keep_dark_clothes: bool = False) -> None:
 		try_add(x, y + 1)
 
 
-def fit_canvas(im: Image.Image, keep_dark_clothes: bool = False) -> tuple[Image.Image, float, tuple[int, int]]:
+def fit_canvas(im: Image.Image, keep_dark_clothes: bool = False) -> Image.Image:
 	flood_edge_black(im, keep_dark_clothes)
+	canvas = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
 	bbox = im.getbbox()
 	if not bbox:
-		empty = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
-		return empty, 1.0, (0, 0)
+		return canvas
 	cropped = im.crop(bbox)
 	cw, ch = cropped.size
 	scale = min(CANVAS / cw, CANVAS / ch)
 	nw = max(1, int(round(cw * scale)))
 	nh = max(1, int(round(ch * scale)))
 	resized = cropped.resize((nw, nh), Image.Resampling.LANCZOS)
-	canvas = Image.new("RGBA", (CANVAS, CANVAS), (0, 0, 0, 0))
-	ox = (CANVAS - nw) // 2
-	oy = (CANVAS - nh) // 2
-	canvas.paste(resized, (ox, oy), resized)
-	return canvas, scale, (ox, oy)
+	canvas.paste(resized, ((CANVAS - nw) // 2, (CANVAS - nh) // 2), resized)
+	return canvas
 
 
-def is_silver(r: int, g: int, b: int, a: int) -> bool:
-	if a < 80:
+# --------------------------------------------------------------------------- joints
+
+def ink_rows(canvas: Image.Image) -> list[list[tuple[int, int]]]:
+	"""For every row, the spans of drawn pixels, left to right."""
+	px = canvas.load()
+	rows: list[list[tuple[int, int]]] = []
+	for y in range(CANVAS):
+		spans: list[tuple[int, int]] = []
+		start = -1
+		for x in range(CANVAS):
+			if px[x, y][3] >= INK_ALPHA:
+				if start < 0:
+					start = x
+			elif start >= 0:
+				spans.append((start, x - 1))
+				start = -1
+		if start >= 0:
+			spans.append((start, CANVAS - 1))
+		rows.append(spans)
+	return rows
+
+
+def _span_at(spans: list[tuple[int, int]], x: float) -> tuple[int, int] | None:
+	if not spans:
+		return None
+	for lo, hi in spans:
+		if lo - 2 <= x <= hi + 2:
+			return (lo, hi)
+	return max(spans, key=lambda s: s[1] - s[0])
+
+
+def ball_joint(rows: list[list[tuple[int, int]]], at_bottom: bool) -> tuple[int, int] | None:
+	"""The connector ball is the round tip at the end of a head or an arm.
+
+	Walking inward from the tip, the silhouette widens to the ball equator and
+	then narrows at the wrist or the neck. That first peak is the ball center.
+	"""
+	order = range(CANVAS - 1, -1, -1) if at_bottom else range(CANVAS)
+	tip = next((y for y in order if rows[y]), -1)
+	if tip < 0:
+		return None
+	step = -1 if at_bottom else 1
+	track = sum(_span_at(rows[tip], CANVAS * 0.5)) * 0.5
+	widths: list[tuple[int, float, int]] = []
+	for i in range(int(CANVAS * 0.5)):
+		y = tip + step * i
+		if y < 0 or y >= CANVAS:
+			break
+		span = _span_at(rows[y], track)
+		if span is None:
+			break
+		track = (span[0] + span[1]) * 0.5
+		widths.append((span[1] - span[0] + 1, track, y))
+	peak = _first_peak(widths)
+	if peak is None:
+		return None
+	return (int(round(peak[1])), peak[2])
+
+
+def _first_peak(widths: list[tuple[int, float, int]], drop_rows: int = 4) -> tuple[int, float, int] | None:
+	for i in range(2, len(widths) - drop_rows):
+		here = widths[i][0]
+		if here < 10 or here > CANVAS * 0.75:
+			continue
+		if widths[i - 1][0] > here:
+			continue
+		if all(widths[i + k][0] < here for k in range(1, drop_rows + 1)):
+			return widths[i]
+	return None
+
+
+def _metal(r: int, g: int, b: int, a: int) -> bool:
+	if a < 120:
 		return False
 	mx = max(r, g, b)
 	mn = min(r, g, b)
-	if mx < 150:
+	if mx < 105 or mx > 250:
 		return False
-	if mx - mn > 45:
-		return False
-	if r > 230 and g > 230 and b > 230:
-		return False
-	return True
+	return (mx - mn) <= mx * 0.33
 
 
-def find_silver_clusters(im: Image.Image, origin: tuple[int, int]) -> list[tuple[float, float]]:
-	w, h = im.size
-	px = im.load()
-	ox, oy = origin
-	seen = [[False] * w for _ in range(h)]
-	centers: list[tuple[float, float, int]] = []
-	for y in range(h):
-		for x in range(w):
-			if seen[y][x]:
-				continue
-			r, g, b, a = px[x, y]
-			if not is_silver(r, g, b, a):
+def metal_blobs(canvas: Image.Image) -> list[dict]:
+	px = canvas.load()
+	seen = [[False] * CANVAS for _ in range(CANVAS)]
+	found: list[dict] = []
+	for y in range(CANVAS):
+		for x in range(CANVAS):
+			if seen[y][x] or not _metal(*px[x, y]):
 				continue
 			q = deque([(x, y)])
 			seen[y][x] = True
@@ -246,210 +274,182 @@ def find_silver_clusters(im: Image.Image, origin: tuple[int, int]) -> list[tuple
 			while q:
 				cx, cy = q.popleft()
 				pts.append((cx, cy))
-				for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+				for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)):
 					nx, ny = cx + dx, cy + dy
-					if 0 <= nx < w and 0 <= ny < h and not seen[ny][nx]:
-						nr, ng, nb, na = px[nx, ny]
-						if is_silver(nr, ng, nb, na):
-							seen[ny][nx] = True
-							q.append((nx, ny))
-			if len(pts) < 80:
+					if 0 <= nx < CANVAS and 0 <= ny < CANVAS and not seen[ny][nx] and _metal(*px[nx, ny]):
+						seen[ny][nx] = True
+						q.append((nx, ny))
+			if len(pts) < 45:
 				continue
-			sx = ox + sum(p[0] for p in pts) / len(pts)
-			sy = oy + sum(p[1] for p in pts) / len(pts)
-			centers.append((sx, sy, len(pts)))
-	centers.sort(key=lambda c: c[2], reverse=True)
-	return [(c[0], c[1]) for c in centers]
+			xs = [p[0] for p in pts]
+			ys = [p[1] for p in pts]
+			w = max(xs) - min(xs) + 1
+			h = max(ys) - min(ys) + 1
+			if w < 6 or h < 6:
+				continue
+			if not 0.30 <= w / h <= 3.2:
+				continue
+			if len(pts) < w * h * 0.34:
+				continue
+			found.append({"n": len(pts), "cx": sum(xs) / len(pts), "cy": sum(ys) / len(pts)})
+	found.sort(key=lambda c: c["n"], reverse=True)
+	return found
 
 
-def to_magnet(px: float, py: float) -> tuple[int, int]:
-	return (int(round(px - CANVAS * 0.5)), int(round(py - CANVAS * 0.5)))
+## A shoulder cup found this close to the neck is really something else on the chest.
+MIN_SHOULDER_SPREAD = 22
+## Sockets live on the torso, never down in the crate.
+SOCKET_CEILING = int(CANVAS * 0.62)
 
 
-def name_body_sockets(points: list[tuple[float, float]]) -> dict[str, tuple[int, int]]:
-	if not points:
-		return {}
-	pts = points[:5] if len(points) > 5 else points
-	if len(pts) == 1:
-		return {"neck": to_magnet(*pts[0])}
-	by_y = sorted(pts, key=lambda p: p[1])
-	named: dict[str, tuple[int, int]] = {"neck": to_magnet(*by_y[0])}
-	rest = by_y[1:]
-	if len(rest) >= 4:
-		hips = sorted(rest, key=lambda p: p[1])[-2:]
-		hips = sorted(hips, key=lambda p: p[0])
-		shoulders = [p for p in rest if p not in hips]
-		shoulders = sorted(shoulders, key=lambda p: p[0])
-		named["shoulder_l"] = to_magnet(*shoulders[0])
-		named["shoulder_r"] = to_magnet(*shoulders[-1])
-		named["hip_l"] = to_magnet(*hips[0])
-		named["hip_r"] = to_magnet(*hips[-1])
-	elif len(rest) >= 2:
-		high, low = sorted(rest, key=lambda p: p[1])[0], sorted(rest, key=lambda p: p[1])[-1]
-		named["shoulder_r"] = to_magnet(*high)
-		named["shoulder_l"] = named["shoulder_r"]
-		named["hip_r"] = to_magnet(*low)
-		named["hip_l"] = named["hip_r"]
-	elif len(rest) == 1:
-		named["hip_r"] = to_magnet(*rest[0])
-		named["hip_l"] = named["hip_r"]
-	return named
+def torso_joints(
+	canvas: Image.Image, rows: list[list[tuple[int, int]]], profile: bool
+) -> dict[str, tuple[int, int]]:
+	"""Neck and shoulder cups, plus the crate base the Freak stands on."""
+	joints: dict[str, tuple[int, int]] = {}
+	floor = next((y for y in range(CANVAS - 1, -1, -1) if rows[y]), CANVAS - 1)
+	mid = _span_at(rows[floor], CANVAS * 0.5)
+	joints["ground"] = (int(round((mid[0] + mid[1]) * 0.5)) if mid else CANVAS // 2, floor)
 
+	cups = [c for c in metal_blobs(canvas) if c["cy"] < SOCKET_CEILING]
+	if profile:
+		# Turned sideways only one shoulder cup faces us, and the neck cup hides
+		# behind the collar, so the neck starts at the top of the silhouette.
+		joints["neck"] = _silhouette_top(rows)
+		if cups:
+			only = (int(round(cups[0]["cx"])), int(round(cups[0]["cy"])))
+			joints["shoulder_l"] = only
+			joints["shoulder_r"] = only
+		return joints
 
-def name_single_socket(points: list[tuple[float, float]], slot: str) -> dict[str, tuple[int, int]]:
-	if not points:
-		return {}
-	if slot == "head":
-		pt = max(points, key=lambda p: p[1])
-		return {"join": to_magnet(*pt)}
-	pt = min(points, key=lambda p: p[1])
-	return {"join": to_magnet(*pt)}
-
-
-def write_part_tres(
-	parts_dir: Path,
-	set_id: str,
-	display_name: str,
-	slot: str,
-	combat: int,
-	magnets_front: dict,
-	magnets_profile: dict,
-) -> None:
-	path = parts_dir / f"{set_id}_{slot}.tres"
-	lines = [
-		'[gd_resource type="Resource" script_class="PartDef" load_steps=4 format=3]',
-		"",
-		'[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1"]',
-		f'[ext_resource type="Texture2D" path="res://assets/characters/{set_id}/{set_id}_{slot}-1.png" id="2"]',
-		f'[ext_resource type="Texture2D" path="res://assets/characters/{set_id}/{set_id}_{slot}-2.png" id="3"]',
-		"",
-		"[resource]",
-		'script = ExtResource("1")',
-		f'id = &"{set_id}_{slot}"',
-		f'display_name = "{display_name} {SLOT_LABELS[slot]}"',
-		f"slot_type = {SLOT_TYPES[slot]}",
-		'sprite = ExtResource("2")',
-		'sprite_profile = ExtResource("3")',
-		f'set_id = &"{set_id}"',
-		f"combat_value = {combat}",
-		"tier = 1" if combat <= 5 else f"tier = {1 if combat <= 5 else (2 if combat == 6 else (3 if combat == 7 else (4 if combat == 8 else 5)))}",
-	]
-	if slot == "body":
-		for key, val in magnets_front.items():
-			lines.append(f"magnet_{key} = Vector2({val[0]}, {val[1]})")
-		for key, val in magnets_profile.items():
-			lines.append(f"magnet_{key}_profile = Vector2({val[0]}, {val[1]})")
-	else:
-		prop = "magnet_down" if slot == "head" else "magnet_up"
-		if "join" in magnets_front:
-			x, y = magnets_front["join"]
-			lines.append(f"{prop} = Vector2({x}, {y})")
-		if "join" in magnets_profile:
-			x, y = magnets_profile["join"]
-			lines.append(f"{prop}_profile = Vector2({x}, {y})")
-	path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-
-def write_character(parts_dir: Path, set_id: str, display_name: str) -> None:
-	path = parts_dir / f"{set_id}_character.tres"
-	path.write_text(
-		"\n".join(
-			[
-				'[gd_resource type="Resource" script_class="CharacterDef" load_steps=6 format=3]',
-				"",
-				'[ext_resource type="Script" path="res://scripts/data/character_def.gd" id="1"]',
-				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_head.tres" id="2"]',
-				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_body.tres" id="3"]',
-				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_arm_l.tres" id="4"]',
-				f'[ext_resource type="Resource" path="res://data/parts/{set_id}_arm_r.tres" id="5"]',
-				"",
-				"[resource]",
-				'script = ExtResource("1")',
-				f'id = &"{set_id}"',
-				f'display_name = "{display_name}"',
-				'head = ExtResource("2")',
-				'body = ExtResource("3")',
-				'arm_l = ExtResource("4")',
-				'arm_r = ExtResource("5")',
-				"",
-			]
+	if not cups:
+		return joints
+	cups.sort(key=lambda c: c["cy"])
+	neck = (int(round(cups[0]["cx"])), int(round(cups[0]["cy"])))
+	joints["neck"] = neck
+	sides = [c for c in cups[1:] if abs(c["cx"] - neck[0]) >= MIN_SHOULDER_SPREAD]
+	if not sides:
+		return joints
+	# The cups sit either side of the neck, so one good find gives the other.
+	far = max(sides, key=lambda c: abs(c["cx"] - neck[0]))
+	spread = abs(far["cx"] - neck[0])
+	pair = [(int(round(far["cx"])), int(round(far["cy"])))]
+	twin = next(
+		(
+			c
+			for c in sides
+			if (c["cx"] - neck[0]) * (far["cx"] - neck[0]) < 0
+			and abs(c["cx"] - neck[0]) >= spread * 0.6
 		),
-		encoding="utf-8",
+		None,
 	)
+	if twin is not None:
+		pair.append((int(round(twin["cx"])), int(round(twin["cy"]))))
+	else:
+		pair.append((2 * neck[0] - pair[0][0], pair[0][1]))
+	pair.sort(key=lambda p: p[0])
+	joints["shoulder_l"] = pair[0]
+	joints["shoulder_r"] = pair[1]
+	return joints
 
 
-def slice_sheet(sheet_path: Path, set_id: str, out_dir: Path) -> dict:
+def _silhouette_top(rows: list[list[tuple[int, int]]]) -> tuple[int, int]:
+	top = next((y for y in range(CANVAS) if rows[y]), 0)
+	band = [s for y in range(top, min(CANVAS, top + 14)) for s in rows[y]]
+	if not band:
+		return (CANVAS // 2, top)
+	lo = min(s[0] for s in band)
+	hi = max(s[1] for s in band)
+	return (int(round((lo + hi) * 0.5)), top + 4)
+
+
+def find_joints(canvas: Image.Image, slot: str, profile: bool) -> dict[str, tuple[int, int]]:
+	rows = ink_rows(canvas)
+	if slot == "body":
+		return torso_joints(canvas, rows, profile)
+	point = ball_joint(rows, at_bottom=slot == "head")
+	return {"join": point} if point else {}
+
+
+def to_magnet(point: tuple[int, int]) -> list[int]:
+	return [point[0] - CANVAS // 2, point[1] - CANVAS // 2]
+
+
+# --------------------------------------------------------------------------- run
+
+def save_overlay(canvas: Image.Image, joints: dict, dest: Path) -> None:
+	shot = Image.new("RGBA", (CANVAS, CANVAS), (24, 20, 34, 255))
+	shot.alpha_composite(canvas)
+	pen = ImageDraw.Draw(shot)
+	for name, (x, y) in joints.items():
+		colour = (255, 90, 90, 255) if name == "ground" else (90, 230, 255, 255)
+		pen.ellipse((x - 6, y - 6, x + 6, y + 6), outline=colour, width=2)
+		pen.line((x - 9, y, x + 9, y), fill=colour)
+		pen.line((x, y - 9, x, y + 9), fill=colour)
+		pen.text((x + 8, y - 12), name, fill=colour)
+	shot.save(dest, "PNG")
+
+
+def slice_sheet(sheet_path: Path, set_id: str, out_dir: Path, overlay: bool) -> dict:
 	sheet = Image.open(sheet_path).convert("RGBA")
 	keep_dark = uses_alpha_background(sheet)
 	try:
-		named = classify(find_blobs(sheet, keep_dark), sheet.width, sheet.height)
+		named = classify(find_blobs(sheet, keep_dark))
 	except RuntimeError:
 		keep_dark = not keep_dark
-		named = classify(find_blobs(sheet, keep_dark), sheet.width, sheet.height)
+		named = classify(find_blobs(sheet, keep_dark))
 	out_dir.mkdir(parents=True, exist_ok=True)
 	report: dict = {}
 	for pose, suffix in (("front", "1"), ("profile", "2")):
 		report[pose] = {}
 		for slot in SLOTS:
-			blob = named[pose][slot]
-			box = blob["box"]
+			box = named[pose][slot]["box"]
 			pad = 8
-			x0 = max(0, box[0] - pad)
-			y0 = max(0, box[1] - pad)
-			x1 = min(sheet.width, box[2] + pad)
-			y1 = min(sheet.height, box[3] + pad)
-			crop = sheet.crop((x0, y0, x1, y1)).convert("RGBA")
-			raw = crop.copy()
-			flood_edge_black(raw, keep_dark)
-			bbox = raw.getbbox()
-			canvas, scale, origin = fit_canvas(crop, keep_dark)
-			dest = out_dir / f"{set_id}_{slot}-{suffix}.png"
-			canvas.save(dest, "PNG")
-			points = []
-			if bbox:
-				local = find_silver_clusters(raw.crop(bbox), (0, 0))
-				points = [(origin[0] + px * scale, origin[1] + py * scale) for px, py in local]
-			mags = name_body_sockets(points) if slot == "body" else name_single_socket(points, slot)
-			report[pose][slot] = mags
-			print(pose, slot, dest.name, "magnets", mags)
+			crop = sheet.crop(
+				(
+					max(0, box[0] - pad),
+					max(0, box[1] - pad),
+					min(sheet.width, box[2] + pad),
+					min(sheet.height, box[3] + pad),
+				)
+			).convert("RGBA")
+			canvas = fit_canvas(crop, keep_dark)
+			canvas.save(out_dir / f"{set_id}_{slot}-{suffix}.png", "PNG")
+			joints = find_joints(canvas, slot, pose == "profile")
+			report[pose][slot] = {name: to_magnet(pt) for name, pt in joints.items()}
+			if overlay:
+				CHECK_DIR.mkdir(parents=True, exist_ok=True)
+				save_overlay(canvas, joints, CHECK_DIR / f"{set_id}_{slot}-{suffix}.png")
+			print(pose, slot, report[pose][slot])
 	return report
 
 
 def main() -> None:
 	parser = argparse.ArgumentParser(description="Cut a 4+4 Freak sheet into eight 200x200 parts.")
 	parser.add_argument("sheet", help="Path to the PNG/WEBP sheet")
-	parser.add_argument("--id", required=True, help="Internal id, e.g. vampiro")
-	parser.add_argument("--name", default="", help="Display name, e.g. Vampiro")
-	parser.add_argument("--value", type=int, default=4, help="Combat number if --head/--body are omitted")
-	parser.add_argument("--head", type=int, default=0, help="Shop number for the head kit")
-	parser.add_argument("--body", type=int, default=0, help="Shop number for the torso kit")
-	parser.add_argument("--write-defs", action="store_true", help="Also write data/parts/*.tres")
+	parser.add_argument("--id", required=True, help="Internal id, e.g. bruxa")
+	parser.add_argument("--name", default="", help="Display name, e.g. Bruxa")
+	parser.add_argument("--power", type=int, default=5, help="Cabeca: Poder, 1 a 10")
+	parser.add_argument("--toughness", type=int, default=15, help="Tronco: Resistencia, 10 a 20")
+	parser.add_argument("--agility", type=int, default=3, help="Bracos: Agilidade, 1 a 5")
+	parser.add_argument("--overlay", action="store_true", help="Save a check image with the joints drawn")
 	args = parser.parse_args()
 	set_id = args.id.strip().lower()
-	display_name = args.name.strip() or set_id.capitalize()
-	head_v = args.head or args.value
-	body_v = args.body or args.value
-	slot_values = {
-		"head": head_v,
-		"body": body_v,
-		"arm_l": body_v,
-		"arm_r": body_v,
-	}
 	out_dir = ROOT / "assets" / "characters" / set_id
-	report = slice_sheet(Path(args.sheet), set_id, out_dir)
-	if args.write_defs:
-		parts_dir = ROOT / "data" / "parts"
-		for slot in SLOTS:
-			write_part_tres(
-				parts_dir,
-				set_id,
-				display_name,
-				slot,
-				slot_values[slot],
-				report["front"][slot],
-				report["profile"][slot],
-			)
-		write_character(parts_dir, set_id, display_name)
+	report = slice_sheet(Path(args.sheet), set_id, out_dir, args.overlay)
+	payload = {
+		"id": set_id,
+		"display_name": args.name.strip() or set_id.capitalize(),
+		"stats": {
+			"power": max(1, min(10, args.power)),
+			"toughness": max(10, min(20, args.toughness)),
+			"agility": max(1, min(5, args.agility)),
+		},
+		"magnets": report,
+	}
+	(out_dir / f"{set_id}_slice.json").write_text(
+		json.dumps(payload, ensure_ascii=False, indent="\t") + "\n", encoding="utf-8"
+	)
 	print("done")
 
 

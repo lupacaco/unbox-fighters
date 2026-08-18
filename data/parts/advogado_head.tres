@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_nqo4j"]
+[ext_resource type="Texture2D" path="res://assets/characters/advogado/advogado_head-1.png" id="2_xg5dc"]
+[ext_resource type="Texture2D" path="res://assets/characters/advogado/advogado_head-2.png" id="3_6igw3"]
+
+[resource]
+script = ExtResource("1_nqo4j")
+id = &"advogado_head"
+display_name = "Advogado Cabeça"
+set_id = &"advogado"
+sprite = ExtResource("2_xg5dc")
+sprite_profile = ExtResource("3_6igw3")
+stat_value = 4
+tier = 2
+magnet_down = Vector2(0, 80)
+magnet_down_profile = Vector2(-13, 82)

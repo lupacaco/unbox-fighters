@@ -4,7 +4,7 @@ Este é o jeito certo de colocar um Freak novo no jogo. Siga **todos** os passos
 
 As regras da loja, sinergia e luta (o que o jogador vê) estão em [Mecânicas e regras](../jogo/mecanicas-e-regras.md).
 
-O jogador manda uma folha de desenho. O jogo precisa de **8 recortes** (4 de frente + 4 de perfil), **4 kits na loja** (cabeça, tronco, braço E, braço D), e uma ficha do personagem. A **base-mola já vem na carta**. Não tem pernas. A loja **acha sozinha** qualquer ficha nova em `data/parts/`.
+O jogador manda uma folha de desenho. O jogo precisa de **8 recortes** (4 de frente + 4 de perfil), **3 kits na loja** (cabeça, tronco, os dois braços juntos), e uma ficha do personagem. O **caixote já vem no tronco**. Não tem pernas. A loja **acha sozinha** qualquer ficha nova em `data/parts/`.
 
 ## O que a folha precisa ter
 
@@ -15,13 +15,13 @@ Pode ser **frente à esquerda e perfil à direita**, ou **frente em cima e perfi
 As 4 partes:
 
 1. Cabeça
-2. Tronco (com **5 esferas** de metal: pescoço, dois ombros, dois quadris)
+2. Tronco (com **4 esferas** de metal: pescoço, dois ombros, e a base do caixote no chão)
 3. Braço esquerdo (de quem olha)
 4. Braço direito
 
 Cabeça e braços têm **1 esfera** cada, no ponto de união.
 
-Nome interno (`id` / pasta): minúsculo, sem acento. Exemplo: `vampiro`.
+Nome interno (`id` / pasta): minúsculo, sem acento. Exemplo: `bruxa`.
 
 Nome na carta: com acento se precisar (`Bruxa`).
 
@@ -31,14 +31,14 @@ Nome na carta: com acento se precisar (`Bruxa`).
 
 1. Menu **Project → Tools → Incluir personagem** (se o Godot estiver em português: **Projeto → Ferramentas**).
 2. Escolha a folha PNG ou WEBP.
-3. Preencha o id, o nome na carta e os **2 números** da loja (Cabeça, Tronco).
-4. Clique **Cortar e criar**. A janela **fica aberta** e mostra o que está acontecendo (costuma levar poucos segundos). Se a folha estiver errada, o texto fica vermelho na mesma janela. Se der certo, abre a ferramenta de ímãs.
+3. Preencha o id, o nome na carta e os **3 números**: Poder (cabeça), Resistência (tronco), Agilidade (braços).
+4. Clique **Cortar e criar**. A janela **fica aberta** e mostra o que está acontecendo. Se a folha estiver errada, o texto fica vermelho na mesma janela. Se der certo, abre a ferramenta de ímãs.
 
 ### B) Quando a folha chega no chat (assistente)
 
-1. Cortar com `tools/slice_character_sheet.py` (8 PNG **200×200** transparentes em `assets/characters/{id}/`).
-2. Criar as fichas em `data/parts/` (`--write-defs`, ou o menu do Godot).
-3. Marcar os ímãs no Godot (passo 2 abaixo). Não chute X = 0.
+1. Cortar com `tools/slice_character_sheet.py` (8 PNG **200×200** transparentes em `assets/characters/{id}/`, mais um `{id}_slice.json` com os ímãs que o script achou).
+2. Gerar as fichas com `godot --headless --path . --script scripts/core/import_roster.gd`.
+3. Conferir os ímãs no Godot (passo 2 abaixo). Não chute X = 0.
 
 Não apague todo pixel preto da folha. Só o preto ligado às **bordas**. Se o Freak tem **roupa preta**, a folha precisa ser **PNG com fundo transparente**. JPG com fundo preto mistura a roupa com o fundo e o corte falha.
 
@@ -64,8 +64,11 @@ Cada PNG:
 Comando:
 
 ```
-python tools/slice_character_sheet.py CAMINHO_DA_FOLHA --id ID --name NOME --value 4 --write-defs
+python tools/slice_character_sheet.py CAMINHO_DA_FOLHA --id ID --name NOME --power 8 --toughness 15 --agility 2 --overlay
+godot --headless --path . --script scripts/core/import_roster.gd
 ```
+
+`--overlay` grava uma foto de conferência em `tools/checks/` (o Godot não importa essa pasta).
 
 ## 2. Pontos de encaixe (ímãs)
 
@@ -74,9 +77,9 @@ Os ímãs dizem onde cada esfera de metal cola na vizinha.
 **Não chute os números.** Marque na imagem:
 
 1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**).
-2. No alto da janela, escolha o **Freak** (ex.: Vampiro).
-3. Use a aba **Frente** e a aba **Perfil**. As 4 partes ficam em duas colunas compactas. À direita: a prévia. A janela cabe na tela do Godot; arraste o canto se quiser maior.
-4. Se um desenho estiver no tipo errado, escolha o certo na caixa (ex.: Braço E). **Virar** e **Girar** corrigem a imagem. **Z** 1 fica na frente **na carta**. Na luta a ordem é outra: de frente cabeça / braço E / braço D / tronco / mola; de perfil braço D / tronco / cabeça / braço E / mola. **Imagem** escolhe o PNG desta peça na pasta do Freak. Se errar, **Trocar** escolhe outro — a pasta fica igual. **Ampliar** abre a peça grande para marcar o ímã com precisão (roda do mouse amplia).
+2. No alto da janela, escolha o **Freak** (ex.: Bruxa).
+3. Use a aba **Frente** e a aba **Perfil**. As 4 partes ficam em duas colunas. À direita: a prévia.
+4. Se um desenho estiver no tipo errado, escolha o certo na caixa (ex.: Braço E). **Virar** e **Girar** corrigem a imagem. **Z** 1 fica na frente **na carta**. **Imagem** escolhe o PNG desta peça na pasta do Freak. Se errar, **Trocar** escolhe outro — a pasta fica igual. **Ampliar** abre a peça grande para marcar o ímã com precisão (roda do mouse amplia).
 5. Arraste cada bolinha até o **centro da esfera de metal**.
 6. Clique **Salvar**. Cada bolinha que você solta também já grava aquela peça.
 
@@ -87,10 +90,10 @@ Espaço da imagem: o centro do PNG é `(0, 0)`. **Y cresce para baixo.**
 | Peça | Ímãs |
 |------|------|
 | Cabeça | 1: BAIXO (base do pescoço) |
-| Tronco | 5: PESCOÇO, OE (ombro esquerdo), OD, QE (quadril esquerdo), QD |
+| Tronco | 4: PESCOÇO, OE (ombro esquerdo), OD, CHÃO (base do caixote) |
 | Braço | 1: CIMA (topo da peça) |
 
-Marque **frente e perfil** nas duas abas. A carta usa a frente; a luta usa o lado. Se só a frente estiver marcada, o pescoço de lado fica torto.
+Marque **frente e perfil** nas duas abas. A carta usa a frente; a esteira usa o lado.
 
 Se você estiver com uma peça aberta no Inspetor, o botão **Abrir Frente / Perfil deste Freak** abre a mesma janela já no Freak certo.
 
@@ -98,26 +101,23 @@ Se você estiver com uma peça aberta no Inspetor, o botão **Abrir Frente / Per
 
 Se o jogador pedir números, use os dele.
 
-O nível da loja sai do número:
+| Kit | Faixa | Preço |
+|-----|-------|-------|
+| Cabeça = Poder | 1 a 10 | o próprio Poder |
+| Tronco = Resistência | 10 a 20 | Resistência − 10 (mínimo $1) |
+| Braços = Agilidade | 1 a 5 | a própria Agilidade |
 
-| Número | Loja |
-|--------|------|
-| 3, 4 ou 5 | 1 (sai cedo) |
-| 6 | 2 |
-| 7 | 3 |
-| 8 | 4 |
-| 9 | 5 (só no fim) |
-
-Grave os dois: `combat_value` e `tier`.
+Grave `stat_value` (o número) em cada kit. O preço a loja calcula sozinha.
 
 ## 4. Fichas das peças e do personagem
 
-Oito recortes viram **4 fichas de desenho** + a ficha do personagem. A loja vende cabeça, tronco e os dois braços:
+Oito recortes viram **4 fichas de desenho** + o kit de braços + a ficha do personagem:
 
-- Desenho / loja: `{id}_head.tres` `{id}_body.tres` `{id}_arm_l.tres` `{id}_arm_r.tres`
+- Desenho: `{id}_head.tres` `{id}_body.tres` `{id}_arm_l.tres` `{id}_arm_r.tres`
+- Loja: `{id}_arms.tres` (os dois braços juntos)
 - Personagem: `{id}_character.tres`
 
-A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 4 kits de cada Freak. Os dois números que você preenche (cabeça, tronco) também valem para os braços (o tronco copia o número para os dois braços). A base-mola já está na carta. Freak novo entra no Play seguinte, sem lista na mão.
+A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 3 kits de cada Freak. Freak novo entra no Play seguinte, sem lista na mão.
 
 ## 5. Documentação
 
@@ -132,12 +132,12 @@ Atualize:
 
 - Os 8 PNG são 200 × 200 e têm transparência de verdade
 - Preto de dentro do desenho não sumiu
-- Play: kit na caixa (braço E e braço D separados), encaixa na carta em cima da mola, set completo (cabeça + tronco + 2 braços) mostra o nome certo
-- Tronco tem 5 ímãs visíveis na ferramenta
+- Play: uma caixa de braços solta os **dois** braços; o tronco senta pelo caixote; set completo (cabeça + tronco + braços) mostra o nome certo
+- Tronco tem 4 ímãs visíveis na ferramenta (pescoço, ombros, chão)
 
 ## Sets que já passaram por este fluxo
 
-| id | Nome | Números |
-|----|------|---------|
-| `vampiro` | Vampiro | Cabeça 3, tronco 4, braços 4 (nível 1). Total 15 |
-| `bruxa` | Bruxa | Cabeça 4, tronco 3, braços 3 (nível 1). Total 13 |
+| id | Nome | Poder | Resistência | Agilidade |
+|----|------|-------|-------------|-----------|
+| `bruxa` | Bruxa | 8 | 15 | 2 |
+| `advogado` | Advogado | 4 | 18 | 5 |

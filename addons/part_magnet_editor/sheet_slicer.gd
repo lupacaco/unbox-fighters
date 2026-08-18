@@ -9,7 +9,7 @@ const SLOT_NAMES: PackedStringArray = ["head", "body", "arm_l", "arm_r"]
 
 static func slice_to_folder(sheet_path: String, set_id: String) -> Dictionary:
 	if set_id.is_empty():
-		return _fail("O id interno precisa ser minúsculo, sem acento. Exemplo: vampiro.")
+		return _fail("O id interno precisa ser minúsculo, sem acento. Exemplo: bruxa.")
 	var img := Image.new()
 	var err := img.load(sheet_path)
 	if err != OK:
@@ -164,88 +164,40 @@ static func _classify(blobs: Array, width: int, height: int) -> Dictionary:
 		else:
 			bottom.append(blob)
 	if left.size() == 4 and right.size() == 4:
-		return {"front": _name_group(left), "profile": _name_group(right), "error": ""}
+		return {"front": _name_four(left), "profile": _name_four(right), "error": ""}
 	if top.size() == 4 and bottom.size() == 4:
-		return {"front": _name_group(top), "profile": _name_group(bottom), "error": ""}
-	if left.size() == 6 and right.size() == 6:
-		return {"front": _name_group(left), "profile": _name_group(right), "error": ""}
-	if top.size() == 6 and bottom.size() == 6:
-		return {"front": _name_group(top), "profile": _name_group(bottom), "error": ""}
+		return {"front": _name_four(top), "profile": _name_four(bottom), "error": ""}
 	return {
 		"front": {},
 		"profile": {},
 		"error": "A folha precisa de 4 desenhos de frente e 4 de perfil, separados. Achei %d à esquerda, %d à direita, %d em cima e %d embaixo. Se o Freak tem roupa preta, use PNG com fundo transparente (não JPG)." % [left.size(), right.size(), top.size(), bottom.size()],
 	}
 
-static func _name_group(group: Array) -> Dictionary:
-	if group.size() == 4:
-		return _name_four(group)
-	if group.size() == 6:
-		return _name_six(group)
-	return {}
-
+## Torso is the biggest blob. Of the three left over, the two closest in size are
+## the arms, because a pair of arms is drawn the same. The odd one is the head.
 static func _name_four(group: Array) -> Dictionary:
-	var ordered := group.duplicate()
-	ordered.sort_custom(func(a, b): return a["cy"] < b["cy"])
-	var head: Dictionary = ordered[0]
-	var rest: Array = ordered.slice(1)
+	if group.size() != 4:
+		return {}
+	var rest := group.duplicate()
 	var torso: Dictionary = rest[0]
 	for blob in rest:
 		if int(blob["n"]) > int(torso["n"]):
 			torso = blob
+	rest.erase(torso)
+	rest.sort_custom(func(a, b): return int(a["n"]) < int(b["n"]))
+	var low_gap: int = int(rest[1]["n"]) - int(rest[0]["n"])
+	var high_gap: int = int(rest[2]["n"]) - int(rest[1]["n"])
+	var head: Dictionary = rest[2] if low_gap <= high_gap else rest[0]
 	var arms: Array = []
 	for blob in rest:
-		if blob != torso:
+		if blob != head:
 			arms.append(blob)
-	if arms.size() != 2:
-		return {}
-	arms.sort_custom(func(a, b): return a["cx"] < b["cx"])
+	arms.sort_custom(func(a, b): return float(a["cx"]) < float(b["cx"]))
 	return {
 		"head": head,
 		"body": torso,
 		"arm_l": arms[0],
 		"arm_r": arms[1],
-	}
-
-static func _name_six(group: Array) -> Dictionary:
-	var ordered := group.duplicate()
-	ordered.sort_custom(func(a, b): return a["cy"] < b["cy"])
-	var head: Dictionary = ordered[0]
-	var rest: Array = ordered.slice(1)
-	var torso: Dictionary = rest[0]
-	for blob in rest:
-		if int(blob["n"]) > int(torso["n"]):
-			torso = blob
-	var limbs: Array = []
-	for blob in rest:
-		if blob != torso:
-			limbs.append(blob)
-	if limbs.size() != 4:
-		return {}
-	var xs: Array[float] = []
-	var ys: Array[float] = []
-	for blob in limbs:
-		xs.append(float(blob["cx"]))
-		ys.append(float(blob["cy"]))
-	var arms: Array
-	var legs: Array
-	if xs.max() - xs.min() > (ys.max() - ys.min()) * 1.4:
-		limbs.sort_custom(func(a, b): return a["cx"] < b["cx"])
-		arms = [limbs[0], limbs[1]]
-		legs = [limbs[2], limbs[3]]
-	else:
-		limbs.sort_custom(func(a, b): return a["cy"] < b["cy"])
-		arms = [limbs[0], limbs[1]]
-		legs = [limbs[2], limbs[3]]
-		arms.sort_custom(func(a, b): return a["cx"] < b["cx"])
-		legs.sort_custom(func(a, b): return a["cx"] < b["cx"])
-	return {
-		"head": head,
-		"body": torso,
-		"arm_l": arms[0],
-		"arm_r": arms[1],
-		"leg_l": legs[0],
-		"leg_r": legs[1],
 	}
 
 static func _flood_edge_black(im: Image, keep_dark_clothes: bool = false) -> void:

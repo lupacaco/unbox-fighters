@@ -23,16 +23,15 @@ Os efeitos passam por um canal **SFX** com compressão leve (segura o volume qua
 |----|---------|-------------|
 | `hammer_hit` | `hammer_hit.wav` | Martelo na caixa (junto com o estouro) |
 | `crate_crack` | `crate_crack.wav` | Trinca de madeira (reservado) |
-| `crate_break` | `crate_break.wav` | Caixa quebra / tábuas caindo |
+| `crate_break` | `crate_break.wav` | Caixa quebra / tábuas caindo / Freak caindo no vão |
 | `part_pickup` | `part_pickup.wav` | Começa a arrastar uma peça |
-| `part_place` | `part_place.wav` | Peça encaixa na carta |
-| `part_reject` | `part_reject.wav` | Soltou no lugar errado / voltou / sem pancada |
-| `fighter_complete` | `fighter_complete.wav` | Carta completa (cabeça + tronco + 2 braços) — só na montagem |
-| `impact` | `impact.wav` | Poom do choque / KO na luta |
-| `step` | `step.wav` | Pouso do pulo ao andar na luta |
-| `spring_boing` | `spring_boing.wav` | Boing da mola (som de mola de desenho) quando o brinquedo sai do chão |
+| `part_place` | `part_place.wav` | Peça encaixa na carta / vende |
+| `part_reject` | `part_reject.wav` | Soltou no lugar errado / voltou / sem dinheiro |
+| `fighter_complete` | `fighter_complete.wav` | Carta completa (3 kits) — só na montagem |
+| `impact` | `impact.wav` | Poom do golpe na luta |
+| `step` | `step.wav` | Pouso ao cair na esteira |
 
-Na luta tocam o **boing** no impulso do pulo, o passo no pouso e o poom do golpe. Vento, clique de ímã e tom de vitória **não** entram no palco.
+Não existe mais som de mola. A base do Freak é o caixote.
 
 Abrir a caixa toca martelo e, um instante depois, a madeira quebrando — os dois juntos, sem o mesmo arquivo servindo para tudo.
 
@@ -44,7 +43,7 @@ Origem e licença: [assets/audio/sfx/ATTRIBUTION.md](../../assets/audio/sfx/ATTR
 python tools/fetch_sfx.py
 ```
 
-Para baixar só um som: `python tools/fetch_sfx.py spring_boing`.
+Para baixar só um som: `python tools/fetch_sfx.py impact`.
 
 (Precisa de `miniaudio` e `numpy` no Python.) Isso baixa de novo as gravações da Mixkit e recorta/normaliza. Não use o gerador antigo de bipes.
 

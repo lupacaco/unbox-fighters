@@ -1,31 +1,36 @@
 class_name MatchRules
 extends RefCounted
 
-## Closed numbers for the auto-battle match. Keep presentation code out of here.
+## Closed numbers for the live 1-versus-1 match. Keep presentation code out of here.
 
-const STARTING_HP := 40
-const STARTING_GOLD := 3
-const MAX_GOLD := 10
-const PREP_SECONDS := 60.0
-const SHOP_SLOTS := 5
-const QUEUE_SIZE := 3
-const DAMAGE_CAP_PER_FIGHTER := 12
-const SHOP_MAX_TIER := 5
-const OPEN_CRATE_COST := 1
+## Each player has a life bar. A Freak alone at the end of the belt drains it.
+const STARTING_HP := 100
+const CHIP_DAMAGE := 1
+const CHIP_INTERVAL := 1.0
+
+## Money ticks up on its own and caps out, so sitting on cash is a waste.
+const STARTING_MONEY := 10
+const MAX_MONEY := 10
+const MONEY_INTERVAL := 2.0
+
+## The shop shows four crates at once and rerolling all four costs a coin.
+const SHOP_SLOTS := 4
 const REFRESH_COST := 1
-const SELL_REWARD := 1
-const HUMAN_COUNT := 1
-const BOT_COUNT := 3
 
-## Cost to go from tier 1→2, 2→3, 3→4, 4→5.
-const UPGRADE_COSTS: Array[int] = [4, 5, 6, 7]
+## Two cards, so you can build the next Freak while the first one fights.
+const CARD_COUNT := 2
+## How many Freaks fit on one belt.
+const BELT_CAPACITY := 2
 
-const BOT_NAMES: Array[String] = ["Sombra", "Ferrugem", "Névoa"]
+## Sliding speed in pixels per second: agility 1 is a crawl, agility 5 flies.
+const BELT_BASE_SPEED := 120.0
+const BELT_SPEED_PER_AGILITY := 60.0
 
-static func gold_for_round(round_index: int) -> int:
-	return mini(MAX_GOLD, STARTING_GOLD + maxi(round_index, 1) - 1)
+## One exchange of blows, then both sides take their damage.
+const DUEL_INTERVAL := 1.1
 
-static func upgrade_cost(current_tier: int) -> int:
-	if current_tier < 1 or current_tier >= SHOP_MAX_TIER:
-		return -1
-	return UPGRADE_COSTS[current_tier - 1]
+const OPPONENT_NAME := "Oponente"
+const PLAYER_NAME := "Você"
+
+static func belt_speed(agility: int) -> float:
+	return BELT_BASE_SPEED + float(maxi(agility, 0)) * BELT_SPEED_PER_AGILITY

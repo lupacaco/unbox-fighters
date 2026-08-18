@@ -1,6 +1,13 @@
 @tool
 extends RefCounted
 
+## Turns a sliced sheet into the resources the game reads: four drawings, the
+## arm kit that carries both arms, and the character card that ties them together.
+##
+## When the Python slicer left a `{id}_slice.json` next to the drawings, the
+## magnets come from it. Otherwise every part starts on the safe default spot
+## and you nudge them in Project → Tools → Ímãs das Peças.
+
 const SheetSlicer := preload("res://addons/part_magnet_editor/sheet_slicer.gd")
 
 const SLOT_NAMES: PackedStringArray = ["head", "body", "arm_l", "arm_r"]
@@ -11,6 +18,7 @@ const SLOT_TYPES: Array[PartSlotType.Value] = [
 	PartSlotType.Value.ARM_L,
 	PartSlotType.Value.ARM_R,
 ]
+const ARMS_LABEL := "Braços"
 
 static func slice_sheet(sheet_path: String, set_id: String) -> Dictionary:
 	return SheetSlicer.slice_to_folder(sheet_path, set_id)
@@ -31,28 +39,36 @@ static func keep_source_sheet(sheet_path: String, set_id: String) -> void:
 		DirAccess.copy_absolute(abs_sheet, keep)
 
 
+## `values` is [Poder, Resistência, Agilidade]. Returns "" when everything saved.
 static func write_defs(set_id: String, display_name: String, values: Array) -> String:
 	set_id = clean_id(set_id)
 	if set_id.is_empty():
-		return "O id interno precisa ser minúsculo, sem acento. Exemplo: vampiro."
+		return "O id interno precisa ser minúsculo, sem acento. Exemplo: bruxa."
 	if display_name.strip_edges().is_empty():
 		display_name = set_id.capitalize()
-	if values.size() < 2:
-		return "Faltam os 2 números da loja (cabeça, tronco)."
+	if values.size() < 3:
+		return "Faltam os 3 números: Poder, Resistência e Agilidade."
 
-	var visual_values: Array = _visual_values(values)
+	var magnets := read_slice_magnets(set_id)
+	var stats := _stat_per_slot(values)
 	var parts: Array[PartDef] = []
 	for i in SLOT_NAMES.size():
 		var slot_name: String = SLOT_NAMES[i]
-		var tex1 := load("res://assets/characters/%s/%s_%s-1.png" % [set_id, set_id, slot_name]) as Texture2D
-		if tex1 == null:
+		var slot_type: PartSlotType.Value = SLOT_TYPES[i]
+		if load(_art_path(set_id, slot_name, 1)) == null:
 			return "Ainda não achei as imagens de %s. Espere o Godot importar e tente de novo." % slot_name
-		var part := _make_part(set_id, display_name, slot_name, SLOT_TYPES[i], int(visual_values[i]))
+		var part := _make_part(
+			set_id, display_name, slot_name, slot_type, int(stats[slot_type]), magnets
+		)
 		var path := "res://data/parts/%s_%s.tres" % [set_id, slot_name]
-		var save_err := ResourceSaver.save(part, path)
-		if save_err != OK:
+		if ResourceSaver.save(part, path) != OK:
 			return "Falha ao salvar %s" % path
 		parts.append(load(path) as PartDef)
+
+	var arms := _make_arms_kit(set_id, display_name, int(values[2]), parts[2], parts[3])
+	var arms_path := "res://data/parts/%s_arms.tres" % set_id
+	if ResourceSaver.save(arms, arms_path) != OK:
+		return "Falha ao salvar %s" % arms_path
 
 	var character := CharacterDef.new()
 	character.id = StringName(set_id)
@@ -61,54 +77,114 @@ static func write_defs(set_id: String, display_name: String, values: Array) -> S
 	character.body = parts[1]
 	character.arm_l = parts[2]
 	character.arm_r = parts[3]
+	character.arms = load(arms_path) as PartDef
 	var char_path := "res://data/parts/%s_character.tres" % set_id
-	var char_err := ResourceSaver.save(character, char_path)
-	if char_err != OK:
+	if ResourceSaver.save(character, char_path) != OK:
 		return "Falha ao salvar %s" % char_path
 
 	ShopPool.reload()
 	return ""
 
-static func _visual_values(values: Array) -> Array:
-	if values.size() >= 4:
-		return [int(values[0]), int(values[1]), int(values[2]), int(values[3])]
-	return [int(values[0]), int(values[1]), int(values[1]), int(values[1])]
+
+## Magnets the slicer found, as {pose: {slot_name: {socket: Vector2}}}.
+static func read_slice_magnets(set_id: String) -> Dictionary:
+	var path := "res://assets/characters/%s/%s_slice.json" % [set_id, set_id]
+	if not FileAccess.file_exists(path):
+		return {}
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return {}
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return {}
+	var raw: Variant = (parsed as Dictionary).get("magnets", {})
+	if typeof(raw) != TYPE_DICTIONARY:
+		return {}
+	var out := {}
+	for pose_name in (raw as Dictionary).keys():
+		var slots: Dictionary = (raw as Dictionary)[pose_name]
+		var by_slot := {}
+		for slot_name in slots.keys():
+			var sockets: Dictionary = slots[slot_name]
+			var points := {}
+			for socket in sockets.keys():
+				var pair: Array = sockets[socket]
+				if pair.size() >= 2:
+					points[socket] = Vector2(float(pair[0]), float(pair[1]))
+			by_slot[slot_name] = points
+		out[pose_name] = by_slot
+	return out
+
+
+static func _stat_per_slot(values: Array) -> Dictionary:
+	return {
+		PartSlotType.Value.HEAD: PartStats.clamp_for(PartSlotType.Value.HEAD, int(values[0])),
+		PartSlotType.Value.BODY: PartStats.clamp_for(PartSlotType.Value.BODY, int(values[1])),
+		PartSlotType.Value.ARM_L: PartStats.clamp_for(PartSlotType.Value.ARM_L, int(values[2])),
+		PartSlotType.Value.ARM_R: PartStats.clamp_for(PartSlotType.Value.ARM_R, int(values[2])),
+	}
+
+
+static func _art_path(set_id: String, slot_name: String, pose: int) -> String:
+	return "res://assets/characters/%s/%s_%s-%d.png" % [set_id, set_id, slot_name, pose]
+
 
 static func _make_part(
 	set_id: String,
 	display_name: String,
 	slot_name: String,
 	slot_type: PartSlotType.Value,
-	combat_value: int
+	stat_value: int,
+	magnets: Dictionary
 ) -> PartDef:
 	var part := PartDef.new()
 	part.id = StringName("%s_%s" % [set_id, slot_name])
 	part.display_name = "%s %s" % [display_name, SLOT_LABELS[SLOT_NAMES.find(slot_name)]]
 	part.slot_type = slot_type
 	part.set_id = StringName(set_id)
-	part.combat_value = combat_value
-	part.tier = PartDef.tier_for(combat_value)
-	part.sprite = load("res://assets/characters/%s/%s_%s-1.png" % [set_id, set_id, slot_name]) as Texture2D
-	part.sprite_profile = load("res://assets/characters/%s/%s_%s-2.png" % [set_id, set_id, slot_name]) as Texture2D
-	match slot_type:
-		PartSlotType.Value.HEAD:
-			part.magnet_down = CompositeResolver.DEFAULT_HEAD_DOWN
-			part.magnet_down_profile = CompositeResolver.DEFAULT_HEAD_DOWN
-		PartSlotType.Value.BODY:
-			part.magnet_neck = CompositeResolver.DEFAULT_NECK
-			part.magnet_shoulder_l = CompositeResolver.DEFAULT_SHOULDER_L
-			part.magnet_shoulder_r = CompositeResolver.DEFAULT_SHOULDER_R
-			part.magnet_hip_l = CompositeResolver.DEFAULT_HIP_L
-			part.magnet_hip_r = CompositeResolver.DEFAULT_HIP_R
-			part.magnet_neck_profile = CompositeResolver.DEFAULT_NECK
-			part.magnet_shoulder_l_profile = CompositeResolver.DEFAULT_SHOULDER_L
-			part.magnet_shoulder_r_profile = CompositeResolver.DEFAULT_SHOULDER_R
-			part.magnet_hip_l_profile = CompositeResolver.DEFAULT_HIP_L
-			part.magnet_hip_r_profile = CompositeResolver.DEFAULT_HIP_R
-		_:
-			part.magnet_up = CompositeResolver.DEFAULT_LIMB_UP
-			part.magnet_up_profile = CompositeResolver.DEFAULT_LIMB_UP
+	part.stat_value = stat_value
+	part.tier = PartStats.tier_for(slot_type, stat_value)
+	part.sprite = load(_art_path(set_id, slot_name, 1)) as Texture2D
+	part.sprite_profile = load(_art_path(set_id, slot_name, 2)) as Texture2D
+	for pose in [0, 1]:
+		var found: Dictionary = _magnets_for(magnets, pose, slot_name)
+		for socket in part.socket_names():
+			part.set_socket(socket, pose, _socket_value(found, socket))
 	return part
+
+
+static func _make_arms_kit(
+	set_id: String, display_name: String, agility: int, arm_l: PartDef, arm_r: PartDef
+) -> PartDef:
+	var kit := PartDef.new()
+	kit.id = StringName("%s_arms" % set_id)
+	kit.display_name = "%s %s" % [display_name, ARMS_LABEL]
+	kit.slot_type = PartSlotType.Value.ARMS
+	kit.set_id = StringName(set_id)
+	kit.stat_value = PartStats.clamp_for(PartSlotType.Value.ARMS, agility)
+	kit.tier = PartStats.tier_for(PartSlotType.Value.ARMS, kit.stat_value)
+	kit.kit_parts = [arm_l, arm_r]
+	## Fallback drawing for anything that shows a kit as a single picture.
+	kit.sprite = arm_r.sprite if arm_r != null else null
+	kit.sprite_profile = arm_r.sprite_profile if arm_r != null else null
+	return kit
+
+
+static func _magnets_for(magnets: Dictionary, pose: int, slot_name: String) -> Dictionary:
+	var pose_name := "profile" if pose == 1 else "front"
+	var by_slot: Dictionary = magnets.get(pose_name, {})
+	return by_slot.get(slot_name, {})
+
+
+## The slicer calls the head and arm joint "join"; the game calls it down/up.
+static func _socket_value(found: Dictionary, socket: String) -> Vector2:
+	var key := socket
+	if socket == "down" or socket == "up":
+		key = "join"
+	if found.has(key):
+		return found[key]
+	return CompositeResolver.default_socket(socket)
+
 
 static func to_project_path(source_path: String) -> String:
 	var path := source_path.strip_edges().replace("\\", "/")
@@ -159,10 +235,9 @@ static func part_image_path(part: PartDef, pose: int) -> String:
 		return tex.resource_path
 	var set_id := String(part.set_id)
 	var slot := String(PartSlotType.to_string_name(part.slot_type))
-	if set_id.is_empty() or slot.is_empty() or slot == "unknown" or slot == "legs":
+	if set_id.is_empty() or slot == "unknown" or slot == "arms":
 		return ""
-	var suffix := "2" if pose == 1 else "1"
-	return "res://assets/characters/%s/%s_%s-%s.png" % [set_id, set_id, slot, suffix]
+	return _art_path(set_id, slot, 2 if pose == 1 else 1)
 
 
 static func clean_id(raw: String) -> String:

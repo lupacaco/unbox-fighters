@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_57jvi"]
+[ext_resource type="Resource" path="res://data/parts/advogado_arm_l.tres" id="2_e0k3m"]
+[ext_resource type="Resource" path="res://data/parts/advogado_arm_r.tres" id="3_ap0jy"]
+[ext_resource type="Texture2D" path="res://assets/characters/advogado/advogado_arm_r-1.png" id="4_2yeq1"]
+[ext_resource type="Texture2D" path="res://assets/characters/advogado/advogado_arm_r-2.png" id="5_q3m7k"]
+
+[resource]
+script = ExtResource("1_57jvi")
+id = &"advogado_arms"
+display_name = "Advogado Braços"
+slot_type = 4
+set_id = &"advogado"
+sprite = ExtResource("4_2yeq1")
+sprite_profile = ExtResource("5_q3m7k")
+stat_value = 5
+tier = 5
+kit_parts = Array[ExtResource("1_57jvi")]([ExtResource("2_e0k3m"), ExtResource("3_ap0jy")])

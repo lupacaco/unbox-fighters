@@ -18,8 +18,7 @@ const SOCKET_COLORS := {
 	"down": Color(0.95, 0.28, 0.32, 1),
 	"shoulder_l": Color(0.96, 0.55, 0.22, 1),
 	"shoulder_r": Color(0.95, 0.35, 0.28, 1),
-	"hip_l": Color(0.38, 0.86, 0.52, 1),
-	"hip_r": Color(0.22, 0.78, 0.72, 1),
+	"ground": Color(0.38, 0.86, 0.52, 1),
 }
 const SOCKET_LABELS := {
 	"neck": "PESCOÇO",
@@ -27,8 +26,7 @@ const SOCKET_LABELS := {
 	"down": "BAIXO",
 	"shoulder_l": "OE",
 	"shoulder_r": "OD",
-	"hip_l": "QE",
-	"hip_r": "QD",
+	"ground": "CHÃO",
 }
 
 var part: PartDef
@@ -244,10 +242,8 @@ func _property_for(socket: String) -> String:
 			return "magnet_shoulder_l_profile" if profile else "magnet_shoulder_l"
 		"shoulder_r":
 			return "magnet_shoulder_r_profile" if profile else "magnet_shoulder_r"
-		"hip_l":
-			return "magnet_hip_l_profile" if profile else "magnet_hip_l"
-		"hip_r":
-			return "magnet_hip_r_profile" if profile else "magnet_hip_r"
+		"ground":
+			return "magnet_ground_profile" if profile else "magnet_ground"
 		_:
 			return "magnet_up"
 

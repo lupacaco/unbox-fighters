@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/part_def.gd" id="1_g8pnb"]
+[ext_resource type="Resource" path="res://data/parts/bruxa_arm_l.tres" id="2_68nmf"]
+[ext_resource type="Resource" path="res://data/parts/bruxa_arm_r.tres" id="3_4iwew"]
+[ext_resource type="Texture2D" path="res://assets/characters/bruxa/bruxa_arm_r-1.png" id="4_pby08"]
+[ext_resource type="Texture2D" path="res://assets/characters/bruxa/bruxa_arm_r-2.png" id="5_n2xkn"]
+
+[resource]
+script = ExtResource("1_g8pnb")
+id = &"bruxa_arms"
+display_name = "Bruxa Braços"
+slot_type = 4
+set_id = &"bruxa"
+sprite = ExtResource("4_pby08")
+sprite_profile = ExtResource("5_n2xkn")
+stat_value = 2
+tier = 2
+kit_parts = Array[ExtResource("1_g8pnb")]([ExtResource("2_68nmf"), ExtResource("3_4iwew")])

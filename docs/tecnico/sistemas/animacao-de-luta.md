@@ -1,53 +1,44 @@
 # Sistema: apresentação da luta
 
-A luta de verdade é calculada **antes** de aparecer (`CombatSim`). O `FightDirector` só **mostra** o resultado no palco (a esteira).
+A luta de verdade é calculada em `Duel`. A tela só **mostra** o resultado nas esteiras.
 
-Cada choque sorteia um kit vivo de cada Freak (cabeça, tronco, braço E ou braço D). Pode misturar, por exemplo cabeça contra braço. No palco o Freak senta numa **base-mola**. Não tem pernas.
+Só a **cabeça** ataca. O Freak não tem pernas: ele desliza puxando o chão com as mãos, sentado no caixote.
 
 ## Sequência
 
-1. As cartas **sobem e somem**. A loja e o HUD de cima saem. **O fundo e a esteira ficam parados** (sem zoom, sem piscar, sem tremer). Os nomes, o HP e o VS aparecem no topo.
-2. Só **um de cada lado** entra: pulam ao mesmo tempo na esteira (impacto no pouso) e **dão dois pulos** até o lugar do ataque, um de cada lado do centro. Os outros esperam fora do palco.
-3. **Anda** de perfil, pulando de verdade. Cada pulo: a mola **aperta** no chão, **impulsiona** e o brinquedo inteiro (base + Freak) **sai do chão** num arco; no ar a mola fica **solta**; ao cair, aperta um pouco mais e volta. Uma **sombra oval** fica no chão da mola (encolhe um pouco no ar). Embaixo dela, um **recorte mais escuro** nos rolos (quase não some no pulo), para a mola parecer encaixada na esteira. Parado, a mola fica pressionada e **o disco branco encosta nos rolos** (a beira da frente entra um pouco entre os cilindros, como as caixas). Braços e cabeça acompanham. Os dois do duelo ficam **na mesma altura do chão** e do **mesmo tamanho**.
+1. Você aperta **LUTAR**. O Freak **cai** no começo da esteira (azul à esquerda, vermelha à direita).
+2. **Desliza** até a ponta: os braços puxam o chão em ciclo, o corpo balança, sai poeirinha nos rolos.
+3. Na ponta: **freia** (esmaga um pouco) e olha para o inimigo. Se já tem alguém na ponta, os dois esperam o intervalo do duelo.
+4. **Golpe:** agacha, a cabeça sai, voa em arco com rastro, trava um instante no impacto, o atingido pisca e recua, a cabeça volta como bumerangue.
+5. Os dois golpes acontecem; o dano entra depois. Quem zera **perde a cor**, escorrega e **cai no vão** entre as esteiras, girando.
+6. Se um lado fica sozinho na ponta: a cada segundo a barra de vida do outro jogador **pula** (1 de dano).
 
-Na luta, quem cobre quem **não** usa o Z da ferramenta de ímãs. **1 fica na frente** (a mola é 5, atrás).
+Na luta, quem cobre quem **não** usa o Z da ferramenta de ímãs. **1 fica na frente**.
 
-**De frente** (parado na carta / início):
+**De frente** (na carta):
 
 1. Cabeça
 2. Braço esquerdo
 3. Braço direito
-4. Tronco
-5. Base-mola
+4. Tronco (caixote)
 
-**De perfil** (andando e lutando):
+**De perfil** (na esteira):
 
 1. Braço direito
 2. Tronco
 3. Cabeça
 4. Braço esquerdo
-5. Base-mola
 
-Depois:
-
-4. Placas no topo: nomes, HP e **VS**.
-5. Cada choque: **só o kit vencedor** se prepara e **sai do corpo**. A peça perdedora **fica colada** no Freak. O kit voa até o ponto da peça alvo, a tela trava um instante, os lutadores tremem (a esteira não), faísca e anel de impacto. Aí a peça atingida é **arrancada e arremessada para fora da tela e some**. A que ganha **volta no corpo como um bumerangue**. Se empatar, **os dois atacam juntos**, batem no centro com física (o jogo calcula o tombo de verdade) e **os dois voam para fora da tela**. Placas com os números; o vencedor mostra o **resto**.
-6. Freak inteiro cai → placa **KO**, inclina e sai. **Aí** o próximo daquele lado pula no palco e se aproxima. O que ganhou fica esperando.
-7. Fim: EMPATE ou nome + dano. Cartas voltam. Quem ainda está de pé pula de volta. Fundo e esteira continuam iguais.
-
-A poeira dos passos é **um** efeito reaproveitado, não um novo a cada passo. Isso deixa a luta mais leve no computador.
-
-Sons da luta: **boing** no impulso da mola, passo no pouso e poom do choque / KO. Sem vento, laser ou clique de ímã no palco.
+Sons da luta: passo no deslize / pouso e poom do golpe. Sem boing de mola.
 
 ## Arquivos
 
 | Peça | Caminho |
 |------|---------|
-| Regras (números) | `scripts/match/combat_sim.gd` |
-| Diretor da sequência | `scripts/assembly/fight_director.gd` |
-| Boneco no palco | `scripts/assembly/fighter_puppet.gd` |
-| Kit arremessado (física) | `scripts/assembly/thrown_kit.gd` |
-| Placas douradas | `scripts/ui/fight_plaque.gd` |
+| Regras (números) | `scripts/match/duel.gd` |
+| Esteira (números) | `scripts/match/belt_lane.gd` |
+| Freak na esteira | `scripts/assembly/belt_freak.gd` |
+| Cabeça que voa | `scripts/assembly/flying_head.gd` |
 | Tags coloridas | `scripts/ui/stat_tag.gd` |
 
 ## Arte (padrão `-1/-2`)
@@ -55,6 +46,6 @@ Sons da luta: **boing** no impulso da mola, passo no pouso e poom do choque / KO
 Em `assets/characters/<nome>/`:
 
 - Frente: `<nome>_head-1.png`, `_body-1`, `_arm_l-1`, `_arm_r-1`
-- Perfil: os mesmos com `-2` (usado no palco e na caminhada)
+- Perfil: os mesmos com `-2` (usado na esteira)
 
-Não precisa de pose de golpe (`-3`). O ataque é o kit vencedor saindo do corpo e voando até a peça do adversário. No empate os dois kits voam até o centro.
+Não precisa de pose de golpe (`-3`). O ataque é a cabeça saindo do corpo e voando até a cabeça do adversário.

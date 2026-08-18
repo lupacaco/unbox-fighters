@@ -10,26 +10,26 @@ unbox-fighters/
 ├── docs/                  # Esta documentação
 ├── assets/                # Arte (imagens)
 │   ├── boxes/             # Sprites da caixa (fechada / quebrada)
-│   ├── objects/           # Martelo do cursor e base-mola
+│   ├── objects/           # Martelo do cursor
 │   ├── audio/sfx/         # Efeitos sonoros (.wav)
 │   ├── fonts/             # Letras da interface (Bebas Neue, Oswald)
-│   ├── characters/vampiro/
 │   ├── characters/bruxa/
-│   ├── characters/crocodilo/
+│   ├── characters/advogado/
+│   ├── nova-ui/           # Fundo, cartas, prateleiras, esteiras
 │   └── ui/
 ├── data/                  # Dados do jogo (.tres)
 │   └── parts/
 ├── scenes/                # Cenas Godot (.tscn)
 │   └── assembly/          # Tela 2D principal
 ├── scripts/               # Código GDScript (.gd)
-│   ├── assembly/          # Tela: cartas, caixas, luta visível, posições
+│   ├── assembly/          # Tela: cartas, caixas, esteira visível, posições
 │   ├── match/             # Regras da partida (loja, sinergia, luta)
 │   ├── core/
 │   ├── data/
 │   └── ui/
 ├── addons/                # Ferramentas do editor (ímãs, incluir personagem)
 ├── tools/                 # Scripts Python de preparação de arte
-└── .cursor/               # Regras e skills do Cursor (assistente) — versão Godot, não Unity
+└── .cursor/               # Regras e skills do Cursor (assistente)
 ```
 
 As regras em `.cursor/rules/` ensinam o assistente a falar simples, atualizar docs, marcar ímãs, incluir personagem, **fazer cada clique parecer gostoso**, e **mostrar no Godot onde clicar**. Não há regras da Unity neste projeto.

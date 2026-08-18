@@ -24,24 +24,20 @@ const MUTE := Color(0.72, 0.68, 0.62)
 const THREAT := Color(0.38, 0.68, 1.0)
 const MIGHT := Color(0.72, 0.42, 0.95)
 const AGILITY := Color(0.38, 0.86, 0.52)
-const PANCADA_RED := Color(0.92, 0.16, 0.20)
 const X_RED := Color(0.92, 0.16, 0.20)
 const DOT_EMPTY := Color(0.2, 0.18, 0.16, 0.7)
-const FREEZE_CRATE := Color(0.72, 0.88, 1.0, 1.0)
+const MONEY_EMPTY := Color(0.13, 0.11, 0.09, 0.85)
+const BELT_PLAYER := Color(0.36, 0.68, 0.95)
+const BELT_OPPONENT := Color(0.93, 0.33, 0.33)
+const REFRESH_BLUE := Color(0.16, 0.34, 0.58)
+const SELL_RED := Color(0.52, 0.14, 0.16)
 
+## Poder é vermelho, Resistência é roxo, Agilidade é verde.
 static func color_for_slot(slot: PartSlotType.Value) -> Color:
 	match slot:
 		PartSlotType.Value.HEAD:
-			return THREAT
+			return Color(0.95, 0.42, 0.30)
 		PartSlotType.Value.BODY:
 			return MIGHT
-		PartSlotType.Value.LEGS:
-			return AGILITY
-		PartSlotType.Value.ARM_L:
-			return Color(0.96, 0.55, 0.22)
-		PartSlotType.Value.ARM_R:
-			return Color(0.95, 0.35, 0.28)
-		PartSlotType.Value.LEG_L:
-			return AGILITY
 		_:
-			return Color(0.22, 0.78, 0.72)
+			return AGILITY

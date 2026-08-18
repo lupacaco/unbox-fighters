@@ -1,26 +1,25 @@
-# Sistema: partida (auto-battle)
+# Sistema: partida
 
-Regras da partida contra bots. Ficam em `scripts/match/` para poder testar os números **sem** abrir a tela.
+Regras da partida 1 contra 1. Ficam em `scripts/match/` para poder testar os números **sem** abrir a tela.
 
 ## Arquivos
 
 | Arquivo | Papel |
 |---------|--------|
-| `match_rules.gd` | Números fechados: HP 40, pancadas, custos, teto 12 |
-| `synergy.gd` | 2 iguais = 100%, 1 = 50% na mesma carta |
-| `fighter_loadout.gd` / `board_loadout.gd` | Uma carta e as 3 cartas em fila |
-| `combat_sim.gd` | Choques (kit sorteado de cada lado) e dano de HP; devolve eventos |
-| `combat_event.gd` / `combat_result.gd` | Cada choque e o placar final |
-| `shop_pool.gd` | Sorteia 5 peças do nível da loja |
-| `contestant.gd` | Um “jogador”: HP, ouro, loja, tabuleiro |
-| `match_state.gd` | Rodada, pareamento (incluindo cópia-fantasma), gastar pancada |
-| `fight_pair.gd` | Um confronto da rodada; `right_is_ghost` se o da direita é cópia |
-| `bot_brain.gd` | Compras dos bots: completa set, só troca se a carta ficar mais forte, recarrega a loja ao subir de nível |
+| `match_rules.gd` | Números fechados: vida 100, dinheiro, velocidade da esteira |
+| `player_state.gd` | Um lado: vida, carteira, 4 ofertas, esteira |
+| `live_match.gd` | Tempo correndo: dinheiro, deslize, duelo, chip, fim |
+| `belt_lane.gd` | Até 2 Freaks; o da ponta luta, o de trás espera |
+| `duel.gd` | Um troca-troca: os dois batem, o dano entra junto |
+| `freak_stats.gd` | Poder / Resistência / Agilidade já com sinergia |
+| `synergy.gd` | Dupla +25%, tripla +50%, arredonda para cima |
+| `fighter_loadout.gd` | Os 3 kits de uma carta |
+| `shop_pool.gd` | Sorteia 4 kits entre todos os Freaks |
+| `bot_brain.gd` | O oponente compra, monta e manda lutar |
 
 ## Fluxo
 
-1. `start_match` cria você + 3 bots
-2. Cada prep: ouro novo (não acumula), loja, bots compram, pareamento
-3. Ao PRONTO ou 60 s: copia as 3 cartas, `CombatSim.simulate`, a tela mostra
-4. Os outros bots lutam só nos números (se sobrar 1, ele luta contra uma cópia)
-5. HP; quem zera sai; último vivo ganha. **NOVA PARTIDA** recomeça.
+1. `start` zera os dois lados, enche a loja e começa o tempo
+2. A cada quadro: dinheiro sobe, Freaks andam, se os dois estão na ponta eles trocam golpes
+3. Se só um está na ponta: 1 de dano por segundo na vida do outro jogador
+4. Vida do jogador em 0 → a partida para e avisa quem ganhou

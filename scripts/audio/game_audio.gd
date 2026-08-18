@@ -59,11 +59,6 @@ static func step() -> void:
 	if s:
 		s.call("step")
 
-static func spring_boing() -> void:
-	var s := _sfx()
-	if s:
-		s.call("spring_boing")
-
 static func ui_click() -> void:
 	var s := _sfx()
 	if s:

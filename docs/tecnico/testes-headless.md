@@ -7,24 +7,26 @@ Scripts que verificam partes do jogo **sem** você jogar na tela.
 
 `scripts/core/`
 
+Rode todos de uma vez:
+
+```
+powershell -File tools/run_checks.ps1
+```
+
 | Script | O que verifica |
 |--------|----------------|
-| `verify_synergy.gd` | 2 iguais = 100% / 1 = 50%, números do vampiro, curva de pancadas |
-| `verify_combat_sim.gd` | Choque, empate, teto de 12 de dano no HP, pares sorteados (pode misturar kits) |
-| `verify_shop_pool.gd` | Loja vende todo Freak com ficha; 4 kits por Freak; 5 ofertas |
-| `verify_character_importer.gd` | Acentos viram id simples (`Leão` → `leao`); cada Freak com 8 desenhos; folha do vampiro vira 4+4 |
-| `verify_match_state.gd` | 4 vivos, HP 40, nomes dos bots, oponente-fantasma |
-| `verify_assembly.gd` | 3 cartas, 5 caixas coladas nos rolos, loja acima da esteira, fontes, câmera parada, VENDER à direita, esteira no rodapé em 1920 |
-| `verify_crate_open.gd` | Um clique na caixa solta a peça colada nos rolos |
-| `verify_composite.gd` | Layout na mola (carta vazia solta; peça pressiona; cabeça na esfera) |
-| `verify_part_magnets.gd` | Cabeça só embaixo; tronco com 5 ímãs; virar X; Z da carta e da luta; PNG da pasta aponta sem substituir arquivo |
+| `verify_synergy.gd` | Dupla +25% / tripla +50%; Bruxa 8→10 e 8→12; carta mista |
+| `verify_duel.gd` | Os dois golpes entram; preço; dinheiro sobe a cada 2 s |
+| `verify_belt.gd` | Deslize até a ponta, fila de 2, chip sozinho vence a partida |
+| `verify_bot.gd` | O oponente gasta, manda Freak e prefere fechar o set |
+| `verify_shop_pool.gd` | Loja vende todo Freak com ficha; 3 kits por Freak; 4 ofertas |
+| `verify_character_importer.gd` | Acentos viram id simples; folha da Bruxa vira 4+4; `_slice.json` tem ímãs |
+| `verify_assembly.gd` | 2 cartas, 4 prateleiras, 2 esteiras, fundo, fontes, câmera parada |
+| `verify_crate_open.gd` | Pagar a caixa deixa o kit na prateleira pelo preço certo |
+| `verify_composite.gd` | Caixote no chão; cabeça no pescoço; kit de braços vira dois |
+| `verify_part_magnets.gd` | Cabeça só embaixo; tronco com 4 ímãs; virar X; Z da carta e da luta |
 | `verify_part_sizes.gd` | Sprites 200×200 e perfil nos desenhos visíveis |
-| `verify_fight_line.gd` | Fila no mesmo chão; disco da mola nos rolos da esteira; pulo da mola inteira; dois pulos até o ataque; sombra e recorte nos rolos; um boing ao sair do chão; duelistas afastados; placas de HP cabem no topo |
-| `verify_thrown_kit.gd` | Kit copiado do boneco some do corpo e pode voltar |
-| `verify_fight_poses.gd` | Personagem tem perfil; carta mostra a mola e a sombra, sem placa de nome embaixo; Freak mais baixo no quadro; aceita cabeça, tronco e braços, recusa pernas |
-| `verify_fight_lock.gd` | Travamento da carta; soltar kit em lugar ocupado devolve o antigo |
-| `debug_parts.gd` | Carrega peça e checa visibilidade do sprite |
-| `debug_reveal.gd` | Força revelar peça da caixa e checa transparência |
+| `import_roster.gd` | Não é teste: gera as fichas a partir dos `_slice.json` |
 
 ## Quando atualizar
 

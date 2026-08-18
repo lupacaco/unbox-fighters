@@ -1,9 +1,10 @@
 @tool
 extends Control
 
-const _Spring := preload("res://scripts/data/spring_base.gd")
-
 ## Assembled preview of the four drawings snapped at the magnets.
+## The crate base of the torso rests on the floor line near the bottom.
+
+const FLOOR_FROM_BOTTOM := 18.0
 
 var parts: Dictionary = {}
 var pose: int = 0
@@ -36,27 +37,22 @@ func _draw() -> void:
 			Color(0.82, 0.84, 0.88, 1)
 		)
 	var textures := {}
-	for slot in PartSlotType.shop_slots():
+	for slot in PartSlotType.visual_slots():
 		textures[slot] = _tex_for(parts.get(slot) as PartDef)
 	var plan := CompositeResolver.resolve_slots(parts, textures)
 	var side := minf(box.size.x - 24.0, box.size.y - 36.0)
 	var s := clampf(side / 420.0, 0.32, 1.05)
-	var origin := box.get_center() + Vector2(0, 10)
-	_draw_spring(plan, s, origin)
+	var floor_point := Vector2(box.size.x * 0.5, box.size.y - FLOOR_FROM_BOTTOM)
+	draw_line(
+		Vector2(12.0, floor_point.y), Vector2(box.size.x - 12.0, floor_point.y),
+		Color(0.30, 0.32, 0.38, 1), 1.0
+	)
 	var positions: Dictionary = plan.get("positions", {})
 	for slot in PartSlotType.draw_order_for(parts):
-		if slot == PartSlotType.Value.LEG_L or slot == PartSlotType.Value.LEG_R:
-			continue
-		_draw_part(slot, parts.get(slot) as PartDef, textures.get(slot), positions.get(slot, Vector2.ZERO), s, origin)
-
-func _draw_spring(plan: Dictionary, scale: float, origin: Vector2) -> void:
-	var tex: Texture2D = plan.get("spring_texture")
-	if tex == null:
-		return
-	var spring_scale := float(plan.get("spring_scale", _Spring.SCALE)) * scale
-	var pos: Vector2 = plan.get("spring_pos", Vector2.ZERO)
-	var size := tex.get_size() * spring_scale
-	draw_texture_rect(tex, Rect2(origin + pos * scale - size * 0.5, size), false)
+		_draw_part(
+			slot, parts.get(slot) as PartDef, textures.get(slot),
+			positions.get(slot, Vector2.ZERO), s, floor_point
+		)
 
 func _tex_for(part: PartDef) -> Texture2D:
 	if part == null:
@@ -79,8 +75,8 @@ func _draw_part(
 		var spread: Dictionary = CompositeResolver.spread_front_arm(slot, part, tex, image_pos, 1.0)
 		image_pos = spread["center"]
 		extra = float(spread["extra"])
-	var size := tex.get_size() * scale
-	var r := Rect2(origin + image_pos * scale - size * 0.5, size)
+	var draw_size := tex.get_size() * scale
+	var r := Rect2(origin + image_pos * scale - draw_size * 0.5, draw_size)
 	if part != null:
 		part.draw_transformed(self, tex, r, pose, extra)
 	else:
