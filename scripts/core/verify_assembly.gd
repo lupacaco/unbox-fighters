@@ -33,6 +33,10 @@ func _check_furniture(scene: Node) -> bool:
 	if cards == null or cards.get_child_count() != MatchRules.CARD_COUNT:
 		push_error("VERIFY_FAIL expected %d cards" % MatchRules.CARD_COUNT)
 		return false
+	var crate := cards.get_child(0).get_node_or_null("Display/CrateBase") as Sprite2D
+	if crate == null or crate.texture == null:
+		push_error("VERIFY_FAIL every card should show the shared crate")
+		return false
 	var opponent_cards := scene.get_node_or_null("OpponentCards")
 	if opponent_cards == null or opponent_cards.get_child_count() != MatchRules.CARD_COUNT:
 		push_error("VERIFY_FAIL expected %d opponent cards" % MatchRules.CARD_COUNT)

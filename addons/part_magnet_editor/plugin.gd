@@ -107,7 +107,7 @@ func _build_form() -> void:
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.custom_minimum_size.x = 380
-	hint.text = "Folha com 4 desenhos de frente e 4 de perfil (cabeça, tronco, braço E, braço D). A loja vende 2 kits: cabeça e corpo (o corpo já traz os braços). Tipo igual nas 2 peças dá +50%. O Poder só liga com o set completo. Depois marque os ímãs em Ampliar."
+	hint.text = "Folha com 4 desenhos de frente e 4 de perfil (cabeça, tronco, braço E, braço D). A loja vende 2 kits: cabeça e corpo (o corpo já traz os braços). O caixote da carta é a base de todos. No tronco marque 4 ímãs, o de baixo encaixa no caixote."
 	box.add_child(hint)
 	_form_status = Label.new()
 	_form_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

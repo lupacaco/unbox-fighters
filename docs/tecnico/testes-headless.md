@@ -23,7 +23,7 @@ powershell -File tools/run_checks.ps1
 | `verify_character_importer.gd` | Acentos viram id simples; folha da Bruxa vira 4+4; `_slice.json` tem ímãs |
 | `verify_assembly.gd` | 2+2 cartas no topo, 1 prateleira, barra-balança no topo (JOGADOR / OPONENTE), 2 esteiras, fundo, fontes, câmera parada |
 | `verify_crate_open.gd` | Pagar a caixa deixa o kit na prateleira pelo preço certo |
-| `verify_composite.gd` | Caixote no chão; cabeça no pescoço; corpo da loja traz os dois braços |
+| `verify_composite.gd` | Caixote no chão; tronco encaixa nele; cabeça no pescoço; corpo da loja traz os dois braços |
 | `verify_part_magnets.gd` | Cabeça só embaixo; tronco com 4 ímãs; virar X; Z da carta e da luta |
 | `verify_part_sizes.gd` | Sprites 200×200 e perfil nos desenhos visíveis |
 | `verify_ability.gd` | Recurso salva em 1 HP uma vez; Controle de Mente desvia o golpe para o aliado |

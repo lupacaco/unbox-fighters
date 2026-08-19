@@ -29,7 +29,7 @@ extends Resource
 @export var magnet_down: Vector2 = Vector2.ZERO
 @export var magnet_up_profile: Vector2 = Vector2.ZERO
 @export var magnet_down_profile: Vector2 = Vector2.ZERO
-## Torso hub: neck, two shoulders, and the crate base that rests on the floor.
+## Torso hub: neck, two shoulders, and the bottom magnet that snaps into the crate.
 @export var magnet_neck: Vector2 = Vector2.ZERO
 @export var magnet_shoulder_l: Vector2 = Vector2.ZERO
 @export var magnet_shoulder_r: Vector2 = Vector2.ZERO

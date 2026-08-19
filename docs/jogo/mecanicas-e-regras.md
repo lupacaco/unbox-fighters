@@ -56,7 +56,7 @@ Nas caixas existem **2 kits**:
 | Cabeça | Cabeça | **Ataque** — quanto a cabeça tira de HP por golpe |
 | Corpo | Caixote com o tronco e os dois braços | **HP** — a vida daquele Freak |
 
-O corpo **é** o chão do Freak (a base do caixote). Não tem pernas e não tem mola. Os braços vêm no corpo; não se compram à parte.
+O corpo **não** é o caixote. O caixote é a **base fixa** da carta e da esteira; o tronco encaixa nele. Não tem pernas e não tem mola. Os braços vêm no corpo; não se compram à parte.
 
 Cada kit tem **um** número. Na carta, as pílulas mostram o número **já com o bônus de tipo**.
 

@@ -35,5 +35,5 @@ A prateleira segura a caixa fechada com o preço. Ao pagar, a caixa abre e o kit
 ## Relação com outras cenas
 
 - `Crate` — 1 clique → pede para pagar → some → a prateleira instancia `PartView`
-- `CharacterSlot` — recebe 2 kits em cima do caixote; **LUTAR** aparece quando está completo (cartas do oponente não têm LUTAR e não aceitam o seu arraste)
+- `CharacterSlot` — recebe 2 kits; o caixote já está na carta; **LUTAR** aparece quando está completo (cartas do oponente não têm LUTAR e não aceitam o seu arraste)
 - `BeltFreak` — o Freak na esteira: pula da carta, rema 5 vezes, mostra Ataque e HP nas partes

@@ -5,29 +5,73 @@ extends RefCounted
 ## Builds a layered display plan. Parts snap together by magnet points
 ## (the metal spheres). PNG files stay 200×200. Every part uses the same scale.
 ##
-## The floor anchor is the base of the torso crate, so the Freak stands wherever
-## the caller asks: on the card ledge, on the belt rollers, anywhere.
+## The wooden crate is furniture, not a Freak kit. Its bottom sits on the floor
+## (card ledge or belt rollers). The torso's bottom magnet snaps into the crate.
 
 const PART_WIDTH_PX := 200.0
 const PART_HEIGHT_PX := 200.0
 const PART_SIZE_PX := 200.0
+const CRATE_PATH := "res://assets/nova-ui/caixote.png"
+## Wide enough to hold the torso, still inside the card well.
+const CRATE_WIDTH := 232.0
+## How far the join sits below the crate's top edge, so the Freak looks inside.
+const CRATE_JOIN_INSET := 22.0
 
 const DEFAULT_NECK := Vector2(0, -80)
 const DEFAULT_SHOULDER_L := Vector2(-64, -46)
 const DEFAULT_SHOULDER_R := Vector2(64, -46)
-## The crate rests on the bottom edge of the 200×200 drawing.
-const DEFAULT_GROUND := Vector2(0, 99)
+## Bottom of the torso, where it plugs into the crate. Not the crate floor.
+const DEFAULT_GROUND := Vector2(0, 22)
 const DEFAULT_HEAD_DOWN := Vector2(0, 80)
 const DEFAULT_LIMB_UP := Vector2(0, -82)
 
 ## Frente: braços um pouco abertos, girando no ímã do ombro (~19°).
 const FRONT_ARM_SPREAD := 0.34
-## Where a lone head or a lone arm hangs when there is no torso yet.
-const LOOSE_HEAD := Vector2(0, -60)
-const LOOSE_ARM_SPREAD := Vector2(52, -30)
+## Extra lift above the crate when a head or arm is on the card alone.
+const LOOSE_HEAD := Vector2(0, -48)
+const LOOSE_ARM_SPREAD := Vector2(52, -24)
+
+static var _crate_tex: Texture2D
 
 static func display_scale(_texture: Texture2D = null) -> float:
 	return PART_SIZE_PX / PART_WIDTH_PX
+
+static func crate_texture() -> Texture2D:
+	if _crate_tex == null:
+		_crate_tex = load(CRATE_PATH) as Texture2D
+	return _crate_tex
+
+static func crate_scale() -> float:
+	var tex := crate_texture()
+	if tex == null:
+		return 1.0
+	return CRATE_WIDTH / maxf(float(tex.get_width()), 1.0)
+
+static func crate_size() -> Vector2:
+	var tex := crate_texture()
+	if tex == null:
+		return Vector2(CRATE_WIDTH, 154.0)
+	return tex.get_size() * crate_scale()
+
+## Center of the crate so its bottom sits on the floor (y = 0).
+static func crate_position() -> Vector2:
+	return Vector2(0.0, -crate_size().y * 0.5)
+
+## Where the torso's bottom magnet snaps. A little inside the crate's top.
+static func crate_join() -> Vector2:
+	var top := crate_position().y - crate_size().y * 0.5
+	return Vector2(0.0, top + CRATE_JOIN_INSET * crate_scale())
+
+## Draws the shared crate. `extra_scale` is 1 on the card (the parent already scales).
+static func apply_crate_to(sprite: Sprite2D, extra_scale: float = 1.0) -> void:
+	if sprite == null:
+		return
+	var tex := crate_texture()
+	sprite.texture = tex
+	sprite.visible = tex != null
+	sprite.centered = true
+	sprite.position = crate_position() * extra_scale
+	sprite.scale = Vector2.ONE * crate_scale() * extra_scale
 
 static func resolve(character: CharacterDef, attached: Dictionary = {}) -> Dictionary:
 	if character == null:
@@ -53,6 +97,7 @@ static func resolve_slots(parts: Dictionary, textures: Dictionary = {}) -> Dicti
 		tex[slot] = shown
 
 	var scale := display_scale()
+	var join := crate_join()
 	var body: PartDef = parts.get(PartSlotType.Value.BODY)
 	var body_tex: Texture2D = tex.get(PartSlotType.Value.BODY)
 	var head: PartDef = parts.get(PartSlotType.Value.HEAD)
@@ -64,7 +109,7 @@ static func resolve_slots(parts: Dictionary, textures: Dictionary = {}) -> Dicti
 
 	var positions := {}
 	if body_tex != null:
-		var body_pos := -_socket(body, "ground", body_tex) * scale
+		var body_pos := join - _socket(body, "ground", body_tex) * scale
 		positions[PartSlotType.Value.BODY] = body_pos
 		positions[PartSlotType.Value.HEAD] = body_pos + (
 			_socket(body, "neck", body_tex) - _socket(head, "down", head_tex)
@@ -77,13 +122,14 @@ static func resolve_slots(parts: Dictionary, textures: Dictionary = {}) -> Dicti
 		) * scale
 	else:
 		positions[PartSlotType.Value.BODY] = Vector2.ZERO
-		positions[PartSlotType.Value.HEAD] = LOOSE_HEAD - _socket(head, "down", head_tex) * scale
+		positions[PartSlotType.Value.HEAD] = join + LOOSE_HEAD - _socket(head, "down", head_tex) * scale
 		positions[PartSlotType.Value.ARM_L] = (
-			Vector2(-LOOSE_ARM_SPREAD.x, LOOSE_ARM_SPREAD.y)
+			join
+			+ Vector2(-LOOSE_ARM_SPREAD.x, LOOSE_ARM_SPREAD.y)
 			- _socket(arm_l, "up", arm_l_tex) * scale
 		)
 		positions[PartSlotType.Value.ARM_R] = (
-			LOOSE_ARM_SPREAD - _socket(arm_r, "up", arm_r_tex) * scale
+			join + LOOSE_ARM_SPREAD - _socket(arm_r, "up", arm_r_tex) * scale
 		)
 
 	return {
@@ -92,6 +138,9 @@ static func resolve_slots(parts: Dictionary, textures: Dictionary = {}) -> Dicti
 		"part_size_px": PART_SIZE_PX,
 		"head_pos": positions[PartSlotType.Value.HEAD],
 		"body_pos": positions[PartSlotType.Value.BODY],
+		"crate_texture": crate_texture(),
+		"crate_position": crate_position(),
+		"crate_scale": crate_scale(),
 	}
 
 ## Top of the assembled Freak, measured up from the floor. Used to fit a card.

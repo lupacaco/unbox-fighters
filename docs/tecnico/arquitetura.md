@@ -35,7 +35,7 @@ Arte e recursos (assets/, data/)
 | `MoneyBar` / `ActionBar` / `TugBar` | Dinheiro, botões redondos, barra-balança |
 | `DragDropService` | Arraste de peça, soltar na carta, vender |
 | `Crate` / `PartView` / `CharacterSlot` / `ShopShelf` | Caixa, peça, carta, prateleira |
-| `CompositeResolver` / `PartKit` | Cola cabeça, tronco e cada braço no caixote |
+| `CompositeResolver` / `PartKit` | Cola cabeça e braços no tronco; o tronco encaixa no caixote compartilhado |
 
 ## Organização dos scripts
 

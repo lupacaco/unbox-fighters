@@ -38,13 +38,16 @@ func _check_magnets() -> bool:
 		push_error("VERIFY_FAIL the bruxa torso should be a torso")
 		return false
 	if body.socket_names().size() != 4:
-		push_error("VERIFY_FAIL a torso has neck, two shoulders and the floor")
+		push_error("VERIFY_FAIL a torso has neck, two shoulders and the crate join")
 		return false
 	if not body.uses_hub_sockets():
 		push_error("VERIFY_FAIL the torso magnets were never marked")
 		return false
 	if body.magnet_ground.y <= 0.0:
-		push_error("VERIFY_FAIL the floor magnet should sit under the crate")
+		push_error("VERIFY_FAIL the crate magnet should sit under the torso")
+		return false
+	if body.magnet_ground.y > 50.0:
+		push_error("VERIFY_FAIL the crate magnet is the torso bottom, not the old crate floor")
 		return false
 	if body.magnet_neck.y >= body.magnet_ground.y:
 		push_error("VERIFY_FAIL the neck should be above the floor")

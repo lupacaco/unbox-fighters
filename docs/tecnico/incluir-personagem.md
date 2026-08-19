@@ -4,7 +4,7 @@ Este é o jeito certo de colocar um Freak novo no jogo. Siga **todos** os passos
 
 As regras da loja, sinergia e luta (o que o jogador vê) estão em [Mecânicas e regras](../jogo/mecanicas-e-regras.md).
 
-O jogador manda uma folha de desenho. O jogo precisa de **8 recortes** (4 de frente + 4 de perfil), **2 kits na loja** (cabeça e corpo; o corpo já traz os braços), e uma ficha do personagem. O **caixote já vem no tronco**. Não tem pernas. A loja **acha sozinha** qualquer ficha nova em `data/parts/`.
+O jogador manda uma folha de desenho. O jogo precisa de **8 recortes** (4 de frente + 4 de perfil), **2 kits na loja** (cabeça e corpo; o corpo já traz os braços), e uma ficha do personagem. O **caixote é a base de todos** (`assets/nova-ui/caixote.png`), não vem no tronco. Não tem pernas. A loja **acha sozinha** qualquer ficha nova em `data/parts/`.
 
 ## O que a folha precisa ter
 
@@ -15,7 +15,7 @@ Pode ser **frente à esquerda e perfil à direita**, ou **frente em cima e perfi
 As 4 partes:
 
 1. Cabeça
-2. Tronco (com **4 esferas** de metal: pescoço, dois ombros, e a base do caixote no chão)
+2. Tronco (com **4 esferas** de metal: pescoço, dois ombros, e uma embaixo que encaixa no caixote)
 3. Braço esquerdo (de quem olha)
 4. Braço direito
 
@@ -90,7 +90,7 @@ Espaço da imagem: o centro do PNG é `(0, 0)`. **Y cresce para baixo.**
 | Peça | Ímãs |
 |------|------|
 | Cabeça | 1: BAIXO (base do pescoço) |
-| Tronco | 4: PESCOÇO, OE (ombro esquerdo), OD, CHÃO (base do caixote) |
+| Tronco | 4: PESCOÇO, OE (ombro esquerdo), OD, CAIXOTE (esfera de baixo) |
 | Braço | 1: CIMA (topo da peça) |
 
 Marque **frente e perfil** nas duas abas. A carta usa a frente; a esteira usa o lado.
@@ -131,7 +131,7 @@ Atualize:
 
 - Os 8 PNG são 200 × 200 e têm transparência de verdade
 - Preto de dentro do desenho não sumiu
-- Play: o corpo traz os **dois** braços; o tronco senta pelo caixote; set completo (cabeça + corpo do mesmo Freak) liga o Poder
+- Play: o corpo traz os **dois** braços; o tronco senta **dentro** do caixote da carta; set completo (cabeça + corpo do mesmo Freak) liga o Poder
 - Tronco tem 4 ímãs visíveis na ferramenta (pescoço, ombros, chão)
 
 ## Sets que já passaram por este fluxo

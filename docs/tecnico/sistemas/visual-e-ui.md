@@ -35,7 +35,7 @@ Pasta `assets/nova-ui/`:
 - `atualizar.png` / `vender.png` — botões redondos (216×216)
 - `barra-hp-vazia.png` — tubo da balança (819×149)
 - `liquido-jogador.png` / `liquido-oponente.png` — líquidos azul e vermelho (349×62)
-- `esteira-blue.png` / `esteira-red.png` — esteiras (840×129)
+- `caixote.png` — base de madeira de todos os Freaks (301×201)
 
 Pasta `assets/fonts/`:
 

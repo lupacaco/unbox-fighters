@@ -19,7 +19,7 @@ Antes de cortar ou ligar qualquer coisa, leia `docs/tecnico/incluir-personagem.m
    - Comando: `python tools/slice_character_sheet.py CAMINHO_DA_FOLHA --id ID --name NOME --attack 8 --hp 15 --kind supernatural --overlay`
    - Depois: `godot --headless --path . --script scripts/core/import_roster.gd`
    - Ou no Godot: **Project → Tools → Incluir personagem** (Ataque, HP, tipo e Poder)
-2. Medir ímãs com **Project → Tools → Ímãs das Peças**: abas **Frente** e **Perfil**, 4 partes à esquerda, prévia à direita. Arraste cada bolinha até a esfera de metal. No tronco são 4 (pescoço, ombros, chão do caixote).
+2. Medir ímãs com **Project → Tools → Ímãs das Peças**: abas **Frente** e **Perfil**, 4 partes à esquerda, prévia à direita. Arraste cada bolinha até a esfera de metal. No tronco são 4 (pescoço, ombros, e CAIXOTE embaixo).
 3. Números: os 2 que o jogador pediu; senão um conjunto diferente dos sets atuais. Cabeça = Ataque 1–10, corpo = HP 10–20. Tipo: Humano, Sobrenatural ou Animal. Poder só no set completo.
 4. Conferir `data/parts/{id}_*.tres` e `{id}_character.tres` (loja = head/body). A loja lê sozinha todo `*_character.tres`.
 5. Atualizar `pecas-e-personagens.md`, `estado-atual.md`, `estrutura-de-pastas.md`.

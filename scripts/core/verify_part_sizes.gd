@@ -48,7 +48,7 @@ func _check_character(character: CharacterDef) -> void:
 	)
 	assert(
 		positions[PartSlotType.Value.BODY].y < 0.0,
-		"%s torso should stand on the floor line" % who
+		"%s torso should sit above the crate floor" % who
 	)
 
 func _check_art(part: PartDef) -> void:

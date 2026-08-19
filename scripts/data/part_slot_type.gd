@@ -2,8 +2,8 @@
 class_name PartSlotType
 extends Object
 
-## The shop sells two kits: head and body. The body draws as the crate plus both
-## arms. Arm_l / arm_r are drawings, not things you buy.
+## The shop sells two kits: head and body. The body draws as the torso plus both
+## arms. The wooden crate is a shared base, not a kit.
 enum Value {
 	HEAD,
 	BODY,

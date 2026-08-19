@@ -298,18 +298,42 @@ def metal_blobs(canvas: Image.Image) -> list[dict]:
 
 ## A shoulder cup found this close to the neck is really something else on the chest.
 MIN_SHOULDER_SPREAD = 22
-## Sockets live on the torso, never down in the crate.
+## Shoulder and neck cups live on the torso, never down in the crate.
 SOCKET_CEILING = int(CANVAS * 0.62)
+
+
+def _torso_crate_join(rows: list[list[tuple[int, int]]]) -> tuple[int, int]:
+	"""Bottom of the torso (where it plugs into the crate), not the crate floor."""
+	widths: list[int] = []
+	for y in range(CANVAS):
+		span = _span_at(rows[y], CANVAS * 0.5) if rows[y] else None
+		widths.append((span[1] - span[0] + 1) if span else 0)
+	start = int(CANVAS * 0.45)
+	lip_y = None
+	for y in range(start, CANVAS - 4):
+		above = max(widths[max(0, y - 3) : y] or [0])
+		if above >= 20 and widths[y] >= above + 18:
+			lip_y = y
+			break
+	if lip_y is None:
+		lip_y = next((y for y in range(CANVAS - 1, -1, -1) if widths[y]), CANVAS - 1)
+	span = _span_at(rows[lip_y], CANVAS * 0.5)
+	cx = int(round((span[0] + span[1]) * 0.5)) if span else CANVAS // 2
+	return cx, lip_y
 
 
 def torso_joints(
 	canvas: Image.Image, rows: list[list[tuple[int, int]]], profile: bool
 ) -> dict[str, tuple[int, int]]:
-	"""Neck and shoulder cups, plus the crate base the Freak stands on."""
+	"""Neck, two shoulders, and the bottom magnet that snaps into the crate."""
 	joints: dict[str, tuple[int, int]] = {}
-	floor = next((y for y in range(CANVAS - 1, -1, -1) if rows[y]), CANVAS - 1)
-	mid = _span_at(rows[floor], CANVAS * 0.5)
-	joints["ground"] = (int(round((mid[0] + mid[1]) * 0.5)) if mid else CANVAS // 2, floor)
+	lip = _torso_crate_join(rows)
+	low_cups = [c for c in metal_blobs(canvas) if abs(c["cy"] - lip[1]) <= 18]
+	if low_cups:
+		cup = max(low_cups, key=lambda c: c["n"])
+		joints["ground"] = (int(round(cup["cx"])), int(round(cup["cy"])))
+	else:
+		joints["ground"] = lip
 
 	cups = [c for c in metal_blobs(canvas) if c["cy"] < SOCKET_CEILING]
 	if profile:

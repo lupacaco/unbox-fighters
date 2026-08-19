@@ -1,8 +1,7 @@
 @tool
 extends Control
 
-## Assembled preview of the four drawings snapped at the magnets.
-## The crate base of the torso rests on the floor line near the bottom.
+## Assembled preview: the shared crate on the floor, Freak snapped into it.
 
 const FLOOR_FROM_BOTTOM := 18.0
 
@@ -48,11 +47,16 @@ func _draw() -> void:
 		Color(0.30, 0.32, 0.38, 1), 1.0
 	)
 	var positions: Dictionary = plan.get("positions", {})
+	var has_body: Texture2D = textures.get(PartSlotType.Value.BODY)
+	if has_body == null:
+		_draw_crate(s, floor_point)
 	for slot in PartSlotType.draw_order_for(parts):
 		_draw_part(
 			slot, parts.get(slot) as PartDef, textures.get(slot),
 			positions.get(slot, Vector2.ZERO), s, floor_point
 		)
+		if slot == PartSlotType.Value.BODY:
+			_draw_crate(s, floor_point)
 
 func _tex_for(part: PartDef) -> Texture2D:
 	if part == null:
@@ -81,3 +85,11 @@ func _draw_part(
 		part.draw_transformed(self, tex, r, pose, extra)
 	else:
 		draw_texture_rect(tex, r, false)
+
+func _draw_crate(scale: float, origin: Vector2) -> void:
+	var tex := CompositeResolver.crate_texture()
+	if tex == null:
+		return
+	var draw_size := CompositeResolver.crate_size() * scale
+	var r := Rect2(origin + CompositeResolver.crate_position() * scale - draw_size * 0.5, draw_size)
+	draw_texture_rect(tex, r, false)

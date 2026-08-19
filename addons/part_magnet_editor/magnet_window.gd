@@ -79,7 +79,7 @@ func _build_ui() -> void:
 	_help = Label.new()
 	_help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_help.modulate = Color(0.78, 0.8, 0.84, 1)
-	_help.text = "Imagem escolhe o desenho desta peça. Trocar escolhe outro se você errou. Os arquivos da pasta não são apagados. Ampliar marca o ímã de perto. Z vale só na carta."
+	_help.text = "Imagem escolhe o desenho desta peça. No tronco são 4 ímãs: pescoço, dois ombros e CAIXOTE (esfera de baixo, que encaixa na base). Ampliar marca de perto. Z vale só na carta."
 	column.add_child(_help)
 
 	_tabs = TabContainer.new()

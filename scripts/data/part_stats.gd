@@ -4,7 +4,7 @@ extends RefCounted
 ## What the number on a kit means, and what it costs in the shop.
 ##
 ## Cabeça = Ataque (1 a 10)  quanto a cabeça tira de HP por golpe
-## Corpo  = HP     (10 a 20) a vida daquele Freak (o caixote já traz os braços)
+## Corpo  = HP     (10 a 20) a vida daquele Freak (o corpo já traz os braços)
 
 const ATTACK_MIN := 1
 const ATTACK_MAX := 10

@@ -2,7 +2,7 @@ class_name PartKit
 extends RefCounted
 
 ## Turns a shop kit into the drawings that go on screen.
-## The body kit is one box in the shop but the crate plus both arms on the Freak.
+## The body kit is one box in the shop but the torso plus both arms on the Freak.
 
 static func expand_shop_part(part: PartDef) -> Dictionary:
 	var visual := {}

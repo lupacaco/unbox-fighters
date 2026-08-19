@@ -1,7 +1,7 @@
 ﻿extends SceneTree
 
-## How the pieces snap together: the crate base is the floor, the head sits on
-## the neck magnet, the arms hang from the shoulder magnets and open outward.
+## How the pieces snap together: the shared crate sits on the floor, the torso
+## plugs into it, the head sits on the neck magnet, the arms hang from the shoulders.
 
 func _init() -> void:
 	call_deferred("_run")
@@ -10,6 +10,9 @@ func _run() -> void:
 	var bruxa: CharacterDef = load("res://data/parts/bruxa_character.tres")
 	if bruxa == null:
 		push_error("VERIFY_FAIL missing bruxa")
+		quit(1)
+		return
+	if not _check_crate():
 		quit(1)
 		return
 	if not _check_anchor(bruxa):
@@ -24,19 +27,39 @@ func _run() -> void:
 	print("VERIFY_COMPOSITE_PASS")
 	quit(0)
 
+func _check_crate() -> bool:
+	if CompositeResolver.crate_texture() == null:
+		push_error("VERIFY_FAIL missing the shared crate drawing")
+		return false
+	var size := CompositeResolver.crate_size()
+	if size.x < 180.0 or size.y < 80.0:
+		push_error("VERIFY_FAIL the crate should be wide enough to hold a Freak")
+		return false
+	var pos := CompositeResolver.crate_position()
+	if not is_equal_approx(pos.y + size.y * 0.5, 0.0):
+		push_error("VERIFY_FAIL the crate bottom should sit on the floor line")
+		return false
+	if CompositeResolver.crate_join().y >= 0.0:
+		push_error("VERIFY_FAIL the torso should plug in at the top of the crate")
+		return false
+	return true
+
 func _check_anchor(bruxa: CharacterDef) -> bool:
 	var empty := CompositeResolver.resolve_slots({})
 	for slot in PartSlotType.visual_slots():
 		if empty["textures"].get(slot) != null:
-			push_error("VERIFY_FAIL an empty card draws nothing")
+			push_error("VERIFY_FAIL an empty card draws no Freak pieces")
 			return false
+	if empty.get("crate_texture") == null:
+		push_error("VERIFY_FAIL an empty card still shows the crate")
+		return false
 
 	var scale := CompositeResolver.display_scale()
 	var body_only := CompositeResolver.resolve_slots({PartSlotType.Value.BODY: bruxa.body})
 	var ground := CompositeResolver.socket_of(bruxa.body, "ground", bruxa.body.sprite) * scale
 	var body_center: Vector2 = body_only["positions"][PartSlotType.Value.BODY]
-	if not body_center.is_equal_approx(-ground):
-		push_error("VERIFY_FAIL the crate base should land on the floor line")
+	if not body_center.is_equal_approx(CompositeResolver.crate_join() - ground):
+		push_error("VERIFY_FAIL the torso bottom magnet should snap into the crate")
 		return false
 
 	var head_only := CompositeResolver.resolve_slots({PartSlotType.Value.HEAD: bruxa.head})

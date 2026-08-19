@@ -11,11 +11,12 @@ Na **loja** existem **2 kits**:
 
 Na **carta** e na **esteira** o corpo mostra **três desenhos** (tronco, braço E e braço D), para cada braço poder se mexer. Na esteira, a cabeça leva a etiqueta de **Ataque** e o tronco a de **HP**.
 
-O chão do Freak é a **base do caixote**. Não tem pernas e não tem mola.
+O **caixote** (`assets/nova-ui/caixote.png`) é a **base fixa** de todos os Freaks. Não é um kit da loja. Fica nas cartas (mesmo vazias) e na esteira. O tronco tem um ímã embaixo que encaixa no caixote; a frente do caixote tapa a parte de baixo do tronco, como se o Freak estivesse sentado dentro.
 
 - Cabeça cola no pescoço do tronco
 - Cada braço cola no ombro
-- Sem tronco: a cabeça e os braços ficam soltos acima da prateleira da carta
+- Tronco cola no caixote pelo ímã de baixo
+- Sem tronco: a cabeça e os braços ficam soltos acima do caixote
 
 ## Tipos de dados
 
@@ -49,7 +50,7 @@ Recurso de **uma peça** (kit da loja ou recorte de desenho):
 - **Ímãs** (pontos de união, em pixels a partir do centro da imagem 200×200):
   - Cabeça: `magnet_down` (esfera na base do pescoço)
   - Braço: `magnet_up` (esfera no topo)
-  - Tronco: **4 ímãs** — `magnet_neck`, `magnet_shoulder_l`, `magnet_shoulder_r`, `magnet_ground`
+  - Tronco: **4 ímãs** — `magnet_neck`, `magnet_shoulder_l`, `magnet_shoulder_r`, `magnet_ground` (esfera de baixo, encaixa no caixote)
   - Frente e perfil podem ser diferentes (`magnet_*_profile`)
 
 ### `CharacterDef` (`scripts/data/character_def.gd`)
@@ -85,7 +86,7 @@ A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 2 ki
 4. Arraste as bolinhas até o **centro das esferas de metal**:
    - Cabeça: **BAIXO**
    - Braço: **CIMA**
-   - Tronco: **PESCOÇO**, **OE**, **OD**, **CHÃO** (base do caixote)
+   - Tronco: **PESCOÇO**, **OE**, **OD**, **CAIXOTE** (esfera de baixo do tronco)
 5. Clique **Salvar**.
 
 Marque **frente e perfil**. A carta usa a frente; a esteira usa o perfil.
@@ -99,8 +100,9 @@ Marque **frente e perfil**. A carta usa a frente; a esteira usa o perfil.
 ### Regra de colagem
 
 1. A base do caixote senta no chão da carta ou nos rolos da esteira.
-2. A cabeça cola no pescoço.
-3. Braços: esfera de cima cola nos ombros. Na **frente**, os braços abrem um pouco, girando nesse ímã (não soltam).
+2. O tronco encaixa no caixote pelo ímã de baixo.
+3. A cabeça cola no pescoço.
+4. Braços: esfera de cima cola nos ombros. Na **frente**, os braços abrem um pouco, girando nesse ímã (não soltam).
 
 ## Arte relacionada
 

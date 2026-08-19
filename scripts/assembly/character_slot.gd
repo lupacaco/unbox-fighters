@@ -2,7 +2,8 @@ class_name CharacterSlot
 extends Node2D
 
 ## A hanging card where one Freak is built. Two kits go on it: head and body
-## (the crate already carries both arms). When both are there, LUTAR appears.
+## (the body already carries both arms). The wooden crate is a fixed base; the
+## Freak sits inside it. When both kits are there, LUTAR appears.
 
 signal part_attached(slot: CharacterSlot, part: PartDef)
 signal part_detached(slot: CharacterSlot, part: PartDef)
@@ -25,6 +26,7 @@ var _frame: Sprite2D
 var _shadow: Sprite2D
 var _glow: Polygon2D
 var _display: Node2D
+var _crate: Sprite2D
 var _hint: Label
 var _fight_button: Button
 var _banner: Label
@@ -307,6 +309,12 @@ func _build_display() -> void:
 	_display.scale = Vector2.ONE * AssemblyLayout.CARD_FREAK_SCALE
 	_display.z_index = 1
 	add_child(_display)
+	_crate = Sprite2D.new()
+	_crate.name = "CrateBase"
+	_crate.centered = true
+	_crate.z_index = 1
+	_display.add_child(_crate)
+	CompositeResolver.apply_crate_to(_crate)
 	for slot in PartSlotType.draw_order():
 		var sprite := Sprite2D.new()
 		sprite.name = String(PartSlotType.to_string_name(slot))
@@ -456,6 +464,23 @@ func _apply_plan() -> void:
 		)
 		sprite.position = spread["center"]
 		sprite.rotation += float(spread["extra"])
+	_restack_crate()
+
+func _restack_crate() -> void:
+	if _display == null or _crate == null:
+		return
+	CompositeResolver.apply_crate_to(_crate)
+	var body: Sprite2D = _layer_sprites.get(PartSlotType.Value.BODY)
+	if body != null:
+		_display.move_child(body, 0)
+	_display.move_child(_crate, mini(1, _display.get_child_count() - 1))
+	var next := 2
+	for slot in [PartSlotType.Value.ARM_L, PartSlotType.Value.ARM_R, PartSlotType.Value.HEAD]:
+		var sprite: Sprite2D = _layer_sprites.get(slot)
+		if sprite == null:
+			continue
+		_display.move_child(sprite, mini(next, _display.get_child_count() - 1))
+		next += 1
 
 func _refresh_pills() -> void:
 	var loadout := to_loadout()

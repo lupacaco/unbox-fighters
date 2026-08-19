@@ -3,7 +3,8 @@ class_name CharacterDef
 extends Resource
 
 ## @tool lets the magnet editor (Project → Tools) read these drawings.
-## The shop sells head and body; the body draws as the crate plus both arms.
+## The shop sells head and body; the body draws as the torso plus both arms.
+## The wooden crate is a shared base on the card, not a kit.
 
 @export var id: StringName
 @export var display_name: String = "???"

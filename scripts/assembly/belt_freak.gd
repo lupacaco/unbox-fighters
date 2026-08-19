@@ -365,6 +365,12 @@ func _build_body(loadout: FighterLoadout) -> void:
 				"rotation": sprite.rotation,
 				"pivot": CompositeResolver.socket_of(part, "up", texture) * CompositeResolver.display_scale() * _display_scale,
 			}
+		if slot == PartSlotType.Value.BODY:
+			var crate := Sprite2D.new()
+			crate.name = "CrateBase"
+			crate.z_index = sprite.z_index + 1
+			_body.add_child(crate)
+			CompositeResolver.apply_crate_to(crate, _display_scale)
 	var head: Sprite2D = _sprites.get(PartSlotType.Value.HEAD)
 	_head_home = head.position if head != null else Vector2.ZERO
 

@@ -26,7 +26,7 @@ const SOCKET_LABELS := {
 	"down": "BAIXO",
 	"shoulder_l": "OE",
 	"shoulder_r": "OD",
-	"ground": "CHÃO",
+	"ground": "CAIXOTE",
 }
 
 var part: PartDef

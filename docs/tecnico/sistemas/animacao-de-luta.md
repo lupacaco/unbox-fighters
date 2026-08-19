@@ -25,7 +25,7 @@ Na luta, quem cobre quem **não** usa o Z da ferramenta de ímãs. **1 fica na f
 1. Cabeça
 2. Braço esquerdo
 3. Braço direito
-4. Tronco (caixote)
+4. Tronco (encaixado no caixote)
 
 **De perfil** (na esteira):
 
