@@ -30,4 +30,4 @@ Para tirar um Freak de vez: **Project → Tools → Remover personagem**. Escolh
 
 ## Por que 200×200
 
-As peças precisam ter o mesmo tamanho de arquivo para o jogo poder colá-las sem esticar umas e encolher outras. Quadrado 200 × 200. No palco e nas cartas elas aparecem no tamanho 1:1. O script `scripts/core/verify_part_sizes.gd` confere isso.
+As peças precisam ter o mesmo tamanho de arquivo para o jogo poder colá-las sem esticar umas e encolher outras. Quadrado 200 × 200. Na carta o Freak inteiro (caixote + peças) aparece em 80%; na esteira, em 85%. O script `scripts/core/verify_part_sizes.gd` confere o tamanho do arquivo.

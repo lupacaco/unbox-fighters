@@ -43,7 +43,7 @@ const CARD_X: Array[float] = [160.0, 486.0]
 const CARD_OPPONENT_X: Array[float] = [1434.0, 1760.0]
 ## Local Y of the little wooden ledge inside the card, where the crate rests.
 const CARD_FLOOR_Y := 200.0
-const CARD_FREAK_SCALE := 0.92
+const CARD_FREAK_SCALE := 0.80
 ## Inner well of the frame, in card-local coordinates.
 const CARD_WELL := Rect2(-124, -246, 248, 458)
 ## The two stat pills sit in a row on the wooden lip under the well.

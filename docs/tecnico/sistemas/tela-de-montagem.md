@@ -25,7 +25,7 @@ A cena principal do jogo hoje: loja + cartas + esteiras no mesmo palco.
 - **2 cartas vermelhas** à direita (`carta-oponente.png`) — só mostram a montagem do oponente
 - **1 prateleira** no centro da tela (`prateleira-loja.png`, 438×95); atualizar e lixeira à esquerda, dinheiro à direita
 - Caixa da loja com **280 px** de altura
-- **Esteira azul** embaixo à esquerda, **vermelha** à direita, vão no meio; os Freaks na esteira ficam quase do tamanho da carta (85%)
+- **Esteira azul** embaixo à esquerda, **vermelha** à direita, vão no meio; os Freaks nas cartas ficam em 80% do desenho, na esteira em 85%
 - **Barra-balança** no topo, no meio, no vão entre as cartas de dentro (`barra-hp-vazia.png`, 70% do tamanho). Escreve **JOGADOR** no líquido azul (esquerda) e **OPONENTE** no vermelho (direita)
 
 ## Loja

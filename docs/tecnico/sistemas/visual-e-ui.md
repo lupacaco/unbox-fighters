@@ -48,7 +48,7 @@ A barra-balança fica **no topo**, no meio da tela. Começa vazia. O líquido az
 
 A caixa da loja é grande (cerca de 280 px de altura) e senta no centro, entre as quatro cartas.
 
-As peças dos Freaks são arquivos **200×200**. No jogo todas ficam no mesmo tamanho.
+As peças dos Freaks são arquivos **200×200**. No jogo todas ficam no mesmo tamanho. Na carta o Freak inteiro aparece um pouco menor (80%); na esteira, 85%.
 
 Ao passar o mouse, clicar ou arrastar, as coisas **crescem, esmagam e brilham** (ouro), sem caixas vermelhas de debug. Regra: `.cursor/rules/feedback-gostoso.mdc`.
 
