@@ -16,7 +16,7 @@ Só a **cabeça** ataca. O Freak não tem pernas: ele **rema** com as duas mãos
 
 Na esteira, o Freak do oponente fica virado para a esquerda (para o vão). O seu fica virado para a direita.
 
-Na esteira aparecem as etiquetas coloridas de **Ataque** na cabeça e **HP** no tronco, iguais às da carta.
+No caixote aparecem o nome, o Ataque (punho) e o HP (coração). O HP **diminui** no painel quando leva golpe.
 
 Na luta, quem cobre quem **não** usa o Z da ferramenta de ímãs. **1 fica na frente**.
 
@@ -44,7 +44,7 @@ Sons da luta: passo no pulo, raspar curto de madeira no deslize, poom do golpe. 
 | Esteira (números) | `scripts/match/belt_lane.gd` |
 | Freak na esteira | `scripts/assembly/belt_freak.gd` |
 | Cabeça que voa | `scripts/assembly/flying_head.gd` |
-| Tags coloridas | `scripts/ui/stat_tag.gd` |
+| Placa do caixote | `scripts/ui/crate_plaque.gd` |
 
 ## Arte (padrão `-1/-2`)
 

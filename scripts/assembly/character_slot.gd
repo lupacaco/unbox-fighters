@@ -28,6 +28,7 @@ var _glow: Polygon2D
 var _display: Node2D
 var _crate_back: Sprite2D
 var _crate_front: Sprite2D
+var _plaque: CratePlaque
 var _hint: Label
 var _fight_button: Button
 var _banner: Label
@@ -35,7 +36,6 @@ var _banner: Label
 var _bound_parts: Dictionary = {}
 var _layer_sprites: Dictionary = {}
 var _zone_areas: Dictionary = {}
-var _pills: Dictionary = {}
 var _crossfade_busy: bool = false
 var _locked: bool = false
 var _drop_hot: bool = false
@@ -46,13 +46,12 @@ func setup(as_opponent: bool = false) -> void:
 	is_opponent = as_opponent
 	_build_frame()
 	_build_display()
-	_build_pills()
 	_build_zones()
 	if not is_opponent:
 		_build_fight_button()
 	_build_banner()
 	_refresh_display(false)
-	_refresh_pills()
+	_refresh_plaque()
 
 # ---------------------------------------------------------------- state
 
@@ -140,7 +139,7 @@ func try_attach(part_view: PartView) -> bool:
 	part_view.set_attached_slot(self)
 	part_view.snap_hide_for_slot()
 	_refresh_display(true)
-	_refresh_pills()
+	_refresh_plaque()
 	_pulse_attach()
 	GameAudio.part_place()
 	var loadout := to_loadout()
@@ -165,7 +164,7 @@ func detach_part(slot: PartSlotType.Value, refresh: bool = true) -> PartView:
 	part_view.set_attached_slot(null)
 	if refresh:
 		_refresh_display(true)
-		_refresh_pills()
+		_refresh_plaque()
 	_refresh_fight_button()
 	part_detached.emit(self, part_view.part_def)
 	assembly_changed.emit(self)
@@ -182,7 +181,7 @@ func steal_all_parts() -> Dictionary:
 			view.set_attached_slot(null)
 			stolen[slot] = view
 	_refresh_display(false)
-	_refresh_pills()
+	_refresh_plaque()
 	_refresh_fight_button()
 	assembly_changed.emit(self)
 	return stolen
@@ -195,7 +194,7 @@ func clear_after_launch() -> void:
 	_bound_parts.clear()
 	_synergy_shown = Synergy.Level.NONE
 	_refresh_display(false)
-	_refresh_pills()
+	_refresh_plaque()
 	_refresh_fight_button()
 	assembly_changed.emit(self)
 
@@ -216,7 +215,7 @@ func show_loadout(loadout: FighterLoadout) -> void:
 	_shown_parts = next
 	_shown_key = key
 	_refresh_display(grew)
-	_refresh_pills()
+	_refresh_plaque()
 	if grew:
 		_pulse_attach()
 
@@ -316,6 +315,9 @@ func _build_display() -> void:
 	_display.add_child(_crate_front)
 	CompositeResolver.apply_crate_back_to(_crate_back)
 	CompositeResolver.apply_crate_front_to(_crate_front)
+	_plaque = CratePlaque.new()
+	_plaque.name = "CratePlaque"
+	_display.add_child(_plaque)
 	for slot in PartSlotType.draw_order():
 		var sprite := Sprite2D.new()
 		sprite.name = String(PartSlotType.to_string_name(slot))
@@ -323,20 +325,6 @@ func _build_display() -> void:
 		sprite.visible = false
 		_display.add_child(sprite)
 		_layer_sprites[slot] = sprite
-
-func _build_pills() -> void:
-	if not _pills.is_empty():
-		return
-	var slots := PartSlotType.shop_slots()
-	for i in slots.size():
-		var pill := StatTag.new()
-		pill.position = Vector2(
-			(float(i) - float(slots.size() - 1) * 0.5) * AssemblyLayout.CARD_PILL_STEP,
-			AssemblyLayout.CARD_PILL_Y
-		)
-		pill.z_index = 6
-		add_child(pill)
-		_pills[slots[i]] = pill
 
 func _build_zones() -> void:
 	if not _zone_areas.is_empty():
@@ -485,6 +473,11 @@ func _restack_crate() -> void:
 		next += 1
 	_display.move_child(_crate_front, next)
 	next += 1
+	if _plaque != null:
+		_plaque.position = CompositeResolver.crate_front_position()
+		_plaque.z_index = CompositeResolver.crate_front_z(BODY_Z) + 1
+		_display.move_child(_plaque, next)
+		next += 1
 	for slot in [PartSlotType.Value.ARM_L, PartSlotType.Value.ARM_R, PartSlotType.Value.HEAD]:
 		var sprite: Sprite2D = _layer_sprites.get(slot)
 		if sprite == null:
@@ -499,13 +492,10 @@ func _make_crate_sprite(node_name: String) -> Sprite2D:
 	sprite.centered = true
 	return sprite
 
-func _refresh_pills() -> void:
-	var loadout := to_loadout()
-	var parts := loadout.parts_array()
-	for slot in _pills.keys():
-		var pill: StatTag = _pills[slot]
-		var boosted := Synergy.kinds_match(parts)
-		pill.setup(loadout.stat_of(slot), ThemeTokens.color_for_slot(slot), boosted)
+func _refresh_plaque() -> void:
+	if _plaque == null:
+		return
+	_plaque.show_loadout(to_loadout())
 
 func _celebrate_power(ability: FreakAbility.Value) -> void:
 	var title := FreakAbility.display_name(ability)
@@ -530,8 +520,8 @@ func _flash_banner(text: String) -> void:
 	var flash := create_tween()
 	flash.tween_property(_glow, "color:a", 0.55, 0.1)
 	flash.tween_property(_glow, "color:a", 0.08, 0.5).set_trans(Tween.TRANS_SINE)
-	for pill in _pills.values():
-		(pill as StatTag).play_boost()
+	if _plaque != null:
+		_plaque.play_pulse()
 
 func _display_rest_scale() -> Vector2:
 	return Vector2.ONE * AssemblyLayout.CARD_FREAK_SCALE

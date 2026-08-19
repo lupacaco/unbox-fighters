@@ -15,7 +15,7 @@ powershell -File tools/run_checks.ps1
 
 | Script | O que verifica |
 |--------|----------------|
-| `verify_synergy.gd` | Tipo igual +50%; Bruxa 8→12 e 15→23; mistura Bruxa+Advogado sem bônus nem Poder |
+| `verify_synergy.gd` | Tipo igual +50%; Bruxa 8→12 e 15→23; mistura lê FREAK; set completo lê BRUXA; verde/vermelho |
 | `verify_duel.gd` | Golpes intercalados; o vencedor mata sozinho; preço; dinheiro; atualizar grátis |
 | `verify_belt.gd` | 5 remadas de 2 s até a ponta, fila de 2 com espaço entre os caixotes, 50 de chip a partir do 0 vence |
 | `verify_bot.gd` | O oponente gasta, não lança no primeiro segundo, manda Freak e prefere fechar o set |

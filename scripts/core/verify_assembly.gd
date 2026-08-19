@@ -163,6 +163,20 @@ func _check_crate_stays_same_size(scene: Node) -> bool:
 	if occupied_front.z_index <= body.z_index:
 		push_error("VERIFY_FAIL the crate front should sit in front of the torso")
 		return false
+	var empty_plaque := empty.get_node_or_null("Display/CratePlaque") as CratePlaque
+	if empty_plaque == null or empty_plaque.visible:
+		push_error("VERIFY_FAIL an empty crate should not show a name")
+		return false
+	var plaque := occupied.get_node_or_null("Display/CratePlaque") as CratePlaque
+	if plaque == null or not plaque.visible:
+		push_error("VERIFY_FAIL a filled crate should show the name and numbers")
+		return false
+	if plaque.shown_title() != "FREAK":
+		push_error("VERIFY_FAIL a body alone should still read FREAK")
+		return false
+	if plaque.shown_hp() != bruxa.body.stat_value:
+		push_error("VERIFY_FAIL the crate should show the body's HP")
+		return false
 	return true
 
 func _check_belts(scene: Node) -> bool:

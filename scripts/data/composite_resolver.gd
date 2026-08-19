@@ -88,6 +88,12 @@ static func crate_front_position() -> Vector2:
 		return crate_position()
 	return Vector2(0.0, -height * 0.5)
 
+static func crate_front_size() -> Vector2:
+	var tex := crate_front_texture()
+	if tex == null:
+		return Vector2(CRATE_WIDTH, 105.0)
+	return tex.get_size() * crate_scale()
+
 ## Back rim, stacked on top of the front box.
 static func crate_back_position() -> Vector2:
 	var front_h := _layer_height(crate_front_texture())

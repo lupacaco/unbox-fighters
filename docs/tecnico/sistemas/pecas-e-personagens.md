@@ -9,7 +9,7 @@ Na **loja** existem **2 kits**:
 - **Cabeça**
 - **Corpo** (o peito dentro do caixote, já com os dois braços)
 
-Na **carta** e na **esteira** o corpo mostra **três desenhos** (tronco, braço E e braço D), para cada braço poder se mexer. Na esteira, a cabeça leva a etiqueta de **Ataque** e o tronco a de **HP**.
+Na **carta** e na **esteira** o corpo mostra **três desenhos** (tronco, braço E e braço D), para cada braço poder se mexer. No **caixote** aparecem o nome, o Ataque (punho) e o HP (coração).
 
 O **caixote** é a **base fixa** de todos os Freaks, em **duas imagens**: `caixote-cima.png` (faixa de trás, Z menor que o Freak) e `caixote-baixo.png` (caixa da frente, Z maior que o tronco). Não é um kit da loja. Fica nas cartas (mesmo vazias) e na esteira, **sempre do mesmo tamanho**. O tronco tem um ímã embaixo que encaixa no caixote; a frente tapa a barriga, como se o Freak estivesse sentado dentro.
 

@@ -4,9 +4,7 @@ extends Node2D
 ## A finished Freak riding its conveyor. It has no legs, so it rows itself
 ## along with both hands. At the tip it brakes and turns to face the enemy.
 
-const HP_BAR := Vector2(96, 10)
 const HEAD_ARC := 210.0
-const TAG_SCALE := 0.72
 const JUMP_PEAK := 280.0
 const JUMP_TIME := 0.52
 ## One paddle: lift both arms forward, throw them back in a half-moon, then slide.
@@ -26,17 +24,13 @@ var arrived: bool = false
 
 var _facing: Node2D
 var _body: Node2D
-var _overlay: Node2D
 var _shadow: Polygon2D
 var _dust: CPUParticles2D
-var _hp_fill: Polygon2D
-var _power_tag: StatTag
-var _tough_tag: StatTag
+var _plaque: CratePlaque
 var _sprites: Dictionary = {}
 var _arm_rest: Dictionary = {}
 var _head_home := Vector2.ZERO
 var _display_scale: float = AssemblyLayout.BELT_FREAK_SCALE
-var _max_hp: int = 1
 var _dead: bool = false
 var _jumping: bool = false
 var _stroking: bool = false
@@ -47,10 +41,8 @@ var _slide_started: bool = false
 func setup(loadout: FighterLoadout, lane_runner: BeltLane.Runner, is_player: bool) -> void:
 	runner = lane_runner
 	player_side = is_player
-	_max_hp = maxi(1, lane_runner.stats.hp)
 	_build_body(loadout)
-	_build_overlay()
-	_build_stat_tags(loadout)
+	_build_plaque(loadout)
 	set_progress(lane_runner.progress)
 
 # ---------------------------------------------------------------- movement
@@ -281,15 +273,9 @@ func flash_hit(damage: int) -> void:
 	refresh_hp()
 
 func refresh_hp() -> void:
-	if _hp_fill == null or runner == null:
+	if _plaque == null or runner == null or runner.loadout == null:
 		return
-	var ratio := clampf(float(runner.hp) / float(_max_hp), 0.0, 1.0)
-	var tween := create_tween()
-	tween.tween_method(
-		func(t: float) -> void: _hp_fill.polygon = _hp_shape(t),
-		_hp_ratio(), ratio, 0.22
-	).set_trans(Tween.TRANS_SINE)
-	_hp_fill.color = ThemeTokens.BELT_PLAYER.lerp(ThemeTokens.X_RED, 1.0 - ratio)
+	_plaque.set_hp(runner.hp, runner.loadout.base_stat_of(PartSlotType.Value.BODY))
 
 ## Grey out, slide toward the gap and drop through with a spin.
 func play_death() -> void:
@@ -297,12 +283,8 @@ func play_death() -> void:
 	_stroking = false
 	if _dust != null:
 		_dust.emitting = false
-	if _overlay != null:
-		_overlay.visible = false
-	if _power_tag != null:
-		_power_tag.visible = false
-	if _tough_tag != null:
-		_tough_tag.visible = false
+	if _plaque != null:
+		_plaque.visible = false
 	var fall_x := AssemblyLayout.gap_center_x()
 	var tween := create_tween()
 	tween.tween_property(_body, "modulate", Color(0.42, 0.4, 0.44, 1), 0.18)
@@ -398,49 +380,17 @@ func _build_body(loadout: FighterLoadout) -> void:
 	_dust.emitting = false
 	_body.add_child(_dust)
 
-func _build_overlay() -> void:
-	_overlay = Node2D.new()
-	_overlay.name = "Overlay"
-	_overlay.position = Vector2(0.0, -330.0 * _display_scale)
-	_overlay.z_index = 12
-	add_child(_overlay)
-
-	var back := Polygon2D.new()
-	back.polygon = _hp_frame(HP_BAR * 0.5 + Vector2(3, 3))
-	back.color = Color(0.05, 0.05, 0.07, 0.9)
-	_overlay.add_child(back)
-
-	_hp_fill = Polygon2D.new()
-	_hp_fill.color = ThemeTokens.BELT_PLAYER if player_side else ThemeTokens.BELT_OPPONENT
-	_hp_fill.polygon = _hp_shape(1.0)
-	_overlay.add_child(_hp_fill)
-
-func _build_stat_tags(loadout: FighterLoadout) -> void:
-	if runner == null or runner.stats == null:
-		return
-	var stats := runner.stats
-	_power_tag = _make_tag(
-		PartSlotType.Value.HEAD,
-		stats.attack,
-		stats.attack > stats.base_of(loadout, PartSlotType.Value.HEAD)
-	)
-	_tough_tag = _make_tag(
-		PartSlotType.Value.BODY,
-		stats.hp,
-		stats.hp > stats.base_of(loadout, PartSlotType.Value.BODY)
-	)
-
-func _make_tag(slot: PartSlotType.Value, value: int, boosted: bool) -> StatTag:
-	var tag := StatTag.new()
-	tag.z_index = 11
-	tag.scale = Vector2.ONE * TAG_SCALE
-	add_child(tag)
-	tag.setup(value, ThemeTokens.color_for_slot(slot), boosted)
-	var sprite: Sprite2D = _sprites.get(slot)
-	if sprite != null:
-		var bump := Vector2(0.0, -42.0 * _display_scale) if slot == PartSlotType.Value.HEAD else Vector2(0.0, 8.0)
-		tag.position = to_local(sprite.global_position) + bump
-	return tag
+func _build_plaque(loadout: FighterLoadout) -> void:
+	_plaque = CratePlaque.new()
+	_plaque.name = "CratePlaque"
+	_plaque.position = CompositeResolver.crate_front_position() * _display_scale
+	_plaque.z_index = 8
+	## Opponent Freaks are flipped; flip the plaque back so the name stays readable.
+	if not player_side:
+		_plaque.scale.x = -1.0
+	_body.add_child(_plaque)
+	var hp := runner.hp if runner != null else -1
+	_plaque.show_loadout(loadout, hp)
 
 func _shop_map(loadout: FighterLoadout) -> Dictionary:
 	var shop := {}
@@ -461,28 +411,6 @@ func _pop_damage(damage: int) -> void:
 	tween.tween_property(label, "position:y", label.position.y - 58.0, 0.6).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(label, "modulate:a", 0.0, 0.6)
 	tween.tween_callback(label.queue_free)
-
-func _hp_ratio() -> float:
-	var poly := _hp_fill.polygon
-	if poly.size() < 3:
-		return 0.0
-	return clampf((poly[1].x + HP_BAR.x * 0.5) / HP_BAR.x, 0.0, 1.0)
-
-func _hp_shape(ratio: float) -> PackedVector2Array:
-	var half := HP_BAR * 0.5
-	var w := HP_BAR.x * clampf(ratio, 0.0, 1.0)
-	if w <= 1.0:
-		return PackedVector2Array()
-	return PackedVector2Array([
-		Vector2(-half.x, -half.y), Vector2(-half.x + w, -half.y),
-		Vector2(-half.x + w, half.y), Vector2(-half.x, half.y),
-	])
-
-func _hp_frame(half: Vector2) -> PackedVector2Array:
-	return PackedVector2Array([
-		Vector2(-half.x, -half.y), Vector2(half.x, -half.y),
-		Vector2(half.x, half.y), Vector2(-half.x, half.y),
-	])
 
 func _oval(rx: float, ry: float) -> PackedVector2Array:
 	var points := PackedVector2Array()

@@ -33,12 +33,6 @@ static func from_loadout(loadout: FighterLoadout) -> FreakStats:
 func is_ready() -> bool:
 	return attack > 0 and hp > 0
 
-func base_of(loadout: FighterLoadout, slot: PartSlotType.Value) -> int:
-	if loadout == null:
-		return 0
-	var part := loadout.get_part(slot)
-	return part.stat_value if part != null else 0
-
 static func _dominant_name(parts: Array) -> String:
 	var tally := {}
 	var best_name := ""

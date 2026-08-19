@@ -12,17 +12,22 @@ Interface da partida. As posições da tela estão em `AssemblyLayout` (1920×10
 | `scripts/ui/action_bar.gd` | Botão redondo de atualizar e lixeira de vender |
 | `scripts/ui/tug_bar.gd` | Barra-balança no topo: JOGADOR / OPONENTE, azul à esquerda, vermelho à direita |
 | `scripts/ui/shop_shelf.gd` | Uma prateleira: caixa fechada ou kit aberto |
-| `scripts/ui/stat_tag.gd` | Pílula colorida com o número da peça |
+| `scripts/ui/crate_plaque.gd` | Nome e números no painel do caixote (punho = Ataque, coração = HP) |
 | `scripts/ui/theme_tokens.gd` | Paleta: ouro, creme, azul da esteira, vermelho do oponente |
 | `scripts/ui/feel.gd` | Reação gostosa: hover, clique, squash. Esconde retângulo de colisão |
 | `scripts/ui/hammer_cursor.gd` | Cursor martelo ao passar / bater nas caixas |
 
-## Cores das tags
+## Números no caixote
 
-- Cabeça (Ataque) = vermelho-laranja
-- Corpo (HP) = roxo
+O painel da frente do caixote mostra o **nome**, o **Ataque** (ícone de punho) e o **HP** (ícone de coração).
 
-Pílula com sinergia ganha um brilho ouro.
+- Sem set completo (cabeça e corpo do mesmo Freak): o nome é **FREAK**
+- Set completo: o nome do Freak, em maiúsculas (ex.: **BRUXA**)
+- Número **branco**: igual ao da ficha
+- Número **verde**: acima da ficha (bônus de tipo)
+- Número **vermelho**: abaixo da ficha (dano na luta)
+
+Na luta o HP do caixote **cai** quando o Freak leva golpe.
 
 ## Arte de UI
 
@@ -37,6 +42,7 @@ Pasta `assets/nova-ui/`:
 - `liquido-jogador.png` / `liquido-oponente.png` — líquidos azul e vermelho (349×62)
 - `caixote-cima.png` — faixa de cima, atrás do Freak (322×26)
 - `caixote-baixo.png` — caixa de baixo, na frente do tronco (330×175)
+- `icone-punho.png` / `icone-coracao.png` — Ataque e HP no painel do caixote
 
 Pasta `assets/fonts/`:
 

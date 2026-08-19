@@ -68,8 +68,25 @@ func _check_card() -> bool:
 	if mixed.is_complete_set():
 		push_error("VERIFY_FAIL mixed kits are not a complete set")
 		return false
+	if mixed.crate_title() != "FREAK":
+		push_error("VERIFY_FAIL a mixed Freak should read FREAK on the crate")
+		return false
 
-	var full := FighterLoadout.from_character(bruxa).stats()
+	var full_loadout := FighterLoadout.from_character(bruxa)
+	if full_loadout.crate_title() != "BRUXA":
+		push_error("VERIFY_FAIL a complete Bruxa should read BRUXA on the crate")
+		return false
+	if CratePlaque.color_for(15, 15) != ThemeTokens.STAT_FLAT:
+		push_error("VERIFY_FAIL a printed number should stay white")
+		return false
+	if CratePlaque.color_for(10, 15) != ThemeTokens.STAT_DOWN:
+		push_error("VERIFY_FAIL a drop below the printed number should be red")
+		return false
+	if CratePlaque.color_for(18, 15) != ThemeTokens.STAT_UP:
+		push_error("VERIFY_FAIL a bonus above the printed number should be green")
+		return false
+
+	var full := full_loadout.stats()
 	if full.attack != 12 or full.hp != 23:
 		push_error("VERIFY_FAIL full bruxa should be 12 / 23, got %d / %d" % [full.attack, full.hp])
 		return false

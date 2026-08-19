@@ -71,5 +71,15 @@ func base_stat_of(slot: PartSlotType.Value) -> int:
 func stats() -> FreakStats:
 	return FreakStats.from_loadout(self)
 
+## Incomplete mix stays generic. Same Freak on both kits uses that Freak's name.
+func crate_title() -> String:
+	if is_complete_set():
+		var character := ShopPool.character_by_id(head.set_id)
+		if character != null:
+			var named := character.display_name.strip_edges()
+			if not named.is_empty():
+				return named.to_upper()
+	return "FREAK"
+
 func duplicate_loadout() -> FighterLoadout:
 	return from_parts(head, body)

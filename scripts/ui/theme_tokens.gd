@@ -31,13 +31,7 @@ const BELT_PLAYER := Color(0.36, 0.68, 0.95)
 const BELT_OPPONENT := Color(0.93, 0.33, 0.33)
 const REFRESH_BLUE := Color(0.16, 0.34, 0.58)
 const SELL_RED := Color(0.52, 0.14, 0.16)
+const STAT_UP := Color(0.38, 0.86, 0.40)
+const STAT_DOWN := Color(0.94, 0.22, 0.24)
+const STAT_FLAT := Color(1.0, 1.0, 1.0)
 
-## Ataque é vermelho-laranja, HP é roxo.
-static func color_for_slot(slot: PartSlotType.Value) -> Color:
-	match slot:
-		PartSlotType.Value.HEAD:
-			return Color(0.95, 0.42, 0.30)
-		PartSlotType.Value.BODY:
-			return MIGHT
-		_:
-			return Color(0.95, 0.42, 0.30)
