@@ -51,6 +51,26 @@ func _check_crate() -> bool:
 	if CompositeResolver.crate_join().y >= 0.0:
 		push_error("VERIFY_FAIL the torso should plug in at the top of the crate")
 		return false
+	if not _check_crate_panel():
+		return false
+	return true
+
+
+func _check_crate_panel() -> bool:
+	var front := CompositeResolver.crate_front_size()
+	var wood := Rect2(-front * 0.5, front)
+	var panel := CompositeResolver.crate_front_panel_rect()
+	if not wood.encloses(panel):
+		push_error("VERIFY_FAIL the chalkboard must sit on the crate front")
+		return false
+	var inset_x := minf(panel.position.x - wood.position.x, wood.end.x - panel.end.x)
+	var inset_y := minf(panel.position.y - wood.position.y, wood.end.y - panel.end.y)
+	if inset_x < front.x * 0.08 or inset_y < front.y * 0.12:
+		push_error("VERIFY_FAIL name and numbers must stay inside the black panel, not on the wood")
+		return false
+	if panel.size.x < 140.0 or panel.size.y < 60.0:
+		push_error("VERIFY_FAIL the black panel should still be large enough to read")
+		return false
 	return true
 
 func _check_anchor(bruxa: CharacterDef) -> bool:

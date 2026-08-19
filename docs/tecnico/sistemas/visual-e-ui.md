@@ -19,7 +19,7 @@ Interface da partida. As posições da tela estão em `AssemblyLayout` (1920×10
 
 ## Números no caixote
 
-O painel da frente do caixote mostra o **nome**, o **Ataque** (ícone azul de punho) e o **HP** (ícone vermelho de coração), em tamanho grande para ler de longe.
+O painel **preto** da frente do caixote mostra o **nome**, o **Ataque** (ícone azul de punho) e o **HP** (ícone vermelho de coração). Tudo fica **dentro** desse retângulo, sem encostar na madeira.
 
 - Sem set completo (cabeça e corpo do mesmo Freak): o nome é **FREAK**
 - Set completo: o nome do Freak, em maiúsculas (ex.: **BRUXA**)

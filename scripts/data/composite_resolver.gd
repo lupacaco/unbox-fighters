@@ -18,6 +18,9 @@ const CRATE_FRONT_PATH := "res://assets/nova-ui/caixote-baixo.png"
 const CRATE_WIDTH := 226.0
 ## How far the join sits below the crate's top edge, so the Freak looks inside.
 const CRATE_JOIN_INSET := 22.0
+## Inner chalkboard of caixote-baixo.png (330×175), in texture pixels.
+## Kept inside the black panel, clear of the wooden frame and rivets.
+const CRATE_PANEL_TEX := Rect2(38, 34, 254, 109)
 
 const DEFAULT_NECK := Vector2(0, -80)
 const DEFAULT_SHOULDER_L := Vector2(-64, -46)
@@ -93,6 +96,18 @@ static func crate_front_size() -> Vector2:
 	if tex == null:
 		return Vector2(CRATE_WIDTH, 105.0)
 	return tex.get_size() * crate_scale()
+
+
+## Black inner panel, in the same local space as the front crate sprite (centered).
+static func crate_front_panel_rect() -> Rect2:
+	var tex := crate_front_texture()
+	var scale := crate_scale()
+	var inner := CRATE_PANEL_TEX
+	if tex == null:
+		var fallback := crate_front_size()
+		return Rect2(-fallback.x * 0.38, -fallback.y * 0.32, fallback.x * 0.76, fallback.y * 0.64)
+	var pos := (inner.position - tex.get_size() * 0.5) * scale
+	return Rect2(pos, inner.size * scale)
 
 ## Back rim, stacked on top of the front box.
 static func crate_back_position() -> Vector2:

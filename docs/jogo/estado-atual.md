@@ -15,7 +15,7 @@
 | Chip | Freak sozinho na ponta empurra a balança 1 ponto por segundo; 50 no lado dele vence |
 | Visual | Fundo, cartas, prateleira e esteiras da arte nova (`assets/nova-ui`) |
 | Arrastar e soltar | Da prateleira para as cartas azuis; clicar seleciona para vender; arrastar na lixeira também vende |
-| Composição | Caixote um pouco maior, em duas partes; no painel: nome, Ataque e HP; na esteira o braço fica para a frente e por cima dos números |
+| Composição | Caixote um pouco maior, em duas partes; nome, Ataque e HP só no retângulo preto; na esteira o braço fica para a frente e por cima dos números |
 | Interface | Dinheiro ao lado da prateleira; botões redondos de atualizar e vender; barra-balança no topo (JOGADOR / OPONENTE) |
 | Incluir Freak | Folha 4+4 vira 8 PNG 200×200 + 2 kits na loja; ímãs em Frente e Perfil |
 | Editar Freak | **Projeto → Ferramentas → Editar personagem**: nome, tipo, Poder, Ataque e HP |
