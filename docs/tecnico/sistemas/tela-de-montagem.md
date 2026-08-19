@@ -21,7 +21,7 @@ A cena principal do jogo hoje: a mesma sala troca de **preparação** para **lut
 
 ## Layout (1920×1080)
 
-- **3 cartas azuis** à esquerda (`carta.png`, 306×572, um pouco menores para caber), coladas no topo
+- **3 cartas azuis** à esquerda (`carta.png`, 306×572, quase do tamanho da arte), coladas no topo
 - **3 cartas vermelhas** à direita (`carta-oponente.png`) — só na luta, no lugar da loja
 - **4 prateleiras** em grade 2×2 à direita na preparação (`prateleira-loja.png`); atualizar, lixeira e dinheiro à direita delas
 - **Esteira azul** embaixo à esquerda, **vermelha** à direita, vão no meio; os Freaks param em cima dos rolos; até três na mesma esteira com espaço entre os caixotes

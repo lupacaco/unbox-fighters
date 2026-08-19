@@ -38,13 +38,13 @@ const BELT_FREAK_SCALE := 0.85
 
 # ---------------------------------------------------------------- cards
 const CARD_SIZE := Vector2(306, 572)
-## Three cards need a little shrink so they sit on the left without eating the shop.
-const CARD_FIT := 0.78
+## Hang almost at art size. The three still fit left of the shop.
+const CARD_FIT := 0.96
 ## Half the drawn card, so the chain hooks sit flush with the top of the screen.
 const CARD_CENTER_Y := CARD_SIZE.y * 0.5 * CARD_FIT
-## Centers 253 px apart after the shrink (art 306 × 0.78 + 14 gap).
-const CARD_X: Array[float] = [135.0, 388.0, 641.0]
-const CARD_OPPONENT_X: Array[float] = [1279.0, 1532.0, 1785.0]
+## Centers 310 px apart (art 306 × 0.96 + 16 gap).
+const CARD_X: Array[float] = [155.0, 465.0, 775.0]
+const CARD_OPPONENT_X: Array[float] = [1145.0, 1455.0, 1765.0]
 ## Local Y of the little wooden ledge inside the card, where the crate rests.
 const CARD_FLOOR_Y := 240.0
 const CARD_FREAK_SCALE := 0.80
@@ -83,7 +83,7 @@ const HP_GLASS := Rect2(-348.0, -33.0, 696.0, 66.0)
 ## Distance from the left/right edge of the screen to the tube center.
 const HP_GUTTER := 52.0
 ## Height of the tube center, between the hanging cards and the belts.
-const HP_STAGE_Y := 640.0
+const HP_STAGE_Y := 780.0
 ## Turns the horizontal art into a thermometer. Fill still grows along local X.
 const HP_TUBE_ROTATION := -PI / 2.0
 
