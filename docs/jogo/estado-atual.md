@@ -10,32 +10,31 @@
 | Dinheiro | Começa em $10, +$1 a cada 2 s, teto $10. Substitui as pancadas |
 | Loja | 1 prateleira no meio; atualizar grátis; VENDER pela metade |
 | Montagem | 2 cartas suas à esquerda; 2 cartas vermelhas do oponente à direita |
-| Esteiras | Azul sua, vermelha deles; pulo da carta (também o oponente); 5 remadas (ritmo pela Agilidade); oponente olha para a esquerda; etiquetas de Poder e Resistência |
-| Luta | Só a cabeça ataca; golpes um de cada vez; o vencedor dá o golpe final; morto cai no vão |
+| Esteiras | Azul sua, vermelha deles; pulo da carta; 5 remadas (2 s cada); oponente olha para a esquerda; etiquetas de Ataque e HP |
+| Luta | Só a cabeça ataca; golpes um de cada vez; o vencedor dá o golpe final; morto cai no vão. Bruxa: Controle de Mente. Advogado: Recurso |
 | Chip | Freak sozinho na ponta empurra a balança 1 ponto por segundo; 50 no lado dele vence |
 | Visual | Fundo, cartas, prateleira e esteiras da arte nova (`assets/nova-ui`) |
 | Arrastar e soltar | Da prateleira para as cartas azuis; clicar seleciona para vender; arrastar na lixeira também vende |
 | Composição | Caixote do tronco é o chão. Ímãs unem cabeça no pescoço e braços nos ombros |
 | Interface | Dinheiro ao lado da prateleira; botões redondos de atualizar e vender; barra-balança no topo (JOGADOR / OPONENTE) |
-| Incluir Freak | Folha 4+4 vira 8 PNG 200×200 + 3 kits na loja; ímãs em Frente e Perfil |
+| Incluir Freak | Folha 4+4 vira 8 PNG 200×200 + 2 kits na loja; ímãs em Frente e Perfil |
 | Áudio | Efeitos gravados (martelo, caixa, ímã, impacto). Sem som de mola |
 | Dados | Loja lê sozinha todo `*_character.tres` (Bruxa, Advogado) |
 | Bot | Compra, monta e manda lutar com as mesmas regras e o mesmo tempo de mãos |
-| Scripts de verificação | 11 checagens sem abrir a interface completa |
+| Scripts de verificação | 12 checagens sem abrir a interface completa |
 
 ## Parcial / provisório
 
 | Item | Observação |
 |------|------------|
-| Elenco | Só Bruxa e Advogado. Com 2 Freaks a sinergia quase sempre acontece |
-| Ritmo do dinheiro | Um Freak custa $15–17 e o teto é $10. Só jogando dá para acertar o tempo |
+| Elenco | Só Bruxa (Sobrenatural) e Advogado (Humano). Ainda não tem Animal |
+| Ritmo do dinheiro | Um Freak custa $12–13 e o teto é $10. Só jogando dá para acertar o tempo |
 | Ímãs | O recorte já sugere os pontos; ainda vale conferir na ferramenta de ímãs |
 | Arte no padrão `-1/-2` | Frente / perfil, arquivos **200×200**. Sem pose de golpe (`-3`) |
 
 ## Ainda não existe
 
 - Multiplayer
-- Habilidade extra de set completo (além da sinergia)
 - Áudio de música de fundo / menu de volume
 - Menus / navegação entre telas
 - Salvamento / progressão

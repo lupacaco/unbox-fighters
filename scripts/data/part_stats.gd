@@ -3,37 +3,30 @@ extends RefCounted
 
 ## What the number on a kit means, and what it costs in the shop.
 ##
-## Cabeça  = Poder       (1 a 10)  quanto tira de vida por golpe
-## Tronco  = Resistência (10 a 20) a vida daquele Freak
-## Braços  = Agilidade   (1 a 5)   velocidade dele na esteira
+## Cabeça = Ataque (1 a 10)  quanto a cabeça tira de HP por golpe
+## Corpo  = HP     (10 a 20) a vida daquele Freak (o caixote já traz os braços)
 
-const POWER_MIN := 1
-const POWER_MAX := 10
-const TOUGHNESS_MIN := 10
-const TOUGHNESS_MAX := 20
-const AGILITY_MIN := 1
-const AGILITY_MAX := 5
+const ATTACK_MIN := 1
+const ATTACK_MAX := 10
+const HP_MIN := 10
+const HP_MAX := 20
 
-## A torso of 10 toughness would cost nothing, so nothing is ever free.
+## A body of 10 HP would cost nothing, so nothing is ever free.
 const MIN_PRICE := 1
 
 static func range_of(slot: PartSlotType.Value) -> Vector2i:
-	match slot:
-		PartSlotType.Value.BODY:
-			return Vector2i(TOUGHNESS_MIN, TOUGHNESS_MAX)
-		PartSlotType.Value.ARMS, PartSlotType.Value.ARM_L, PartSlotType.Value.ARM_R:
-			return Vector2i(AGILITY_MIN, AGILITY_MAX)
-		_:
-			return Vector2i(POWER_MIN, POWER_MAX)
+	if slot == PartSlotType.Value.BODY:
+		return Vector2i(HP_MIN, HP_MAX)
+	return Vector2i(ATTACK_MIN, ATTACK_MAX)
 
 static func clamp_for(slot: PartSlotType.Value, value: int) -> int:
 	var span := range_of(slot)
 	return clampi(value, span.x, span.y)
 
-## Head costs its Power, arms cost their Agility, a torso costs Toughness above 10.
+## Head costs its Attack; a body costs HP above 10.
 static func price_for(slot: PartSlotType.Value, value: int) -> int:
 	if slot == PartSlotType.Value.BODY:
-		return maxi(MIN_PRICE, value - TOUGHNESS_MIN)
+		return maxi(MIN_PRICE, value - HP_MIN)
 	return maxi(MIN_PRICE, value)
 
 static func price_of(part: PartDef) -> int:
@@ -48,13 +41,9 @@ static func sell_price(paid: int) -> int:
 	return int(ceil(float(paid) / 2.0))
 
 static func label_of(slot: PartSlotType.Value) -> String:
-	match slot:
-		PartSlotType.Value.BODY:
-			return "Resistência"
-		PartSlotType.Value.ARMS, PartSlotType.Value.ARM_L, PartSlotType.Value.ARM_R:
-			return "Agilidade"
-		_:
-			return "Poder"
+	if slot == PartSlotType.Value.BODY:
+		return "HP"
+	return "Ataque"
 
 ## Shop tier so the pool can grow with the match. Cheap kits show up first.
 static func tier_for(slot: PartSlotType.Value, value: int) -> int:

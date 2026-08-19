@@ -2,11 +2,20 @@ class_name PartKit
 extends RefCounted
 
 ## Turns a shop kit into the drawings that go on screen.
-## The arm kit is one box in the shop but two drawings on the Freak.
+## The body kit is one box in the shop but the crate plus both arms on the Freak.
 
 static func expand_shop_part(part: PartDef) -> Dictionary:
 	var visual := {}
 	if part == null:
+		return visual
+	if part.slot_type == PartSlotType.Value.BODY:
+		visual[PartSlotType.Value.BODY] = part
+		var character := ShopPool.character_by_id(part.set_id)
+		if character != null:
+			if character.arm_l != null:
+				visual[PartSlotType.Value.ARM_L] = character.arm_l
+			if character.arm_r != null:
+				visual[PartSlotType.Value.ARM_R] = character.arm_r
 		return visual
 	if part.is_bundle():
 		for piece in part.kit_parts:

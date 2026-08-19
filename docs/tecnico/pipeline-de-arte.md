@@ -23,7 +23,7 @@ Em `assets/characters/<nome>/`:
 - `<nome>_slice.json` — ímãs e números que o cortador achou
 - Canvas **200×200**
 
-Para um set novo: [Incluir personagem](incluir-personagem.md). O Godot também tem **Project → Tools → Incluir personagem** (corta os 8 PNG e cria os 3 kits da loja).
+Para um set novo: [Incluir personagem](incluir-personagem.md). O Godot também tem **Project → Tools → Incluir personagem** (corta os 8 PNG e cria os 2 kits da loja).
 
 ## Por que 200×200
 

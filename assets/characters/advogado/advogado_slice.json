@@ -2,10 +2,11 @@
 	"id": "advogado",
 	"display_name": "Advogado",
 	"stats": {
-		"power": 4,
-		"toughness": 18,
-		"agility": 5
+		"attack": 4,
+		"hp": 18
 	},
+	"kind": "human",
+	"ability": "appeal",
 	"magnets": {
 		"front": {
 			"head": {

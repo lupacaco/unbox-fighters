@@ -2,8 +2,8 @@
 class_name PartSlotType
 extends Object
 
-## The shop sells three kits: head, torso and the arm pair.
-## The screen draws four pieces, because the arm kit becomes two arms.
+## The shop sells two kits: head and body. The body draws as the crate plus both
+## arms. Arm_l / arm_r are drawings, not things you buy.
 enum Value {
 	HEAD,
 	BODY,
@@ -13,7 +13,7 @@ enum Value {
 }
 
 static func shop_slots() -> Array[Value]:
-	return [Value.HEAD, Value.BODY, Value.ARMS]
+	return [Value.HEAD, Value.BODY]
 
 static func visual_slots() -> Array[Value]:
 	return [Value.HEAD, Value.BODY, Value.ARM_L, Value.ARM_R]
@@ -89,13 +89,15 @@ static func _draw_z_of(parts: Dictionary, slot: Value) -> int:
 	return default_draw_z(slot)
 
 static func is_shop_slot(value: Value) -> bool:
-	return value == Value.HEAD or value == Value.BODY or value == Value.ARMS
+	return value == Value.HEAD or value == Value.BODY
 
 static func is_arm(value: Value) -> bool:
 	return value == Value.ARM_L or value == Value.ARM_R
 
-## Which drawings a shop kit puts on screen. The arm kit becomes both arms.
+## Which drawings a shop kit puts on screen. The body kit brings both arms.
 static func visual_slots_for(shop_slot: Value) -> Array[Value]:
+	if shop_slot == Value.BODY:
+		return [Value.BODY, Value.ARM_L, Value.ARM_R]
 	if shop_slot == Value.ARMS:
 		return [Value.ARM_L, Value.ARM_R]
 	return [shop_slot]
@@ -120,7 +122,7 @@ static func display_label(value: Value) -> String:
 		Value.HEAD:
 			return "Cabeça"
 		Value.BODY:
-			return "Tronco"
+			return "Corpo"
 		Value.ARM_L:
 			return "Braço E"
 		Value.ARM_R:

@@ -5,11 +5,10 @@ const MagnetInspectorPlugin := preload("res://addons/part_magnet_editor/magnet_i
 const MagnetWindowScene := preload("res://addons/part_magnet_editor/magnet_window.gd")
 const CharacterImporter := preload("res://addons/part_magnet_editor/character_importer.gd")
 
-## The three numbers the shop and the fight read, in the order write_defs wants.
+## The two numbers the shop and the fight read, in the order write_defs wants.
 const STAT_SPINS: Array[Dictionary] = [
-	{"label": "Cabeça — Poder", "slot": PartSlotType.Value.HEAD},
-	{"label": "Tronco — Resistência", "slot": PartSlotType.Value.BODY},
-	{"label": "Braços — Agilidade", "slot": PartSlotType.Value.ARMS},
+	{"label": "Cabeça — Ataque", "slot": PartSlotType.Value.HEAD},
+	{"label": "Corpo — HP", "slot": PartSlotType.Value.BODY},
 ]
 
 var _inspector_plugin: EditorInspectorPlugin
@@ -19,6 +18,8 @@ var _form: AcceptDialog
 var _id_edit: LineEdit
 var _name_edit: LineEdit
 var _value_spins: Array[SpinBox] = []
+var _kind_option: OptionButton
+var _ability_option: OptionButton
 var _pending_sheet := ""
 var _form_status: Label
 var _importing := false
@@ -83,13 +84,13 @@ func _on_sheet_chosen(path: String) -> void:
 	_id_edit.text = CharacterImporter.clean_id(stem)
 	_name_edit.text = stem.capitalize()
 	_set_form_status("Ao clicar, a janela fica aberta e mostra o que está acontecendo. Costuma levar poucos segundos.", false)
-	_form.popup_centered(Vector2i(440, 420))
+	_form.popup_centered(Vector2i(440, 520))
 
 func _build_form() -> void:
 	_form = AcceptDialog.new()
 	_form.title = "Incluir personagem"
 	_form.ok_button_text = "Cortar e criar"
-	_form.min_size = Vector2i(420, 400)
+	_form.min_size = Vector2i(420, 500)
 	_form.dialog_hide_on_ok = false
 	_form.confirmed.connect(_on_form_confirmed)
 	var box := VBoxContainer.new()
@@ -101,10 +102,12 @@ func _build_form() -> void:
 	_value_spins.clear()
 	for spec in STAT_SPINS:
 		box.add_child(_labeled_spin(spec))
+	box.add_child(_labeled_kind())
+	box.add_child(_labeled_ability())
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.custom_minimum_size.x = 380
-	hint.text = "Folha com 4 desenhos de frente e 4 de perfil (cabeça, tronco, braço E, braço D). A loja vende 3 kits: cabeça, tronco e os dois braços juntos. Depois marque os ímãs em Ampliar."
+	hint.text = "Folha com 4 desenhos de frente e 4 de perfil (cabeça, tronco, braço E, braço D). A loja vende 2 kits: cabeça e corpo (o corpo já traz os braços). Tipo igual nas 2 peças dá +50%. O Poder só liga com o set completo. Depois marque os ímãs em Ampliar."
 	box.add_child(hint)
 	_form_status = Label.new()
 	_form_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -141,6 +144,32 @@ func _labeled_spin(spec: Dictionary) -> Control:
 	_value_spins.append(spin)
 	return row
 
+func _labeled_kind() -> Control:
+	var row := VBoxContainer.new()
+	var lab := Label.new()
+	lab.text = "Tipo"
+	row.add_child(lab)
+	_kind_option = OptionButton.new()
+	_kind_option.add_item("Humano", int(FreakKind.Value.HUMAN))
+	_kind_option.add_item("Sobrenatural", int(FreakKind.Value.SUPERNATURAL))
+	_kind_option.add_item("Animal", int(FreakKind.Value.ANIMAL))
+	_kind_option.select(0)
+	row.add_child(_kind_option)
+	return row
+
+func _labeled_ability() -> Control:
+	var row := VBoxContainer.new()
+	var lab := Label.new()
+	lab.text = "Poder (só no set completo)"
+	row.add_child(lab)
+	_ability_option = OptionButton.new()
+	_ability_option.add_item("Nenhum", int(FreakAbility.Value.NONE))
+	_ability_option.add_item("Controle de Mente", int(FreakAbility.Value.MIND_CONTROL))
+	_ability_option.add_item("Recurso", int(FreakAbility.Value.APPEAL))
+	_ability_option.select(0)
+	row.add_child(_ability_option)
+	return row
+
 func _on_form_confirmed() -> void:
 	if _importing:
 		return
@@ -165,6 +194,10 @@ func _set_form_busy(busy: bool) -> void:
 		_name_edit.editable = not busy
 	for spin in _value_spins:
 		spin.editable = not busy
+	if _kind_option != null:
+		_kind_option.disabled = busy
+	if _ability_option != null:
+		_ability_option.disabled = busy
 
 func _editor_tree() -> SceneTree:
 	var host := EditorInterface.get_base_control()
@@ -200,9 +233,15 @@ func _run_import() -> void:
 	var values: Array = []
 	for spin in _value_spins:
 		values.append(int(spin.value))
+	var kind := FreakKind.Value.HUMAN
+	if _kind_option != null:
+		kind = _kind_option.get_item_id(_kind_option.selected) as FreakKind.Value
+	var ability := FreakAbility.Value.NONE
+	if _ability_option != null:
+		ability = _ability_option.get_item_id(_ability_option.selected) as FreakAbility.Value
 	for _attempt in 8:
 		await _wait_filesystem(fs)
-		err = CharacterImporter.write_defs(set_id, _name_edit.text, values)
+		err = CharacterImporter.write_defs(set_id, _name_edit.text, values, kind, ability)
 		if err.is_empty():
 			break
 	if not err.is_empty():

@@ -47,7 +47,7 @@ var _slide_started: bool = false
 func setup(loadout: FighterLoadout, lane_runner: BeltLane.Runner, is_player: bool) -> void:
 	runner = lane_runner
 	player_side = is_player
-	_max_hp = maxi(1, lane_runner.stats.toughness)
+	_max_hp = maxi(1, lane_runner.stats.hp)
 	_build_body(loadout)
 	_build_overlay()
 	_build_stat_tags(loadout)
@@ -409,13 +409,13 @@ func _build_stat_tags(loadout: FighterLoadout) -> void:
 	var stats := runner.stats
 	_power_tag = _make_tag(
 		PartSlotType.Value.HEAD,
-		stats.power,
-		stats.power > stats.base_of(loadout, PartSlotType.Value.HEAD)
+		stats.attack,
+		stats.attack > stats.base_of(loadout, PartSlotType.Value.HEAD)
 	)
 	_tough_tag = _make_tag(
 		PartSlotType.Value.BODY,
-		stats.toughness,
-		stats.toughness > stats.base_of(loadout, PartSlotType.Value.BODY)
+		stats.hp,
+		stats.hp > stats.base_of(loadout, PartSlotType.Value.BODY)
 	)
 
 func _make_tag(slot: PartSlotType.Value, value: int, boosted: bool) -> StatTag:

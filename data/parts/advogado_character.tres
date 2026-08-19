@@ -11,6 +11,8 @@
 script = ExtResource("6_eo4n8")
 id = &"advogado"
 display_name = "Advogado"
+kind = 0
+ability = 2
 head = ExtResource("5_46ivl")
 body = ExtResource("4_7mw7x")
 arm_l = ExtResource("1_8ie18")

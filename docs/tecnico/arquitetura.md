@@ -25,11 +25,11 @@ Arte e recursos (assets/, data/)
 | Peça | Papel |
 |------|--------|
 | `AssemblyController` | Maestro: loja, cartas, esteiras, animações |
-| `LiveMatch` | Tempo correndo: dinheiro, esteira, duelo, fim da partida |
+| `LiveMatch` | Tempo correndo: dinheiro, esteira, duelo, Poderes, fim da partida |
 | `PlayerState` | Carteira, loja e esteira de **um** lado (você ou o bot) |
 | `BeltLane` | Até 2 Freaks remando até a ponta (5 remadas) |
 | `Duel` | Contas de um troca-troca de golpes |
-| `FreakStats` / `Synergy` | Poder, Resistência e Agilidade já com o bônus |
+| `FreakStats` / `Synergy` | Ataque, HP já com o bônus de tipo; Poder se o set fechou |
 | `ShopPool` / `BotBrain` | Sorteio da loja e o oponente jogando igual a você |
 | `BeltFreak` / `FlyingHead` | Desenho do Freak na esteira e a cabeça que voa |
 | `MoneyBar` / `ActionBar` / `TugBar` | Dinheiro, botões redondos, barra-balança |

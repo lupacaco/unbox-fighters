@@ -60,8 +60,8 @@ func _run() -> void:
 	if not _check_taste():
 		quit(1)
 		return
-	if BotBrain.earliest_launch_time() < 6.0:
-		push_error("VERIFY_FAIL assembling three kits must take several seconds")
+	if BotBrain.earliest_launch_time() < 4.0:
+		push_error("VERIFY_FAIL assembling two kits must take several seconds")
 		quit(1)
 		return
 

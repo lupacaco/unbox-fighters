@@ -1,17 +1,15 @@
 class_name FighterLoadout
 extends RefCounted
 
-## One card: head, torso and the arm kit. Missing kits are allowed while building.
+## One card: head and body. Missing kits are allowed while building.
 
 var head: PartDef
 var body: PartDef
-var arms: PartDef
 
-static func from_parts(head_part: PartDef, body_part: PartDef, arms_part: PartDef = null) -> FighterLoadout:
+static func from_parts(head_part: PartDef, body_part: PartDef) -> FighterLoadout:
 	var loadout := FighterLoadout.new()
 	loadout.head = head_part
 	loadout.body = body_part
-	loadout.arms = arms_part
 	return loadout
 
 static func from_character(character: CharacterDef) -> FighterLoadout:
@@ -34,6 +32,12 @@ func is_complete() -> bool:
 			return false
 	return true
 
+## Head and body of the same Freak. That is what turns the unique power on.
+func is_complete_set() -> bool:
+	if not is_complete() or head == null or body == null:
+		return false
+	return head.set_id != StringName() and head.set_id == body.set_id
+
 func parts_array() -> Array:
 	var list: Array = []
 	for slot in PartSlotType.shop_slots():
@@ -46,8 +50,6 @@ func get_part(slot: PartSlotType.Value) -> PartDef:
 			return head
 		PartSlotType.Value.BODY:
 			return body
-		PartSlotType.Value.ARMS:
-			return arms
 		_:
 			return null
 
@@ -57,10 +59,8 @@ func set_part(slot: PartSlotType.Value, part: PartDef) -> void:
 			head = part
 		PartSlotType.Value.BODY:
 			body = part
-		PartSlotType.Value.ARMS:
-			arms = part
 
-## The kit number with the synergy bonus already in it.
+## The kit number with the type bonus already in it.
 func stat_of(slot: PartSlotType.Value) -> int:
 	return Synergy.value_for_part(get_part(slot), parts_array())
 
@@ -72,4 +72,4 @@ func stats() -> FreakStats:
 	return FreakStats.from_loadout(self)
 
 func duplicate_loadout() -> FighterLoadout:
-	return from_parts(head, body, arms)
+	return from_parts(head, body)

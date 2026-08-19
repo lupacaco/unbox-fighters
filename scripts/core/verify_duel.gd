@@ -21,14 +21,14 @@ func _run() -> void:
 	quit(0)
 
 func _check_exchange() -> bool:
-	var strong := _stats(8, 20, 2)
-	var quick := _stats(4, 12, 5)
+	var strong := _stats(8, 20)
+	var quick := _stats(4, 12)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 7
 
 	var trade := Duel.exchange(strong, quick, 20, 12, rng)
 	if trade.damage_to_right != 8 or trade.damage_to_left != 4:
-		push_error("VERIFY_FAIL damage should equal the attacker's Power")
+		push_error("VERIFY_FAIL damage should equal the attacker's Attack")
 		return false
 	if trade.left_dies or trade.right_dies or not trade.second_happens:
 		push_error("VERIFY_FAIL nobody dies here, so both should swing")
@@ -62,22 +62,19 @@ func _check_exchange() -> bool:
 		return false
 
 	if Duel.blows_to_kill(20, 8) != 3:
-		push_error("VERIFY_FAIL 20 life against Power 8 takes 3 blows")
+		push_error("VERIFY_FAIL 20 life against Attack 8 takes 3 blows")
 		return false
 	if Duel.blows_to_kill(20, 0) < 999:
-		push_error("VERIFY_FAIL Power 0 never kills")
+		push_error("VERIFY_FAIL Attack 0 never kills")
 		return false
 	return true
 
 func _check_prices() -> bool:
 	if PartStats.price_for(PartSlotType.Value.HEAD, 8) != 8:
-		push_error("VERIFY_FAIL a head costs its Power")
-		return false
-	if PartStats.price_for(PartSlotType.Value.ARMS, 5) != 5:
-		push_error("VERIFY_FAIL arms cost their Agility")
+		push_error("VERIFY_FAIL a head costs its Attack")
 		return false
 	if PartStats.price_for(PartSlotType.Value.BODY, 15) != 5:
-		push_error("VERIFY_FAIL a torso costs Toughness minus 10")
+		push_error("VERIFY_FAIL a body costs HP minus 10")
 		return false
 	if PartStats.price_for(PartSlotType.Value.BODY, 10) != PartStats.MIN_PRICE:
 		push_error("VERIFY_FAIL no crate may be free")
@@ -128,9 +125,8 @@ func _check_money() -> bool:
 		return false
 	return true
 
-func _stats(power: int, toughness: int, agility: int) -> FreakStats:
+func _stats(attack: int, hp: int) -> FreakStats:
 	var stats := FreakStats.new()
-	stats.power = power
-	stats.toughness = toughness
-	stats.agility = agility
+	stats.attack = attack
+	stats.hp = hp
 	return stats

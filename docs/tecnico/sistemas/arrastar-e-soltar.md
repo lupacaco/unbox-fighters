@@ -28,7 +28,7 @@ Um clique curto **sem arrastar** seleciona a peça na prateleira. Aí **VENDER**
 ## Regras de aceite (`CharacterSlot.can_accept`)
 
 - A peça não pode ser nula
-- Só entram os 3 kits da loja (cabeça, tronco, braços)
+- Só entram os 2 kits da loja (cabeça e corpo)
 - Se o encaixe **já tem** peça, a nova entra e a antiga volta para a prateleira
 - Depois que a partida acaba a carta fica travada
 

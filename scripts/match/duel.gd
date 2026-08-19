@@ -23,15 +23,17 @@ static func exchange(
 	right: FreakStats,
 	left_hp: int,
 	right_hp: int,
-	rng: RandomNumberGenerator
+	rng: RandomNumberGenerator,
+	left_appeal: bool = false,
+	right_appeal: bool = false
 ) -> Exchange:
 	var result := Exchange.new()
 	if left == null or right == null:
 		return result
-	result.damage_to_right = maxi(0, left.power)
-	result.damage_to_left = maxi(0, right.power)
-	var left_kills := right_hp - result.damage_to_right <= 0
-	var right_kills := left_hp - result.damage_to_left <= 0
+	result.damage_to_right = maxi(0, left.attack)
+	result.damage_to_left = maxi(0, right.attack)
+	var left_kills := _would_die(right_hp, result.damage_to_right, right_appeal)
+	var right_kills := _would_die(left_hp, result.damage_to_left, left_appeal)
 	if left_kills and right_kills:
 		result.first_is_left = _coin(rng)
 		result.second_happens = true
@@ -59,8 +61,13 @@ static func exchange(
 static func _coin(rng: RandomNumberGenerator) -> bool:
 	return rng == null or rng.randi_range(0, 1) == 0
 
-## Rounds of blows a Freak survives against a given power. Used by the bot.
-static func blows_to_kill(hp: int, power: int) -> int:
-	if power <= 0:
+static func _would_die(hp: int, damage: int, appeal: bool) -> bool:
+	if hp - damage > 0:
+		return false
+	return not appeal
+
+## Rounds of blows a Freak survives against a given attack. Used by the bot.
+static func blows_to_kill(hp: int, attack: int) -> int:
+	if attack <= 0:
 		return 9999
-	return ceili(float(hp) / float(power))
+	return ceili(float(hp) / float(attack))

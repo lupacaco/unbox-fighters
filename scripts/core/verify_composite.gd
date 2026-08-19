@@ -73,16 +73,15 @@ func _check_stack(bruxa: CharacterDef) -> bool:
 	return true
 
 func _check_arms(bruxa: CharacterDef) -> bool:
-	var arm_kit := PartKit.expand_shop_part(bruxa.arms)
-	if arm_kit.size() != 2:
-		push_error("VERIFY_FAIL one arm crate opens into two arms")
-		return false
-	if not arm_kit.has(PartSlotType.Value.ARM_L) or not arm_kit.has(PartSlotType.Value.ARM_R):
-		push_error("VERIFY_FAIL the arm crate should give a left and a right")
-		return false
 	var body_kit := PartKit.expand_shop_part(bruxa.body)
-	if body_kit.size() != 1 or not body_kit.has(PartSlotType.Value.BODY):
-		push_error("VERIFY_FAIL a torso crate draws only the torso")
+	if body_kit.size() != 3:
+		push_error("VERIFY_FAIL a body crate draws the torso plus both arms")
+		return false
+	if not body_kit.has(PartSlotType.Value.BODY):
+		push_error("VERIFY_FAIL a body crate still draws the torso")
+		return false
+	if not body_kit.has(PartSlotType.Value.ARM_L) or not body_kit.has(PartSlotType.Value.ARM_R):
+		push_error("VERIFY_FAIL a body crate should bring both arms")
 		return false
 
 	if CompositeResolver.front_arm_spread(PartSlotType.Value.ARM_L) <= 0.0:

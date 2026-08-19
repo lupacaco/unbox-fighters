@@ -2,10 +2,11 @@
 	"id": "bruxa",
 	"display_name": "Bruxa",
 	"stats": {
-		"power": 8,
-		"toughness": 15,
-		"agility": 2
+		"attack": 8,
+		"hp": 15
 	},
+	"kind": "supernatural",
+	"ability": "mind_control",
 	"magnets": {
 		"front": {
 			"head": {

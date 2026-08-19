@@ -4,13 +4,12 @@ Como o jogo descreve personagens e decide o que desenhar na carta.
 
 ## O que o jogador vê vs o desenho
 
-Na **loja** existem **3 kits**:
+Na **loja** existem **2 kits**:
 
 - **Cabeça**
-- **Tronco** (o peito dentro do caixote)
-- **Braços** (os dois juntos numa caixa)
+- **Corpo** (o peito dentro do caixote, já com os dois braços)
 
-Na **carta** e na **esteira** o kit de braços vira **dois desenhos** (braço E e braço D), para cada braço poder se mexer. Na esteira, a cabeça leva a etiqueta de **Poder** e o tronco a de **Resistência**.
+Na **carta** e na **esteira** o corpo mostra **três desenhos** (tronco, braço E e braço D), para cada braço poder se mexer. Na esteira, a cabeça leva a etiqueta de **Ataque** e o tronco a de **HP**.
 
 O chão do Freak é a **base do caixote**. Não tem pernas e não tem mola.
 
@@ -22,7 +21,7 @@ O chão do Freak é a **base do caixote**. Não tem pernas e não tem mola.
 
 ### `PartSlotType` (`scripts/data/part_slot_type.gd`)
 
-- Loja: `HEAD`, `BODY`, `ARMS`
+- Loja: `HEAD`, `BODY`
 - Desenho: `HEAD`, `BODY`, `ARM_L`, `ARM_R`
 
 Esquerda/direita no desenho = lado **de quem olha** a frente.
@@ -31,9 +30,8 @@ Esquerda/direita no desenho = lado **de quem olha** a frente.
 
 O que o número de um kit significa, e quanto custa:
 
-- Cabeça = Poder (1 a 10) → preço = Poder
-- Tronco = Resistência (10 a 20) → preço = Resistência − 10 (mínimo $1)
-- Braços = Agilidade (1 a 5) → preço = Agilidade
+- Cabeça = Ataque (1 a 10) → preço = Ataque
+- Corpo = HP (10 a 20) → preço = HP − 10 (mínimo $1)
 - Vender = metade do pago, arredondado para cima
 
 ### `PartDef` (`scripts/data/part_def.gd`)
@@ -45,9 +43,9 @@ Recurso de **uma peça** (kit da loja ou recorte de desenho):
 - `set_id`
 - `sprite` — frente (pose 1)
 - `sprite_profile` — perfil (pose 2). Precisa existir nos desenhos visíveis para a luta
-- `stat_value` — Poder, Resistência ou Agilidade, conforme o encaixe
+- `stat_value` — Ataque ou HP, conforme o encaixe
 - `tier` — faixa do número (a loja atual não trava por nível)
-- `kit_parts` — no kit `ARMS`, aponta para `arm_l` e `arm_r`
+- `kit_parts` — só no agrupamento antigo `ARMS` (não é vendido)
 - **Ímãs** (pontos de união, em pixels a partir do centro da imagem 200×200):
   - Cabeça: `magnet_down` (esfera na base do pescoço)
   - Braço: `magnet_up` (esfera no topo)
@@ -59,23 +57,25 @@ Recurso de **uma peça** (kit da loja ou recorte de desenho):
 Recurso de **um personagem**:
 
 - `id`, `display_name`
+- `kind` — Humano, Sobrenatural ou Animal
+- `ability` — Poder do set completo (Controle de Mente, Recurso, ou nenhum)
 - Desenho: `head`, `body`, `arm_l`, `arm_r`
-- Loja: `head`, `body`, `arms`
+- Loja: `head`, `body`
 
-A loja lê `shop_parts()` (3 kits).
+A loja lê `shop_parts()` (2 kits).
 
 ## Números atuais
 
 Na loja entram **todos** os Freaks que tiverem ficha `*_character.tres`. Hoje:
 
-| Set | Poder | Resistência | Agilidade | Custo |
-|-----|-------|-------------|-----------|-------|
-| Bruxa | 8 | 15 | 2 | $15 |
-| Advogado | 4 | 18 | 5 | $17 |
+| Set | Tipo | Ataque | HP | Custo | Poder |
+|-----|------|--------|----|-------|-------|
+| Bruxa | Sobrenatural | 8 | 15 | $13 | Controle de Mente |
+| Advogado | Humano | 4 | 18 | $12 | Recurso |
 
-A sinergia (dupla +25%, tripla +50%) está em `scripts/match/synergy.gd`.
+Duas peças do **mesmo tipo** dão +50% em Ataque e HP (`scripts/match/synergy.gd`). O Poder só liga se cabeça e corpo forem do **mesmo** Freak.
 
-A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 3 kits de cada uma.
+A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 2 kits de cada uma.
 
 ## Como marcar os ímãs
 

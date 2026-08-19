@@ -124,7 +124,15 @@ func _tick_duel(delta: float, mine: BeltLane.Runner, theirs: BeltLane.Runner) ->
 	if _duel_timer < MatchRules.DUEL_INTERVAL:
 		return
 	_duel_timer = 0.0
-	var trade := Duel.exchange(mine.stats, theirs.stats, mine.hp, theirs.hp, rng)
+	var trade := Duel.exchange(
+		mine.stats,
+		theirs.stats,
+		mine.hp,
+		theirs.hp,
+		rng,
+		mine.appeal_ready(),
+		theirs.appeal_ready()
+	)
 	_exchange_open = true
 	if blows_traded.get_connections().is_empty():
 		_resolve_quietly(trade, mine, theirs)
@@ -133,14 +141,68 @@ func _tick_duel(delta: float, mine: BeltLane.Runner, theirs: BeltLane.Runner) ->
 
 func _resolve_quietly(trade: Duel.Exchange, mine: BeltLane.Runner, theirs: BeltLane.Runner) -> void:
 	if trade.first_is_left:
-		apply_hit(opponent, theirs, trade.damage_to_right)
+		apply_blow(mine, theirs, player, opponent)
 		if trade.second_happens:
-			apply_hit(player, mine, trade.damage_to_left)
+			apply_blow(theirs, mine, opponent, player)
 	else:
-		apply_hit(player, mine, trade.damage_to_left)
+		apply_blow(theirs, mine, opponent, player)
 		if trade.second_happens:
-			apply_hit(opponent, theirs, trade.damage_to_right)
+			apply_blow(mine, theirs, player, opponent)
 	close_exchange()
+
+## Who this blow actually hits. Mind control can send it to the attacker's ally.
+func plan_blow(
+	attacker: BeltLane.Runner,
+	defender: BeltLane.Runner,
+	attacker_side: PlayerState,
+	defender_side: PlayerState
+) -> Dictionary:
+	var waiter := attacker_side.lane.waiter() if attacker_side != null else null
+	if attacker != null and attacker.redirect_next and waiter != null:
+		return {
+			"victim": waiter,
+			"victim_side": attacker_side,
+			"damage": maxi(0, attacker.stats.attack),
+			"redirected": true,
+		}
+	return {
+		"victim": defender,
+		"victim_side": defender_side,
+		"damage": maxi(0, attacker.stats.attack) if attacker != null and attacker.stats != null else 0,
+		"redirected": false,
+	}
+
+## Lands one swing: maybe onto an ally, then maybe marks the victim for mind control.
+func apply_blow(
+	attacker: BeltLane.Runner,
+	defender: BeltLane.Runner,
+	attacker_side: PlayerState,
+	defender_side: PlayerState
+) -> bool:
+	var plan := plan_blow(attacker, defender, attacker_side, defender_side)
+	var victim: BeltLane.Runner = plan["victim"]
+	var victim_side: PlayerState = plan["victim_side"]
+	var damage: int = int(plan["damage"])
+	if bool(plan["redirected"]):
+		attacker.redirect_next = false
+		if attacker.mc_source != null:
+			attacker.mc_source.mc_available = false
+			attacker.mc_source = null
+		return apply_hit(victim_side, victim, damage)
+	var died := apply_hit(victim_side, victim, damage)
+	if (
+		attacker != null
+		and attacker.stats != null
+		and attacker.stats.ability == FreakAbility.Value.MIND_CONTROL
+		and attacker.mc_available
+		and defender_side != null
+		and defender_side.lane.waiter() != null
+		and defender != null
+		and defender.alive
+	):
+		defender.redirect_next = true
+		defender.mc_source = attacker
+	return died
 
 func _tick_chip(delta: float, player_leads: bool) -> void:
 	_chip_timer += delta

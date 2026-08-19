@@ -11,7 +11,7 @@ extends Resource
 @export var sprite_profile: Texture2D
 ## Attack pose. Optional; the side view is used if this is empty.
 @export var sprite_attack: Texture2D
-## Poder (cabeça), Resistência (tronco) ou Agilidade (braços). Veja PartStats.
+## Ataque (cabeça) or HP (corpo). Veja PartStats.
 @export var stat_value: int = 0
 @export var tier: int = 1
 ## A shop kit that puts more than one drawing on screen, like the arm pair.

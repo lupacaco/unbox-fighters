@@ -39,15 +39,22 @@ static func keep_source_sheet(sheet_path: String, set_id: String) -> void:
 		DirAccess.copy_absolute(abs_sheet, keep)
 
 
-## `values` is [Poder, Resistência, Agilidade]. Returns "" when everything saved.
-static func write_defs(set_id: String, display_name: String, values: Array) -> String:
+## `values` is [Ataque, HP]. `kind` and `ability` come from the Freak's card.
+## Returns "" when everything saved.
+static func write_defs(
+	set_id: String,
+	display_name: String,
+	values: Array,
+	kind: FreakKind.Value = FreakKind.Value.HUMAN,
+	ability: FreakAbility.Value = FreakAbility.Value.NONE
+) -> String:
 	set_id = clean_id(set_id)
 	if set_id.is_empty():
 		return "O id interno precisa ser minúsculo, sem acento. Exemplo: bruxa."
 	if display_name.strip_edges().is_empty():
 		display_name = set_id.capitalize()
-	if values.size() < 3:
-		return "Faltam os 3 números: Poder, Resistência e Agilidade."
+	if values.size() < 2:
+		return "Faltam os 2 números: Ataque e HP."
 
 	var magnets := read_slice_magnets(set_id)
 	var stats := _stat_per_slot(values)
@@ -65,7 +72,7 @@ static func write_defs(set_id: String, display_name: String, values: Array) -> S
 			return "Falha ao salvar %s" % path
 		parts.append(load(path) as PartDef)
 
-	var arms := _make_arms_kit(set_id, display_name, int(values[2]), parts[2], parts[3])
+	var arms := _make_arms_kit(set_id, display_name, parts[2], parts[3])
 	var arms_path := "res://data/parts/%s_arms.tres" % set_id
 	if ResourceSaver.save(arms, arms_path) != OK:
 		return "Falha ao salvar %s" % arms_path
@@ -78,6 +85,8 @@ static func write_defs(set_id: String, display_name: String, values: Array) -> S
 	character.arm_l = parts[2]
 	character.arm_r = parts[3]
 	character.arms = load(arms_path) as PartDef
+	character.kind = kind
+	character.ability = ability
 	var char_path := "res://data/parts/%s_character.tres" % set_id
 	if ResourceSaver.save(character, char_path) != OK:
 		return "Falha ao salvar %s" % char_path
@@ -117,11 +126,12 @@ static func read_slice_magnets(set_id: String) -> Dictionary:
 
 
 static func _stat_per_slot(values: Array) -> Dictionary:
+	var hp := PartStats.clamp_for(PartSlotType.Value.BODY, int(values[1]))
 	return {
 		PartSlotType.Value.HEAD: PartStats.clamp_for(PartSlotType.Value.HEAD, int(values[0])),
-		PartSlotType.Value.BODY: PartStats.clamp_for(PartSlotType.Value.BODY, int(values[1])),
-		PartSlotType.Value.ARM_L: PartStats.clamp_for(PartSlotType.Value.ARM_L, int(values[2])),
-		PartSlotType.Value.ARM_R: PartStats.clamp_for(PartSlotType.Value.ARM_R, int(values[2])),
+		PartSlotType.Value.BODY: hp,
+		PartSlotType.Value.ARM_L: hp,
+		PartSlotType.Value.ARM_R: hp,
 	}
 
 
@@ -154,15 +164,15 @@ static func _make_part(
 
 
 static func _make_arms_kit(
-	set_id: String, display_name: String, agility: int, arm_l: PartDef, arm_r: PartDef
+	set_id: String, display_name: String, arm_l: PartDef, arm_r: PartDef
 ) -> PartDef:
 	var kit := PartDef.new()
 	kit.id = StringName("%s_arms" % set_id)
 	kit.display_name = "%s %s" % [display_name, ARMS_LABEL]
 	kit.slot_type = PartSlotType.Value.ARMS
 	kit.set_id = StringName(set_id)
-	kit.stat_value = PartStats.clamp_for(PartSlotType.Value.ARMS, agility)
-	kit.tier = PartStats.tier_for(PartSlotType.Value.ARMS, kit.stat_value)
+	kit.stat_value = 0
+	kit.tier = 1
 	kit.kit_parts = [arm_l, arm_r]
 	## Fallback drawing for anything that shows a kit as a single picture.
 	kit.sprite = arm_r.sprite if arm_r != null else null

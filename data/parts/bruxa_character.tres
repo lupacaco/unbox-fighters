@@ -11,6 +11,8 @@
 script = ExtResource("6_im3f2")
 id = &"bruxa"
 display_name = "Bruxa"
+kind = 1
+ability = 1
 head = ExtResource("5_giohx")
 body = ExtResource("4_0llep")
 arm_l = ExtResource("1_wk6wx")

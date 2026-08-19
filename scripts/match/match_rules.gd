@@ -25,10 +25,8 @@ const BELT_CAPACITY := 2
 
 ## Five paddle strokes from the belt entry to the fighting tip.
 const STROKES_TO_TIP := 5
-## Agility 1 waits 3 s between strokes; each extra point shaves 0.5 s, floor 1 s.
-const STROKE_INTERVAL_MAX := 3.0
-const STROKE_INTERVAL_MIN := 1.0
-const STROKE_INTERVAL_STEP := 0.5
+## Every Freak waits the same time between strokes. Agility is gone.
+const STROKE_INTERVAL := 2.0
 
 ## Pause between finished exchanges, so the blows can be read.
 const DUEL_INTERVAL := 1.1
@@ -39,9 +37,5 @@ const PLAYER_NAME := "Você"
 static func stroke_step() -> float:
 	return 1.0 / float(STROKES_TO_TIP)
 
-static func stroke_interval(agility: int) -> float:
-	return clampf(
-		STROKE_INTERVAL_MAX - STROKE_INTERVAL_STEP * float(maxi(agility, 1) - 1),
-		STROKE_INTERVAL_MIN,
-		STROKE_INTERVAL_MAX
-	)
+static func stroke_interval() -> float:
+	return STROKE_INTERVAL

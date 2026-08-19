@@ -1,9 +1,8 @@
 class_name CharacterSlot
 extends Node2D
 
-## A hanging card where one Freak is built. Three kits go on it: head, torso and
-## the arm pair. When all three are there, LUTAR appears and sends it to the belt,
-## leaving the card empty for the next one.
+## A hanging card where one Freak is built. Two kits go on it: head and body
+## (the crate already carries both arms). When both are there, LUTAR appears.
 
 signal part_attached(slot: CharacterSlot, part: PartDef)
 signal part_detached(slot: CharacterSlot, part: PartDef)
@@ -18,8 +17,7 @@ var _shown_key: String = ""
 ## Drop areas in card-local space. A kit may also be dropped anywhere on the card.
 const ZONES := {
 	PartSlotType.Value.HEAD: [Rect2(-112, -150, 224, 152)],
-	PartSlotType.Value.BODY: [Rect2(-74, 18, 148, 194)],
-	PartSlotType.Value.ARMS: [Rect2(-126, 2, 58, 200), Rect2(68, 2, 58, 200)],
+	PartSlotType.Value.BODY: [Rect2(-126, 2, 252, 210)],
 }
 const CARD_BOUNDS := Rect2(-150, -300, 300, 600)
 
@@ -133,7 +131,8 @@ func try_attach(part_view: PartView) -> bool:
 	var displaced: PartView = null
 	if _bound_parts.has(slot):
 		displaced = detach_part(slot, false)
-	var before := Synergy.best_level(to_loadout().parts_array())
+	var before_kind := Synergy.kinds_match(to_loadout().parts_array())
+	var before_set := to_loadout().is_complete_set()
 	_bound_parts[slot] = part_view
 	part_view.set_attached_slot(self)
 	part_view.snap_hide_for_slot()
@@ -141,9 +140,11 @@ func try_attach(part_view: PartView) -> bool:
 	_refresh_pills()
 	_pulse_attach()
 	GameAudio.part_place()
-	var after := Synergy.best_level(to_loadout().parts_array())
-	if after > before:
-		_celebrate_synergy(after)
+	var loadout := to_loadout()
+	if loadout.is_complete_set() and not before_set:
+		_celebrate_power(loadout.stats().ability)
+	elif Synergy.kinds_match(loadout.parts_array()) and not before_kind:
+		_celebrate_synergy(Synergy.Level.KIND, Synergy.kind_of(part_view.part_def))
 	if is_complete():
 		GameAudio.fighter_complete()
 	_refresh_fight_button()
@@ -292,7 +293,7 @@ func _build_frame() -> void:
 
 	if not is_opponent:
 		_hint = GameTheme.make_label(
-			"monte 3 peças", 30, Vector2(0, -40), Vector2(240, 48), Color(0.62, 0.56, 0.46, 0.55)
+			"monte 2 peças", 30, Vector2(0, -40), Vector2(240, 48), Color(0.62, 0.56, 0.46, 0.55)
 		)
 		_hint.z_index = 2
 		add_child(_hint)
@@ -461,13 +462,21 @@ func _refresh_pills() -> void:
 	var parts := loadout.parts_array()
 	for slot in _pills.keys():
 		var pill: StatTag = _pills[slot]
-		var part := loadout.get_part(slot)
-		var boosted := Synergy.matching_kits(part, parts) >= 2
+		var boosted := Synergy.kinds_match(parts)
 		pill.setup(loadout.stat_of(slot), ThemeTokens.color_for_slot(slot), boosted)
 
-func _celebrate_synergy(level: Synergy.Level) -> void:
+func _celebrate_power(ability: FreakAbility.Value) -> void:
+	var title := FreakAbility.display_name(ability)
+	if title.is_empty():
+		title = "SET COMPLETO"
+	_flash_banner(title)
+
+func _celebrate_synergy(level: Synergy.Level, kind: FreakKind.Value = FreakKind.Value.HUMAN) -> void:
 	_synergy_shown = level
-	_banner.text = Synergy.level_name(level)
+	_flash_banner(Synergy.level_name(level, kind))
+
+func _flash_banner(text: String) -> void:
+	_banner.text = text
 	_banner.modulate.a = 0.0
 	_banner.scale = Vector2(0.7, 0.7)
 	_banner.pivot_offset = _banner.size * 0.5

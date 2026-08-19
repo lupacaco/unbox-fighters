@@ -46,7 +46,7 @@ const CARD_FLOOR_Y := 200.0
 const CARD_FREAK_SCALE := 0.92
 ## Inner well of the frame, in card-local coordinates.
 const CARD_WELL := Rect2(-124, -246, 248, 458)
-## The three stat pills sit in a row on the wooden lip under the well.
+## The two stat pills sit in a row on the wooden lip under the well.
 const CARD_PILL_Y := 256.0
 const CARD_PILL_STEP := 84.0
 const FIGHT_BUTTON_SIZE := Vector2(214, 58)

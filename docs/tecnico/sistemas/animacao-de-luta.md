@@ -7,7 +7,7 @@ Só a **cabeça** ataca. O Freak não tem pernas: ele **rema** com as duas mãos
 ## Sequência
 
 1. Você aperta **LUTAR**. O Freak **salta da carta** em arco até o começo da esteira (azul à esquerda). O oponente **salta da carta vermelha** até o começo da vermelha.
-2. **Rema** até a ponta em **5 remadas**. Cada remada: os dois braços sobem para a frente, jogam para trás em meia-lua, **aí** o caixote desliza (som de madeira no chão e fumacinha atrás). Depois os braços caem e esperam o tempo da Agilidade.
+2. **Rema** até a ponta em **5 remadas**. Cada remada: os dois braços sobem para a frente, jogam para trás em meia-lua, **aí** o caixote desliza (som de madeira no chão e fumacinha atrás). Depois os braços caem e esperam **2 segundos**.
 3. Na ponta: **freia** (esmaga um pouco). Se já tem alguém na ponta, os dois esperam o intervalo do duelo.
 4. **Golpe:** agacha, a cabeça sai, voa em arco com rastro, trava um instante no impacto, o atingido pisca, recua e mostra o número do dano, a cabeça volta como bumerangue.
 5. Os golpes são **um de cada vez**. Se o primeiro não derrubou ninguém, o outro responde. O golpe que mata é sempre do vencedor. Se os dois cairiam, os dois atacam.
@@ -16,7 +16,7 @@ Só a **cabeça** ataca. O Freak não tem pernas: ele **rema** com as duas mãos
 
 Na esteira, o Freak do oponente fica virado para a esquerda (para o vão). O seu fica virado para a direita.
 
-Na esteira aparecem as etiquetas coloridas de **Poder** na cabeça e **Resistência** no tronco, iguais às da carta.
+Na esteira aparecem as etiquetas coloridas de **Ataque** na cabeça e **HP** no tronco, iguais às da carta.
 
 Na luta, quem cobre quem **não** usa o Z da ferramenta de ímãs. **1 fica na frente**.
 

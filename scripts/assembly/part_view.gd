@@ -1,7 +1,7 @@
 class_name PartView
 extends Area2D
 
-## A kit you can pick up: one drawing for the head or the torso, two for the arms.
+## A kit you can pick up: the head is one drawing, the body is the crate plus both arms.
 ## It remembers what it cost, so selling can pay half of it back.
 
 signal pressed(part: PartView)

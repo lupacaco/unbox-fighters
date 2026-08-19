@@ -36,61 +36,61 @@ O preço sai do número da peça, não de um valor solto:
 
 | Kit | Número | Preço |
 |-----|--------|-------|
-| Cabeça | Poder 1 a 10 | o próprio Poder |
-| Tronco | Resistência 10 a 20 | Resistência − 10 (mínimo $1) |
-| Braços | Agilidade 1 a 5 | a própria Agilidade |
+| Cabeça | Ataque 1 a 10 | o próprio Ataque |
+| Corpo | HP 10 a 20 | HP − 10 (mínimo $1) |
 
 ## Cartas
 
 - **2 cartas azuis** suas à esquerda.
 - **2 cartas vermelhas** do oponente à direita: mostram o que ele está encaixando. Você **não** arrasta peças nelas.
-- Só vai para a esteira o Freak com **os 3 kits**. Aí aparece o botão **LUTAR** (só nas suas cartas).
+- Só vai para a esteira o Freak com **os 2 kits** (cabeça + corpo). Aí aparece o botão **LUTAR** (só nas suas cartas).
 - Ao lutar, a carta **esvazia** para montar o próximo. O Freak do oponente também **pula da carta vermelha**.
 - Cada esteira cabe **2 Freaks**. Se já tem 2, LUTAR recusa.
 
 ## Peças
 
-Nas caixas existem **3 kits**:
+Nas caixas existem **2 kits**:
 
 | Tipo | O que o jogador recebe | O que isso vale na luta |
 |------|------------------------|-------------------------|
-| Cabeça | Cabeça | **Poder** — quanto tira de vida por golpe |
-| Tronco | Tronco dentro do caixote | **Resistência** — a vida daquele Freak |
-| Braços | Os dois braços juntos | **Agilidade** — tempo entre cada remada na esteira |
+| Cabeça | Cabeça | **Ataque** — quanto a cabeça tira de HP por golpe |
+| Corpo | Caixote com o tronco e os dois braços | **HP** — a vida daquele Freak |
 
-O tronco **é** o chão do Freak (a base do caixote). Não tem pernas e não tem mola.
+O corpo **é** o chão do Freak (a base do caixote). Não tem pernas e não tem mola. Os braços vêm no corpo; não se compram à parte.
 
-Cada kit tem **um** número. Na carta, as pílulas mostram o número **já com a sinergia**.
+Cada kit tem **um** número. Na carta, as pílulas mostram o número **já com o bônus de tipo**.
 
-| Set | Poder | Resistência | Agilidade | Custo dos 3 kits |
-|-----|-------|-------------|-----------|------------------|
-| Bruxa | 8 | 15 | 2 | $8 + $5 + $2 = **$15** |
-| Advogado | 4 | 18 | 5 | $4 + $8 + $5 = **$17** |
+| Set | Tipo | Ataque | HP | Custo | Poder (set completo) |
+|-----|------|--------|----|-------|----------------------|
+| Bruxa | Sobrenatural | 8 | 15 | $8 + $5 = **$13** | Controle de Mente |
+| Advogado | Humano | 4 | 18 | $4 + $8 = **$12** | Recurso |
 
-## Sinergia (na mesma carta)
+## Tipo e Poder
 
-Conta quantos kits do **mesmo Freak** estão na carta. Arredonda para cima.
+Cada Freak tem um tipo: **Humano**, **Sobrenatural** ou **Animal**.
 
-- **Dupla (2 do mesmo):** +25% nessas 2 peças
-- **Tripla (3 do mesmo):** +50% nos 3 atributos
+- Se as **2 peças** da carta forem do **mesmo tipo**, Ataque e HP ganham **+50%** (arredonda para cima). Vale misturar Freaks diferentes, desde que o tipo bata.
+- O **Poder** só liga com **set completo** (cabeça e corpo do **mesmo** Freak). Não é um soco extra: é uma habilidade.
 
-Exemplo com a Bruxa (8 / 15 / 2):
+Exemplos:
 
-- Cabeça + tronco da Bruxa e braços de outro: Poder **10**, Resistência **19**, Agilidade fica a do outro
-- Bruxa inteira: Poder **12**, Resistência **23**, Agilidade **3**
+- Bruxa completa: Ataque **12**, HP **23**, Controle de Mente
+- Advogado completo: Ataque **6**, HP **27**, Recurso
+- Cabeça da Bruxa + corpo do Advogado: Ataque 8, HP 18, **sem** bônus e **sem** Poder (tipos diferentes)
 
-O **preço na loja** continua sendo o número base. O bônus entra só na hora de lutar.
+**Controle de Mente** (Bruxa, 1 vez): depois que ela acerta, o **próximo golpe** daquele inimigo vai no aliado da esteira dele (o da fila). Se não tiver aliado, nada acontece e a carga não gasta.
 
-Com só 2 Freaks no jogo, quase toda carta ganha dupla ou tripla. O bônus vira o normal até entrar um terceiro personagem.
+**Recurso** (Advogado, 1 vez): a primeira vez que o HP ia a 0, ele fica com **1 HP**.
+
+O **preço na loja** continua sendo o número base. O bônus de tipo entra só na hora de lutar.
 
 ## Esteira e luta
 
 - Azul = você, da esquerda para o centro. Vermelha = oponente, da direita para o centro. Na vermelha o Freak olha para a esquerda (para o vão).
 - Ao apertar **LUTAR**, o Freak **salta da carta** até o começo da esteira.
-- Chega na ponta em **5 remadas**. Cada remada: os dois braços sobem para a frente, jogam para trás em meia-lua, e **só então** o caixote desliza (com fumacinha atrás). Depois os braços ficam para baixo até o próximo tempo da Agilidade.
-- Tempo entre remadas (Agilidade já com sinergia): **1 → 3 s**, **2 → 2,5 s**, **3 → 2 s**, **4 → 1,5 s**, **5 ou mais → 1 s**.
+- Chega na ponta em **5 remadas**. Cada remada: os dois braços sobem para a frente, jogam para trás em meia-lua, e **só então** o caixote desliza (com fumacinha atrás). Depois os braços ficam para baixo **2 segundos** até a próxima remada. Todo mundo rema no mesmo ritmo.
 - Só o Freak da **ponta** luta. O de trás espera uma remada atrás.
-- Na esteira aparecem as etiquetas de **Poder** (cabeça) e **Resistência** (tronco), iguais às da carta.
+- Na esteira aparecem as etiquetas de **Ataque** (cabeça) e **HP** (corpo), iguais às da carta.
 - Só a **cabeça** ataca: pula, voa, bate e volta. O número do dano sobe do Freak atingido.
 - Os golpes são **um de cada vez**. Primeiro um ataca e causa o dano; se ninguém caiu, o outro responde.
 - O golpe que **mata** é sempre do que vai vencer. Se o troca-troca mataria os dois, a ordem é sorteada e **os dois atacam**.
@@ -106,4 +106,4 @@ O oponente usa **as mesmas regras** que você: o mesmo dinheiro, 1 caixa, atuali
 
 ## O que ainda não é regra
 
-Multiplayer, habilidades extras de set, menus, salvamento.
+Multiplayer, menus, salvamento.

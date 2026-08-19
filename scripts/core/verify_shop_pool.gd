@@ -1,7 +1,7 @@
 extends SceneTree
 
 ## The shop reads data/parts by itself: every Freak file shows up, each one sells
-## three kits (head, torso, arm pair), and a roll fills the shop.
+## two kits (head and body), and a roll fills the shop.
 
 func _init() -> void:
 	call_deferred("_run")
@@ -27,7 +27,7 @@ func _run() -> void:
 
 	var parts := ShopPool.all_parts()
 	if parts.size() != roster.size() * PartSlotType.shop_slots().size():
-		push_error("VERIFY_FAIL shop should sell 3 kits per Freak, got %d" % parts.size())
+		push_error("VERIFY_FAIL shop should sell 2 kits per Freak, got %d" % parts.size())
 		quit(1)
 		return
 	for part in parts:
@@ -40,9 +40,14 @@ func _run() -> void:
 			quit(1)
 			return
 
-	var arms := ShopPool.character_by_id(&"bruxa").arms
-	if arms == null or not arms.is_bundle() or PartKit.expand_shop_part(arms).size() != 2:
-		push_error("VERIFY_FAIL the arm kit should open into two arms")
+	var body := ShopPool.character_by_id(&"bruxa").body
+	var expanded := PartKit.expand_shop_part(body)
+	if expanded.size() != 3 or not expanded.has(PartSlotType.Value.BODY):
+		push_error("VERIFY_FAIL the body kit should open into the crate plus both arms")
+		quit(1)
+		return
+	if not expanded.has(PartSlotType.Value.ARM_L) or not expanded.has(PartSlotType.Value.ARM_R):
+		push_error("VERIFY_FAIL the body kit should bring both arms")
 		quit(1)
 		return
 

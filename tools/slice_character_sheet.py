@@ -429,9 +429,10 @@ def main() -> None:
 	parser.add_argument("sheet", help="Path to the PNG/WEBP sheet")
 	parser.add_argument("--id", required=True, help="Internal id, e.g. bruxa")
 	parser.add_argument("--name", default="", help="Display name, e.g. Bruxa")
-	parser.add_argument("--power", type=int, default=5, help="Cabeca: Poder, 1 a 10")
-	parser.add_argument("--toughness", type=int, default=15, help="Tronco: Resistencia, 10 a 20")
-	parser.add_argument("--agility", type=int, default=3, help="Bracos: Agilidade, 1 a 5")
+	parser.add_argument("--attack", type=int, default=5, help="Cabeca: Ataque, 1 a 10")
+	parser.add_argument("--hp", type=int, default=15, help="Corpo: HP, 10 a 20")
+	parser.add_argument("--kind", default="human", help="humano, sobrenatural ou animal")
+	parser.add_argument("--ability", default="", help="mind_control, appeal, or empty")
 	parser.add_argument("--overlay", action="store_true", help="Save a check image with the joints drawn")
 	args = parser.parse_args()
 	set_id = args.id.strip().lower()
@@ -441,10 +442,11 @@ def main() -> None:
 		"id": set_id,
 		"display_name": args.name.strip() or set_id.capitalize(),
 		"stats": {
-			"power": max(1, min(10, args.power)),
-			"toughness": max(10, min(20, args.toughness)),
-			"agility": max(1, min(5, args.agility)),
+			"attack": max(1, min(10, args.attack)),
+			"hp": max(10, min(20, args.hp)),
 		},
+		"kind": args.kind.strip().lower() or "human",
+		"ability": args.ability.strip().lower(),
 		"magnets": report,
 	}
 	(out_dir / f"{set_id}_slice.json").write_text(

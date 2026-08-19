@@ -4,7 +4,7 @@ Este é o jeito certo de colocar um Freak novo no jogo. Siga **todos** os passos
 
 As regras da loja, sinergia e luta (o que o jogador vê) estão em [Mecânicas e regras](../jogo/mecanicas-e-regras.md).
 
-O jogador manda uma folha de desenho. O jogo precisa de **8 recortes** (4 de frente + 4 de perfil), **3 kits na loja** (cabeça, tronco, os dois braços juntos), e uma ficha do personagem. O **caixote já vem no tronco**. Não tem pernas. A loja **acha sozinha** qualquer ficha nova em `data/parts/`.
+O jogador manda uma folha de desenho. O jogo precisa de **8 recortes** (4 de frente + 4 de perfil), **2 kits na loja** (cabeça e corpo; o corpo já traz os braços), e uma ficha do personagem. O **caixote já vem no tronco**. Não tem pernas. A loja **acha sozinha** qualquer ficha nova em `data/parts/`.
 
 ## O que a folha precisa ter
 
@@ -31,7 +31,7 @@ Nome na carta: com acento se precisar (`Bruxa`).
 
 1. Menu **Project → Tools → Incluir personagem** (se o Godot estiver em português: **Projeto → Ferramentas**).
 2. Escolha a folha PNG ou WEBP.
-3. Preencha o id, o nome na carta e os **3 números**: Poder (cabeça), Resistência (tronco), Agilidade (braços).
+3. Preencha o id, o nome na carta, os **2 números** (Ataque e HP), o **tipo** e o **Poder**.
 4. Clique **Cortar e criar**. A janela **fica aberta** e mostra o que está acontecendo. Se a folha estiver errada, o texto fica vermelho na mesma janela. Se der certo, abre a ferramenta de ímãs.
 
 ### B) Quando a folha chega no chat (assistente)
@@ -64,7 +64,7 @@ Cada PNG:
 Comando:
 
 ```
-python tools/slice_character_sheet.py CAMINHO_DA_FOLHA --id ID --name NOME --power 8 --toughness 15 --agility 2 --overlay
+python tools/slice_character_sheet.py CAMINHO_DA_FOLHA --id ID --name NOME --attack 8 --hp 15 --kind supernatural --overlay
 godot --headless --path . --script scripts/core/import_roster.gd
 ```
 
@@ -103,21 +103,20 @@ Se o jogador pedir números, use os dele.
 
 | Kit | Faixa | Preço |
 |-----|-------|-------|
-| Cabeça = Poder | 1 a 10 | o próprio Poder |
-| Tronco = Resistência | 10 a 20 | Resistência − 10 (mínimo $1) |
-| Braços = Agilidade | 1 a 5 | a própria Agilidade |
+| Cabeça = Ataque | 1 a 10 | o próprio Ataque |
+| Corpo = HP | 10 a 20 | HP − 10 (mínimo $1) |
 
 Grave `stat_value` (o número) em cada kit. O preço a loja calcula sozinha.
 
 ## 4. Fichas das peças e do personagem
 
-Oito recortes viram **4 fichas de desenho** + o kit de braços + a ficha do personagem:
+Oito recortes viram **4 fichas de desenho** + a ficha do personagem:
 
 - Desenho: `{id}_head.tres` `{id}_body.tres` `{id}_arm_l.tres` `{id}_arm_r.tres`
-- Loja: `{id}_arms.tres` (os dois braços juntos)
-- Personagem: `{id}_character.tres`
+- Loja: cabeça e corpo (os braços vêm no corpo)
+- Personagem: `{id}_character.tres` (tipo + Poder)
 
-A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 3 kits de cada Freak. Freak novo entra no Play seguinte, sem lista na mão.
+A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 2 kits de cada Freak. Freak novo entra no Play seguinte, sem lista na mão.
 
 ## 5. Documentação
 
@@ -132,12 +131,12 @@ Atualize:
 
 - Os 8 PNG são 200 × 200 e têm transparência de verdade
 - Preto de dentro do desenho não sumiu
-- Play: uma caixa de braços solta os **dois** braços; o tronco senta pelo caixote; set completo (cabeça + tronco + braços) mostra o nome certo
+- Play: o corpo traz os **dois** braços; o tronco senta pelo caixote; set completo (cabeça + corpo do mesmo Freak) liga o Poder
 - Tronco tem 4 ímãs visíveis na ferramenta (pescoço, ombros, chão)
 
 ## Sets que já passaram por este fluxo
 
-| id | Nome | Poder | Resistência | Agilidade |
-|----|------|-------|-------------|-----------|
-| `bruxa` | Bruxa | 8 | 15 | 2 |
-| `advogado` | Advogado | 4 | 18 | 5 |
+| id | Nome | Tipo | Ataque | HP | Poder |
+|----|------|------|--------|----|-------|
+| `bruxa` | Bruxa | Sobrenatural | 8 | 15 | Controle de Mente |
+| `advogado` | Advogado | Humano | 4 | 18 | Recurso |

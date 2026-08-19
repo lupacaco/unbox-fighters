@@ -1,12 +1,14 @@
 class_name FreakStats
 extends RefCounted
 
-## The three numbers a finished Freak takes into the fight, synergy already applied.
+## The numbers a finished Freak takes into the fight, type bonus already applied.
 
-var power: int = 0
-var toughness: int = 0
-var agility: int = 0
+var attack: int = 0
+var hp: int = 0
+var kind: FreakKind.Value = FreakKind.Value.HUMAN
+var ability: FreakAbility.Value = FreakAbility.Value.NONE
 var synergy_level: Synergy.Level = Synergy.Level.NONE
+var complete_set: bool = false
 var set_name: String = ""
 
 static func from_loadout(loadout: FighterLoadout) -> FreakStats:
@@ -14,15 +16,22 @@ static func from_loadout(loadout: FighterLoadout) -> FreakStats:
 	if loadout == null:
 		return stats
 	var parts := loadout.parts_array()
-	stats.power = Synergy.value_for_part(loadout.head, parts)
-	stats.toughness = Synergy.value_for_part(loadout.body, parts)
-	stats.agility = Synergy.value_for_part(loadout.arms, parts)
+	stats.attack = Synergy.value_for_part(loadout.head, parts)
+	stats.hp = Synergy.value_for_part(loadout.body, parts)
 	stats.synergy_level = Synergy.best_level(parts)
+	stats.complete_set = loadout.is_complete_set()
 	stats.set_name = _dominant_name(parts)
+	if loadout.head != null:
+		stats.kind = Synergy.kind_of(loadout.head)
+	if stats.complete_set:
+		var character := ShopPool.character_by_id(loadout.head.set_id)
+		if character != null:
+			stats.ability = character.ability
+			stats.kind = character.kind
 	return stats
 
 func is_ready() -> bool:
-	return power > 0 and toughness > 0 and agility > 0
+	return attack > 0 and hp > 0
 
 func base_of(loadout: FighterLoadout, slot: PartSlotType.Value) -> int:
 	if loadout == null:

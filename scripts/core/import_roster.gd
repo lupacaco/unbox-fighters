@@ -57,8 +57,9 @@ func _import(report: Dictionary) -> String:
 	var display_name := String(report.get("display_name", set_id.capitalize()))
 	var stats: Dictionary = report.get("stats", {})
 	var values := [
-		int(stats.get("power", PartStats.POWER_MIN)),
-		int(stats.get("toughness", PartStats.TOUGHNESS_MIN)),
-		int(stats.get("agility", PartStats.AGILITY_MIN)),
+		int(stats.get("attack", stats.get("power", PartStats.ATTACK_MIN))),
+		int(stats.get("hp", stats.get("toughness", PartStats.HP_MIN))),
 	]
-	return CharacterImporter.write_defs(set_id, display_name, values)
+	var kind := FreakKind.from_string(String(report.get("kind", "human")))
+	var ability := FreakAbility.from_string(String(report.get("ability", "")))
+	return CharacterImporter.write_defs(set_id, display_name, values, kind, ability)

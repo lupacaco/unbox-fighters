@@ -17,9 +17,9 @@ const LAUNCH_TIME := 0.9
 static func kit_handle_time() -> float:
 	return OPEN_TIME + PLACE_TIME
 
-## Fastest a finished Freak can leave a card: look, three kits, then LUTAR.
+## Fastest a finished Freak can leave a card: look, two kits, then LUTAR.
 static func earliest_launch_time() -> float:
-	return LOOK_TIME + kit_handle_time() * 3.0 + LAUNCH_TIME
+	return LOOK_TIME + kit_handle_time() * float(PartSlotType.shop_slots().size()) + LAUNCH_TIME
 
 var _wait: float = 0.0
 var _launch_armed: bool = false
@@ -76,7 +76,7 @@ func _try_launch(side: PlayerState, match_ref: LiveMatch) -> bool:
 		if not card.is_complete():
 			continue
 		var stats := card.stats()
-		var worth := stats.power * 3 + stats.toughness + stats.agility
+		var worth := stats.attack * 3 + stats.hp
 		if worth > best_power:
 			best_power = worth
 			best = i

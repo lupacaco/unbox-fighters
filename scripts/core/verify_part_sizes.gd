@@ -1,7 +1,7 @@
 extends SceneTree
 
 ## Every drawing is a 200x200 PNG with a front and a side view, and every Freak
-## on disk sells exactly three crates with numbers inside the allowed range.
+## on disk sells exactly two crates with numbers inside the allowed range.
 
 const EXPECTED := Vector2(200, 200)
 
@@ -24,7 +24,7 @@ func _check_character(character: CharacterDef) -> void:
 	assert(character.can_fight(), "%s needs a side view on every drawing" % who)
 	assert(
 		character.shop_parts().size() == PartSlotType.shop_slots().size(),
-		"%s should sell head, torso and arms" % who
+		"%s should sell head and body" % who
 	)
 	for part in character.visual_parts():
 		_check_art(part)

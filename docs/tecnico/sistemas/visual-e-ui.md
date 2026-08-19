@@ -19,9 +19,8 @@ Interface da partida. As posições da tela estão em `AssemblyLayout` (1920×10
 
 ## Cores das tags
 
-- Cabeça (Poder) = vermelho-laranja
-- Tronco (Resistência) = roxo
-- Braços (Agilidade) = verde
+- Cabeça (Ataque) = vermelho-laranja
+- Corpo (HP) = roxo
 
 Pílula com sinergia ganha um brilho ouro.
 

@@ -1,7 +1,7 @@
 extends SceneTree
 
 ## The conveyor: a Freak paddles from the far end to the fighting tip in five
-## strokes timed by Agility, only two fit at a time, and the one behind waits.
+## strokes, only two fit at a time, and the one behind waits.
 
 const TRAVEL := 700.0
 
@@ -31,14 +31,8 @@ func _run() -> void:
 	quit(0)
 
 func _check_intervals() -> bool:
-	var expected := [3.0, 2.5, 2.0, 1.5, 1.0]
-	for i in expected.size():
-		var got := MatchRules.stroke_interval(i + 1)
-		if not is_equal_approx(got, expected[i]):
-			push_error("VERIFY_FAIL agility %d should wait %.1fs, got %.2f" % [i + 1, expected[i], got])
-			return false
-	if not is_equal_approx(MatchRules.stroke_interval(8), 1.0):
-		push_error("VERIFY_FAIL agility above 5 still waits 1s")
+	if not is_equal_approx(MatchRules.stroke_interval(), 2.0):
+		push_error("VERIFY_FAIL every Freak should wait 2s between strokes")
 		return false
 	if not is_equal_approx(MatchRules.stroke_step(), 0.2):
 		push_error("VERIFY_FAIL five strokes should each cover a fifth of the belt")
@@ -52,14 +46,14 @@ func _check_lane() -> bool:
 	if runner == null:
 		push_error("VERIFY_FAIL a finished card should get on the belt")
 		return false
-	if runner.hp != runner.stats.toughness:
-		push_error("VERIFY_FAIL a Freak starts with Toughness as its life")
+	if runner.hp != runner.stats.hp:
+		push_error("VERIFY_FAIL a Freak starts with HP as its life")
 		return false
 	if lane.champion() != null:
 		push_error("VERIFY_FAIL nobody fights before reaching the tip")
 		return false
 
-	var interval := MatchRules.stroke_interval(runner.stats.agility)
+	var interval := MatchRules.stroke_interval()
 	lane.advance(interval * 0.5)
 	if runner.progress > 0.001:
 		push_error("VERIFY_FAIL it should wait a full stroke beat before the first paddle")
@@ -158,11 +152,12 @@ func _check_live_duel() -> bool:
 	mine.progress = 1.0
 	theirs.progress = 1.0
 	theirs.hp = 10
+	theirs.appeal_used = true
 	live.tick(MatchRules.DUEL_INTERVAL + 0.05)
 	if theirs.alive or live.opponent.lane.front() != null:
 		push_error("VERIFY_FAIL the winner's blow should finish the weaker Freak")
 		return false
-	if not mine.alive or mine.hp != mine.stats.toughness:
+	if not mine.alive or mine.hp != mine.stats.hp:
 		push_error("VERIFY_FAIL a finished Freak must not get a counter")
 		return false
 	return true

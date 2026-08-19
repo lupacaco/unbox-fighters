@@ -9,7 +9,7 @@ extends RefCounted
 
 class Runner extends RefCounted:
 	var stats: FreakStats
-	## The three kits it was built from, so the screen can draw it.
+	## The two kits it was built from, so the screen can draw it.
 	var loadout: FighterLoadout
 	var hp: int = 0
 	var progress: float = 0.0
@@ -21,9 +21,23 @@ class Runner extends RefCounted:
 	var stroke_timer: float = 0.0
 	## Set when this tick actually moved the Freak, so the screen can paddle.
 	var pending_stroke: bool = false
+	## Recurso: already used the one extra life this fight.
+	var appeal_used: bool = false
+	## Controle de Mente: still unused on this Freak.
+	var mc_available: bool = false
+	## Next attack from this Freak hits its own waiter, if any.
+	var redirect_next: bool = false
+	var mc_source: Runner = null
 
 	func at_tip() -> bool:
 		return progress >= 1.0
+
+	func appeal_ready() -> bool:
+		return (
+			not appeal_used
+			and stats != null
+			and stats.ability == FreakAbility.Value.APPEAL
+		)
 
 var runners: Array[Runner] = []
 var travel_px: float = 1.0
@@ -38,7 +52,8 @@ func add(loadout: FighterLoadout) -> Runner:
 	var runner := Runner.new()
 	runner.loadout = loadout.duplicate_loadout()
 	runner.stats = runner.loadout.stats()
-	runner.hp = runner.stats.toughness
+	runner.hp = runner.stats.hp
+	runner.mc_available = runner.stats.ability == FreakAbility.Value.MIND_CONTROL
 	runner.id = _next_id
 	_next_id += 1
 	runners.append(runner)
@@ -47,6 +62,14 @@ func add(loadout: FighterLoadout) -> Runner:
 func front() -> Runner:
 	for runner in runners:
 		if runner.alive:
+			return runner
+	return null
+
+## The Freak waiting one stroke behind the champion, if any.
+func waiter() -> Runner:
+	var lead := front()
+	for runner in runners:
+		if runner.alive and runner != lead:
 			return runner
 	return null
 
@@ -69,7 +92,7 @@ func advance(delta: float) -> void:
 			blocked_at = maxf(0.0, runner.progress - gap)
 			continue
 		runner.stroke_timer += delta
-		var interval := MatchRules.stroke_interval(runner.stats.agility)
+		var interval := MatchRules.stroke_interval()
 		while runner.stroke_timer >= interval and not runner.at_tip():
 			var next_p := minf(runner.progress + gap, blocked_at)
 			if next_p <= runner.progress + 0.0001:
@@ -83,7 +106,12 @@ func advance(delta: float) -> void:
 func take_damage(runner: Runner, amount: int) -> bool:
 	if runner == null or not runner.alive or amount <= 0:
 		return false
-	runner.hp = maxi(0, runner.hp - amount)
+	var next := runner.hp - amount
+	if next <= 0 and runner.appeal_ready():
+		runner.appeal_used = true
+		runner.hp = 1
+		return false
+	runner.hp = maxi(0, next)
 	if runner.hp > 0:
 		return false
 	runner.alive = false

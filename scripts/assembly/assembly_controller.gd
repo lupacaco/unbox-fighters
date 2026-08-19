@@ -394,16 +394,14 @@ func _on_blows_traded(
 	if visuals_ok:
 		var first := mine if exchange.first_is_left else theirs
 		var second := theirs if exchange.first_is_left else mine
-		var first_side := _match.opponent if exchange.first_is_left else _match.player
-		var second_side := _match.player if exchange.first_is_left else _match.opponent
-		var first_runner := right if exchange.first_is_left else left
-		var second_runner := left if exchange.first_is_left else right
-		var first_damage := exchange.damage_to_right if exchange.first_is_left else exchange.damage_to_left
-		var second_damage := exchange.damage_to_left if exchange.first_is_left else exchange.damage_to_right
-		await _swing(first, second, first_damage, first_side, first_runner)
+		var first_side := _match.player if exchange.first_is_left else _match.opponent
+		var second_side := _match.opponent if exchange.first_is_left else _match.player
+		var first_runner := left if exchange.first_is_left else right
+		var second_runner := right if exchange.first_is_left else left
+		await _play_blow(first, first_runner, first_side, second, second_runner, second_side)
 		if exchange.second_happens:
 			await get_tree().create_timer(SWING_STAGGER).timeout
-			await _swing(second, first, second_damage, second_side, second_runner)
+			await _play_blow(second, second_runner, second_side, first, first_runner, first_side)
 	else:
 		_apply_exchange_hits(exchange, left, right)
 	_match.close_exchange()
@@ -414,32 +412,46 @@ func _apply_exchange_hits(
 	exchange: Duel.Exchange, left: BeltLane.Runner, right: BeltLane.Runner
 ) -> void:
 	if exchange.first_is_left:
-		_match.apply_hit(_match.opponent, right, exchange.damage_to_right)
+		_match.apply_blow(left, right, _match.player, _match.opponent)
 		if exchange.second_happens:
-			_match.apply_hit(_match.player, left, exchange.damage_to_left)
+			_match.apply_blow(right, left, _match.opponent, _match.player)
 	else:
-		_match.apply_hit(_match.player, left, exchange.damage_to_left)
+		_match.apply_blow(right, left, _match.opponent, _match.player)
 		if exchange.second_happens:
-			_match.apply_hit(_match.opponent, right, exchange.damage_to_right)
+			_match.apply_blow(left, right, _match.player, _match.opponent)
 
-func _swing(
+func _play_blow(
 	attacker: BeltFreak,
-	victim: BeltFreak,
-	damage: int,
-	victim_side: PlayerState,
-	victim_runner: BeltLane.Runner
+	attacker_runner: BeltLane.Runner,
+	attacker_side: PlayerState,
+	defender: BeltFreak,
+	defender_runner: BeltLane.Runner,
+	defender_side: PlayerState
 ) -> void:
+	var plan := _match.plan_blow(attacker_runner, defender_runner, attacker_side, defender_side)
+	var victim_runner: BeltLane.Runner = plan["victim"]
+	var victim_side: PlayerState = plan["victim_side"]
+	var victim_view := _freak_view(victim_side, victim_runner)
 	if not is_instance_valid(attacker):
-		_match.apply_hit(victim_side, victim_runner, damage)
+		_match.apply_blow(attacker_runner, defender_runner, attacker_side, defender_side)
 		return
 	await attacker.attack(
 		func() -> Vector2:
-			return victim.head_global_position() if is_instance_valid(victim) else attacker.global_position,
+			if is_instance_valid(victim_view):
+				return victim_view.head_global_position()
+			if is_instance_valid(defender):
+				return defender.head_global_position()
+			return attacker.global_position,
 		func() -> void:
-			_match.apply_hit(victim_side, victim_runner, damage)
-			if is_instance_valid(victim):
-				victim.flash_hit(damage)
+			_match.apply_blow(attacker_runner, defender_runner, attacker_side, defender_side)
+			if is_instance_valid(victim_view):
+				victim_view.flash_hit(int(plan["damage"]))
 	)
+
+func _freak_view(side: PlayerState, runner: BeltLane.Runner) -> BeltFreak:
+	if side == null or runner == null:
+		return null
+	return _views_of(side == _match.player).get(runner.id) as BeltFreak
 
 func _on_freak_died(side: PlayerState, runner: BeltLane.Runner) -> void:
 	var views := _views_of(side == _match.player)

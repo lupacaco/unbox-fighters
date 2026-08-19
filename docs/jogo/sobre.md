@@ -6,7 +6,7 @@
 
 ## Ideia em uma frase
 
-Você abre caixas, monta Freaks com **3 kits** (cabeça, tronco e os dois braços juntos) em cima de um **caixote**, e manda eles remarem na esteira para lutar contra o oponente.
+Você abre caixas, monta Freaks com **2 kits** (cabeça e corpo, o corpo já traz os braços) em cima de um **caixote**, e manda eles remarem na esteira para lutar contra o oponente.
 
 ## Loop principal
 

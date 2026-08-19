@@ -3,15 +3,17 @@ class_name CharacterDef
 extends Resource
 
 ## @tool lets the magnet editor (Project → Tools) read these drawings.
-## The shop sells head, torso and the arm pair; the screen draws the two arms apart.
+## The shop sells head and body; the body draws as the crate plus both arms.
 
 @export var id: StringName
 @export var display_name: String = "???"
+@export var kind: FreakKind.Value = FreakKind.Value.HUMAN
+@export var ability: FreakAbility.Value = FreakAbility.Value.NONE
 @export var head: PartDef
 @export var body: PartDef
 @export var arm_l: PartDef
 @export var arm_r: PartDef
-## Shop kit that carries both arms at once.
+## Leftover grouping of the two arm drawings. Not sold in the shop.
 @export var arms: PartDef
 
 func get_part(slot: PartSlotType.Value) -> PartDef:

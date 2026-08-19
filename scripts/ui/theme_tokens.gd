@@ -32,7 +32,7 @@ const BELT_OPPONENT := Color(0.93, 0.33, 0.33)
 const REFRESH_BLUE := Color(0.16, 0.34, 0.58)
 const SELL_RED := Color(0.52, 0.14, 0.16)
 
-## Poder é vermelho, Resistência é roxo, Agilidade é verde.
+## Ataque é vermelho-laranja, HP é roxo.
 static func color_for_slot(slot: PartSlotType.Value) -> Color:
 	match slot:
 		PartSlotType.Value.HEAD:
@@ -40,4 +40,4 @@ static func color_for_slot(slot: PartSlotType.Value) -> Color:
 		PartSlotType.Value.BODY:
 			return MIGHT
 		_:
-			return AGILITY
+			return Color(0.95, 0.42, 0.30)
