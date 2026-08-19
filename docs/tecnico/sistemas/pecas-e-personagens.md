@@ -113,7 +113,7 @@ Padrão de arquivos em `assets/characters/<nome>/`:
 
 Todos em **200×200**. No jogo o tamanho fica 1:1 (não estica).
 
-Para colocar um Freak **novo**, veja [Incluir personagem](../incluir-personagem.md).
+Para colocar um Freak **novo**, veja [Incluir personagem](../incluir-personagem.md). Para tirar um Freak de vez: **Project → Tools → Remover personagem**.
 
 ## Arquivos de dados atuais
 

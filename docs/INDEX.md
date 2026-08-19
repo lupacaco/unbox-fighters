@@ -23,7 +23,7 @@ O jogo ainda **não está pronto**. Estes docs descrevem o que **já existe** ho
 | [Partida](tecnico/sistemas/partida.md) | Jogo corrido 1 contra 1, dinheiro, esteira, duelo |
 | [Tela de montagem](tecnico/sistemas/tela-de-montagem.md) | Cartas (suas e dele), prateleira, esteiras, barra-balança |
 | [Peças e personagens](tecnico/sistemas/pecas-e-personagens.md) | Dados dos personagens, sinergia e composição visual |
-| [Incluir personagem](tecnico/incluir-personagem.md) | Folha 4+4 → 8 PNG 200×200, 2 kits na loja, ímãs |
+| [Incluir personagem](tecnico/incluir-personagem.md) | Folha 4+4 → 8 PNG 200×200, 2 kits na loja, ímãs. Também: apagar um Freak por completo |
 | [Arrastar e soltar](tecnico/sistemas/arrastar-e-soltar.md) | Peças da prateleira para a carta, vender |
 | [Animação de luta](tecnico/sistemas/animacao-de-luta.md) | Pulo da carta, remadas, cabeça que voa, morte no vão |
 | [Visual e UI](tecnico/sistemas/visual-e-ui.md) | Fundo, cartas, prateleira, barra-balança, botões |

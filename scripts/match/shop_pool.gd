@@ -14,9 +14,14 @@ static var _roster: Array[CharacterDef] = []
 
 
 static func reload() -> void:
+	drop_cache()
+	_ensure_loaded()
+
+
+## Lets the editor delete a Freak's files without the shop still holding them.
+static func drop_cache() -> void:
 	_roster = []
 	_all_parts = []
-	_ensure_loaded()
 
 
 static func roster() -> Array[CharacterDef]:

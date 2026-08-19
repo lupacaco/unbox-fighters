@@ -27,7 +27,7 @@ unbox-fighters/
 │   ├── core/
 │   ├── data/
 │   └── ui/
-├── addons/                # Ferramentas do editor (ímãs, incluir personagem)
+├── addons/                # Ferramentas do editor (ímãs, incluir / remover personagem)
 ├── tools/                 # Scripts Python de preparação de arte
 └── .cursor/               # Regras e skills do Cursor (assistente)
 ```
@@ -46,6 +46,7 @@ As regras em `.cursor/rules/` ensinam o assistente a falar simples, atualizar do
 | Mudar HUD / fundo / tags | `scripts/ui/` |
 | Preparar imagens 200×200 | `tools/` |
 | Incluir um Freak novo | [Incluir personagem](incluir-personagem.md) |
+| Apagar um Freak por completo | [Incluir personagem](incluir-personagem.md#7-remover-um-personagem) — **Projeto → Ferramentas → Remover personagem** |
 | Documentação | `docs/` |
 
 ## Pastas que o Godot gera

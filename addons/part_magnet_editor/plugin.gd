@@ -4,6 +4,7 @@ extends EditorPlugin
 const MagnetInspectorPlugin := preload("res://addons/part_magnet_editor/magnet_inspector_plugin.gd")
 const MagnetWindowScene := preload("res://addons/part_magnet_editor/magnet_window.gd")
 const CharacterImporter := preload("res://addons/part_magnet_editor/character_importer.gd")
+const CharacterRemoveWindow := preload("res://addons/part_magnet_editor/character_remove_window.gd")
 
 ## The two numbers the shop and the fight read, in the order write_defs wants.
 const STAT_SPINS: Array[Dictionary] = [
@@ -23,6 +24,7 @@ var _ability_option: OptionButton
 var _pending_sheet := ""
 var _form_status: Label
 var _importing := false
+var _remove_window
 
 func _enter_tree() -> void:
 	_inspector_plugin = MagnetInspectorPlugin.new()
@@ -30,10 +32,12 @@ func _enter_tree() -> void:
 	add_inspector_plugin(_inspector_plugin)
 	add_tool_menu_item("Ímãs das Peças", _open_magnet_window)
 	add_tool_menu_item("Incluir personagem", _begin_import)
+	add_tool_menu_item("Remover personagem", _open_remove_window)
 
 func _exit_tree() -> void:
 	remove_tool_menu_item("Ímãs das Peças")
 	remove_tool_menu_item("Incluir personagem")
+	remove_tool_menu_item("Remover personagem")
 	if _inspector_plugin != null:
 		remove_inspector_plugin(_inspector_plugin)
 		_inspector_plugin = null
@@ -43,6 +47,8 @@ func _exit_tree() -> void:
 	_file_dialog = null
 	_free_node(_form)
 	_form = null
+	_free_node(_remove_window)
+	_remove_window = null
 
 func _ensure_window() -> void:
 	if _window == null or not is_instance_valid(_window):
@@ -65,6 +71,36 @@ func _popup_magnet() -> void:
 	var w := clampi(int(host.x * 0.62), 840, 980)
 	var h := clampi(int(host.y * 0.62), 500, 620)
 	_window.popup_centered(Vector2i(w, h))
+
+func _open_remove_window() -> void:
+	if _remove_window == null or not is_instance_valid(_remove_window):
+		_remove_window = CharacterRemoveWindow.new()
+		_remove_window.release_set.connect(_release_set)
+		_remove_window.roster_changed.connect(_on_roster_changed)
+		EditorInterface.get_base_control().add_child(_remove_window)
+	_remove_window.present()
+
+func _release_set(set_id: String) -> void:
+	if _window != null and is_instance_valid(_window):
+		_window.evict_set(set_id)
+	var edited := EditorInterface.get_inspector().get_edited_object()
+	if _object_belongs_to_set(edited, set_id):
+		EditorInterface.inspect_object(null)
+
+func _on_roster_changed() -> void:
+	if _window != null and is_instance_valid(_window):
+		_window.reload_roster()
+
+func _object_belongs_to_set(edited: Object, set_id: String) -> bool:
+	if edited == null or set_id.is_empty():
+		return false
+	var character := edited as CharacterDef
+	if character != null:
+		return String(character.id) == set_id
+	var part := edited as PartDef
+	if part != null:
+		return String(part.set_id) == set_id
+	return false
 
 func _begin_import() -> void:
 	if _file_dialog == null or not is_instance_valid(_file_dialog):

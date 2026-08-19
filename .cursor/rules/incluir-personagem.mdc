@@ -16,3 +16,4 @@ Armadilhas:
 - Ímã: abra **Project → Tools → Ímãs das Peças**, escolha o Freak. Abas **Frente** e **Perfil**: 4 partes à esquerda, prévia à direita. Arraste as bolinhas até as **esferas de metal**. No tronco são 4 (pescoço, dois ombros, e CAIXOTE embaixo). Não force X = 0. Marque frente e perfil.
 - A loja lê sozinha as fichas `data/parts/*_character.tres`. Não precisa ligar o set na tela na mão.
 - Atualize a tabela em `docs/tecnico/sistemas/pecas-e-personagens.md`.
+- Para apagar um Freak por completo: **Project → Tools → Remover personagem**. Não apague os arquivos na mão.

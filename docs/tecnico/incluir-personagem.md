@@ -134,6 +134,29 @@ Atualize:
 - Play: o corpo traz os **dois** braços; o tronco senta **dentro** do caixote da carta; set completo (cabeça + corpo do mesmo Freak) liga o Poder
 - Tronco tem 4 ímãs visíveis na ferramenta (pescoço, ombros, chão)
 
+## 7. Remover um personagem
+
+Para tirar um Freak **inteiro** do jogo (desenhos, pasta e fichas da loja):
+
+1. Menu **Project → Tools → Remover personagem** (em português: **Projeto → Ferramentas**).
+2. Escolha o Freak na lista. A janela mostra a cara dele e os arquivos que vão sumir.
+3. Clique **Apagar este Freak**.
+4. Confirme **Apagar de vez**.
+
+A loja deixa de vender esse Freak no **próximo Play**. Não dá para desfazer no Godot.
+
+A ferramenta também acha Freak **incompleto** (pasta de desenhos sem ficha na loja). Folhas soltas na pasta `assets/characters/` com o mesmo nome (JPG/PNG) saem junto.
+
+Pelo terminal, o mesmo apagar:
+
+```
+godot --headless --path . --script scripts/core/remove_character.gd -- ID
+```
+
+Depois de apagar, atualize as tabelas dos docs se esse Freak estava listado.
+
+Não apague os arquivos na mão: é fácil esquecer uma ficha e a loja continuar vendendo um Freak pela metade.
+
 ## Sets que já passaram por este fluxo
 
 | id | Nome | Tipo | Ataque | HP | Poder |

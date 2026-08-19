@@ -23,3 +23,5 @@ Antes de cortar ou ligar qualquer coisa, leia `docs/tecnico/incluir-personagem.m
 3. Números: os 2 que o jogador pediu; senão um conjunto diferente dos sets atuais. Cabeça = Ataque 1–10, corpo = HP 10–20. Tipo: Humano, Sobrenatural ou Animal. Poder só no set completo.
 4. Conferir `data/parts/{id}_*.tres` e `{id}_character.tres` (loja = head/body). A loja lê sozinha todo `*_character.tres`.
 5. Atualizar `pecas-e-personagens.md`, `estado-atual.md`, `estrutura-de-pastas.md`.
+
+Para **apagar** um Freak por completo: **Project → Tools → Remover personagem**. Não apague os arquivos na mão.

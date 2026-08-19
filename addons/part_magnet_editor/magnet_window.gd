@@ -45,6 +45,38 @@ func present_character_id(set_id: String) -> void:
 	if is_node_ready():
 		_apply_pending()
 
+
+func reload_roster() -> void:
+	if not is_node_ready():
+		return
+	var keep_id := String(_character.id) if _character != null else ""
+	_refresh_roster()
+	if _characters.is_empty():
+		_show_character(null)
+		return
+	var chosen := _character_by_id(keep_id)
+	if chosen == null:
+		chosen = _characters[0]
+	_select_character(chosen)
+
+
+func evict_set(set_id: String) -> void:
+	if set_id.is_empty():
+		return
+	var kept: Array[CharacterDef] = []
+	for character in _characters:
+		if String(character.id) != set_id:
+			kept.append(character)
+	_characters = kept
+	if _character == null or String(_character.id) != set_id:
+		return
+	_character = null
+	_pending_part = null
+	_pending_set_id = ""
+	if is_node_ready():
+		_show_character(null)
+	hide()
+
 func _apply_pending() -> void:
 	_refresh_roster()
 	if _characters.is_empty():
