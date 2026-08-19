@@ -177,6 +177,9 @@ func _check_crate_stays_same_size(scene: Node) -> bool:
 	if plaque.shown_hp() != bruxa.body.stat_value:
 		push_error("VERIFY_FAIL the crate should show the body's HP")
 		return false
+	if load("res://assets/nova-ui/ataque.png") == null or load("res://assets/nova-ui/hp.png") == null:
+		push_error("VERIFY_FAIL missing attack or HP icons for the crate")
+		return false
 	return true
 
 func _check_belts(scene: Node) -> bool:

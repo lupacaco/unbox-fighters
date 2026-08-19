@@ -16,7 +16,7 @@ Só a **cabeça** ataca. O Freak não tem pernas: ele **rema** com as duas mãos
 
 Na esteira, o Freak do oponente fica virado para a esquerda (para o vão). O seu fica virado para a direita.
 
-No caixote aparecem o nome, o Ataque (punho) e o HP (coração). O HP **diminui** no painel quando leva golpe.
+No caixote aparecem o nome, o Ataque e o HP, com os ícones grandes. O HP **diminui** no painel quando leva golpe.
 
 Na luta, quem cobre quem **não** usa o Z da ferramenta de ímãs. **1 fica na frente**.
 

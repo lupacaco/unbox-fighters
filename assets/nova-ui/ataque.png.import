@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b5lbpcjejrf53"
-path="res://.godot/imported/icone-coracao.png-b7c05d6e890bb2820c8018be2a4381dc.ctex"
+uid="uid://dp3j878qtukj3"
+path="res://.godot/imported/ataque.png-486bc918bd191f34db92f806e8eb37cc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/nova-ui/icone-coracao.png"
-dest_files=["res://.godot/imported/icone-coracao.png-b7c05d6e890bb2820c8018be2a4381dc.ctex"]
+source_file="res://assets/nova-ui/ataque.png"
+dest_files=["res://.godot/imported/ataque.png-486bc918bd191f34db92f806e8eb37cc.ctex"]
 
 [params]
 

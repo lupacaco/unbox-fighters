@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b5lb3iflwiq53"
-path="res://.godot/imported/icone-punho.png-14ad499e1055551f7413d84ba46e1e02.ctex"
+uid="uid://cuyuv1pmq6vuq"
+path="res://.godot/imported/hp.png-cb1c54220423e270ed29ad6a6e66aab4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/nova-ui/icone-punho.png"
-dest_files=["res://.godot/imported/icone-punho.png-14ad499e1055551f7413d84ba46e1e02.ctex"]
+source_file="res://assets/nova-ui/hp.png"
+dest_files=["res://.godot/imported/hp.png-cb1c54220423e270ed29ad6a6e66aab4.ctex"]
 
 [params]
 
