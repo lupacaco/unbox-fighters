@@ -80,7 +80,7 @@ A loja lê sozinha as fichas `*_character.tres` em `data/parts/` e vende os 2 ki
 
 ## Como marcar os ímãs
 
-1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**).
+1. No Godot, menu **Project → Tools → Ímãs das Peças** (em português: **Projeto → Ferramentas**). A janela abre em **800 × 600**.
 2. No alto, escolha o **Freak**. A janela tem duas abas: **Frente** e **Perfil**.
 3. À esquerda, as **4 partes em duas colunas**. À direita, a prévia do Freak montado.
 4. Arraste as bolinhas até o **centro das esferas de metal**:

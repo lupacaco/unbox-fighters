@@ -31,6 +31,8 @@ Para mudar nome, tipo, Poder, Ataque ou HP: **Project → Tools → Editar perso
 
 Para tirar um Freak de vez: **Project → Tools → Remover personagem**. Escolha na lista e confirme. Some a pasta de desenhos e as fichas da loja.
 
+Essas janelas (e a de ímãs) abrem em **800 × 600**, com barra para rolar se o conteúdo for maior.
+
 ## Por que 200×200
 
 As peças precisam ter o mesmo tamanho de arquivo para o jogo poder colá-las sem esticar umas e encolher outras. Quadrado 200 × 200. Na carta o Freak inteiro (caixote + peças) aparece em 80%; na esteira, em 85%. O script `scripts/core/verify_part_sizes.gd` confere o tamanho do arquivo.

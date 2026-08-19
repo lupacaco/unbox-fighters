@@ -3,6 +3,7 @@ extends SceneTree
 ## Checks that editing a Freak changes the card and puts the files back.
 
 const CharacterEditor := preload("res://addons/part_magnet_editor/character_editor.gd")
+const ToolChrome := preload("res://addons/part_magnet_editor/tool_chrome.gd")
 
 const SNAP_PATHS: PackedStringArray = [
 	"res://data/parts/bruxa_character.tres",
@@ -23,7 +24,13 @@ func _run() -> void:
 		push_error("VERIFY_FAIL could not read the Bruxa files")
 		quit(1)
 		return
-	var ok := _check_read() and _check_errors() and _check_storage_keys() and _check_edit_and_magnets()
+	var ok := (
+		_check_chrome()
+		and _check_read()
+		and _check_errors()
+		and _check_storage_keys()
+		and _check_edit_and_magnets()
+	)
 	_restore(snap)
 	ShopPool.reload()
 	if not ok:
@@ -36,6 +43,12 @@ func _run() -> void:
 		return
 	print("VERIFY_CHARACTER_EDITOR_PASS")
 	quit(0)
+
+func _check_chrome() -> bool:
+	if ToolChrome.SIZE != Vector2i(800, 600):
+		push_error("VERIFY_FAIL tool windows should be 800x600")
+		return false
+	return true
 
 func _check_read() -> bool:
 	var snap: Dictionary = CharacterEditor.read("bruxa")

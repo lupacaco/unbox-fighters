@@ -9,6 +9,7 @@ signal transform_changed
 signal replace_requested(part: PartDef, pose: int)
 
 const MagnetTile := preload("res://addons/part_magnet_editor/magnet_tile.gd")
+const ToolChrome := preload("res://addons/part_magnet_editor/tool_chrome.gd")
 
 var part: PartDef
 var pose: int = 0
@@ -221,14 +222,14 @@ func _on_expand_pressed() -> void:
 	tile.start_zoom = 2.2
 	tile.set_target(part, pose)
 	_zoom_win.title = "Ímã — %s" % PartSlotType.display_label(part.slot_type)
-	_zoom_win.popup_centered(Vector2i(720, 780))
+	ToolChrome.popup(_zoom_win)
 	tile.call_deferred("reset_view")
 
 func _ensure_zoom_window() -> void:
 	if _zoom_win != null and is_instance_valid(_zoom_win):
 		return
 	_zoom_win = Window.new()
-	_zoom_win.min_size = Vector2i(560, 620)
+	ToolChrome.apply(_zoom_win)
 	_zoom_win.unresizable = false
 	_zoom_win.exclusive = false
 	_zoom_win.close_requested.connect(func() -> void: _zoom_win.hide())
@@ -241,9 +242,7 @@ func _ensure_zoom_window() -> void:
 	_zoom_win.add_child(root)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 8)
-	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	column.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	root.add_child(column)
+	root.add_child(ToolChrome.scrolled_body(column))
 	var help := Label.new()
 	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	help.modulate = Color(0.78, 0.8, 0.84, 1)
@@ -270,7 +269,7 @@ func _ensure_zoom_window() -> void:
 	)
 	bar.add_child(reset)
 	_zoom_tile = MagnetTile.new()
-	_zoom_tile.custom_minimum_size = Vector2(520, 520)
+	_zoom_tile.custom_minimum_size = Vector2(520, 420)
 	_zoom_tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_zoom_tile.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	(_zoom_tile as MagnetTile).start_zoom = 2.2

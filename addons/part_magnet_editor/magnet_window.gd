@@ -6,6 +6,7 @@ extends Window
 const MagnetPartCard := preload("res://addons/part_magnet_editor/magnet_part_card.gd")
 const MagnetMix := preload("res://addons/part_magnet_editor/magnet_mix.gd")
 const CharacterImporter := preload("res://addons/part_magnet_editor/character_importer.gd")
+const ToolChrome := preload("res://addons/part_magnet_editor/tool_chrome.gd")
 
 var _picker: OptionButton
 var _help: Label
@@ -26,7 +27,7 @@ var _pending_set_id: String = ""
 
 func _ready() -> void:
 	title = "Ímãs das peças"
-	min_size = Vector2i(820, 480)
+	ToolChrome.apply(self)
 	unresizable = false
 	exclusive = false
 	close_requested.connect(hide)
@@ -110,6 +111,7 @@ func _build_ui() -> void:
 
 	_help = Label.new()
 	_help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_help.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_help.modulate = Color(0.78, 0.8, 0.84, 1)
 	_help.text = "Imagem escolhe o desenho desta peça. No tronco são 4 ímãs: pescoço, dois ombros e CAIXOTE (esfera de baixo, que encaixa na base). Ampliar marca de perto. Z vale só na carta."
 	column.add_child(_help)
@@ -154,14 +156,14 @@ func _make_tab(pose: int, caption: String) -> Control:
 	var row := HSplitContainer.new()
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	row.split_offset = 540
+	row.split_offset = 500
 	tab.add_child(row)
 
 	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size.x = 500
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_stretch_ratio = 0.72
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	row.add_child(scroll)
 
 	var grid := GridContainer.new()

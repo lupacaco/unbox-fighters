@@ -34,6 +34,8 @@ Nome na carta: com acento se precisar (`Bruxa`).
 3. Preencha o id, o nome na carta, os **2 números** (Ataque e HP), o **tipo** e o **Poder**.
 4. Clique **Cortar e criar**. A janela **fica aberta** e mostra o que está acontecendo. Se a folha estiver errada, o texto fica vermelho na mesma janela. Se der certo, abre a ferramenta de ímãs.
 
+Todas as janelas de **Projeto → Ferramentas** (incluir, editar, apagar, ímãs e ampliar) abrem em **800 × 600**. Se o conteúdo for mais alto, aparece uma barra para rolar.
+
 ### B) Quando a folha chega no chat (assistente)
 
 1. Cortar com `tools/slice_character_sheet.py` (8 PNG **200×200** transparentes em `assets/characters/{id}/`, mais um `{id}_slice.json` com os ímãs que o script achou).

@@ -4,6 +4,7 @@ extends AcceptDialog
 ## Pick an existing Freak and delete every file the include tool created.
 
 const CharacterRemover := preload("res://addons/part_magnet_editor/character_remover.gd")
+const ToolChrome := preload("res://addons/part_magnet_editor/tool_chrome.gd")
 
 signal roster_changed
 signal release_set(set_id: String)
@@ -23,7 +24,7 @@ func _ready() -> void:
 	title = "Remover personagem"
 	ok_button_text = "Apagar este Freak"
 	dialog_hide_on_ok = false
-	min_size = Vector2i(480, 560)
+	ToolChrome.apply(self)
 	confirmed.connect(_on_delete_pressed)
 	add_cancel_button("Fechar")
 	_build_body()
@@ -33,14 +34,13 @@ func _ready() -> void:
 
 func present() -> void:
 	_refresh()
-	popup_centered(Vector2i(500, 580))
+	ToolChrome.popup(self)
 
 
 func _build_body() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
-	box.custom_minimum_size = Vector2(460, 480)
-	add_child(box)
+	add_child(ToolChrome.scrolled_body(box))
 
 	var pick_lab := Label.new()
 	pick_lab.text = "Escolha o Freak"
@@ -78,13 +78,13 @@ func _build_body() -> void:
 
 	_hint = Label.new()
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_hint.custom_minimum_size.x = 440
+	_hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_hint.text = "Isso apaga de vez: desenhos, pasta e fichas da loja. Não dá para desfazer no Godot."
 	box.add_child(_hint)
 
 	_status = Label.new()
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_status.custom_minimum_size.x = 440
+	_status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_child(_status)
 
 

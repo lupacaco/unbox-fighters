@@ -4,6 +4,7 @@ extends AcceptDialog
 ## Pick an existing Freak and change the card: name, type, power, Attack, HP.
 
 const CharacterEditor := preload("res://addons/part_magnet_editor/character_editor.gd")
+const ToolChrome := preload("res://addons/part_magnet_editor/tool_chrome.gd")
 
 signal roster_changed
 signal open_magnets(set_id: String)
@@ -29,7 +30,7 @@ func _ready() -> void:
 	title = "Editar personagem"
 	ok_button_text = "Salvar"
 	dialog_hide_on_ok = false
-	min_size = Vector2i(460, 560)
+	ToolChrome.apply(self)
 	confirmed.connect(_on_save_pressed)
 	add_cancel_button("Fechar")
 	_build_body()
@@ -38,14 +39,13 @@ func _ready() -> void:
 
 func present() -> void:
 	_refresh()
-	popup_centered(Vector2i(480, 580))
+	ToolChrome.popup(self)
 
 
 func _build_body() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
-	box.custom_minimum_size = Vector2(440, 500)
-	add_child(box)
+	add_child(ToolChrome.scrolled_body(box))
 
 	var pick_lab := Label.new()
 	pick_lab.text = "Escolha o Freak"
@@ -91,13 +91,13 @@ func _build_body() -> void:
 
 	_hint = Label.new()
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_hint.custom_minimum_size.x = 420
+	_hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_hint.text = "O nome da pasta (id) não muda por aqui. Desenhos entram em Incluir; ímãs têm a ferramenta própria."
 	box.add_child(_hint)
 
 	_status = Label.new()
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_status.custom_minimum_size.x = 420
+	_status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_child(_status)
 
 	_name_edit.text_changed.connect(_on_fields_changed)

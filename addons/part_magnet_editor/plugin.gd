@@ -6,6 +6,7 @@ const MagnetWindowScene := preload("res://addons/part_magnet_editor/magnet_windo
 const CharacterImporter := preload("res://addons/part_magnet_editor/character_importer.gd")
 const CharacterRemoveWindow := preload("res://addons/part_magnet_editor/character_remove_window.gd")
 const CharacterEditWindow := preload("res://addons/part_magnet_editor/character_edit_window.gd")
+const ToolChrome := preload("res://addons/part_magnet_editor/tool_chrome.gd")
 
 ## The two numbers the shop and the fight read, in the order write_defs wants.
 const STAT_SPINS: Array[Dictionary] = [
@@ -73,10 +74,7 @@ func _open_magnet_window_for_set(set_id: String) -> void:
 	_popup_magnet()
 
 func _popup_magnet() -> void:
-	var host := EditorInterface.get_base_control().size
-	var w := clampi(int(host.x * 0.62), 840, 980)
-	var h := clampi(int(host.y * 0.62), 500, 620)
-	_window.popup_centered(Vector2i(w, h))
+	ToolChrome.popup(_window)
 
 func _open_remove_window() -> void:
 	if _remove_window == null or not is_instance_valid(_remove_window):
@@ -134,19 +132,18 @@ func _on_sheet_chosen(path: String) -> void:
 	_id_edit.text = CharacterImporter.clean_id(stem)
 	_name_edit.text = stem.capitalize()
 	_set_form_status("Ao clicar, a janela fica aberta e mostra o que está acontecendo. Costuma levar poucos segundos.", false)
-	_form.popup_centered(Vector2i(440, 520))
+	ToolChrome.popup(_form)
 
 func _build_form() -> void:
 	_form = AcceptDialog.new()
 	_form.title = "Incluir personagem"
 	_form.ok_button_text = "Cortar e criar"
-	_form.min_size = Vector2i(420, 500)
+	_form.min_size = ToolChrome.SIZE
 	_form.dialog_hide_on_ok = false
 	_form.confirmed.connect(_on_form_confirmed)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
-	box.custom_minimum_size = Vector2(400, 300)
-	_form.add_child(box)
+	_form.add_child(ToolChrome.scrolled_body(box))
 	box.add_child(_labeled_edit("Id interno (ex: bruxa)", true))
 	box.add_child(_labeled_edit("Nome na carta (ex: Bruxa)", false))
 	_value_spins.clear()
@@ -156,12 +153,12 @@ func _build_form() -> void:
 	box.add_child(_labeled_ability())
 	var hint := Label.new()
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.custom_minimum_size.x = 380
+	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hint.text = "Folha com 4 desenhos de frente e 4 de perfil (cabeça, tronco, braço E, braço D). A loja vende 2 kits: cabeça e corpo (o corpo já traz os braços). O caixote da carta é a base de todos. No tronco marque 4 ímãs, o de baixo encaixa no caixote."
 	box.add_child(hint)
 	_form_status = Label.new()
 	_form_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_form_status.custom_minimum_size.x = 380
+	_form_status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_form_status.text = "Ao clicar, a janela fica aberta e mostra o que está acontecendo. Costuma levar poucos segundos."
 	box.add_child(_form_status)
 	EditorInterface.get_base_control().add_child(_form)
