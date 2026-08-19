@@ -25,3 +25,13 @@ static func from_string(raw: String) -> Value:
 			return Value.APPEAL
 		_:
 			return Value.NONE
+
+
+static func storage_key(value: Value) -> String:
+	match value:
+		Value.MIND_CONTROL:
+			return "mind_control"
+		Value.APPEAL:
+			return "appeal"
+		_:
+			return ""

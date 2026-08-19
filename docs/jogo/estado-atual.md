@@ -18,11 +18,12 @@
 | Composição | Caixote compartilhado na carta e na esteira; tronco encaixa pelo ímã de baixo |
 | Interface | Dinheiro ao lado da prateleira; botões redondos de atualizar e vender; barra-balança no topo (JOGADOR / OPONENTE) |
 | Incluir Freak | Folha 4+4 vira 8 PNG 200×200 + 2 kits na loja; ímãs em Frente e Perfil |
+| Editar Freak | **Projeto → Ferramentas → Editar personagem**: nome, tipo, Poder, Ataque e HP |
 | Remover Freak | **Projeto → Ferramentas → Remover personagem**: escolhe na lista e apaga desenhos, pasta e fichas |
 | Áudio | Efeitos gravados (martelo, caixa, ímã, impacto). Sem som de mola |
 | Dados | Loja lê sozinha todo `*_character.tres` (Bruxa, Advogado) |
 | Bot | Compra, monta e manda lutar com as mesmas regras e o mesmo tempo de mãos |
-| Scripts de verificação | 13 checagens sem abrir a interface completa |
+| Scripts de verificação | 14 checagens sem abrir a interface completa |
 
 ## Parcial / provisório
 

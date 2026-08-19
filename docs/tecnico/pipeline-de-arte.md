@@ -11,6 +11,7 @@ Scripts fora do Godot que preparam imagens dos personagens.
 | `slice_character_sheet.py` | Corta uma folha 4+4 em 8 PNG 200×200 e grava `{id}_slice.json` com os ímãs |
 | `scripts/core/import_roster.gd` | Lê cada `_slice.json` e cria as fichas em `data/parts/` |
 | `scripts/core/remove_character.gd` | Apaga um Freak por id (o mesmo que **Remover personagem** no Godot) |
+| `scripts/core/edit_character.gd` | Muda nome, tipo, Poder, Ataque e HP (o mesmo que **Editar personagem** no Godot) |
 | `remove_backgrounds.py` | Remove fundo xadrez / sólido de artes de UI |
 | `fetch_sfx.py` | Baixa e recorta os efeitos sonoros gravados (Mixkit) |
 | `run_checks.ps1` | Roda todos os `verify_*.gd` sem abrir a janela do jogo |
@@ -25,6 +26,8 @@ Em `assets/characters/<nome>/`:
 - Canvas **200×200**
 
 Para um set novo: [Incluir personagem](incluir-personagem.md). O Godot também tem **Project → Tools → Incluir personagem** (corta os 8 PNG e cria os 2 kits da loja).
+
+Para mudar nome, tipo, Poder, Ataque ou HP: **Project → Tools → Editar personagem**. Os ímãs e os desenhos ficam.
 
 Para tirar um Freak de vez: **Project → Tools → Remover personagem**. Escolha na lista e confirme. Some a pasta de desenhos e as fichas da loja.
 

@@ -8,7 +8,7 @@ Feito em **Godot 4.7**. Ainda em construção.
 1. Abra a pasta do projeto no Godot 4.7
 2. Rode a cena principal: `scenes/assembly/Assembly.tscn`
 
-Para marcar ímãs (abas Frente e Perfil), incluir um Freak novo ou **apagar um Freak por completo**: **Projeto → Ferramentas** (Project → Tools). Passo a passo em [docs/tecnico/incluir-personagem.md](docs/tecnico/incluir-personagem.md).
+Para marcar ímãs (abas Frente e Perfil), incluir, **editar** ou apagar um Freak: **Projeto → Ferramentas** (Project → Tools). Passo a passo em [docs/tecnico/incluir-personagem.md](docs/tecnico/incluir-personagem.md).
 
 ## Documentação
 

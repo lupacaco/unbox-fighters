@@ -24,4 +24,6 @@ Antes de cortar ou ligar qualquer coisa, leia `docs/tecnico/incluir-personagem.m
 4. Conferir `data/parts/{id}_*.tres` e `{id}_character.tres` (loja = head/body). A loja lê sozinha todo `*_character.tres`.
 5. Atualizar `pecas-e-personagens.md`, `estado-atual.md`, `estrutura-de-pastas.md`.
 
+Para **editar** nome, tipo, Poder, Ataque ou HP: **Project → Tools → Editar personagem**. Não recrie a ficha na mão.
+
 Para **apagar** um Freak por completo: **Project → Tools → Remover personagem**. Não apague os arquivos na mão.

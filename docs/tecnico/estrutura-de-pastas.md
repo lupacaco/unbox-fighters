@@ -46,6 +46,7 @@ As regras em `.cursor/rules/` ensinam o assistente a falar simples, atualizar do
 | Mudar HUD / fundo / tags | `scripts/ui/` |
 | Preparar imagens 200×200 | `tools/` |
 | Incluir um Freak novo | [Incluir personagem](incluir-personagem.md) |
+| Editar nome, tipo, Poder, Ataque ou HP | [Incluir personagem](incluir-personagem.md#8-editar-um-personagem) — **Projeto → Ferramentas → Editar personagem** |
 | Apagar um Freak por completo | [Incluir personagem](incluir-personagem.md#7-remover-um-personagem) — **Projeto → Ferramentas → Remover personagem** |
 | Documentação | `docs/` |
 

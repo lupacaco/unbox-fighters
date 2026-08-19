@@ -29,3 +29,13 @@ static func from_string(raw: String) -> Value:
 			return Value.ANIMAL
 		_:
 			return Value.HUMAN
+
+
+static func storage_key(value: Value) -> String:
+	match value:
+		Value.SUPERNATURAL:
+			return "supernatural"
+		Value.ANIMAL:
+			return "animal"
+		_:
+			return "human"

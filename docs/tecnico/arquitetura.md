@@ -45,7 +45,7 @@ Arte e recursos (assets/, data/)
 | `scripts/match/` | Regras (podem ser testadas sem abrir o jogo) |
 | `scripts/data/` | Definições de peças e composição visual |
 | `scripts/ui/` | HUD, tags, cores |
-| `scripts/core/` | Scripts de verificação, importar e apagar o elenco |
+| `scripts/core/` | Scripts de verificação, importar, editar e apagar o elenco |
 
 ## Padrões usados
 

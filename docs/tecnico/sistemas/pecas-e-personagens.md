@@ -11,7 +11,7 @@ Na **loja** existem **2 kits**:
 
 Na **carta** e na **esteira** o corpo mostra **três desenhos** (tronco, braço E e braço D), para cada braço poder se mexer. Na esteira, a cabeça leva a etiqueta de **Ataque** e o tronco a de **HP**.
 
-O **caixote** (`assets/nova-ui/caixote.png`) é a **base fixa** de todos os Freaks. Não é um kit da loja. Fica nas cartas (mesmo vazias) e na esteira. O tronco tem um ímã embaixo que encaixa no caixote; a frente do caixote tapa a parte de baixo do tronco, como se o Freak estivesse sentado dentro.
+O **caixote** (`assets/nova-ui/caixote.png`) é a **base fixa** de todos os Freaks. Não é um kit da loja. Fica nas cartas (mesmo vazias) e na esteira, **sempre do mesmo tamanho**. O tronco tem um ímã embaixo que encaixa no caixote; a frente do caixote tapa a parte de baixo do tronco, como se o Freak estivesse sentado dentro.
 
 - Cabeça cola no pescoço do tronco
 - Cada braço cola no ombro

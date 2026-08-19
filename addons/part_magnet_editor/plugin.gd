@@ -5,6 +5,7 @@ const MagnetInspectorPlugin := preload("res://addons/part_magnet_editor/magnet_i
 const MagnetWindowScene := preload("res://addons/part_magnet_editor/magnet_window.gd")
 const CharacterImporter := preload("res://addons/part_magnet_editor/character_importer.gd")
 const CharacterRemoveWindow := preload("res://addons/part_magnet_editor/character_remove_window.gd")
+const CharacterEditWindow := preload("res://addons/part_magnet_editor/character_edit_window.gd")
 
 ## The two numbers the shop and the fight read, in the order write_defs wants.
 const STAT_SPINS: Array[Dictionary] = [
@@ -25,6 +26,7 @@ var _pending_sheet := ""
 var _form_status: Label
 var _importing := false
 var _remove_window
+var _edit_window
 
 func _enter_tree() -> void:
 	_inspector_plugin = MagnetInspectorPlugin.new()
@@ -32,11 +34,13 @@ func _enter_tree() -> void:
 	add_inspector_plugin(_inspector_plugin)
 	add_tool_menu_item("Ímãs das Peças", _open_magnet_window)
 	add_tool_menu_item("Incluir personagem", _begin_import)
+	add_tool_menu_item("Editar personagem", _open_edit_window)
 	add_tool_menu_item("Remover personagem", _open_remove_window)
 
 func _exit_tree() -> void:
 	remove_tool_menu_item("Ímãs das Peças")
 	remove_tool_menu_item("Incluir personagem")
+	remove_tool_menu_item("Editar personagem")
 	remove_tool_menu_item("Remover personagem")
 	if _inspector_plugin != null:
 		remove_inspector_plugin(_inspector_plugin)
@@ -49,6 +53,8 @@ func _exit_tree() -> void:
 	_form = null
 	_free_node(_remove_window)
 	_remove_window = null
+	_free_node(_edit_window)
+	_edit_window = null
 
 func _ensure_window() -> void:
 	if _window == null or not is_instance_valid(_window):
@@ -79,6 +85,14 @@ func _open_remove_window() -> void:
 		_remove_window.roster_changed.connect(_on_roster_changed)
 		EditorInterface.get_base_control().add_child(_remove_window)
 	_remove_window.present()
+
+func _open_edit_window() -> void:
+	if _edit_window == null or not is_instance_valid(_edit_window):
+		_edit_window = CharacterEditWindow.new()
+		_edit_window.roster_changed.connect(_on_roster_changed)
+		_edit_window.open_magnets.connect(_open_magnet_window_for_set)
+		EditorInterface.get_base_control().add_child(_edit_window)
+	_edit_window.present()
 
 func _release_set(set_id: String) -> void:
 	if _window != null and is_instance_valid(_window):

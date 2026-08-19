@@ -157,6 +157,26 @@ Depois de apagar, atualize as tabelas dos docs se esse Freak estava listado.
 
 Não apague os arquivos na mão: é fácil esquecer uma ficha e a loja continuar vendendo um Freak pela metade.
 
+## 8. Editar um personagem
+
+Para mudar o **nome na carta**, o **tipo**, o **Poder**, o **Ataque** ou o **HP** de um Freak que já existe:
+
+1. Menu **Project → Tools → Editar personagem** (em português: **Projeto → Ferramentas**).
+2. Escolha o Freak na lista. A janela mostra a cara, os números e o preço na loja.
+3. Mude o que quiser e clique **Salvar**.
+4. Vale no **próximo Play**. Os ímãs e os desenhos ficam como estão.
+
+O **id interno** (o nome da pasta, ex.: `bruxa`) **não muda** por aqui. Para trocar a pasta, apague e inclua de novo. Para mexer nos ímãs, use o botão **Abrir ímãs deste Freak** na mesma janela.
+
+Pelo terminal:
+
+```
+godot --headless --path . --script scripts/core/edit_character.gd -- bruxa
+godot --headless --path . --script scripts/core/edit_character.gd -- bruxa --attack 9 --hp 16 --name Bruxa --kind supernatural --ability mind_control
+```
+
+Depois de mudar Ataque, HP, tipo ou Poder, atualize a tabela em [Peças e personagens](sistemas/pecas-e-personagens.md) se esses números estiverem escritos lá.
+
 ## Sets que já passaram por este fluxo
 
 | id | Nome | Tipo | Ataque | HP | Poder |
