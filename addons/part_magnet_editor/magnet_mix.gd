@@ -47,16 +47,16 @@ func _draw() -> void:
 		Color(0.30, 0.32, 0.38, 1), 1.0
 	)
 	var positions: Dictionary = plan.get("positions", {})
-	var has_body: Texture2D = textures.get(PartSlotType.Value.BODY)
-	if has_body == null:
-		_draw_crate(s, floor_point)
+	_draw_crate_back(s, floor_point)
 	for slot in PartSlotType.draw_order_for(parts):
 		_draw_part(
 			slot, parts.get(slot) as PartDef, textures.get(slot),
 			positions.get(slot, Vector2.ZERO), s, floor_point
 		)
 		if slot == PartSlotType.Value.BODY:
-			_draw_crate(s, floor_point)
+			_draw_crate_front(s, floor_point)
+	if textures.get(PartSlotType.Value.BODY) == null:
+		_draw_crate_front(s, floor_point)
 
 func _tex_for(part: PartDef) -> Texture2D:
 	if part == null:
@@ -86,10 +86,25 @@ func _draw_part(
 	else:
 		draw_texture_rect(tex, r, false)
 
-func _draw_crate(scale: float, origin: Vector2) -> void:
-	var tex := CompositeResolver.crate_texture()
+func _draw_crate_back(scale: float, origin: Vector2) -> void:
+	_draw_crate_layer(
+		CompositeResolver.crate_back_texture(),
+		CompositeResolver.crate_back_position(),
+		scale,
+		origin
+	)
+
+func _draw_crate_front(scale: float, origin: Vector2) -> void:
+	_draw_crate_layer(
+		CompositeResolver.crate_front_texture(),
+		CompositeResolver.crate_front_position(),
+		scale,
+		origin
+	)
+
+func _draw_crate_layer(tex: Texture2D, pos: Vector2, scale: float, origin: Vector2) -> void:
 	if tex == null:
 		return
-	var draw_size := CompositeResolver.crate_size() * scale
-	var r := Rect2(origin + CompositeResolver.crate_position() * scale - draw_size * 0.5, draw_size)
+	var draw_size := tex.get_size() * CompositeResolver.crate_scale() * scale
+	var r := Rect2(origin + pos * scale - draw_size * 0.5, draw_size)
 	draw_texture_rect(tex, r, false)

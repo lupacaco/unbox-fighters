@@ -26,7 +26,8 @@ var _frame: Sprite2D
 var _shadow: Sprite2D
 var _glow: Polygon2D
 var _display: Node2D
-var _crate: Sprite2D
+var _crate_back: Sprite2D
+var _crate_front: Sprite2D
 var _hint: Label
 var _fight_button: Button
 var _banner: Label
@@ -309,12 +310,12 @@ func _build_display() -> void:
 	_display.scale = _display_rest_scale()
 	_display.z_index = 1
 	add_child(_display)
-	_crate = Sprite2D.new()
-	_crate.name = "CrateBase"
-	_crate.centered = true
-	_crate.z_index = 1
-	_display.add_child(_crate)
-	CompositeResolver.apply_crate_to(_crate)
+	_crate_back = _make_crate_sprite("CrateBack")
+	_crate_front = _make_crate_sprite("CrateFront")
+	_display.add_child(_crate_back)
+	_display.add_child(_crate_front)
+	CompositeResolver.apply_crate_back_to(_crate_back)
+	CompositeResolver.apply_crate_front_to(_crate_front)
 	for slot in PartSlotType.draw_order():
 		var sprite := Sprite2D.new()
 		sprite.name = String(PartSlotType.to_string_name(slot))
@@ -467,16 +468,23 @@ func _apply_plan() -> void:
 	_restack_crate()
 
 func _restack_crate() -> void:
-	if _display == null or _crate == null:
+	if _display == null or _crate_back == null or _crate_front == null:
 		return
-	CompositeResolver.apply_crate_to(_crate)
+	CompositeResolver.apply_crate_back_to(_crate_back)
+	CompositeResolver.apply_crate_front_to(_crate_front)
 	var body: Sprite2D = _layer_sprites.get(PartSlotType.Value.BODY)
+	const BODY_Z := 0
+	_crate_back.z_index = CompositeResolver.crate_back_z(BODY_Z)
+	_crate_front.z_index = CompositeResolver.crate_front_z(BODY_Z)
+	var next := 0
+	_display.move_child(_crate_back, next)
+	next += 1
 	if body != null:
-		body.z_index = 0
-		_display.move_child(body, 0)
-	_crate.z_index = 1
-	_display.move_child(_crate, mini(1, _display.get_child_count() - 1))
-	var next := 2
+		body.z_index = BODY_Z
+		_display.move_child(body, next)
+		next += 1
+	_display.move_child(_crate_front, next)
+	next += 1
 	for slot in [PartSlotType.Value.ARM_L, PartSlotType.Value.ARM_R, PartSlotType.Value.HEAD]:
 		var sprite: Sprite2D = _layer_sprites.get(slot)
 		if sprite == null:
@@ -484,6 +492,12 @@ func _restack_crate() -> void:
 		sprite.z_index = 2 if PartSlotType.is_arm(slot) else 3
 		_display.move_child(sprite, mini(next, _display.get_child_count() - 1))
 		next += 1
+
+func _make_crate_sprite(node_name: String) -> Sprite2D:
+	var sprite := Sprite2D.new()
+	sprite.name = node_name
+	sprite.centered = true
+	return sprite
 
 func _refresh_pills() -> void:
 	var loadout := to_loadout()

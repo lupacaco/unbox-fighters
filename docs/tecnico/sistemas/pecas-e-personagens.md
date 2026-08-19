@@ -11,7 +11,7 @@ Na **loja** existem **2 kits**:
 
 Na **carta** e na **esteira** o corpo mostra **três desenhos** (tronco, braço E e braço D), para cada braço poder se mexer. Na esteira, a cabeça leva a etiqueta de **Ataque** e o tronco a de **HP**.
 
-O **caixote** (`assets/nova-ui/caixote.png`) é a **base fixa** de todos os Freaks. Não é um kit da loja. Fica nas cartas (mesmo vazias) e na esteira, **sempre do mesmo tamanho**. O tronco tem um ímã embaixo que encaixa no caixote; a frente do caixote tapa a parte de baixo do tronco, como se o Freak estivesse sentado dentro.
+O **caixote** é a **base fixa** de todos os Freaks, em **duas imagens**: `caixote-cima.png` (faixa de trás, Z menor que o Freak) e `caixote-baixo.png` (caixa da frente, Z maior que o tronco). Não é um kit da loja. Fica nas cartas (mesmo vazias) e na esteira, **sempre do mesmo tamanho**. O tronco tem um ímã embaixo que encaixa no caixote; a frente tapa a barriga, como se o Freak estivesse sentado dentro.
 
 - Cabeça cola no pescoço do tronco
 - Cada braço cola no ombro
@@ -102,7 +102,7 @@ Marque **frente e perfil**. A carta usa a frente; a esteira usa o perfil.
 1. A base do caixote senta no chão da carta ou nos rolos da esteira.
 2. O tronco encaixa no caixote pelo ímã de baixo.
 3. A cabeça cola no pescoço.
-4. Braços: esfera de cima cola nos ombros. Na **frente**, os braços abrem um pouco, girando nesse ímã (não soltam). Na carta, os braços ficam **na frente** do caixote. Na esteira, a cabeça fica **na frente** do tronco.
+4. Braços: esfera de cima cola nos ombros. Na **frente**, os braços abrem um pouco, girando nesse ímã (não soltam). Na carta, os braços ficam **na frente** da caixa. Na esteira, a cabeça fica **na frente** do tronco.
 
 ## Arte relacionada
 

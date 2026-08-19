@@ -5,13 +5,15 @@ extends RefCounted
 ## Builds a layered display plan. Parts snap together by magnet points
 ## (the metal spheres). PNG files stay 200×200. Every part uses the same scale.
 ##
-## The wooden crate is furniture, not a Freak kit. Its bottom sits on the floor
-## (card ledge or belt rollers). The torso's bottom magnet snaps into the crate.
+## The wooden crate is furniture, not a Freak kit. Two drawings stack: the thin
+## top rim sits behind the Freak, the box sits in front, so he looks inside.
+## The crate bottom sits on the floor. The torso's bottom magnet snaps in.
 
 const PART_WIDTH_PX := 200.0
 const PART_HEIGHT_PX := 200.0
 const PART_SIZE_PX := 200.0
-const CRATE_PATH := "res://assets/nova-ui/caixote.png"
+const CRATE_BACK_PATH := "res://assets/nova-ui/caixote-cima.png"
+const CRATE_FRONT_PATH := "res://assets/nova-ui/caixote-baixo.png"
 ## Wide enough to hold the torso, still inside the card well.
 const CRATE_WIDTH := 198.0
 ## How far the join sits below the crate's top edge, so the Freak looks inside.
@@ -31,46 +33,95 @@ const FRONT_ARM_SPREAD := 0.34
 const LOOSE_HEAD := Vector2(0, -48)
 const LOOSE_ARM_SPREAD := Vector2(52, -24)
 
-static var _crate_tex: Texture2D
+static var _crate_back_tex: Texture2D
+static var _crate_front_tex: Texture2D
 
 static func display_scale(_texture: Texture2D = null) -> float:
 	return PART_SIZE_PX / PART_WIDTH_PX
 
+## Thin top rim. Sits behind the Freak (lower z_index).
+static func crate_back_texture() -> Texture2D:
+	if _crate_back_tex == null:
+		_crate_back_tex = load(CRATE_BACK_PATH) as Texture2D
+	return _crate_back_tex
+
+## Box body. Sits in front of the torso (higher z_index).
+static func crate_front_texture() -> Texture2D:
+	if _crate_front_tex == null:
+		_crate_front_tex = load(CRATE_FRONT_PATH) as Texture2D
+	return _crate_front_tex
+
+## The main box drawing. Empty cards still need a crate to show.
 static func crate_texture() -> Texture2D:
-	if _crate_tex == null:
-		_crate_tex = load(CRATE_PATH) as Texture2D
-	return _crate_tex
+	return crate_front_texture()
 
 static func crate_scale() -> float:
-	var tex := crate_texture()
-	if tex == null:
-		return 1.0
-	return CRATE_WIDTH / maxf(float(tex.get_width()), 1.0)
+	var width := 1.0
+	var back := crate_back_texture()
+	var front := crate_front_texture()
+	if back != null:
+		width = maxf(width, float(back.get_width()))
+	if front != null:
+		width = maxf(width, float(front.get_width()))
+	return CRATE_WIDTH / width
 
 static func crate_size() -> Vector2:
-	var tex := crate_texture()
-	if tex == null:
-		return Vector2(CRATE_WIDTH, 154.0)
-	return tex.get_size() * crate_scale()
+	return Vector2(CRATE_WIDTH, _crate_stack_height())
 
-## Center of the crate so its bottom sits on the floor (y = 0).
+static func _layer_height(tex: Texture2D) -> float:
+	if tex == null:
+		return 0.0
+	return float(tex.get_height()) * crate_scale()
+
+static func _crate_stack_height() -> float:
+	var height := _layer_height(crate_front_texture()) + _layer_height(crate_back_texture())
+	return height if height > 0.0 else 154.0
+
+## Center of the stacked crate so its bottom sits on the floor (y = 0).
 static func crate_position() -> Vector2:
 	return Vector2(0.0, -crate_size().y * 0.5)
+
+## Front box, sitting on the floor.
+static func crate_front_position() -> Vector2:
+	var height := _layer_height(crate_front_texture())
+	if height <= 0.0:
+		return crate_position()
+	return Vector2(0.0, -height * 0.5)
+
+## Back rim, stacked on top of the front box.
+static func crate_back_position() -> Vector2:
+	var front_h := _layer_height(crate_front_texture())
+	var back_h := _layer_height(crate_back_texture())
+	if back_h <= 0.0:
+		return crate_position()
+	return Vector2(0.0, -(front_h + back_h * 0.5))
 
 ## Where the torso's bottom magnet snaps. A little inside the crate's top.
 static func crate_join() -> Vector2:
 	var top := crate_position().y - crate_size().y * 0.5
 	return Vector2(0.0, top + CRATE_JOIN_INSET * crate_scale())
 
-## Draws the shared crate. `extra_scale` is 1 on the card (the parent already scales).
-static func apply_crate_to(sprite: Sprite2D, extra_scale: float = 1.0) -> void:
+static func crate_back_z(body_z: int) -> int:
+	return body_z - 1
+
+static func crate_front_z(body_z: int) -> int:
+	return body_z + 1
+
+static func apply_crate_back_to(sprite: Sprite2D, extra_scale: float = 1.0) -> void:
+	_apply_crate_layer(sprite, crate_back_texture(), crate_back_position(), extra_scale)
+
+static func apply_crate_front_to(sprite: Sprite2D, extra_scale: float = 1.0) -> void:
+	_apply_crate_layer(sprite, crate_front_texture(), crate_front_position(), extra_scale)
+
+static func _apply_crate_layer(
+	sprite: Sprite2D, tex: Texture2D, pos: Vector2, extra_scale: float
+) -> void:
 	if sprite == null:
 		return
-	var tex := crate_texture()
 	sprite.texture = tex
 	sprite.visible = tex != null
 	sprite.centered = true
-	sprite.position = crate_position() * extra_scale
+	sprite.position = pos * extra_scale
 	sprite.scale = Vector2.ONE * crate_scale() * extra_scale
 
 static func resolve(character: CharacterDef, attached: Dictionary = {}) -> Dictionary:
@@ -138,8 +189,12 @@ static func resolve_slots(parts: Dictionary, textures: Dictionary = {}) -> Dicti
 		"part_size_px": PART_SIZE_PX,
 		"head_pos": positions[PartSlotType.Value.HEAD],
 		"body_pos": positions[PartSlotType.Value.BODY],
-		"crate_texture": crate_texture(),
+		"crate_texture": crate_front_texture(),
+		"crate_back_texture": crate_back_texture(),
+		"crate_front_texture": crate_front_texture(),
 		"crate_position": crate_position(),
+		"crate_back_position": crate_back_position(),
+		"crate_front_position": crate_front_position(),
 		"crate_scale": crate_scale(),
 	}
 

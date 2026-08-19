@@ -4,7 +4,7 @@ Este é o jeito certo de colocar um Freak novo no jogo. Siga **todos** os passos
 
 As regras da loja, sinergia e luta (o que o jogador vê) estão em [Mecânicas e regras](../jogo/mecanicas-e-regras.md).
 
-O jogador manda uma folha de desenho. O jogo precisa de **8 recortes** (4 de frente + 4 de perfil), **2 kits na loja** (cabeça e corpo; o corpo já traz os braços), e uma ficha do personagem. O **caixote é a base de todos** (`assets/nova-ui/caixote.png`), não vem no tronco. Não tem pernas. A loja **acha sozinha** qualquer ficha nova em `data/parts/`.
+O jogador manda uma folha de desenho. O jogo precisa de **8 recortes** (4 de frente + 4 de perfil), **2 kits na loja** (cabeça e corpo; o corpo já traz os braços), e uma ficha do personagem. O **caixote é a base de todos** (`caixote-cima.png` atrás e `caixote-baixo.png` na frente), não vem no tronco. Não tem pernas. A loja **acha sozinha** qualquer ficha nova em `data/parts/`.
 
 ## O que a folha precisa ter
 

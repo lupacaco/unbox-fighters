@@ -28,8 +28,17 @@ func _run() -> void:
 	quit(0)
 
 func _check_crate() -> bool:
-	if CompositeResolver.crate_texture() == null:
-		push_error("VERIFY_FAIL missing the shared crate drawing")
+	if CompositeResolver.crate_back_texture() == null or CompositeResolver.crate_front_texture() == null:
+		push_error("VERIFY_FAIL missing the two crate drawings")
+		return false
+	if CompositeResolver.crate_back_z(0) >= 0:
+		push_error("VERIFY_FAIL the crate top rim should sit behind the Freak")
+		return false
+	if CompositeResolver.crate_front_z(0) <= 0:
+		push_error("VERIFY_FAIL the crate front should sit in front of the torso")
+		return false
+	if CompositeResolver.crate_back_position().y >= CompositeResolver.crate_front_position().y:
+		push_error("VERIFY_FAIL the top rim should sit above the front of the crate")
 		return false
 	var size := CompositeResolver.crate_size()
 	if size.x < 180.0 or size.y < 80.0:
@@ -50,8 +59,8 @@ func _check_anchor(bruxa: CharacterDef) -> bool:
 		if empty["textures"].get(slot) != null:
 			push_error("VERIFY_FAIL an empty card draws no Freak pieces")
 			return false
-	if empty.get("crate_texture") == null:
-		push_error("VERIFY_FAIL an empty card still shows the crate")
+	if empty.get("crate_back_texture") == null or empty.get("crate_front_texture") == null:
+		push_error("VERIFY_FAIL an empty card still shows both crate pieces")
 		return false
 
 	var scale := CompositeResolver.display_scale()

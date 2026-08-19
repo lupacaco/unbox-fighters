@@ -36,9 +36,10 @@ func _check_furniture(scene: Node) -> bool:
 	if cards == null or cards.get_child_count() != MatchRules.CARD_COUNT:
 		push_error("VERIFY_FAIL expected %d cards" % MatchRules.CARD_COUNT)
 		return false
-	var crate := cards.get_child(0).get_node_or_null("Display/CrateBase") as Sprite2D
-	if crate == null or crate.texture == null:
-		push_error("VERIFY_FAIL every card should show the shared crate")
+	var crate_back := cards.get_child(0).get_node_or_null("Display/CrateBack") as Sprite2D
+	var crate_front := cards.get_child(0).get_node_or_null("Display/CrateFront") as Sprite2D
+	if crate_back == null or crate_back.texture == null or crate_front == null or crate_front.texture == null:
+		push_error("VERIFY_FAIL every card should show both crate pieces")
 		return false
 	var opponent_cards := scene.get_node_or_null("OpponentCards")
 	if opponent_cards == null or opponent_cards.get_child_count() != MatchRules.CARD_COUNT:
@@ -139,13 +140,28 @@ func _check_crate_stays_same_size(scene: Node) -> bool:
 	if occupied_display == null or not occupied_display.scale.is_equal_approx(rest):
 		push_error("VERIFY_FAIL dropping a kit should not grow the crate")
 		return false
-	var empty_crate := empty.get_node_or_null("Display/CrateBase") as Sprite2D
-	var occupied_crate := occupied.get_node_or_null("Display/CrateBase") as Sprite2D
-	if empty_crate == null or occupied_crate == null:
-		push_error("VERIFY_FAIL both cards should show the shared crate")
+	var empty_back := empty.get_node_or_null("Display/CrateBack") as Sprite2D
+	var empty_front := empty.get_node_or_null("Display/CrateFront") as Sprite2D
+	var occupied_back := occupied.get_node_or_null("Display/CrateBack") as Sprite2D
+	var occupied_front := occupied.get_node_or_null("Display/CrateFront") as Sprite2D
+	if empty_back == null or empty_front == null or occupied_back == null or occupied_front == null:
+		push_error("VERIFY_FAIL both cards should show both crate pieces")
 		return false
-	if not empty_crate.global_scale.is_equal_approx(occupied_crate.global_scale):
-		push_error("VERIFY_FAIL the crate must be the same size empty or filled")
+	if not empty_back.global_scale.is_equal_approx(occupied_back.global_scale):
+		push_error("VERIFY_FAIL the crate back must be the same size empty or filled")
+		return false
+	if not empty_front.global_scale.is_equal_approx(occupied_front.global_scale):
+		push_error("VERIFY_FAIL the crate front must be the same size empty or filled")
+		return false
+	var body := occupied.get_node_or_null("Display/body") as Sprite2D
+	if body == null or not body.visible:
+		push_error("VERIFY_FAIL the filled card should show the torso")
+		return false
+	if occupied_back.z_index >= body.z_index:
+		push_error("VERIFY_FAIL the crate top rim should sit behind the Freak")
+		return false
+	if occupied_front.z_index <= body.z_index:
+		push_error("VERIFY_FAIL the crate front should sit in front of the torso")
 		return false
 	return true
 
