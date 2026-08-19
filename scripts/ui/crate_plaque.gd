@@ -156,10 +156,10 @@ func _layout() -> void:
 	_board.position = box.position
 	_board.size = box.size
 	var inner := Rect2(Vector2.ZERO, box.size).grow(-PANEL_PAD)
-	var title_h := inner.size.y * 0.40
+	var title_h := inner.size.y * 0.28
 	_title.position = inner.position
 	_title.size = Vector2(inner.size.x, title_h)
-	GameTheme.apply_display(_title, maxi(14, int(title_h * 0.70)), ThemeTokens.STAT_FLAT, 3)
+	GameTheme.apply_display(_title, maxi(16, int(title_h * 0.78)), ThemeTokens.STAT_FLAT, 4)
 	var stats := Rect2(inner.position + Vector2(0.0, title_h), Vector2(inner.size.x, inner.size.y - title_h))
 	var col_w := stats.size.x * 0.5
 	_place_row(_attack_row, _attack, _attack_icon, Rect2(stats.position, Vector2(col_w, stats.size.y)))
@@ -173,11 +173,11 @@ func _place_row(row: Control, label: Label, icon: TextureRect, col: Rect2) -> vo
 	row.position = col.position
 	row.size = col.size
 	row.pivot_offset = col.size * 0.5
-	var icon_side := minf(col.size.y - 2.0, col.size.x * 0.34)
+	var icon_side := minf(col.size.y - 2.0, col.size.x * 0.48)
 	icon.size = Vector2(icon_side, icon_side)
 	icon.position = Vector2(col.size.x - icon_side, (col.size.y - icon_side) * 0.5)
-	var font_px := maxi(14, int(col.size.y * 0.62))
+	var font_px := maxi(18, int(col.size.y * 0.88))
 	var color := label.get_theme_color("font_color")
-	GameTheme.apply_display(label, font_px, color, 3)
+	GameTheme.apply_display(label, font_px, color, 4)
 	label.size = Vector2(maxf(8.0, icon.position.x - 2.0), col.size.y)
 	label.position = Vector2.ZERO

@@ -42,7 +42,7 @@ func _build() -> void:
 	if _disc != null:
 		return
 	var edge := Polygon2D.new()
-	edge.polygon = _circle(AssemblyLayout.MONEY_RADIUS + 5.0)
+	edge.polygon = _circle(AssemblyLayout.MONEY_RADIUS + AssemblyLayout.MONEY_EDGE)
 	edge.color = FILL_EDGE
 	add_child(edge)
 	_disc = Polygon2D.new()
@@ -51,11 +51,11 @@ func _build() -> void:
 	add_child(_disc)
 	var shine := Polygon2D.new()
 	shine.polygon = _circle(AssemblyLayout.MONEY_RADIUS * 0.28)
-	shine.position = Vector2(-18.0, -16.0)
+	shine.position = Vector2(-16.0, -14.0)
 	shine.color = Color(1, 1, 1, 0.32)
 	add_child(shine)
-	var label_size := Vector2(120, 64)
-	_label = GameTheme.make_label("$0", 42, Vector2.ZERO, label_size, ThemeTokens.INK)
+	var label_size := Vector2(100, 56)
+	_label = GameTheme.make_label("$0", 36, Vector2.ZERO, label_size, ThemeTokens.INK)
 	_label.position = -label_size * 0.5
 	_label.pivot_offset = label_size * 0.5
 	add_child(_label)

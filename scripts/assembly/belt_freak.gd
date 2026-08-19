@@ -4,7 +4,7 @@ extends Node2D
 ## A finished Freak riding its conveyor. It has no legs, so it rows itself
 ## along with both hands. At the tip it brakes and turns to face the enemy.
 
-const HEAD_ARC := 210.0
+const HEAD_ARC := 118.0
 const JUMP_PEAK := 280.0
 const JUMP_TIME := 0.52
 ## One paddle: half-moon back for impulse, then the crate slides as arms return.
@@ -262,17 +262,24 @@ func head_global_position() -> Vector2:
 	var head: Sprite2D = _sprites.get(PartSlotType.Value.HEAD)
 	return head.global_position if head != null else global_position
 
-## Wind up, throw the head at the target, land the hit, bring it back.
+## Lean back, whip forward, throw the head crown-first, land the hit, snap it home.
 func attack(target: Callable, on_impact: Callable) -> void:
 	var head: Sprite2D = _sprites.get(PartSlotType.Value.HEAD)
 	if head == null or head.texture == null:
 		if on_impact.is_valid():
 			on_impact.call()
 		return
-	var crouch := create_tween()
-	crouch.tween_property(_body, "scale", Vector2(1.1, 0.88), 0.1).set_trans(Tween.TRANS_SINE)
-	crouch.tween_property(_body, "scale", Vector2.ONE, 0.08)
-	await crouch.finished
+	var back := -0.42 if player_side else 0.42
+	var forward := 0.30 if player_side else -0.30
+	var wind := create_tween()
+	wind.tween_property(_body, "rotation", back, 0.16).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	wind.parallel().tween_property(_body, "scale", Vector2(0.94, 1.08), 0.16)
+	await wind.finished
+	await get_tree().create_timer(0.07).timeout
+	var whip := create_tween()
+	whip.tween_property(_body, "rotation", forward, 0.11).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	whip.parallel().tween_property(_body, "scale", Vector2(1.14, 0.84), 0.11)
+	await whip.finished
 
 	var bullet := FlyingHead.new()
 	get_parent().add_child(bullet)
@@ -282,17 +289,20 @@ func attack(target: Callable, on_impact: Callable) -> void:
 	head.visible = false
 
 	var arc := HEAD_ARC if player_side else -HEAD_ARC
-	await bullet.strike(target, 0.26, arc)
+	var crown := PI * 0.5 if player_side else -PI * 0.5
+	await bullet.strike(target, 0.22, arc, crown)
 	bullet.land_hit()
 	if on_impact.is_valid():
 		on_impact.call()
-	await get_tree().create_timer(0.09).timeout
-	await bullet.fly_home(func() -> Vector2: return head.global_position, 0.3, arc)
+	await get_tree().create_timer(0.08).timeout
+	await bullet.fly_home(func() -> Vector2: return head.global_position, 0.26, arc)
 	if is_instance_valid(bullet):
 		bullet.queue_free()
 	if is_instance_valid(self):
 		head.visible = true
-		Feel.punch(_body, Vector2(0.92, 1.1), Vector2.ONE)
+		var recover := create_tween()
+		recover.tween_property(_body, "rotation", 0.0, 0.18).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		recover.parallel().tween_property(_body, "scale", Vector2.ONE, 0.18)
 
 func flash_hit(damage: int) -> void:
 	if _dead:

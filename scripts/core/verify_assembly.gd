@@ -77,7 +77,13 @@ func _check_furniture(scene: Node) -> bool:
 	var player_hp := scene.get_node_or_null("PlayerHpBar")
 	var opponent_hp := scene.get_node_or_null("OpponentHpBar")
 	if player_hp == null or opponent_hp == null:
-		push_error("VERIFY_FAIL each belt should have a life bar above it")
+		push_error("VERIFY_FAIL each side should have a life bar on the far edge")
+		return false
+	if player_hp.position.x > 100.0:
+		push_error("VERIFY_FAIL your life bar should stand on the left edge")
+		return false
+	if opponent_hp.position.x < AssemblyLayout.WIDTH - 100.0:
+		push_error("VERIFY_FAIL their life bar should stand on the right edge")
 		return false
 	if int(player_hp.shown_hp()) != MatchRules.PLAYER_HP or int(opponent_hp.shown_hp()) != MatchRules.PLAYER_HP:
 		push_error("VERIFY_FAIL both life bars start full")
@@ -87,6 +93,22 @@ func _check_furniture(scene: Node) -> bool:
 		push_error("VERIFY_FAIL your life bar should show liquid while you still have life")
 		return false
 	player_hp.set_hp(MatchRules.PLAYER_HP, false)
+	if absf((AssemblyLayout.MONEY_RADIUS + AssemblyLayout.MONEY_EDGE) * 2.0 - AssemblyLayout.HUD_DISC) > 0.5:
+		push_error("VERIFY_FAIL the gold coin should be the same size as the round buttons")
+		return false
+	if not AssemblyLayout.ICON_BUTTON_SIZE.is_equal_approx(Vector2(AssemblyLayout.HUD_DISC, AssemblyLayout.HUD_DISC)):
+		push_error("VERIFY_FAIL refresh and sell should use the gold-coin size")
+		return false
+	var first_card := cards.get_child(0) as CharacterSlot
+	var hung := first_card.scale
+	first_card.set_drop_highlight(true)
+	if not first_card.scale.is_equal_approx(hung):
+		push_error("VERIFY_FAIL hanging cards should not grow when a kit hovers them")
+		return false
+	first_card.set_drop_highlight(false)
+	if not first_card.scale.is_equal_approx(Vector2.ONE * AssemblyLayout.CARD_FIT):
+		push_error("VERIFY_FAIL hanging cards should stay at their hung size")
+		return false
 	if scene.get_node_or_null("PrepClock") == null:
 		push_error("VERIFY_FAIL the preparation clock should sit between the belts")
 		return false

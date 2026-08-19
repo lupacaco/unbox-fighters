@@ -32,7 +32,7 @@ Arte e recursos (assets/, data/)
 | `FreakStats` / `Synergy` | Ataque, HP já com o bônus de tipo; Poder se o set fechou |
 | `ShopPool` / `BotBrain` | Sorteio da loja e o oponente comprando no mesmo relógio |
 | `BeltFreak` / `FlyingHead` | Desenho do Freak na esteira e a cabeça que voa |
-| `MoneyBar` / `ActionBar` / `SideHpBar` / `PrepClock` | Dinheiro, botões, vida acima da esteira, relógio 60s |
+| `MoneyBar` / `ActionBar` / `SideHpBar` / `PrepClock` | Dinheiro e botões do mesmo tamanho, vida nos cantos, relógio 60s |
 | `DragDropService` | Arraste de peça, soltar na carta (e pagar), vender |
 | `PartView` / `CharacterSlot` / `ShopShelf` | Peça, carta, prateleira |
 | `CompositeResolver` / `PartKit` | Cola cabeça e braços no tronco; o tronco encaixa no caixote (faixa atrás, caixa na frente) |

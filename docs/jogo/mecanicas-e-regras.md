@@ -6,7 +6,7 @@ O que o jogador pode fazer hoje, e as regras que o jogo aplica.
 
 A partida vai em **rodadas**, cada uma com duas telas: **preparação** e **luta**.
 
-1. Cada um começa com **$10** e **50 de vida**. As barras de vida ficam **acima das esteiras** (azul a sua, vermelha a dele).
+1. Cada um começa com **$10** e **50 de vida**. As barras de vida ficam **em pé nos cantos** (azul a sua à esquerda, vermelha a dele à direita).
 2. **Preparação: 60 segundos** para os dois ao mesmo tempo. Você pode apertar **LUTAR AGORA** e pular a espera — o oponente também para de comprar.
 3. Você compra kits, monta nas cartas. Set completo mostra **PRONTO**.
 4. Na luta a loja some e aparecem as 3 cartas do oponente. Os Freaks prontos pulam para a esteira, da esquerda para a direita, e remam até a ponta.

@@ -15,7 +15,7 @@
 | Visual | Fundo, cartas, prateleira e esteiras da arte nova (`assets/nova-ui`) |
 | Arrastar e soltar | Da prateleira para as cartas azuis (pagar no soltar); clicar seleciona para vender; arrastar na lixeira também vende |
 | Composição | Caixote um pouco maior, em duas partes; nome, Ataque e HP só no retângulo preto; na esteira o braço fica para a frente e por cima dos números |
-| Interface | Dinheiro em círculo $N; botões redondos de atualizar e vender; barras de vida acima das esteiras; relógio 60s; LUTAR AGORA |
+| Interface | Dinheiro em círculo $N do mesmo tamanho que atualizar e vender; barras de vida verticais nos cantos; relógio 60s; LUTAR AGORA |
 | Incluir Freak | Folha 4+4 vira 8 PNG 200×200 + 2 kits na loja; ímãs em Frente e Perfil |
 | Editar Freak | **Projeto → Ferramentas → Editar personagem**: nome, tipo, Poder, Ataque e HP |
 | Remover Freak | **Projeto → Ferramentas → Remover personagem**: escolhe na lista e apaga desenhos, pasta e fichas |

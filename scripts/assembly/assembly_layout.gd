@@ -6,7 +6,7 @@ extends Object
 ##
 ## Preparation: three hanging cards on the left, a 2×2 shop on the right.
 ## Fight: the shop hides and three opponent cards take that space.
-## Life bars sit above each belt. The prep clock sits in the gap between them.
+## Life bars stand on the far left and right. The prep clock sits in the gap.
 
 const WIDTH := 1920.0
 const HEIGHT := 1080.0
@@ -46,10 +46,10 @@ const CARD_CENTER_Y := CARD_SIZE.y * 0.5 * CARD_FIT
 const CARD_X: Array[float] = [135.0, 388.0, 641.0]
 const CARD_OPPONENT_X: Array[float] = [1279.0, 1532.0, 1785.0]
 ## Local Y of the little wooden ledge inside the card, where the crate rests.
-const CARD_FLOOR_Y := 200.0
+const CARD_FLOOR_Y := 240.0
 const CARD_FREAK_SCALE := 0.80
 ## Inner well of the frame, in card-local coordinates.
-const CARD_WELL := Rect2(-124, -246, 248, 458)
+const CARD_WELL := Rect2(-124, -246, 248, 498)
 const READY_LABEL_SIZE := Vector2(214, 48)
 const READY_LABEL_DROP := 348.0
 
@@ -59,24 +59,33 @@ const SHELF_FIT := 0.62
 const SHELF_ORIGIN := Vector2(1080.0, 250.0)
 const SHELF_STEP := Vector2(310.0, 210.0)
 ## From the shelf center up to the wooden surface a kit sits on.
-const SHELF_SURFACE_FROM_CENTER := 36.0
+const SHELF_SURFACE_FROM_CENTER := 54.0
 const SHOP_PART_SCALE := 0.72
 const PRICE_TAG_DROP := 78.0
 ## Kept for the unused crate drawing, so that script still compiles.
 const SHOP_CRATE_HEIGHT := 280.0
 
 # ---------------------------------------------------------------- buttons and money, right of the 2×2 shop
-const ICON_BUTTON_SIZE := Vector2(110, 110)
+## Outer size of the gold coin and the two round buttons. They must match.
+const HUD_DISC := 110.0
+const ICON_BUTTON_SIZE := Vector2(HUD_DISC, HUD_DISC)
 const MONEY_CENTER := Vector2(1720.0, 168.0)
-const MONEY_RADIUS := 56.0
-const REFRESH_BUTTON := Vector2(1720.0, 360.0)
+const MONEY_EDGE := 5.0
+const MONEY_RADIUS := HUD_DISC * 0.5 - MONEY_EDGE
+const REFRESH_BUTTON := Vector2(1720.0, 344.0)
 const SELL_BUTTON := Vector2(1720.0, 520.0)
 
-# ---------------------------------------------------------------- life bars (one above each belt)
+# ---------------------------------------------------------------- life bars (vertical tubes on the far sides)
 const HP_SIZE := Vector2(819, 149)
 const HP_SCALE := 0.42
 ## Inner glass of barra-hp-vazia.png, in frame-local pixels (sprite is centered).
 const HP_GLASS := Rect2(-348.0, -33.0, 696.0, 66.0)
+## Distance from the left/right edge of the screen to the tube center.
+const HP_GUTTER := 52.0
+## Height of the tube center, between the hanging cards and the belts.
+const HP_STAGE_Y := 640.0
+## Turns the horizontal art into a thermometer. Fill still grows along local X.
+const HP_TUBE_ROTATION := -PI / 2.0
 
 # ---------------------------------------------------------------- clock between the belts
 const TIMER_CENTER := Vector2(CENTER_X, 992.0)
@@ -159,8 +168,8 @@ static func shelf_surface(index: int = 0) -> Vector2:
 	return Vector2(center.x, center.y - SHELF_SURFACE_FROM_CENTER * SHELF_FIT)
 
 static func hp_bar_center(player_side: bool) -> Vector2:
-	var belt := belt_center(player_side)
-	return Vector2(belt.x, belt_top() - 38.0)
+	var x := HP_GUTTER if player_side else WIDTH - HP_GUTTER
+	return Vector2(x, HP_STAGE_Y)
 
 static func top_left(center: Vector2, size: Vector2) -> Vector2:
 	return center - size * 0.5

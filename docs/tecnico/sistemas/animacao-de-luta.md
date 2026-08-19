@@ -9,7 +9,7 @@ Só a **cabeça** ataca. O Freak não tem pernas: ele **rema** com as duas mãos
 1. Quando a **luta** começa, cada Freak **PRONTO** **salta da carta** em arco até o começo da esteira, um por um (azul à esquerda, vermelha à direita). A carta continua com as peças.
 2. **Rema** até a ponta em **5 remadas**. Na esteira o braço fica **esticado para a frente**. Cada remada: meia-lua para trás (frente → baixo → trás) para pegar impulso; **aí** o caixote desliza (som de madeira e fumacinha) enquanto os braços voltam (trás → baixo → frente). Depois espera **1 segundo** com o braço de novo para a frente. Os braços ficam **na frente** dos números do caixote.
 3. Na ponta: **freia** (esmaga um pouco), ainda em cima da esteira. Se já tem alguém na ponta, os dois esperam o intervalo do duelo. O de trás fica com um vão entre os caixotes.
-4. **Golpe:** agacha, a cabeça sai, voa em arco com rastro, trava um instante no impacto, o atingido pisca, recua e mostra o número do dano, a cabeça volta como bumerangue.
+4. **Golpe:** o Freak inclina o corpo para trás, segura um instante, depois chicoteia para a frente e a cabeça sai. Ela voa em um arco baixo **sem pirueta** — só gira o bastante para o **topo da cabeça** bater no inimigo. Trava no impacto, o atingido pisca, recua e mostra o dano; a cabeça volta ao pescoço e o corpo endireita.
 5. Os golpes são **um de cada vez**. Se o primeiro não derrubou ninguém, o outro responde. O golpe que mata é sempre do vencedor. Se os dois cairiam, os dois atacam.
 6. Quem zera **perde a cor** e nocauteia na esteira. No fim da luta, **todos saltam de volta** para as cartas.
 
@@ -52,4 +52,4 @@ Em `assets/characters/<nome>/`:
 - Frente: `<nome>_head-1.png`, `_body-1`, `_arm_l-1`, `_arm_r-1`
 - Perfil: os mesmos com `-2` (usado na esteira)
 
-Não precisa de pose de golpe (`-3`). O ataque é a cabeça saindo do corpo e voando até a cabeça do adversário.
+Não precisa de pose de golpe (`-3`). O ataque é o corpo inclinando e a cabeça saindo, batendo de topo no adversário.

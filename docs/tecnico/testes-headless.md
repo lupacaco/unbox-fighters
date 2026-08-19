@@ -24,7 +24,7 @@ powershell -File tools/run_checks.ps1
 | `verify_character_importer.gd` | Acentos viram id simples; folha da Bruxa vira 4+4; `_slice.json` tem ímãs |
 | `verify_character_remover.gd` | Lista o elenco; apaga um Freak temporário por completo; não mexe na Bruxa |
 | `verify_character_editor.gd` | Muda a ficha da Bruxa e devolve os arquivos; os ímãs ficam no mesmo lugar |
-| `verify_assembly.gd` | 3 cartas no topo, caixote do mesmo tamanho vazio ou com peça, 4 prateleiras com kit visível, barras de vida, relógio, 2 esteiras, fundo, fontes, câmera parada |
+| `verify_assembly.gd` | 3 cartas no topo que não crescem no hover, caixote do mesmo tamanho, 4 prateleiras, círculos iguais, barras de vida nos cantos, relógio, 2 esteiras |
 | `verify_crate_open.gd` | A prateleira já mostra o kit com o preço, sem caixa para quebrar |
 | `verify_composite.gd` | Caixote em duas partes no chão; tronco encaixa nele; cabeça no pescoço; corpo da loja traz os dois braços |
 | `verify_part_magnets.gd` | Cabeça só embaixo; tronco com 4 ímãs; virar X; Z da carta e da luta |

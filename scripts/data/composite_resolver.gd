@@ -17,7 +17,7 @@ const CRATE_FRONT_PATH := "res://assets/nova-ui/caixote-baixo.png"
 ## Wide enough to hold the torso, still inside the card well.
 const CRATE_WIDTH := 226.0
 ## How far the join sits below the crate's top edge, so the Freak looks inside.
-const CRATE_JOIN_INSET := 22.0
+const CRATE_JOIN_INSET := 34.0
 ## Inner chalkboard of caixote-baixo.png (330×175), in texture pixels.
 ## Kept inside the black panel, clear of the wooden frame and rivets.
 const CRATE_PANEL_TEX := Rect2(38, 34, 254, 109)

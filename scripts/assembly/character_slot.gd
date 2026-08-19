@@ -212,7 +212,6 @@ func set_drop_highlight(enabled: bool, _slot: PartSlotType.Value = PartSlotType.
 	if _drop_hot == enabled:
 		return
 	_drop_hot = enabled
-	Feel.to_scale(self, Vector2.ONE * (1.045 if enabled else 1.0), 0.12)
 	var tween := create_tween()
 	tween.tween_property(
 		_frame, "modulate", Color(1.22, 1.14, 0.92, 1) if enabled else Color.WHITE, 0.12

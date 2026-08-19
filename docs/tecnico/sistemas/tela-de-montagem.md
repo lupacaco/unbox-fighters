@@ -14,7 +14,7 @@ A cena principal do jogo hoje: a mesma sala troca de **preparação** para **lut
 ## O que o controlador faz ao iniciar
 
 1. Desenha o fundo, as duas esteiras, as 3 cartas suas, as 3 cartas do oponente (escondidas) e 4 prateleiras
-2. Sobe o dinheiro em círculo, os botões redondos, as barras de vida acima das esteiras e o relógio de 60s
+2. Sobe o dinheiro em círculo, os botões redondos (mesmo tamanho), as barras de vida nos cantos e o relógio de 60s
 3. Liga o arraste (só nas cartas azuis, só na preparação)
 4. Começa a `LiveMatch` e sorteia **4 peças**
 5. O bot compra e monta no mesmo relógio
@@ -25,7 +25,7 @@ A cena principal do jogo hoje: a mesma sala troca de **preparação** para **lut
 - **3 cartas vermelhas** à direita (`carta-oponente.png`) — só na luta, no lugar da loja
 - **4 prateleiras** em grade 2×2 à direita na preparação (`prateleira-loja.png`); atualizar, lixeira e dinheiro à direita delas
 - **Esteira azul** embaixo à esquerda, **vermelha** à direita, vão no meio; os Freaks param em cima dos rolos; até três na mesma esteira com espaço entre os caixotes
-- **Barras de vida** acima de cada esteira (`barra-hp-vazia.png` + líquidos). Escreve **JOGADOR** / **OPONENTE** e o número
+- **Barras de vida** em pé nos cantos (`barra-hp-vazia.png` + líquidos). Escreve **JOGADOR** / **OPONENTE** e o número ao lado, em pé
 - **Relógio 60s** no vão entre as esteiras; botão **LUTAR AGORA** acima
 
 ## Loja

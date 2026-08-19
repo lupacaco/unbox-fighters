@@ -10,7 +10,7 @@ Interface da partida. As posições da tela estão em `AssemblyLayout` (1920×10
 | `scripts/ui/game_theme.gd` | Fontes, placas e o visual dos botões |
 | `scripts/ui/money_bar.gd` | Círculo de ouro com `$N` |
 | `scripts/ui/action_bar.gd` | Botão redondo de atualizar ($2) e lixeira de vender ($1) |
-| `scripts/ui/side_hp_bar.gd` | Vida acima de cada esteira: JOGADOR / OPONENTE e o número |
+| `scripts/ui/side_hp_bar.gd` | Vida na vertical nos cantos: JOGADOR / OPONENTE e o número |
 | `scripts/ui/prep_clock.gd` | Relógio de 60s e o botão LUTAR AGORA |
 | `scripts/ui/shop_shelf.gd` | Uma prateleira: kit já visível com preço |
 | `scripts/ui/crate_plaque.gd` | Nome e números no painel do caixote (ícone de ataque + HP) |
@@ -50,15 +50,15 @@ Pasta `assets/fonts/`:
 - `BebasNeue-Regular.ttf` — títulos e botões
 - `Oswald-Variable.ttf` — nomes e frases
 
-Os botões da loja são os círculos da arte. Ao passar o mouse eles crescem um pouco; ao clicar, esmagam. O dinheiro é um **círculo** dourado com `$N` à direita da loja.
+Os botões da loja são os círculos da arte, **do mesmo tamanho** que o círculo de ouro do dinheiro. Ao passar o mouse eles crescem um pouco; ao clicar, esmagam. O dinheiro é um **círculo** dourado com `$N` à direita da loja.
 
-As barras de vida ficam **acima de cada esteira**. Cheias em 50, vazias em 0. Azul a sua, vermelha a dele.
+As barras de vida ficam **em pé nos cantos** da tela (esquerda a sua, direita a dele). Cheias em 50, vazias em 0. O líquido desce de cima para baixo quando perde vida. Azul a sua, vermelha a dele.
 
 Na preparação a loja ocupa a direita (4 prateleiras). Na luta ela some e as 3 cartas do oponente ocupam aquele espaço.
 
 As peças dos Freaks são arquivos **200×200**. No jogo todas ficam no mesmo tamanho. Na carta o Freak inteiro aparece um pouco menor (80%); na esteira, 85%.
 
-Ao passar o mouse, clicar ou arrastar, as coisas **crescem, esmagam e brilham** (ouro), sem caixas vermelhas de debug. Regra: `.cursor/rules/feedback-gostoso.mdc`.
+Ao passar o mouse, clicar ou arrastar, as coisas **crescem, esmagam e brilham** (ouro), sem caixas vermelhas de debug. As **cartas penduradas não mudam de tamanho** — só acendem ouro. Regra: `.cursor/rules/feedback-gostoso.mdc`.
 
 ## Arte das caixas
 
