@@ -1,13 +1,10 @@
 extends SceneTree
 
 ## The conveyor: a Freak paddles from the far end to the fighting tip in five
-## strokes, only two fit at a time, and the one behind waits with space
+## strokes, three fit at a time, and the ones behind wait with space
 ## between the crates.
 
 const TRAVEL := 700.0
-
-## Counted from the signal. A lambda copies locals, so this has to live outside.
-var _chips: int = 0
 
 func _init() -> void:
 	call_deferred("_run")
@@ -35,8 +32,8 @@ func _run() -> void:
 	quit(0)
 
 func _check_intervals() -> bool:
-	if not is_equal_approx(MatchRules.stroke_interval(), 2.0):
-		push_error("VERIFY_FAIL every Freak should wait 2s between strokes")
+	if not is_equal_approx(MatchRules.stroke_interval(), 1.0):
+		push_error("VERIFY_FAIL every Freak should wait 1s between strokes")
 		return false
 	if not is_equal_approx(MatchRules.stroke_step(), 0.2):
 		push_error("VERIFY_FAIL five strokes should each cover a fifth of the belt")
@@ -112,8 +109,9 @@ func _check_queue() -> bool:
 	lane.queue_gap_px = AssemblyLayout.belt_queue_gap_px()
 	var first := lane.add(_loadout(&"bruxa"))
 	var second := lane.add(_loadout(&"advogado"))
-	if first == null or second == null:
-		push_error("VERIFY_FAIL two Freaks should fit")
+	var third := lane.add(_loadout(&"bruxa"))
+	if first == null or second == null or third == null:
+		push_error("VERIFY_FAIL three Freaks should fit")
 		return false
 	if lane.can_accept():
 		push_error("VERIFY_FAIL only %d fit on a belt" % MatchRules.BELT_CAPACITY)
@@ -122,8 +120,8 @@ func _check_queue() -> bool:
 	if not first.at_tip():
 		push_error("VERIFY_FAIL the leader should reach the tip")
 		return false
-	if second.at_tip():
-		push_error("VERIFY_FAIL the second one has to wait behind")
+	if second.at_tip() or third.at_tip():
+		push_error("VERIFY_FAIL the ones behind have to wait")
 		return false
 	var expected := 1.0 - lane.follow_gap()
 	if not is_equal_approx(second.progress, expected):
@@ -144,44 +142,43 @@ func _check_live_match() -> bool:
 	live.player.lane.travel_px = TRAVEL
 	live.opponent.lane.travel_px = TRAVEL
 	live.start()
-	if not live.running:
-		push_error("VERIFY_FAIL the match should be running after start")
+	if not live.running or live.phase != MatchRules.Phase.PREP:
+		push_error("VERIFY_FAIL the match should open in preparation")
 		return false
 	if live.player.shop_offers.size() != MatchRules.SHOP_SLOTS:
-		push_error("VERIFY_FAIL the shop should open with %d crates" % MatchRules.SHOP_SLOTS)
+		push_error("VERIFY_FAIL the shop should open with %d kits" % MatchRules.SHOP_SLOTS)
 		return false
-	if live.tug != 0:
-		push_error("VERIFY_FAIL the tug bar should start empty")
+	if live.player.life != MatchRules.PLAYER_HP or live.opponent.life != MatchRules.PLAYER_HP:
+		push_error("VERIFY_FAIL both sides start at %d life" % MatchRules.PLAYER_HP)
 		return false
-	if live.launch(live.player, FighterLoadout.new()) != null:
-		push_error("VERIFY_FAIL an unfinished card cannot fight")
-		return false
-	if live.launch(live.player, _loadout(&"bruxa")) == null:
-		push_error("VERIFY_FAIL a finished card should launch")
+	if live.launch(live.player, _loadout(&"bruxa")) != null:
+		push_error("VERIFY_FAIL nobody jumps to the belt during preparation")
 		return false
 
-	_chips = 0
-	live.tug_changed.connect(_count_chip)
-	## Long enough for five paddles plus one chip a second through 50 on the bar.
-	var ticks := int((MatchRules.TUG_MAX * MatchRules.CHIP_INTERVAL + 30.0) / 0.1)
-	for _i in ticks:
+	live.player.cards[0] = _loadout(&"bruxa")
+	live.skip_prep()
+	if live.phase != MatchRules.Phase.FIGHT:
+		push_error("VERIFY_FAIL skipping prep should start the fight")
+		return false
+	for _i in 80:
 		live.tick(0.1)
-		if not live.running:
+		if live.phase != MatchRules.Phase.FIGHT:
 			break
-	if _chips < MatchRules.TUG_MAX:
-		push_error("VERIFY_FAIL a lone Freak at the tip should push the bar, got %d" % _chips)
+	if live.opponent.life != MatchRules.PLAYER_HP - MatchRules.SURVIVOR_DAMAGE:
+		push_error("VERIFY_FAIL one living Freak should deal 5 life, got opponent=%d" % live.opponent.life)
 		return false
-	if live.tug != -MatchRules.TUG_MAX:
-		push_error("VERIFY_FAIL 50 chips from 0 should fill your side of the bar")
+	if live.player.life != MatchRules.PLAYER_HP:
+		push_error("VERIFY_FAIL the winner should not lose life")
 		return false
-	if live.winner != live.player:
-		push_error("VERIFY_FAIL the side still standing wins")
+	if live.player.cards[0] == null or not live.player.cards[0].is_complete():
+		push_error("VERIFY_FAIL the card should still hold the Freak after the fight")
 		return false
 	return true
 
 func _check_live_duel() -> bool:
 	var live := LiveMatch.new()
 	live.start()
+	live.enter_fight()
 	var mine := live.launch(live.player, _loadout(&"bruxa"))
 	var theirs := live.launch(live.opponent, _loadout(&"advogado"))
 	if mine == null or theirs == null:
@@ -199,9 +196,6 @@ func _check_live_duel() -> bool:
 		push_error("VERIFY_FAIL a finished Freak must not get a counter")
 		return false
 	return true
-
-func _count_chip(_tug: int, _attacker: PlayerState) -> void:
-	_chips += 1
 
 func _loadout(set_id: StringName) -> FighterLoadout:
 	return FighterLoadout.from_character(ShopPool.character_by_id(set_id))

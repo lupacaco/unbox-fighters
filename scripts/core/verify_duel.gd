@@ -79,8 +79,8 @@ func _check_prices() -> bool:
 	if PartStats.price_for(PartSlotType.Value.BODY, 10) != PartStats.MIN_PRICE:
 		push_error("VERIFY_FAIL no crate may be free")
 		return false
-	if PartStats.sell_price(5) != 3 or PartStats.sell_price(8) != 4:
-		push_error("VERIFY_FAIL selling gives back half, rounded up")
+	if PartStats.sell_price(5) != MatchRules.SELL_REFUND or PartStats.sell_price(8) != MatchRules.SELL_REFUND:
+		push_error("VERIFY_FAIL selling always gives $%d back" % MatchRules.SELL_REFUND)
 		return false
 	if PartStats.sell_price(0) != 0:
 		push_error("VERIFY_FAIL nothing paid, nothing back")
@@ -94,20 +94,15 @@ func _check_money() -> bool:
 		push_error("VERIFY_FAIL a fresh player starts with a full wallet")
 		return false
 	if side.shop_offers.size() != MatchRules.SHOP_SLOTS:
-		push_error("VERIFY_FAIL a fresh shop has %d crate(s)" % MatchRules.SHOP_SLOTS)
-		return false
-	if side.tick_money(MatchRules.MONEY_INTERVAL * 2.0):
-		push_error("VERIFY_FAIL a full wallet cannot grow")
+		push_error("VERIFY_FAIL a fresh shop has %d kit(s)" % MatchRules.SHOP_SLOTS)
 		return false
 	side.spend(4)
 	if side.money != MatchRules.STARTING_MONEY - 4:
 		push_error("VERIFY_FAIL spending should take the coins")
 		return false
-	if not side.tick_money(MatchRules.MONEY_INTERVAL):
-		push_error("VERIFY_FAIL a coin should land after %.0f seconds" % MatchRules.MONEY_INTERVAL)
-		return false
-	if side.money != MatchRules.STARTING_MONEY - 3:
-		push_error("VERIFY_FAIL the wallet should gain exactly one coin")
+	side.grant_round_income()
+	if side.money != MatchRules.STARTING_MONEY - 4 + MatchRules.MONEY_PER_ROUND:
+		push_error("VERIFY_FAIL a new round should add $%d" % MatchRules.MONEY_PER_ROUND)
 		return false
 	side.earn(99)
 	if side.money != MatchRules.MAX_MONEY:
@@ -115,13 +110,14 @@ func _check_money() -> bool:
 		return false
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 3
+	side.money = 10
 	side.roll_shop(rng)
 	var money_before := side.money
 	if not side.refresh_shop(rng):
-		push_error("VERIFY_FAIL a free refresh should always work")
+		push_error("VERIFY_FAIL a refresh should work when you can pay")
 		return false
-	if side.money != money_before:
-		push_error("VERIFY_FAIL refreshing the shop is free")
+	if side.money != money_before - MatchRules.REFRESH_COST:
+		push_error("VERIFY_FAIL refreshing the shop costs $%d" % MatchRules.REFRESH_COST)
 		return false
 	return true
 

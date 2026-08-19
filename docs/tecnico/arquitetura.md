@@ -4,7 +4,7 @@ Como o programa está organizado por dentro (visão simples).
 
 ## Em uma frase
 
-Há **uma tela principal**. As **regras da partida** (dinheiro, esteira, luta) ficam em código puro; a tela só **mostra** o que aconteceu.
+Há **uma tela principal**. As **regras da partida** (dinheiro, fases, esteira, luta) ficam em código puro; a tela só **mostra** o que aconteceu.
 
 ## Camadas
 
@@ -24,24 +24,24 @@ Arte e recursos (assets/, data/)
 
 | Peça | Papel |
 |------|--------|
-| `AssemblyController` | Maestro: loja, cartas, esteiras, animações |
-| `LiveMatch` | Tempo correndo: dinheiro, esteira, duelo, Poderes, fim da partida |
-| `PlayerState` | Carteira, loja e esteira de **um** lado (você ou o bot) |
-| `BeltLane` | Até 2 Freaks remando até a ponta (5 remadas) |
+| `AssemblyController` | Maestro: loja, cartas, esteiras, animações, troca das duas telas |
+| `LiveMatch` | Fases da rodada: preparação 60s, luta, dano na vida, fim |
+| `PlayerState` | Carteira, vida, loja, 3 cartas e esteira de **um** lado (você ou o bot) |
+| `BeltLane` | Até 3 Freaks remando até a ponta (5 remadas) |
 | `Duel` | Contas de um troca-troca de golpes |
 | `FreakStats` / `Synergy` | Ataque, HP já com o bônus de tipo; Poder se o set fechou |
-| `ShopPool` / `BotBrain` | Sorteio da loja e o oponente jogando igual a você |
+| `ShopPool` / `BotBrain` | Sorteio da loja e o oponente comprando no mesmo relógio |
 | `BeltFreak` / `FlyingHead` | Desenho do Freak na esteira e a cabeça que voa |
-| `MoneyBar` / `ActionBar` / `TugBar` | Dinheiro, botões redondos, barra-balança |
-| `DragDropService` | Arraste de peça, soltar na carta, vender |
-| `Crate` / `PartView` / `CharacterSlot` / `ShopShelf` | Caixa, peça, carta, prateleira |
+| `MoneyBar` / `ActionBar` / `SideHpBar` / `PrepClock` | Dinheiro, botões, vida acima da esteira, relógio 60s |
+| `DragDropService` | Arraste de peça, soltar na carta (e pagar), vender |
+| `PartView` / `CharacterSlot` / `ShopShelf` | Peça, carta, prateleira |
 | `CompositeResolver` / `PartKit` | Cola cabeça e braços no tronco; o tronco encaixa no caixote (faixa atrás, caixa na frente) |
 
 ## Organização dos scripts
 
 | Pasta | Responsabilidade |
 |-------|------------------|
-| `scripts/assembly/` | Tela: cartas, caixas, esteira visível |
+| `scripts/assembly/` | Tela: cartas, peças, esteira visível |
 | `scripts/match/` | Regras (podem ser testadas sem abrir o jogo) |
 | `scripts/data/` | Definições de peças e composição visual |
 | `scripts/ui/` | HUD, tags, cores |
@@ -50,8 +50,8 @@ Arte e recursos (assets/, data/)
 ## Padrões usados
 
 - **Dados em Resource** (`.tres`): fichas editáveis no Godot.
-- **Cenas instanciadas**: carta, caixa, peça.
-- **Sinais**: “loja sorteada”, “Freak lançado”, “golpes trocados”. Um sinal é um aviso de que algo aconteceu, sem a outra parte ficar perguntando o tempo todo.
+- **Cenas instanciadas**: carta, peça.
+- **Sinais**: “loja sorteada”, “Freak lançado”, “fase mudou”. Um sinal é um aviso de que algo aconteceu, sem a outra parte ficar perguntando o tempo todo.
 - **Lógica pura** em `Duel` e `Synergy`: a animação não inventa o resultado.
 
 ## O que ainda não há na arquitetura
@@ -64,8 +64,8 @@ Arte e recursos (assets/, data/)
 ```mermaid
 flowchart TD
   AC[AssemblyController] --> LM[LiveMatch]
-  AC --> Cards[2 cartas suas + 2 do oponente]
-  AC --> Shop[1 prateleira]
+  AC --> Cards[3 cartas suas]
+  AC --> Shop[4 prateleiras]
   LM --> PS[PlayerState x2]
   PS --> Lane[BeltLane]
   LM --> Bot[BotBrain]

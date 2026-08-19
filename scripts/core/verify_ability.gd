@@ -22,6 +22,7 @@ func _run() -> void:
 func _check_appeal() -> bool:
 	var live := LiveMatch.new()
 	live.start()
+	live.enter_fight()
 	var mine := live.launch(live.player, _loadout(&"bruxa"))
 	var theirs := live.launch(live.opponent, _loadout(&"advogado"))
 	if mine == null or theirs == null:
@@ -47,6 +48,7 @@ func _check_appeal() -> bool:
 func _check_mind_control() -> bool:
 	var live := LiveMatch.new()
 	live.start()
+	live.enter_fight()
 	var witch := live.launch(live.player, _loadout(&"bruxa"))
 	var lead := live.launch(live.opponent, _loadout(&"advogado"))
 	var ally := live.launch(live.opponent, _loadout(&"advogado"))
@@ -83,6 +85,7 @@ func _check_mind_control() -> bool:
 func _check_mind_control_without_ally() -> bool:
 	var live := LiveMatch.new()
 	live.start()
+	live.enter_fight()
 	var witch := live.launch(live.player, _loadout(&"bruxa"))
 	var lead := live.launch(live.opponent, _loadout(&"advogado"))
 	if witch == null or lead == null:

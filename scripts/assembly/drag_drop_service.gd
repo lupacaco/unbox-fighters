@@ -9,6 +9,8 @@ signal drag_started(part: PartView)
 signal drag_ended(part: PartView, accepted: bool)
 signal sell_requested(part: PartView)
 signal part_clicked(part: PartView)
+## A for-sale kit landed on a card. The screen pays, then attaches.
+signal purchase_drop(part: PartView, card: CharacterSlot)
 
 ## How far the mouse may wander and still count as a click, not a drag.
 const CLICK_SLOP := 8.0
@@ -105,7 +107,15 @@ func _finish_drag() -> void:
 	_clear_drag_visuals()
 	part.set_over_target(false)
 	if sold:
+		if part.for_sale:
+			part.return_home()
+			drag_ended.emit(part, false)
+			return
 		sell_requested.emit(part)
+		drag_ended.emit(part, true)
+		return
+	if not was_click and target != null and part.for_sale:
+		purchase_drop.emit(part, target)
 		drag_ended.emit(part, true)
 		return
 	var accepted := not was_click and target != null and target.try_attach(part)

@@ -1,102 +1,49 @@
 class_name BotBrain
 extends RefCounted
 
-## The opponent plays with the same hands you do: it waits for money, cracks a
-## crate, drags the kit onto a card, and only then presses LUTAR. It cannot
-## assemble a Freak in a blink because opening and placing take real time.
+## The opponent shops with the same clock you do. It looks, buys a kit, and
+## drops it on a card. It never sends anyone to the belt — that happens when
+## preparation ends, for both sides at once.
 
 ## Glance at the shop before the next move.
 const LOOK_TIME := 0.85
-## Matches the crate cracking on your shelves.
-const OPEN_TIME := 0.45
 ## Time to pick a kit up and drop it on a card.
 const PLACE_TIME := 1.2
-## Time to notice LUTAR and press it.
-const LAUNCH_TIME := 0.9
-
-static func kit_handle_time() -> float:
-	return OPEN_TIME + PLACE_TIME
-
-## Fastest a finished Freak can leave a card: look, two kits, then LUTAR.
-static func earliest_launch_time() -> float:
-	return LOOK_TIME + kit_handle_time() * float(PartSlotType.shop_slots().size()) + LAUNCH_TIME
 
 var _wait: float = 0.0
-var _launch_armed: bool = false
-var cards: Array[FighterLoadout] = []
-
-func _init() -> void:
-	reset()
 
 func reset() -> void:
 	_wait = LOOK_TIME
-	_launch_armed = false
-	cards.clear()
-	for _i in MatchRules.CARD_COUNT:
-		cards.append(FighterLoadout.new())
 
 func tick(delta: float, side: PlayerState, match_ref: LiveMatch) -> void:
-	if side == null or match_ref == null or not match_ref.running:
+	if side == null or match_ref == null or not match_ref.is_prep():
 		return
 	_wait -= delta
 	if _wait > 0.0:
 		return
-	if _launch_armed:
-		_launch_armed = false
-		if _try_launch(side, match_ref):
-			_wait = LOOK_TIME
-			return
-	if _can_launch(side):
-		_launch_armed = true
-		_wait = LAUNCH_TIME
-		return
-	if _try_buy(side, match_ref):
-		_wait = kit_handle_time()
+	if _try_buy(side):
+		_wait = PLACE_TIME
 		return
 	if _try_refresh(side, match_ref):
 		_wait = LOOK_TIME
 		return
 	_wait = LOOK_TIME
 
-func _can_launch(side: PlayerState) -> bool:
-	if side == null or not side.lane.can_accept():
-		return false
-	for card in cards:
-		if card.is_complete():
-			return true
-	return false
-
-func _try_launch(side: PlayerState, match_ref: LiveMatch) -> bool:
-	if not _can_launch(side):
-		return false
-	var best := -1
-	var best_power := -1
-	for i in cards.size():
-		var card := cards[i]
-		if not card.is_complete():
-			continue
-		var stats := card.stats()
-		var worth := stats.attack * 3 + stats.hp
-		if worth > best_power:
-			best_power = worth
-			best = i
-	if best < 0:
-		return false
-	if match_ref.launch(side, cards[best]) == null:
-		return false
-	cards[best] = FighterLoadout.new()
-	return true
-
-func _try_buy(side: PlayerState, match_ref: LiveMatch) -> bool:
+func _try_buy(side: PlayerState) -> bool:
 	var best_offer := -1
 	var best_card := -1
 	var best_score := 0
 	for i in side.shop_offers.size():
 		var part := side.shop_offers[i]
-		if part == null or not side.can_afford(side.price_at(i)):
+		if part == null or (i < side.shop_owned.size() and side.shop_owned[i]):
 			continue
-		for c in cards.size():
-			var score := _score(cards[c], part)
+		var price := side.price_at(i)
+		if not side.can_afford(price):
+			continue
+		for c in side.cards.size():
+			if not _can_finish_after(side, side.cards[c], part, price, i):
+				continue
+			var score := _score(side.cards[c], part)
 			if score > best_score:
 				best_score = score
 				best_offer = i
@@ -106,27 +53,62 @@ func _try_buy(side: PlayerState, match_ref: LiveMatch) -> bool:
 	var bought := side.buy(best_offer)
 	if bought == null:
 		return false
-	cards[best_card].set_part(bought.slot_type, bought)
-	match_ref.restock_shop(side, _filled_slots(side))
+	side.cards[best_card].set_part(bought.slot_type, bought)
 	return true
 
-## Free reroll when the crate on offer cannot go on any card.
+## Pays to reroll only when leftover coins can still buy a full Freak.
 func _try_refresh(side: PlayerState, match_ref: LiveMatch) -> bool:
+	if not side.can_afford(MatchRules.REFRESH_COST):
+		return false
+	if side.money - MatchRules.REFRESH_COST < _cheapest_pair_cost():
+		return false
+	return match_ref.refresh_shop(side, side.owned_keep())
+
+## True when this buy either closes the card, or leaves enough for a mate on a shelf.
+func _can_finish_after(
+	side: PlayerState,
+	card: FighterLoadout,
+	part: PartDef,
+	price: int,
+	offer_index: int
+) -> bool:
+	if side == null or card == null or part == null:
+		return false
+	if card.get_part(part.slot_type) != null:
+		return false
+	var leftover := side.money - price
+	if leftover < 0:
+		return false
+	var mate := _mate_slot(part.slot_type)
+	if card.get_part(mate) != null:
+		return true
 	for i in side.shop_offers.size():
-		var part := side.shop_offers[i]
+		if i == offer_index:
+			continue
+		var other: PartDef = side.shop_offers[i]
+		if other == null or other.slot_type != mate:
+			continue
+		if side.price_at(i) <= leftover:
+			return true
+	return false
+
+func _mate_slot(slot: PartSlotType.Value) -> PartSlotType.Value:
+	if slot == PartSlotType.Value.HEAD:
+		return PartSlotType.Value.BODY
+	return PartSlotType.Value.HEAD
+
+func _cheapest_pair_cost() -> int:
+	var min_head := 99
+	var min_body := 99
+	for part in ShopPool.all_parts():
 		if part == null:
 			continue
-		for card in cards:
-			if _score(card, part) > 0:
-				return false
-	return match_ref.refresh_shop(side)
-
-func _filled_slots(side: PlayerState) -> PackedInt32Array:
-	var keep := PackedInt32Array()
-	for i in side.shop_offers.size():
-		if side.shop_offers[i] != null:
-			keep.append(i)
-	return keep
+		var price := PartStats.price_of(part)
+		if part.slot_type == PartSlotType.Value.HEAD:
+			min_head = mini(min_head, price)
+		elif part.slot_type == PartSlotType.Value.BODY:
+			min_body = mini(min_body, price)
+	return maxi(2, min_head + min_body)
 
 ## Higher is better: finishing a set beats a big lone number.
 func _score(card: FighterLoadout, part: PartDef) -> int:

@@ -2,7 +2,7 @@ class_name PartView
 extends Area2D
 
 ## A kit you can pick up: the head is one drawing, the body is the torso plus both arms.
-## It remembers what it cost, so selling can pay half of it back.
+## For-sale kits sit on a shelf with a price. After you pay, selling gives $1 back.
 
 signal pressed(part: PartView)
 
@@ -14,8 +14,11 @@ signal pressed(part: PartView)
 
 var part_def: PartDef
 var paid_price: int = 0
+var for_sale: bool = false
+var sale_price: int = 0
 var home_shelf: ShopShelf
 var rest_home: Vector2 = Vector2.ZERO
+var _price_label: Label
 
 var _interaction_locked: bool = false
 var _dragging: bool = false
@@ -77,7 +80,56 @@ func play_reveal() -> void:
 	tween.parallel().tween_property(self, "scale", Vector2.ONE * _base_scale, 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func sell_value() -> int:
+	if for_sale:
+		return 0
 	return PartStats.sell_price(paid_price)
+
+func set_for_sale(part_price: int) -> void:
+	for_sale = true
+	sale_price = part_price
+	paid_price = 0
+	_ensure_price_label()
+	_paint_price(true)
+
+func mark_purchased() -> void:
+	for_sale = false
+	paid_price = sale_price
+	hide_price()
+
+func hide_price() -> void:
+	if _price_label != null:
+		_price_label.visible = false
+
+func set_affordable(can_pay: bool) -> void:
+	if not for_sale:
+		modulate = Color.WHITE
+		_paint_price(true)
+		return
+	modulate = Color.WHITE if can_pay else Color(0.62, 0.60, 0.62, 1)
+	_paint_price(can_pay)
+
+func play_reject() -> void:
+	GameAudio.part_reject()
+	var tween := create_tween()
+	var x := position.x
+	tween.tween_property(self, "position:x", x + 7.0, 0.05)
+	tween.tween_property(self, "position:x", x - 7.0, 0.06)
+	tween.tween_property(self, "position:x", x, 0.06)
+
+func _ensure_price_label() -> void:
+	if _price_label != null:
+		return
+	_price_label = GameTheme.make_label("$0", 34, Vector2.ZERO, Vector2(140, 40), ThemeTokens.GOLD)
+	_price_label.position = Vector2(-70.0, AssemblyLayout.PRICE_TAG_DROP)
+	_price_label.z_index = 8
+	add_child(_price_label)
+
+func _paint_price(can_pay: bool) -> void:
+	if _price_label == null:
+		return
+	_price_label.visible = for_sale
+	_price_label.text = "$%d" % sale_price
+	GameTheme.apply_display(_price_label, 34, ThemeTokens.GOLD if can_pay else ThemeTokens.MUTE, 5)
 
 func can_interact() -> bool:
 	return not _interaction_locked and part_def != null
@@ -94,9 +146,9 @@ func set_attached_slot(slot: CharacterSlot) -> void:
 	if slot == null:
 		return
 	_origin_card = null
+	hide_price()
 	if home_shelf != null:
 		home_shelf.take_part()
-		home_shelf = null
 
 ## Gold pulse that says "this is the one VENDER will take".
 func set_selected(on: bool) -> void:
@@ -124,6 +176,8 @@ func begin_drag() -> void:
 	_shadow.position = Vector2(18, 28)
 	_shadow.modulate = Color(0, 0, 0, 0.55)
 	Feel.punch(self, Vector2(_base_scale * 1.2, _base_scale * 0.84), Vector2.ONE * _base_scale * 1.14)
+	if _price_label != null:
+		_price_label.visible = false
 	_origin_card = _attached_slot
 	if _attached_slot != null:
 		_attached_slot.detach_part(part_def.slot_type, true)
@@ -167,6 +221,20 @@ func return_home() -> void:
 	_origin_card = null
 	if card != null and is_instance_valid(card) and card.try_attach(self):
 		return
+	if for_sale:
+		_paint_price(true)
+		_tween_home()
+		return
+	if home_shelf != null and is_instance_valid(home_shelf) and not home_shelf.has_part():
+		home_shelf.receive_owned(self)
+		return
+	var empty := _empty_shelf()
+	if empty != null:
+		empty.receive_owned(self)
+		return
+	_tween_home()
+
+func _tween_home() -> void:
 	if not is_inside_tree():
 		global_position = rest_home
 		scale = Vector2.ONE * _base_scale
@@ -183,6 +251,15 @@ func snap_hide_for_slot() -> void:
 
 func lock_interaction(locked: bool) -> void:
 	_interaction_locked = locked
+
+func _empty_shelf() -> ShopShelf:
+	if not is_inside_tree():
+		return null
+	for node in get_tree().get_nodes_in_group("shop_shelf"):
+		var shelf := node as ShopShelf
+		if shelf != null and not shelf.has_part():
+			return shelf
+	return null
 
 func _ready() -> void:
 	input_pickable = true

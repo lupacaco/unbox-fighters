@@ -8,10 +8,11 @@ Interface da partida. As posições da tela estão em `AssemblyLayout` (1920×10
 |---------|--------|
 | `scripts/assembly/assembly_layout.gd` | Onde cada coisa fica na tela |
 | `scripts/ui/game_theme.gd` | Fontes, placas e o visual dos botões |
-| `scripts/ui/money_bar.gd` | 10 tijolinhos de ouro + `$N` |
-| `scripts/ui/action_bar.gd` | Botão redondo de atualizar e lixeira de vender |
-| `scripts/ui/tug_bar.gd` | Barra-balança no topo: JOGADOR / OPONENTE, azul à esquerda, vermelho à direita |
-| `scripts/ui/shop_shelf.gd` | Uma prateleira: caixa fechada ou kit aberto |
+| `scripts/ui/money_bar.gd` | Círculo de ouro com `$N` |
+| `scripts/ui/action_bar.gd` | Botão redondo de atualizar ($2) e lixeira de vender ($1) |
+| `scripts/ui/side_hp_bar.gd` | Vida acima de cada esteira: JOGADOR / OPONENTE e o número |
+| `scripts/ui/prep_clock.gd` | Relógio de 60s e o botão LUTAR AGORA |
+| `scripts/ui/shop_shelf.gd` | Uma prateleira: kit já visível com preço |
 | `scripts/ui/crate_plaque.gd` | Nome e números no painel do caixote (ícone de ataque + HP) |
 | `scripts/ui/theme_tokens.gd` | Paleta: ouro, creme, azul da esteira, vermelho do oponente |
 | `scripts/ui/feel.gd` | Reação gostosa: hover, clique, squash. Esconde retângulo de colisão |
@@ -49,11 +50,11 @@ Pasta `assets/fonts/`:
 - `BebasNeue-Regular.ttf` — títulos e botões
 - `Oswald-Variable.ttf` — nomes e frases
 
-Os botões da loja são os círculos da arte, sem texto “ATUALIZAR $1”. Ao passar o mouse eles crescem um pouco; ao clicar, esmagam. O dinheiro são **tijolinhos** dourados ao lado da prateleira.
+Os botões da loja são os círculos da arte. Ao passar o mouse eles crescem um pouco; ao clicar, esmagam. O dinheiro é um **círculo** dourado com `$N` à direita da loja.
 
-A barra-balança fica **no topo**, no meio da tela. Começa vazia. O líquido azul cresce do centro para a esquerda; o vermelho, para a direita. Nunca os dois ao mesmo tempo. Cada +1 dá um pulso gostoso. No lado azul está escrito **JOGADOR**; no vermelho, **OPONENTE**. A barra é um pouco menor que a arte original.
+As barras de vida ficam **acima de cada esteira**. Cheias em 50, vazias em 0. Azul a sua, vermelha a dele.
 
-A caixa da loja é grande (cerca de 280 px de altura) e senta no centro, entre as quatro cartas.
+Na preparação a loja ocupa a direita (4 prateleiras). Na luta ela some e as 3 cartas do oponente ocupam aquele espaço.
 
 As peças dos Freaks são arquivos **200×200**. No jogo todas ficam no mesmo tamanho. Na carta o Freak inteiro aparece um pouco menor (80%); na esteira, 85%.
 

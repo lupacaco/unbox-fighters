@@ -34,11 +34,11 @@ static func price_of(part: PartDef) -> int:
 		return 0
 	return price_for(part.slot_type, part.stat_value)
 
-## Selling gives back half of what you paid, rounded up.
+## Selling always returns a flat coin, no matter what you paid.
 static func sell_price(paid: int) -> int:
 	if paid <= 0:
 		return 0
-	return int(ceil(float(paid) / 2.0))
+	return MatchRules.SELL_REFUND
 
 static func label_of(slot: PartSlotType.Value) -> String:
 	if slot == PartSlotType.Value.BODY:

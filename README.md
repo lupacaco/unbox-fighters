@@ -1,6 +1,6 @@
 # Unbox Fighters
 
-Jogo de **abrir caixas**, **montar Freaks** e **lutar na esteira** contra um oponente.  
+Jogo de **comprar peças**, **montar Freaks** e **lutar na esteira** contra um oponente.  
 Feito em **Godot 4.7**. Ainda em construção.
 
 ## Como abrir

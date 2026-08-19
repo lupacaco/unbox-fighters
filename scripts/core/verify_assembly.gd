@@ -1,8 +1,8 @@
 extends SceneTree
 
-## Opens the match screen for real and checks the furniture is all there and in
-## the right place: two cards of yours, two of theirs, one shelf, two belts,
-## money, the tug bar and the round buttons.
+## Opens the match screen and checks the furniture: three cards of yours,
+## three of theirs (hidden in prep), four shelves with kits already unwrapped,
+## two life bars, the prep clock, two belts.
 
 func _init() -> void:
 	call_deferred("_run")
@@ -45,6 +45,9 @@ func _check_furniture(scene: Node) -> bool:
 	if opponent_cards == null or opponent_cards.get_child_count() != MatchRules.CARD_COUNT:
 		push_error("VERIFY_FAIL expected %d opponent cards" % MatchRules.CARD_COUNT)
 		return false
+	if opponent_cards.visible:
+		push_error("VERIFY_FAIL opponent cards stay hidden during preparation")
+		return false
 	for card in opponent_cards.get_children():
 		if not (card as CharacterSlot).is_opponent:
 			push_error("VERIFY_FAIL the red cards should be marked as the opponent's")
@@ -53,53 +56,57 @@ func _check_furniture(scene: Node) -> bool:
 	if shelves == null or shelves.get_child_count() != MatchRules.SHOP_SLOTS:
 		push_error("VERIFY_FAIL expected %d shelves" % MatchRules.SHOP_SLOTS)
 		return false
+	var seen := {}
 	for shelf in shelves.get_children():
-		if (shelf as ShopShelf).offer == null:
-			push_error("VERIFY_FAIL every shelf should open with a crate on it")
+		var board := shelf as ShopShelf
+		if board.offer == null:
+			push_error("VERIFY_FAIL every shelf should open with a kit on it")
 			return false
+		if board.has_part() == false:
+			push_error("VERIFY_FAIL the kit should already be unwrapped on the shelf")
+			return false
+		var key := "%d,%d" % [int(board.position.x), int(board.position.y)]
+		if seen.has(key):
+			push_error("VERIFY_FAIL the four shelves should not sit on top of each other")
+			return false
+		seen[key] = true
 	var hud := scene.get_node_or_null("Hud")
 	if hud == null or hud.get_node_or_null("MoneyBar") == null or hud.get_node_or_null("ActionBar") == null:
 		push_error("VERIFY_FAIL money and the round buttons should sit in the HUD")
 		return false
-	var tug := scene.get_node_or_null("TugBar") as TugBar
-	if tug == null:
-		push_error("VERIFY_FAIL the tug bar should sit on the match screen, not in the HUD")
+	var player_hp := scene.get_node_or_null("PlayerHpBar")
+	var opponent_hp := scene.get_node_or_null("OpponentHpBar")
+	if player_hp == null or opponent_hp == null:
+		push_error("VERIFY_FAIL each belt should have a life bar above it")
 		return false
-	if AssemblyLayout.TUG_CENTER.y > 100.0:
-		push_error("VERIFY_FAIL the tug bar should sit at the top of the screen")
+	if int(player_hp.shown_hp()) != MatchRules.PLAYER_HP or int(opponent_hp.shown_hp()) != MatchRules.PLAYER_HP:
+		push_error("VERIFY_FAIL both life bars start full")
 		return false
-	if absf(tug.position.y - AssemblyLayout.TUG_CENTER.y) > 1.0:
-		push_error("VERIFY_FAIL the tug bar should use the layout center")
+	player_hp.set_hp(25, false)
+	if not player_hp.fill_visible():
+		push_error("VERIFY_FAIL your life bar should show liquid while you still have life")
+		return false
+	player_hp.set_hp(MatchRules.PLAYER_HP, false)
+	if scene.get_node_or_null("PrepClock") == null:
+		push_error("VERIFY_FAIL the preparation clock should sit between the belts")
 		return false
 	var freaks := scene.get_node_or_null("Freaks") as Node2D
 	if freaks == null:
 		push_error("VERIFY_FAIL missing Freaks layer")
 		return false
-	if not tug.has_side_captions():
-		push_error("VERIFY_FAIL the tug bar should read JOGADOR on the left and OPONENTE on the right")
-		return false
-	if absf(AssemblyLayout.CARD_CENTER_Y - AssemblyLayout.CARD_SIZE.y * 0.5) > 1.0:
-		push_error("VERIFY_FAIL the four cards should hang flush with the top of the screen")
+	if absf(AssemblyLayout.CARD_CENTER_Y - AssemblyLayout.CARD_SIZE.y * 0.5 * AssemblyLayout.CARD_FIT) > 1.0:
+		push_error("VERIFY_FAIL the cards should hang flush with the top of the screen")
 		return false
 	if AssemblyLayout.BELT_FREAK_SCALE < 0.8:
 		push_error("VERIFY_FAIL Freaks on the belts should be close to card size")
 		return false
-	tug.set_tug(-25, false)
-	if not tug.player_fill_visible() or tug.opponent_fill_visible():
-		push_error("VERIFY_FAIL your side of the bar should fill left from the middle")
-		return false
-	tug.set_tug(25, false)
-	if not tug.opponent_fill_visible() or tug.player_fill_visible():
-		push_error("VERIFY_FAIL their side of the bar should fill right from the middle")
-		return false
-	tug.set_tug(0, false)
-	if absf(AssemblyLayout.SHELF_CENTER.x - AssemblyLayout.CENTER_X) > 0.5:
-		push_error("VERIFY_FAIL the shop shelf should sit on the screen center")
-		return false
-	if absf(AssemblyLayout.CARD_X[0] + AssemblyLayout.CARD_OPPONENT_X[1] - AssemblyLayout.WIDTH) > 1.0:
+	if absf(AssemblyLayout.CARD_X[0] + AssemblyLayout.CARD_OPPONENT_X[2] - AssemblyLayout.WIDTH) > 1.0:
 		push_error("VERIFY_FAIL the outer cards should mirror each other")
 		return false
-	if absf(AssemblyLayout.CARD_X[1] + AssemblyLayout.CARD_OPPONENT_X[0] - AssemblyLayout.WIDTH) > 1.0:
+	if absf(AssemblyLayout.CARD_X[1] + AssemblyLayout.CARD_OPPONENT_X[1] - AssemblyLayout.WIDTH) > 1.0:
+		push_error("VERIFY_FAIL the middle cards should mirror each other")
+		return false
+	if absf(AssemblyLayout.CARD_X[2] + AssemblyLayout.CARD_OPPONENT_X[0] - AssemblyLayout.WIDTH) > 1.0:
 		push_error("VERIFY_FAIL the inner cards should mirror each other")
 		return false
 	var background := scene.get_node_or_null("Background") as Sprite2D

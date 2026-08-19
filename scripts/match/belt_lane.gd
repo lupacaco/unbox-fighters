@@ -83,6 +83,16 @@ func champion() -> Runner:
 func is_empty() -> bool:
 	return runners.is_empty()
 
+func alive_count() -> int:
+	var n := 0
+	for runner in runners:
+		if runner.alive:
+			n += 1
+	return n
+
+func has_living() -> bool:
+	return alive_count() > 0
+
 func advance(delta: float) -> void:
 	var blocked_at := 1.0
 	var step := MatchRules.stroke_step()

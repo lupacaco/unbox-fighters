@@ -3,12 +3,11 @@ extends Node2D
 
 ## A hanging card where one Freak is built. Two kits go on it: head and body
 ## (the body already carries both arms). The wooden crate is a fixed base; the
-## Freak sits inside it. When both kits are there, LUTAR appears.
+## Freak sits inside it. When both kits are there, PRONTO appears under the card.
 
 signal part_attached(slot: CharacterSlot, part: PartDef)
 signal part_detached(slot: CharacterSlot, part: PartDef)
 signal assembly_changed(slot: CharacterSlot)
-signal fight_requested(slot: CharacterSlot)
 
 ## Opponent cards only show what they built. You cannot drop kits on them.
 var is_opponent: bool = false
@@ -30,7 +29,7 @@ var _crate_back: Sprite2D
 var _crate_front: Sprite2D
 var _plaque: CratePlaque
 var _hint: Label
-var _fight_button: Button
+var _ready_label: Label
 var _banner: Label
 
 var _bound_parts: Dictionary = {}
@@ -41,14 +40,14 @@ var _locked: bool = false
 var _drop_hot: bool = false
 var _synergy_shown: Synergy.Level = Synergy.Level.NONE
 var _glow_pulse: Tween
+var _on_belt: bool = false
 
 func setup(as_opponent: bool = false) -> void:
 	is_opponent = as_opponent
 	_build_frame()
 	_build_display()
 	_build_zones()
-	if not is_opponent:
-		_build_fight_button()
+	_build_ready_label()
 	_build_banner()
 	_refresh_display(false)
 	_refresh_plaque()
@@ -85,7 +84,7 @@ func has_any_part() -> bool:
 	return false
 
 func can_fight() -> bool:
-	if _locked or not is_complete():
+	if _on_belt or not is_complete():
 		return false
 	for part in PartKit.expand_shop_parts(_shop_parts_map()).values():
 		if (part as PartDef).sprite_profile == null:
@@ -97,7 +96,16 @@ func set_locked(locked: bool) -> void:
 	for view in _bound_parts.values():
 		if view != null and is_instance_valid(view):
 			(view as PartView).lock_interaction(locked)
-	_refresh_fight_button()
+	_refresh_ready_label()
+
+func set_on_belt(away: bool) -> void:
+	_on_belt = away
+	if _display != null:
+		_display.visible = not away
+	_refresh_ready_label()
+
+func is_on_belt() -> bool:
+	return _on_belt
 
 # ---------------------------------------------------------------- drop
 
@@ -149,7 +157,7 @@ func try_attach(part_view: PartView) -> bool:
 		_celebrate_synergy(Synergy.Level.KIND, Synergy.kind_of(part_view.part_def))
 	if is_complete():
 		GameAudio.fighter_complete()
-	_refresh_fight_button()
+	_refresh_ready_label()
 	part_attached.emit(self, part_view.part_def)
 	assembly_changed.emit(self)
 	if displaced != null:
@@ -165,40 +173,11 @@ func detach_part(slot: PartSlotType.Value, refresh: bool = true) -> PartView:
 	if refresh:
 		_refresh_display(true)
 		_refresh_plaque()
-	_refresh_fight_button()
+	_refresh_ready_label()
 	part_detached.emit(self, part_view.part_def)
 	assembly_changed.emit(self)
 	return part_view
 
-func steal_all_parts() -> Dictionary:
-	var stolen := {}
-	for slot in PartSlotType.shop_slots():
-		if not _bound_parts.has(slot):
-			continue
-		var view: PartView = _bound_parts[slot]
-		_bound_parts.erase(slot)
-		if view != null and is_instance_valid(view):
-			view.set_attached_slot(null)
-			stolen[slot] = view
-	_refresh_display(false)
-	_refresh_plaque()
-	_refresh_fight_button()
-	assembly_changed.emit(self)
-	return stolen
-
-## Empties the card after the Freak jumped onto the belt.
-func clear_after_launch() -> void:
-	for view in _bound_parts.values():
-		if view != null and is_instance_valid(view):
-			(view as PartView).queue_free()
-	_bound_parts.clear()
-	_synergy_shown = Synergy.Level.NONE
-	_refresh_display(false)
-	_refresh_plaque()
-	_refresh_fight_button()
-	assembly_changed.emit(self)
-
-## Paints the kits the opponent has placed. No dragging on this card.
 func show_loadout(loadout: FighterLoadout) -> void:
 	if not is_opponent:
 		return
@@ -216,6 +195,7 @@ func show_loadout(loadout: FighterLoadout) -> void:
 	_shown_key = key
 	_refresh_display(grew)
 	_refresh_plaque()
+	_refresh_ready_label()
 	if grew:
 		_pulse_attach()
 
@@ -352,19 +332,19 @@ func _build_zones() -> void:
 		root.add_child(area)
 		_zone_areas[slot] = area
 
-func _build_fight_button() -> void:
-	if _fight_button != null:
+func _build_ready_label() -> void:
+	if _ready_label != null:
 		return
-	_fight_button = GameTheme.make_button(
-		"LUTAR",
-		Vector2(0.0, AssemblyLayout.FIGHT_BUTTON_DROP),
-		AssemblyLayout.FIGHT_BUTTON_SIZE,
-		ThemeTokens.SELL_RED,
-		32
+	_ready_label = GameTheme.make_label(
+		"PRONTO",
+		32,
+		Vector2(0.0, AssemblyLayout.READY_LABEL_DROP),
+		AssemblyLayout.READY_LABEL_SIZE,
+		ThemeTokens.GOLD
 	)
-	_fight_button.pressed.connect(func() -> void: fight_requested.emit(self))
-	add_child(_fight_button)
-	_refresh_fight_button()
+	_ready_label.z_index = 8
+	add_child(_ready_label)
+	_refresh_ready_label()
 
 func _build_banner() -> void:
 	if _banner != null:
@@ -374,13 +354,11 @@ func _build_banner() -> void:
 	_banner.modulate.a = 0.0
 	add_child(_banner)
 
-func _refresh_fight_button() -> void:
-	if _fight_button == null:
+func _refresh_ready_label() -> void:
+	if _ready_label == null:
 		return
 	var ready := can_fight()
-	_fight_button.visible = ready
-	_fight_button.disabled = not ready
-	_fight_button.mouse_filter = Control.MOUSE_FILTER_STOP if ready else Control.MOUSE_FILTER_IGNORE
+	_ready_label.visible = ready
 	if ready and _glow_pulse == null:
 		_start_glow()
 	elif not ready:

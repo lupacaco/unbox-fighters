@@ -313,22 +313,39 @@ func refresh_hp() -> void:
 		return
 	_plaque.set_hp(runner.hp, runner.loadout.base_stat_of(PartSlotType.Value.BODY))
 
-## Grey out, slide toward the gap and drop through with a spin.
-func play_death() -> void:
+## Grey out and slump on the belt. The Freak is not gone — it jumps home after the fight.
+func play_knockout() -> void:
 	_dead = true
 	_stroking = false
 	if _dust != null:
 		_dust.emitting = false
-	if _plaque != null:
-		_plaque.visible = false
-	var fall_x := AssemblyLayout.gap_center_x()
 	var tween := create_tween()
 	tween.tween_property(_body, "modulate", Color(0.42, 0.4, 0.44, 1), 0.18)
-	tween.parallel().tween_property(self, "position:x", fall_x, 0.36).set_trans(Tween.TRANS_SINE)
-	tween.parallel().tween_property(_body, "rotation", 0.5 if player_side else -0.5, 0.36)
-	tween.tween_property(self, "position:y", AssemblyLayout.HEIGHT + 260.0, 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.parallel().tween_property(_body, "rotation", 3.4 if player_side else -3.4, 0.55)
-	tween.parallel().tween_property(_body, "modulate:a", 0.25, 0.55)
+	tween.parallel().tween_property(_body, "rotation", 0.45 if player_side else -0.45, 0.28).set_trans(Tween.TRANS_SINE)
+	tween.parallel().tween_property(_body, "position:y", 18.0, 0.28)
+
+## Leap back to a card. The kit on that card was never destroyed.
+func play_return_to(target: Vector2) -> void:
+	_dead = true
+	_stroking = false
+	_jumping = true
+	var start := global_position
+	var start_s := scale.x
+	var dest_s := AssemblyLayout.CARD_FREAK_SCALE / maxf(AssemblyLayout.BELT_FREAK_SCALE, 0.01)
+	GameAudio.step()
+	var tween := create_tween()
+	tween.tween_method(
+		func(t: float) -> void:
+			var p := start.lerp(target, t)
+			p.y -= sin(t * PI) * (JUMP_PEAK * 0.55)
+			global_position = p
+			var s := lerpf(start_s, dest_s, t)
+			scale = Vector2(s, s)
+			modulate.a = lerpf(1.0, 0.0, t),
+		0.0,
+		1.0,
+		0.42
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	await tween.finished
 	queue_free()
 

@@ -1,8 +1,8 @@
 class_name ActionBar
 extends Node2D
 
-## Round shop buttons: the blue arrows dump the closed crate, the red bin
-## buys a kit back for half of what you paid.
+## Round shop buttons: the blue arrows swap the four kits for $2, the red bin
+## buys a kit back for $1.
 
 signal refresh_pressed
 signal sell_pressed

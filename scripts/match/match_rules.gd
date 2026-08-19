@@ -1,32 +1,41 @@
 class_name MatchRules
 extends RefCounted
 
-## Closed numbers for the live 1-versus-1 match. Keep presentation code out of here.
+## Closed numbers for the round-based match. Keep presentation code out of here.
 
-## One shared tug bar: 0 in the middle, 50 toward you (left) or them (right).
-## A Freak alone at the belt tip pushes that number 1 per second.
-const TUG_MAX := 50
-const CHIP_DAMAGE := 1
-const CHIP_INTERVAL := 1.0
+enum Phase {
+	PREP,
+	FIGHT,
+	RESOLUTION,
+	GAME_OVER,
+}
 
-## Money ticks up on its own and caps out, so sitting on cash is a waste.
+## Each side starts at 50 life. After a fight, the winner deals 5 per living Freak.
+const PLAYER_HP := 50
+const SURVIVOR_DAMAGE := 5
+
+## Shared preparation clock. The player can skip it for both sides.
+const PREP_SECONDS := 60.0
+## Pause between one Freak jumping onto the belt and the next.
+const DEPLOY_STAGGER := 0.4
+
 const STARTING_MONEY := 10
-const MAX_MONEY := 10
-const MONEY_INTERVAL := 2.0
+const MONEY_PER_ROUND := 10
+const MAX_MONEY := 50
 
-## The shop shows one crate. Rerolling it is free.
-const SHOP_SLOTS := 1
-const REFRESH_COST := 0
+## Four shelves of kits already unwrapped. Rerolling costs coins.
+const SHOP_SLOTS := 4
+const REFRESH_COST := 2
+## Selling always returns this, no matter what you paid.
+const SELL_REFUND := 1
 
-## Two cards, so you can build the next Freak while the first one fights.
-const CARD_COUNT := 2
-## How many Freaks fit on one belt.
-const BELT_CAPACITY := 2
+const CARD_COUNT := 3
+const BELT_CAPACITY := 3
 
 ## Five paddle strokes from the belt entry to the fighting tip.
 const STROKES_TO_TIP := 5
-## Every Freak waits the same time between strokes. Agility is gone.
-const STROKE_INTERVAL := 2.0
+## Every Freak waits the same time between strokes.
+const STROKE_INTERVAL := 1.0
 
 ## Pause between finished exchanges, so the blows can be read.
 const DUEL_INTERVAL := 1.1
@@ -39,3 +48,8 @@ static func stroke_step() -> float:
 
 static func stroke_interval() -> float:
 	return STROKE_INTERVAL
+
+static func is_ready_loadout(loadout: FighterLoadout) -> bool:
+	if loadout == null or not loadout.is_complete():
+		return false
+	return loadout.stats().is_ready()

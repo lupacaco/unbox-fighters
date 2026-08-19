@@ -20,13 +20,13 @@ O jogo ainda **não está pronto**. Estes docs descrevem o que **já existe** ho
 |-----|----------------|
 | [Arquitetura](tecnico/arquitetura.md) | Como as partes do programa se encaixam |
 | [Estrutura de pastas](tecnico/estrutura-de-pastas.md) | Onde fica cada tipo de arquivo |
-| [Partida](tecnico/sistemas/partida.md) | Jogo corrido 1 contra 1, dinheiro, esteira, duelo |
-| [Tela de montagem](tecnico/sistemas/tela-de-montagem.md) | Cartas (suas e dele), prateleira, esteiras, barra-balança |
+| [Partida](tecnico/sistemas/partida.md) | Rodadas: preparação 60s, luta, vida, esteira, duelo |
+| [Tela de montagem](tecnico/sistemas/tela-de-montagem.md) | Cartas (suas e dele), prateleiras, esteiras, barras de vida |
 | [Peças e personagens](tecnico/sistemas/pecas-e-personagens.md) | Dados dos personagens, sinergia e composição visual |
 | [Incluir personagem](tecnico/incluir-personagem.md) | Folha 4+4 → 8 PNG 200×200, 2 kits na loja, ímãs. Também: editar e apagar um Freak |
-| [Arrastar e soltar](tecnico/sistemas/arrastar-e-soltar.md) | Peças da prateleira para a carta, vender |
-| [Animação de luta](tecnico/sistemas/animacao-de-luta.md) | Pulo da carta, remadas, cabeça que voa, morte no vão |
-| [Visual e UI](tecnico/sistemas/visual-e-ui.md) | Fundo, cartas, prateleira, barra-balança, botões |
+| [Arrastar e soltar](tecnico/sistemas/arrastar-e-soltar.md) | Peças da prateleira para a carta, pagar, vender |
+| [Animação de luta](tecnico/sistemas/animacao-de-luta.md) | Pulo da carta, remadas, cabeça que voa, volta para a carta |
+| [Visual e UI](tecnico/sistemas/visual-e-ui.md) | Fundo, cartas, prateleira, barras de vida, botões |
 | [Áudio](tecnico/sistemas/audio.md) | Efeitos gravados: caixa, ímã, luta |
 | [Pipeline de arte](tecnico/pipeline-de-arte.md) | Scripts que preparam imagens dos personagens |
 | [Testes rápidos](tecnico/testes-headless.md) | Scripts que verificam o jogo sem abrir a tela |

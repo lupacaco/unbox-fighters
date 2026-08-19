@@ -4,9 +4,9 @@ extends Object
 ## Every position on the match screen, in a 1920×1080 world
 ## (origin top-left, Y grows downward).
 ##
-## Left: your two hanging cards. Right: the opponent's two cards.
-## Middle column: sell / refresh, one shop crate, money.
-## Tug bar sits at the top center, in the gap between the inner cards.
+## Preparation: three hanging cards on the left, a 2×2 shop on the right.
+## Fight: the shop hides and three opponent cards take that space.
+## Life bars sit above each belt. The prep clock sits in the gap between them.
 
 const WIDTH := 1920.0
 const HEIGHT := 1080.0
@@ -20,9 +20,9 @@ const BELT_PLAYER_TEX := "res://assets/nova-ui/esteira-blue.png"
 const BELT_OPPONENT_TEX := "res://assets/nova-ui/esteira-red.png"
 const REFRESH_TEX := "res://assets/nova-ui/atualizar.png"
 const SELL_TEX := "res://assets/nova-ui/vender.png"
-const TUG_FRAME_TEX := "res://assets/nova-ui/barra-hp-vazia.png"
-const TUG_PLAYER_TEX := "res://assets/nova-ui/liquido-jogador.png"
-const TUG_OPPONENT_TEX := "res://assets/nova-ui/liquido-oponente.png"
+const HP_FRAME_TEX := "res://assets/nova-ui/barra-hp-vazia.png"
+const HP_PLAYER_TEX := "res://assets/nova-ui/liquido-jogador.png"
+const HP_OPPONENT_TEX := "res://assets/nova-ui/liquido-oponente.png"
 
 # ---------------------------------------------------------------- belts
 const BELT_SIZE := Vector2(840, 129)
@@ -38,46 +38,50 @@ const BELT_FREAK_SCALE := 0.85
 
 # ---------------------------------------------------------------- cards
 const CARD_SIZE := Vector2(306, 572)
-## Half the card art: the chain hooks sit flush with the top of the screen.
-const CARD_CENTER_Y := 286.0
-## Centers 326 px apart (306 art + 20 gap). Mirrored around the screen middle.
-const CARD_X: Array[float] = [160.0, 486.0]
-const CARD_OPPONENT_X: Array[float] = [1434.0, 1760.0]
+## Three cards need a little shrink so they sit on the left without eating the shop.
+const CARD_FIT := 0.78
+## Half the drawn card, so the chain hooks sit flush with the top of the screen.
+const CARD_CENTER_Y := CARD_SIZE.y * 0.5 * CARD_FIT
+## Centers 253 px apart after the shrink (art 306 × 0.78 + 14 gap).
+const CARD_X: Array[float] = [135.0, 388.0, 641.0]
+const CARD_OPPONENT_X: Array[float] = [1279.0, 1532.0, 1785.0]
 ## Local Y of the little wooden ledge inside the card, where the crate rests.
 const CARD_FLOOR_Y := 200.0
 const CARD_FREAK_SCALE := 0.80
 ## Inner well of the frame, in card-local coordinates.
 const CARD_WELL := Rect2(-124, -246, 248, 458)
-const FIGHT_BUTTON_SIZE := Vector2(214, 58)
-const FIGHT_BUTTON_DROP := 348.0
+const READY_LABEL_SIZE := Vector2(214, 48)
+const READY_LABEL_DROP := 348.0
 
-# ---------------------------------------------------------------- shop (centered column between the cards)
+# ---------------------------------------------------------------- shop (2×2 on the right during preparation)
 const SHELF_SIZE := Vector2(438, 95)
-const SHELF_CENTER := Vector2(CENTER_X, 588.0)
-## From the shelf center up to the wooden surface a crate sits on.
+const SHELF_FIT := 0.62
+const SHELF_ORIGIN := Vector2(1080.0, 250.0)
+const SHELF_STEP := Vector2(310.0, 210.0)
+## From the shelf center up to the wooden surface a kit sits on.
 const SHELF_SURFACE_FROM_CENTER := 36.0
+const SHOP_PART_SCALE := 0.72
+const PRICE_TAG_DROP := 78.0
+## Kept for the unused crate drawing, so that script still compiles.
 const SHOP_CRATE_HEIGHT := 280.0
-const SHOP_PART_SCALE := 0.95
-const PRICE_TAG_DROP := 108.0
 
-# ---------------------------------------------------------------- buttons and money, same row as the shelf, mirrored
+# ---------------------------------------------------------------- buttons and money, right of the 2×2 shop
 const ICON_BUTTON_SIZE := Vector2(110, 110)
-const SHOP_SIDE_OFFSET := 230.0
-const REFRESH_BUTTON := Vector2(CENTER_X - SHOP_SIDE_OFFSET, 518.0)
-const SELL_BUTTON := Vector2(CENTER_X - SHOP_SIDE_OFFSET, 658.0)
-const MONEY_X := CENTER_X + SHOP_SIDE_OFFSET
-const MONEY_LABEL_Y := 430.0
-const MONEY_BOTTOM_Y := 700.0
-const MONEY_BRICK := Vector2(78, 26)
-const MONEY_BRICK_STEP := 28.0
+const MONEY_CENTER := Vector2(1720.0, 168.0)
+const MONEY_RADIUS := 56.0
+const REFRESH_BUTTON := Vector2(1720.0, 360.0)
+const SELL_BUTTON := Vector2(1720.0, 520.0)
 
-# ---------------------------------------------------------------- tug bar (top center, in the gap between the inner cards)
-const TUG_SIZE := Vector2(819, 149)
-const TUG_SCALE := 0.70
-## A few pixels below the top so the wooden rim is not clipped.
-const TUG_CENTER := Vector2(CENTER_X, 58.0)
+# ---------------------------------------------------------------- life bars (one above each belt)
+const HP_SIZE := Vector2(819, 149)
+const HP_SCALE := 0.42
 ## Inner glass of barra-hp-vazia.png, in frame-local pixels (sprite is centered).
-const TUG_GLASS := Rect2(-348.0, -33.0, 696.0, 66.0)
+const HP_GLASS := Rect2(-348.0, -33.0, 696.0, 66.0)
+
+# ---------------------------------------------------------------- clock between the belts
+const TIMER_CENTER := Vector2(CENTER_X, 992.0)
+const SKIP_CENTER := Vector2(CENTER_X, 760.0)
+const SKIP_SIZE := Vector2(280, 64)
 const BANNER_CENTER := Vector2(CENTER_X, 210.0)
 
 static func belt_top() -> float:
@@ -127,11 +131,11 @@ static func belt_travel_px(player_side: bool) -> float:
 static func belt_x_at(player_side: bool, progress: float) -> float:
 	return lerpf(belt_entry_x(player_side), belt_tip_x(player_side), clampf(progress, 0.0, 1.0))
 
-## The hole between the two belts, where beaten Freaks fall.
+## The hole between the two belts.
 static func gap_center_x() -> float:
 	return CENTER_X
 
-## Where a dumped closed crate lands, in the hole between the belts.
+## Where a dumped shop kit lands, in the hole between the belts.
 static func dump_point() -> Vector2:
 	return Vector2(CENTER_X, belt_floor_y() + 80.0)
 
@@ -143,16 +147,20 @@ static func opponent_card_center(index: int) -> Vector2:
 	var x: float = CARD_OPPONENT_X[clampi(index, 0, CARD_OPPONENT_X.size() - 1)]
 	return Vector2(x, CARD_CENTER_Y)
 
-static func shelf_center(_index: int = 0) -> Vector2:
-	return SHELF_CENTER
+static func shelf_center(index: int = 0) -> Vector2:
+	var i := clampi(index, 0, MatchRules.SHOP_SLOTS - 1)
+	var col := i % 2
+	var row := int(i / 2)
+	return SHELF_ORIGIN + Vector2(float(col) * SHELF_STEP.x, float(row) * SHELF_STEP.y)
 
-## Where a crate or a loose part rests on that shelf.
-static func shelf_surface(_index: int = 0) -> Vector2:
-	var center := shelf_center(_index)
-	return Vector2(center.x, center.y - SHELF_SURFACE_FROM_CENTER)
+## Where a loose part rests on that shelf.
+static func shelf_surface(index: int = 0) -> Vector2:
+	var center := shelf_center(index)
+	return Vector2(center.x, center.y - SHELF_SURFACE_FROM_CENTER * SHELF_FIT)
 
-static func money_brick_center(index: int) -> Vector2:
-	return Vector2(MONEY_X, MONEY_BOTTOM_Y - MONEY_BRICK.y * 0.5 - float(index) * MONEY_BRICK_STEP)
+static func hp_bar_center(player_side: bool) -> Vector2:
+	var belt := belt_center(player_side)
+	return Vector2(belt.x, belt_top() - 38.0)
 
 static func top_left(center: Vector2, size: Vector2) -> Vector2:
 	return center - size * 0.5

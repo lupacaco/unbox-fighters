@@ -19,23 +19,26 @@ Como o jogador move peças até as cartas ou para vender.
 4. A peça inclinada segue o mouse, fica maior, e a sombra alonga. Em cima da carta ela puxa um pouco mais.
 5. Passar por **VENDER** deixa o botão dourado e maior
 6. Ao soltar:
-   - Na carta que aceita → encaixa
-   - Em **VENDER** → some e você recebe metade do que pagou
+   - Na carta que aceita, se ainda estava à venda → paga e encaixa
+   - Na carta que aceita, se já era sua → só encaixa
+   - Em **VENDER** → some e você recebe **$1** (só peça já paga)
    - Senão → volta para a prateleira (ou para a carta de onde saiu)
 
-Um clique curto **sem arrastar** seleciona a peça na prateleira. Aí **VENDER** mostra quanto ela vale.
+Um clique curto **sem arrastar** seleciona a peça **já paga** na prateleira. Aí **VENDER** mostra +$1.
+
+Na luta o arraste fica travado.
 
 ## Regras de aceite (`CharacterSlot.can_accept`)
 
 - A peça não pode ser nula
 - Só entram os 2 kits da loja (cabeça e corpo)
 - Se o encaixe **já tem** peça, a nova entra e a antiga volta para a prateleira
-- Depois que a partida acaba a carta fica travada
+- Durante a luta e depois que a partida acaba a carta fica travada
 
 ## Sinais úteis
 
-- `DragDropService.drag_started` / `drag_ended` / `sell_requested` / `part_clicked`
-- `CharacterSlot.part_attached` / `part_detached` / `fight_requested`
+- `DragDropService.drag_started` / `drag_ended` / `sell_requested` / `part_clicked` / `purchase_drop`
+- `CharacterSlot.part_attached` / `part_detached`
 
 ## Input
 
