@@ -88,7 +88,7 @@ O **preço na loja** continua sendo o número base. O bônus de tipo entra só n
 
 - Azul = você, da esquerda para o centro. Vermelha = oponente, da direita para o centro. Na vermelha o Freak olha para a esquerda (para o vão).
 - Ao apertar **LUTAR**, o Freak **salta da carta** até o começo da esteira.
-- Chega na ponta em **5 remadas**. Cada remada: os dois braços sobem para a frente, jogam para trás em meia-lua, e **só então** o caixote desliza (com fumacinha atrás). Depois os braços ficam para baixo **2 segundos** até a próxima remada. Todo mundo rema no mesmo ritmo. A ponta fica **em cima dos rolos**, não por cima do buraco.
+- Chega na ponta em **5 remadas**. Na esteira o braço fica esticado para a frente. Cada remada: meia-lua para trás (frente, baixo, trás) para pegar impulso; **aí** o caixote desliza (com fumacinha atrás) e os braços voltam para a frente. Espera **2 segundos** até a próxima remada. Todo mundo rema no mesmo ritmo. A ponta fica **em cima dos rolos**, não por cima do buraco.
 - Só o Freak da **ponta** luta. O de trás espera com um vão entre os caixotes, para não grudar.
 - Na esteira (e na carta) o **caixote** mostra Ataque (ícone de punho) e HP (ícone de coração). O HP cai na luta. Verde = acima da ficha, vermelho = abaixo, branco = igual. Sem set completo o nome é **FREAK**; com set completo, o nome do Freak.
 - Só a **cabeça** ataca: pula, voa, bate e volta. O número do dano sobe do Freak atingido.

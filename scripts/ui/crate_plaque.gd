@@ -100,7 +100,6 @@ func _set_stat(row: Node2D, label: Label, current: int, base: int, is_attack: bo
 
 
 func _build() -> void:
-	z_index = 6
 	_title = _make_label(TITLE_SIZE)
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(_title)

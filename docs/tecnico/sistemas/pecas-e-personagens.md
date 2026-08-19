@@ -102,7 +102,7 @@ Marque **frente e perfil**. A carta usa a frente; a esteira usa o perfil.
 1. A base do caixote senta no chão da carta ou nos rolos da esteira.
 2. O tronco encaixa no caixote pelo ímã de baixo.
 3. A cabeça cola no pescoço.
-4. Braços: esfera de cima cola nos ombros. Na **frente**, os braços abrem um pouco, girando nesse ímã (não soltam). Na carta, os braços ficam **na frente** da caixa. Na esteira, a cabeça fica **na frente** do tronco.
+4. Braços: esfera de cima cola nos ombros. Na **frente**, os braços abrem um pouco, girando nesse ímã (não soltam). Na carta, os braços ficam **na frente** da caixa. Na esteira, os braços ficam **esticados para a frente** e **na frente** dos números do caixote; a cabeça fica **na frente** do tronco.
 
 ## Arte relacionada
 

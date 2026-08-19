@@ -16,6 +16,9 @@ func _run() -> void:
 	if not _check_intervals():
 		quit(1)
 		return
+	if not _check_stroke_pose():
+		quit(1)
+		return
 	if not _check_lane():
 		quit(1)
 		return
@@ -37,6 +40,33 @@ func _check_intervals() -> bool:
 		return false
 	if not is_equal_approx(MatchRules.stroke_step(), 0.2):
 		push_error("VERIFY_FAIL five strokes should each cover a fifth of the belt")
+		return false
+	return true
+
+
+func _check_stroke_pose() -> bool:
+	if not is_equal_approx(BeltFreak.stroke_arm_angle(0.0), BeltFreak.ARM_FORWARD):
+		push_error("VERIFY_FAIL a Freak on the belt starts with arms forward")
+		return false
+	if not is_equal_approx(BeltFreak.stroke_arm_angle(1.0), BeltFreak.ARM_FORWARD):
+		push_error("VERIFY_FAIL after a paddle the arms return forward")
+		return false
+	if BeltFreak.stroke_arm_angle(BeltFreak.WIND_BACK_END) < BeltFreak.ARM_BACK - 0.05:
+		push_error("VERIFY_FAIL the wind-up should finish with the arms back")
+		return false
+	for i in 21:
+		var t := float(i) / 20.0
+		var angle := BeltFreak.stroke_arm_angle(t)
+		if angle < BeltFreak.ARM_FORWARD - 0.05 or angle > BeltFreak.ARM_BACK + 0.05:
+			push_error("VERIFY_FAIL the paddle is a half-moon under, not over the head")
+			return false
+	var body_z := PartSlotType.fight_z_index(PartSlotType.Value.BODY, true)
+	var plaque_z := CompositeResolver.crate_plaque_z(body_z)
+	if BeltFreak.belt_arm_z(PartSlotType.Value.ARM_R, body_z) <= plaque_z:
+		push_error("VERIFY_FAIL the near arm should sit in front of the crate numbers")
+		return false
+	if BeltFreak.belt_arm_z(PartSlotType.Value.ARM_L, body_z) <= plaque_z:
+		push_error("VERIFY_FAIL both arms should sit in front of the crate numbers")
 		return false
 	return true
 

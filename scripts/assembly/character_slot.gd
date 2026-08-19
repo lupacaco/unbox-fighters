@@ -475,7 +475,7 @@ func _restack_crate() -> void:
 	next += 1
 	if _plaque != null:
 		_plaque.position = CompositeResolver.crate_front_position()
-		_plaque.z_index = CompositeResolver.crate_front_z(BODY_Z) + 1
+		_plaque.z_index = CompositeResolver.crate_plaque_z(BODY_Z)
 		_display.move_child(_plaque, next)
 		next += 1
 	for slot in [PartSlotType.Value.ARM_L, PartSlotType.Value.ARM_R, PartSlotType.Value.HEAD]:

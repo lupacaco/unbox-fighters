@@ -15,7 +15,7 @@ const PART_SIZE_PX := 200.0
 const CRATE_BACK_PATH := "res://assets/nova-ui/caixote-cima.png"
 const CRATE_FRONT_PATH := "res://assets/nova-ui/caixote-baixo.png"
 ## Wide enough to hold the torso, still inside the card well.
-const CRATE_WIDTH := 198.0
+const CRATE_WIDTH := 226.0
 ## How far the join sits below the crate's top edge, so the Freak looks inside.
 const CRATE_JOIN_INSET := 22.0
 
@@ -112,6 +112,11 @@ static func crate_back_z(body_z: int) -> int:
 
 static func crate_front_z(body_z: int) -> int:
 	return body_z + 1
+
+
+## Numbers sit on the wood, still behind the belt arms.
+static func crate_plaque_z(body_z: int) -> int:
+	return crate_front_z(body_z) + 1
 
 static func apply_crate_back_to(sprite: Sprite2D, extra_scale: float = 1.0) -> void:
 	_apply_crate_layer(sprite, crate_back_texture(), crate_back_position(), extra_scale)

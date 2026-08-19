@@ -41,7 +41,7 @@ func _check_crate() -> bool:
 		push_error("VERIFY_FAIL the top rim should sit above the front of the crate")
 		return false
 	var size := CompositeResolver.crate_size()
-	if size.x < 180.0 or size.y < 80.0:
+	if size.x < 210.0 or size.y < 90.0:
 		push_error("VERIFY_FAIL the crate should be wide enough to hold a Freak")
 		return false
 	var pos := CompositeResolver.crate_position()

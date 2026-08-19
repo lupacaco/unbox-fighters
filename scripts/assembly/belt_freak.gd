@@ -7,15 +7,16 @@ extends Node2D
 const HEAD_ARC := 210.0
 const JUMP_PEAK := 280.0
 const JUMP_TIME := 0.52
-## One paddle: lift both arms forward, throw them back in a half-moon, then slide.
+## One paddle: half-moon back for impulse, then the crate slides as arms return.
 const STROKE_TIME := 0.88
-const LIFT_END := 0.24
-const SWEEP_END := 0.50
+const WIND_DOWN_END := 0.18
+const WIND_BACK_END := 0.36
+const RETURN_DOWN_END := 0.58
 const SLIDE_END := 0.82
-## Extra arm rotation from hanging down, in radians, sweeping over the top.
-const ARM_FRONT := -2.05
-const ARM_BACK := -4.55
-const ARM_DOWN := -TAU
+## Extra arm rotation from the hanging-down drawing. Negative = forward (right).
+const ARM_FORWARD := -PI * 0.5
+const ARM_DOWN := 0.0
+const ARM_BACK := PI * 0.5
 
 var runner: BeltLane.Runner
 var player_side: bool = true
@@ -115,6 +116,7 @@ func _finish_jump(dest: Vector2) -> void:
 	Feel.punch(_body, Vector2(1.22, 0.78), Vector2.ONE)
 	GameAudio.part_place()
 	_puff_dust(0.22)
+	_settle()
 	if runner != null:
 		runner.landed = true
 	_jumping = false
@@ -132,39 +134,33 @@ func _finish_stroke() -> void:
 		arrived = true
 		play_arrive()
 
-## Lift both arms forward, throw them back in a half-moon, then the crate slides.
+## Arms start forward. Wind-up is a half-moon back (forward → down → back).
+## Then the crate slides while the arms return (back → down → forward).
 func _row_at(t: float) -> void:
-	var angle := 0.0
+	var angle := stroke_arm_angle(t)
 	var lean := 0.0
 	var bob := 0.0
-	if t < LIFT_END:
-		var u := t / LIFT_END
-		u = _smooth(u)
-		angle = lerpf(0.0, ARM_FRONT, u)
-		lean = lerpf(0.0, 0.1, u)
-		bob = lerpf(0.0, -8.0, u)
+	if t < WIND_DOWN_END:
+		var u := _smooth(t / WIND_DOWN_END)
+		lean = lerpf(0.0, 0.08, u)
+		bob = lerpf(0.0, 4.0, u)
 		position.x = _stroke_from_x
-	elif t < SWEEP_END:
-		var u := (t - LIFT_END) / (SWEEP_END - LIFT_END)
-		u = _smooth(u)
-		angle = lerpf(ARM_FRONT, ARM_BACK, u)
-		lean = lerpf(0.1, -0.08, u)
-		bob = lerpf(-8.0, -2.0, u)
+	elif t < WIND_BACK_END:
+		var u := _smooth((t - WIND_DOWN_END) / (WIND_BACK_END - WIND_DOWN_END))
+		lean = lerpf(0.08, -0.1, u)
+		bob = lerpf(4.0, -2.0, u)
 		position.x = _stroke_from_x
 	elif t < SLIDE_END:
 		_begin_slide()
-		var u := (t - SWEEP_END) / (SLIDE_END - SWEEP_END)
+		var u := (t - WIND_BACK_END) / (SLIDE_END - WIND_BACK_END)
 		u = 1.0 - (1.0 - u) * (1.0 - u)
-		angle = ARM_BACK
-		lean = lerpf(-0.08, 0.02, u)
-		bob = 0.0
+		lean = lerpf(-0.1, 0.02, u)
+		bob = lerpf(-2.0, 0.0, u)
 		position.x = lerpf(_stroke_from_x, _stroke_to_x, u)
 	else:
 		if _dust != null:
 			_dust.emitting = false
-		var u := (t - SLIDE_END) / maxf(0.001, 1.0 - SLIDE_END)
-		u = _smooth(u)
-		angle = lerpf(ARM_BACK, ARM_DOWN, u)
+		var u := _smooth((t - SLIDE_END) / maxf(0.001, 1.0 - SLIDE_END))
 		lean = lerpf(0.02, 0.0, u)
 		bob = 0.0
 		position.x = _stroke_to_x
@@ -175,6 +171,42 @@ func _row_at(t: float) -> void:
 	var head: Sprite2D = _sprites.get(PartSlotType.Value.HEAD)
 	if head != null:
 		head.position = _head_home + Vector2(-sin(angle) * 3.0, bob * 0.12)
+
+
+## 1 forward → 2 down → 3 back → 4 down → 5 forward. Never goes over the head.
+static func stroke_arm_angle(t: float) -> float:
+	var x := clampf(t, 0.0, 1.0)
+	if x < WIND_DOWN_END:
+		return lerpf(ARM_FORWARD, ARM_DOWN, _smooth_unit(x / WIND_DOWN_END))
+	if x < WIND_BACK_END:
+		return lerpf(
+			ARM_DOWN,
+			ARM_BACK,
+			_smooth_unit((x - WIND_DOWN_END) / (WIND_BACK_END - WIND_DOWN_END))
+		)
+	if x < RETURN_DOWN_END:
+		return lerpf(
+			ARM_BACK,
+			ARM_DOWN,
+			_smooth_unit((x - WIND_BACK_END) / (RETURN_DOWN_END - WIND_BACK_END))
+		)
+	if x < SLIDE_END:
+		return lerpf(
+			ARM_DOWN,
+			ARM_FORWARD,
+			_smooth_unit((x - RETURN_DOWN_END) / (SLIDE_END - RETURN_DOWN_END))
+		)
+	return ARM_FORWARD
+
+
+## Both belt arms sit in front of the crate numbers. Right arm is the near one.
+static func belt_arm_z(slot: PartSlotType.Value, body_z: int) -> int:
+	var plaque_z := CompositeResolver.crate_plaque_z(body_z)
+	if slot == PartSlotType.Value.ARM_R:
+		return plaque_z + 2
+	if slot == PartSlotType.Value.ARM_L:
+		return plaque_z + 1
+	return PartSlotType.fight_z_index(slot, true)
 
 func _begin_slide() -> void:
 	if _slide_started:
@@ -187,6 +219,10 @@ func _begin_slide() -> void:
 	Feel.punch(_body, Vector2(1.12, 0.88), Vector2.ONE)
 
 func _smooth(u: float) -> float:
+	return _smooth_unit(u)
+
+
+static func _smooth_unit(u: float) -> float:
 	var x := clampf(u, 0.0, 1.0)
 	return x * x * (3.0 - 2.0 * x)
 
@@ -194,7 +230,7 @@ func _settle() -> void:
 	_body.rotation = 0.0
 	_body.position.y = 0.0
 	for slot in [PartSlotType.Value.ARM_L, PartSlotType.Value.ARM_R]:
-		_swing(_sprites.get(slot) as Sprite2D, 0.0)
+		_swing(_sprites.get(slot) as Sprite2D, ARM_FORWARD)
 	var head: Sprite2D = _sprites.get(PartSlotType.Value.HEAD)
 	if head != null:
 		head.position = _head_home
@@ -313,7 +349,7 @@ func _build_body(loadout: FighterLoadout) -> void:
 
 	_shadow = Polygon2D.new()
 	_shadow.color = Color(0.02, 0.02, 0.04, 0.4)
-	_shadow.polygon = _oval(74.0 * _display_scale, 11.0)
+	_shadow.polygon = _oval(84.0 * _display_scale, 12.0)
 	_body.add_child(_shadow)
 
 	var expanded := PartKit.expand_shop_parts(_shop_map(loadout))
@@ -335,6 +371,8 @@ func _build_body(loadout: FighterLoadout) -> void:
 		sprite.position = positions.get(slot, Vector2.ZERO) * _display_scale
 		sprite.scale = Vector2.ONE * CompositeResolver.display_scale() * _display_scale
 		sprite.z_index = PartSlotType.fight_z_index(slot, true)
+		if PartSlotType.is_arm(slot):
+			sprite.z_index = belt_arm_z(slot, PartSlotType.fight_z_index(PartSlotType.Value.BODY, true))
 		var part := expanded.get(slot) as PartDef
 		if part != null:
 			sprite.flip_h = part.flip_h_for(1)
@@ -379,12 +417,15 @@ func _build_body(loadout: FighterLoadout) -> void:
 	_dust.z_index = -1
 	_dust.emitting = false
 	_body.add_child(_dust)
+	_settle()
 
 func _build_plaque(loadout: FighterLoadout) -> void:
 	_plaque = CratePlaque.new()
 	_plaque.name = "CratePlaque"
 	_plaque.position = CompositeResolver.crate_front_position() * _display_scale
-	_plaque.z_index = 8
+	var body_sprite: Sprite2D = _sprites.get(PartSlotType.Value.BODY)
+	var body_z := body_sprite.z_index if body_sprite != null else PartSlotType.fight_z_index(PartSlotType.Value.BODY, true)
+	_plaque.z_index = CompositeResolver.crate_plaque_z(body_z)
 	## Opponent Freaks are flipped; flip the plaque back so the name stays readable.
 	if not player_side:
 		_plaque.scale.x = -1.0
