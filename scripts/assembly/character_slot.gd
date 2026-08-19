@@ -306,7 +306,7 @@ func _build_display() -> void:
 	_display = Node2D.new()
 	_display.name = "Display"
 	_display.position = Vector2(0.0, AssemblyLayout.CARD_FLOOR_Y)
-	_display.scale = Vector2.ONE * AssemblyLayout.CARD_FREAK_SCALE
+	_display.scale = _display_rest_scale()
 	_display.z_index = 1
 	add_child(_display)
 	_crate = Sprite2D.new()
@@ -519,8 +519,12 @@ func _flash_banner(text: String) -> void:
 	for pill in _pills.values():
 		(pill as StatTag).play_boost()
 
+func _display_rest_scale() -> Vector2:
+	return Vector2.ONE * AssemblyLayout.CARD_FREAK_SCALE
+
 func _pulse_attach() -> void:
-	Feel.punch(_display, Vector2(1.08, 0.92), Vector2.ONE)
+	var rest := _display_rest_scale()
+	Feel.punch(_display, rest * Vector2(1.08, 0.92), rest)
 	var tween := create_tween()
 	tween.tween_property(_frame, "modulate", Color(1.2, 1.14, 0.95, 1), 0.08)
 	tween.tween_property(_frame, "modulate", Color.WHITE, 0.28).set_trans(Tween.TRANS_SINE)

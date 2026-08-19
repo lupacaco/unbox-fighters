@@ -19,6 +19,9 @@ func _run() -> void:
 	if not _check_furniture(scene):
 		quit(1)
 		return
+	if not await _check_crate_stays_same_size(scene):
+		quit(1)
+		return
 	if not _check_belts(scene):
 		quit(1)
 		return
@@ -105,6 +108,44 @@ func _check_furniture(scene: Node) -> bool:
 	var cam := scene.get_node_or_null("Camera2D") as Camera2D
 	if cam == null or not cam.zoom.is_equal_approx(Vector2.ONE):
 		push_error("VERIFY_FAIL camera should stay at rest so the screen does not jump")
+		return false
+	return true
+
+func _check_crate_stays_same_size(scene: Node) -> bool:
+	var cards := scene.get_node_or_null("Cards")
+	if cards == null or cards.get_child_count() < 2:
+		push_error("VERIFY_FAIL need two player cards to compare the crate")
+		return false
+	var empty := cards.get_child(0) as CharacterSlot
+	var occupied := cards.get_child(1) as CharacterSlot
+	var rest := Vector2.ONE * AssemblyLayout.CARD_FREAK_SCALE
+	var empty_display := empty.get_node_or_null("Display") as Node2D
+	if empty_display == null or not empty_display.scale.is_equal_approx(rest):
+		push_error("VERIFY_FAIL an empty card should keep the crate at card size")
+		return false
+	var bruxa: CharacterDef = load("res://data/parts/bruxa_character.tres")
+	var packed: PackedScene = load("res://scenes/assembly/PartView.tscn")
+	if bruxa == null or bruxa.body == null or packed == null:
+		push_error("VERIFY_FAIL missing a body kit to drop on a card")
+		return false
+	var view := packed.instantiate() as PartView
+	scene.add_child(view)
+	view.setup(bruxa.body, null)
+	if not occupied.try_attach(view):
+		push_error("VERIFY_FAIL could not drop a body on a card")
+		return false
+	await create_timer(0.3).timeout
+	var occupied_display := occupied.get_node_or_null("Display") as Node2D
+	if occupied_display == null or not occupied_display.scale.is_equal_approx(rest):
+		push_error("VERIFY_FAIL dropping a kit should not grow the crate")
+		return false
+	var empty_crate := empty.get_node_or_null("Display/CrateBase") as Sprite2D
+	var occupied_crate := occupied.get_node_or_null("Display/CrateBase") as Sprite2D
+	if empty_crate == null or occupied_crate == null:
+		push_error("VERIFY_FAIL both cards should show the shared crate")
+		return false
+	if not empty_crate.global_scale.is_equal_approx(occupied_crate.global_scale):
+		push_error("VERIFY_FAIL the crate must be the same size empty or filled")
 		return false
 	return true
 
