@@ -1,7 +1,8 @@
 extends SceneTree
 
 ## The conveyor: a Freak paddles from the far end to the fighting tip in five
-## strokes, only two fit at a time, and the one behind waits.
+## strokes, only two fit at a time, and the one behind waits with space
+## between the crates.
 
 const TRAVEL := 700.0
 
@@ -77,7 +78,8 @@ func _check_lane() -> bool:
 
 func _check_queue() -> bool:
 	var lane := BeltLane.new()
-	lane.travel_px = TRAVEL
+	lane.travel_px = AssemblyLayout.belt_travel_px(true)
+	lane.queue_gap_px = AssemblyLayout.belt_queue_gap_px()
 	var first := lane.add(_loadout(&"bruxa"))
 	var second := lane.add(_loadout(&"advogado"))
 	if first == null or second == null:
@@ -93,8 +95,14 @@ func _check_queue() -> bool:
 	if second.at_tip():
 		push_error("VERIFY_FAIL the second one has to wait behind")
 		return false
-	if not is_equal_approx(second.progress, 1.0 - MatchRules.stroke_step()):
-		push_error("VERIFY_FAIL the waiter should sit one paddle behind, got %.2f" % second.progress)
+	var expected := 1.0 - lane.follow_gap()
+	if not is_equal_approx(second.progress, expected):
+		push_error("VERIFY_FAIL the waiter should sit a crate behind, got %.2f" % second.progress)
+		return false
+	var lead_x := AssemblyLayout.belt_x_at(true, 1.0)
+	var wait_x := AssemblyLayout.belt_x_at(true, second.progress)
+	if absf(lead_x - wait_x) + 0.5 < AssemblyLayout.belt_freak_width():
+		push_error("VERIFY_FAIL the two crates should not overlap on the belt")
 		return false
 	if lane.champion() != first:
 		push_error("VERIFY_FAIL only the leader fights")

@@ -10,7 +10,7 @@
 | Dinheiro | Começa em $10, +$1 a cada 2 s, teto $10. Substitui as pancadas |
 | Loja | 1 prateleira no meio; atualizar grátis; VENDER pela metade |
 | Montagem | 2 cartas suas à esquerda; 2 cartas vermelhas do oponente à direita |
-| Esteiras | Azul sua, vermelha deles; pulo da carta; 5 remadas (2 s cada); oponente olha para a esquerda; etiquetas de Ataque e HP |
+| Esteiras | Azul sua, vermelha deles; param nos rolos (não no buraco); dois Freaks com vão entre os caixotes |
 | Luta | Só a cabeça ataca; golpes um de cada vez; o vencedor dá o golpe final; morto cai no vão. Bruxa: Controle de Mente. Advogado: Recurso |
 | Chip | Freak sozinho na ponta empurra a balança 1 ponto por segundo; 50 no lado dele vence |
 | Visual | Fundo, cartas, prateleira e esteiras da arte nova (`assets/nova-ui`) |

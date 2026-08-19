@@ -191,6 +191,21 @@ func _check_belts(scene: Node) -> bool:
 	if AssemblyLayout.belt_travel_px(true) <= 0.0:
 		push_error("VERIFY_FAIL a belt needs room to slide on")
 		return false
+	var half := AssemblyLayout.belt_freak_width() * 0.5
+	var blue_inner := AssemblyLayout.belt_tip_x(true) + half
+	if blue_inner > AssemblyLayout.BELT_SIZE.x - AssemblyLayout.BELT_TIP_MARGIN + 0.5:
+		push_error("VERIFY_FAIL the blue Freak should stop on the rollers, not over the hole")
+		return false
+	var red_start := AssemblyLayout.WIDTH - AssemblyLayout.BELT_SIZE.x
+	var red_inner := AssemblyLayout.belt_tip_x(false) - half
+	if red_inner < red_start + AssemblyLayout.BELT_TIP_MARGIN - 0.5:
+		push_error("VERIFY_FAIL the red Freak should stop on the rollers, not over the hole")
+		return false
+	var wait_x := AssemblyLayout.belt_x_at(true, 1.0 - AssemblyLayout.belt_queue_gap(true))
+	var lead_x := AssemblyLayout.belt_x_at(true, 1.0)
+	if absf(lead_x - wait_x) + 0.5 < AssemblyLayout.belt_freak_width():
+		push_error("VERIFY_FAIL two Freaks on a belt should keep a crate-width of space")
+		return false
 	return true
 
 func _check_fonts() -> bool:

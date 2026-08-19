@@ -41,6 +41,8 @@ class Runner extends RefCounted:
 
 var runners: Array[Runner] = []
 var travel_px: float = 1.0
+## How many pixels to keep between two crate centers. 0 = one paddle apart.
+var queue_gap_px: float = 0.0
 var _next_id: int = 1
 
 func can_accept() -> bool:
@@ -65,7 +67,7 @@ func front() -> Runner:
 			return runner
 	return null
 
-## The Freak waiting one stroke behind the champion, if any.
+## The Freak waiting behind the champion, if any.
 func waiter() -> Runner:
 	var lead := front()
 	for runner in runners:
@@ -83,25 +85,32 @@ func is_empty() -> bool:
 
 func advance(delta: float) -> void:
 	var blocked_at := 1.0
-	var gap := MatchRules.stroke_step()
+	var step := MatchRules.stroke_step()
+	var follow := follow_gap()
 	for runner in runners:
 		if not runner.alive:
 			continue
 		runner.pending_stroke = false
 		if not runner.landed or runner.at_tip():
-			blocked_at = maxf(0.0, runner.progress - gap)
+			blocked_at = maxf(0.0, runner.progress - follow)
 			continue
 		runner.stroke_timer += delta
 		var interval := MatchRules.stroke_interval()
 		while runner.stroke_timer >= interval and not runner.at_tip():
-			var next_p := minf(runner.progress + gap, blocked_at)
+			var next_p := minf(runner.progress + step, blocked_at)
 			if next_p <= runner.progress + 0.0001:
 				runner.stroke_timer = interval
 				break
 			runner.stroke_timer -= interval
 			runner.progress = next_p
 			runner.pending_stroke = true
-		blocked_at = maxf(0.0, runner.progress - gap)
+		blocked_at = maxf(0.0, runner.progress - follow)
+
+## Progress kept between a Freak and the one in front, so the crates do not overlap.
+func follow_gap() -> float:
+	if travel_px > 1.0 and queue_gap_px > 0.0:
+		return maxf(queue_gap_px / travel_px, MatchRules.stroke_step())
+	return MatchRules.stroke_step()
 
 func take_damage(runner: Runner, amount: int) -> bool:
 	if runner == null or not runner.alive or amount <= 0:

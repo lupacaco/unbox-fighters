@@ -28,10 +28,12 @@ const TUG_OPPONENT_TEX := "res://assets/nova-ui/liquido-oponente.png"
 const BELT_SIZE := Vector2(840, 129)
 ## Pixels from the top of the belt art down to the crown of the rollers.
 const BELT_ROLLER_FROM_TOP := 24.0
-## How far a Freak stops from the gap, so the two never overlap.
-const BELT_TIP_INSET := 40.0
-## Where a Freak drops on, measured from the outer end of the belt.
-const BELT_ENTRY_INSET := 70.0
+## Empty wood left between the crate's inner edge and the hole.
+const BELT_TIP_MARGIN := 48.0
+## Empty wood left between the crate's outer edge and the far end.
+const BELT_ENTRY_MARGIN := 20.0
+## Empty air between two crates waiting on the same belt.
+const BELT_QUEUE_AIR := 64.0
 const BELT_FREAK_SCALE := 0.85
 
 # ---------------------------------------------------------------- cards
@@ -92,15 +94,34 @@ static func belt_center(player_side: bool) -> Vector2:
 	var x := BELT_SIZE.x * 0.5 if player_side else WIDTH - BELT_SIZE.x * 0.5
 	return Vector2(x, belt_top() + BELT_SIZE.y * 0.5)
 
+## How wide a Freak's crate is on the belt.
+static func belt_freak_width() -> float:
+	return CompositeResolver.crate_size().x * BELT_FREAK_SCALE
+
+static func belt_entry_inset() -> float:
+	return belt_freak_width() * 0.5 + BELT_ENTRY_MARGIN
+
+static func belt_tip_inset() -> float:
+	return belt_freak_width() * 0.5 + BELT_TIP_MARGIN
+
+## Space from one crate center to the next, so the boxes do not touch.
+static func belt_queue_gap_px() -> float:
+	return belt_freak_width() + BELT_QUEUE_AIR
+
+static func belt_queue_gap(player_side: bool) -> float:
+	return belt_queue_gap_px() / maxf(belt_travel_px(player_side), 1.0)
+
 ## Where a Freak lands when it leaves the card.
 static func belt_entry_x(player_side: bool) -> float:
-	return BELT_ENTRY_INSET if player_side else WIDTH - BELT_ENTRY_INSET
+	var inset := belt_entry_inset()
+	return inset if player_side else WIDTH - inset
 
 ## Where a Freak stops and fights, at the inner end of its belt.
 static func belt_tip_x(player_side: bool) -> float:
+	var inset := belt_tip_inset()
 	if player_side:
-		return BELT_SIZE.x - BELT_TIP_INSET
-	return WIDTH - BELT_SIZE.x + BELT_TIP_INSET
+		return BELT_SIZE.x - inset
+	return WIDTH - BELT_SIZE.x + inset
 
 static func belt_travel_px(player_side: bool) -> float:
 	return absf(belt_tip_x(player_side) - belt_entry_x(player_side))

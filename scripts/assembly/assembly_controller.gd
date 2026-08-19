@@ -179,6 +179,8 @@ func _wire_match() -> void:
 func _start_match() -> void:
 	_match.player.lane.travel_px = AssemblyLayout.belt_travel_px(true)
 	_match.opponent.lane.travel_px = AssemblyLayout.belt_travel_px(false)
+	_match.player.lane.queue_gap_px = AssemblyLayout.belt_queue_gap_px()
+	_match.opponent.lane.queue_gap_px = AssemblyLayout.belt_queue_gap_px()
 	_bot.reset()
 	_match.start()
 	_money_bar.set_amount(_match.player.money, false)
