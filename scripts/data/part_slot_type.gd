@@ -37,7 +37,7 @@ static func default_draw_z(slot: Value) -> int:
 			return 3
 
 ## Palco: 1 fica na frente (igual à carta). Godot desenha o número maior por cima, então invertemos.
-## Perfil: braço D, tronco, cabeça, braço E. Frente: cabeça, braço E, braço D, tronco.
+## Perfil: braço D, cabeça, tronco, braço E. Frente: cabeça, braço E, braço D, tronco.
 static func fight_z_index(slot: Value, profile: bool = true) -> int:
 	return _fight_godot_z(_fight_rank(slot, profile))
 
@@ -46,9 +46,9 @@ static func _fight_rank(slot: Value, profile: bool) -> int:
 		match slot:
 			Value.ARM_R:
 				return 1
-			Value.BODY:
-				return 2
 			Value.HEAD:
+				return 2
+			Value.BODY:
 				return 3
 			Value.ARM_L:
 				return 4

@@ -13,7 +13,7 @@ const PART_HEIGHT_PX := 200.0
 const PART_SIZE_PX := 200.0
 const CRATE_PATH := "res://assets/nova-ui/caixote.png"
 ## Wide enough to hold the torso, still inside the card well.
-const CRATE_WIDTH := 232.0
+const CRATE_WIDTH := 198.0
 ## How far the join sits below the crate's top edge, so the Freak looks inside.
 const CRATE_JOIN_INSET := 22.0
 

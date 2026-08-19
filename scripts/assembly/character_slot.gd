@@ -472,13 +472,16 @@ func _restack_crate() -> void:
 	CompositeResolver.apply_crate_to(_crate)
 	var body: Sprite2D = _layer_sprites.get(PartSlotType.Value.BODY)
 	if body != null:
+		body.z_index = 0
 		_display.move_child(body, 0)
+	_crate.z_index = 1
 	_display.move_child(_crate, mini(1, _display.get_child_count() - 1))
 	var next := 2
 	for slot in [PartSlotType.Value.ARM_L, PartSlotType.Value.ARM_R, PartSlotType.Value.HEAD]:
 		var sprite: Sprite2D = _layer_sprites.get(slot)
 		if sprite == null:
 			continue
+		sprite.z_index = 2 if PartSlotType.is_arm(slot) else 3
 		_display.move_child(sprite, mini(next, _display.get_child_count() - 1))
 		next += 1
 

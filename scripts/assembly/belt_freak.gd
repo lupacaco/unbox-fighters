@@ -368,7 +368,8 @@ func _build_body(loadout: FighterLoadout) -> void:
 		if slot == PartSlotType.Value.BODY:
 			var crate := Sprite2D.new()
 			crate.name = "CrateBase"
-			crate.z_index = sprite.z_index + 1
+			## In front of the torso, behind the head and the near arm.
+			crate.z_index = sprite.z_index
 			_body.add_child(crate)
 			CompositeResolver.apply_crate_to(crate, _display_scale)
 	var head: Sprite2D = _sprites.get(PartSlotType.Value.HEAD)

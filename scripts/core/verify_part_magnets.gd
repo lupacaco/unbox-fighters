@@ -97,13 +97,13 @@ func _check_draw_order() -> bool:
 			return false
 	var profile := [
 		PartSlotType.Value.ARM_R,
-		PartSlotType.Value.BODY,
 		PartSlotType.Value.HEAD,
+		PartSlotType.Value.BODY,
 		PartSlotType.Value.ARM_L,
 	]
 	for i in range(profile.size() - 1):
 		if PartSlotType.fight_z_index(profile[i], true) <= PartSlotType.fight_z_index(profile[i + 1], true):
-			push_error("VERIFY_FAIL side order should be right arm, torso, head, left arm")
+			push_error("VERIFY_FAIL side order should be right arm, head, torso, left arm")
 			return false
 	return true
 
